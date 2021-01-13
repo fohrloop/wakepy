@@ -35,8 +35,17 @@ def wait_until_keyboardinterrupt():
         pass
 
 
-def start():
-    set_keepawake()
+def start(keep_screen_awake=False):
+    """
+    Start the keep-awake. During keep-awake, the CPU is not allowed to
+    go to sleep automatically until the CTRL+C is pressed.
+
+    Parameters
+    -----------
+    keep_screen_awake: bool
+        If True, keeps also the screen awake.
+    """
+    set_keepawake(keep_screen_awake=keep_screen_awake)
     print(
         "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
     )
