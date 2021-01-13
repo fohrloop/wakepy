@@ -13,9 +13,7 @@ from functools import wraps
 import platform
 import time
 
-
 SYSTEM = platform.system().lower()
-
 
 if SYSTEM == "windows":
     from ._win import set_keepawake, unset_keepawake
@@ -29,9 +27,6 @@ p = ["|", "/", "-", "\\"]
 
 def wait_until_keyboardinterrupt():
     try:
-        print(
-            "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
-        )
         while True:
             for i in range(0, 4):
                 print("\r" + p[i] + r" [Press Ctrl+C to exit]", end="")
@@ -42,5 +37,9 @@ def wait_until_keyboardinterrupt():
 
 def start():
     set_keepawake()
+    print(
+        "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
+    )
     wait_until_keyboardinterrupt()
+    print("Stopped wakepy. Your computer is allowed to sleep.")
     unset_keepawake()
