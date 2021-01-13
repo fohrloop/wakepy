@@ -38,7 +38,7 @@ optional arguments:
 
 ## Set keepawake within a python script
 
-```
+```python
 from wakepy import set_keepawake, unset_keepawake
 
 set_keepawake(keep_screen_awake=False)
