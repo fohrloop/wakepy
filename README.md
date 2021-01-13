@@ -25,20 +25,34 @@ python -m wakepy
 ```
 Starts the program. While running, computer will not go to sleep. If battery running out, Windows might force laptop to sleep.
 
+### CLI 
+
+```
+usage: wakepy [-h] [-s]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s, --keep-screen-awake
+                        Keep also the screen awake.
+```
+
 ## Set keepawake within a python script
 
 ```
 from wakepy import set_keepawake, unset_keepawake
 
-set_keepawake()
+set_keepawake(keep_screen_awake=False)
 # do stuff that takes long time
 unset_keepawake()
 ```
+### Parameters
+-  `keep_screen_awake` can be used to keep also the screen awake. The default is `False`.
 
 ## Details
 
 ### Windows
 The program simply calls the [SetThreadExecutionState](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate?redirectedfrom=MSDN) with the `ES_SYSTEM_REQUIRED` flag, when setting the keepawake, and removes flag when unsetting. The flag cannot prevent sleeping if
-- User closes the lid of their laptop
 - User presses power button
 - User selects *Sleep* from the Start menu.
+
+
