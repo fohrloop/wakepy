@@ -8,7 +8,11 @@ Simple wakelock written in Python. Keeps your computer from going to sleep.
 - Can be added into your long running scripts
 
 ## Requirements
+<<<<<<< HEAD
 Wakepy currently supports both Windows and Linux. Feel free to submit pull request(s) for other platforms.
+=======
+Wakepy currently supports Windows and Darwin operating systems. Feel free to submit pull request(s) for other platforms.
+>>>>>>> Add darwin support
 
 # Installing
 
@@ -57,4 +61,7 @@ The program simply calls the [SetThreadExecutionState](https://docs.microsoft.co
 
 ### Linux
 The program uses the `systemctl mask` command to prevent all forms of sleep or hybernation when setting the keepawake, and unmasks the functions when unsetting keepawake. This command will remain active until keepawake is removed.  The flag cannot prevent sleeping from user interaction.  This action does require sudo privilages.
+
+### Darwin
+The program calls the `caffeinate` command when setting keepawake, and sends a break key-command when unsetting.  The flag does not prevent the user from manually sleeping the system or terminating the caffeinate process.
 
