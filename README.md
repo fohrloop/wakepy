@@ -28,7 +28,7 @@ pip install wakepy
 ```
 python -m wakepy
 ```
-Starts the program. While running, computer will not go to sleep. If battery running out, Windows might force laptop to sleep.
+Starts the program. While running, computer will not go to sleep. If battery is running out, your OS might force laptop to sleep.
 
 ### CLI 
 
@@ -60,7 +60,7 @@ The program simply calls the [SetThreadExecutionState](https://docs.microsoft.co
 - User selects *Sleep* from the Start menu.
 
 ### Linux
-The program uses the `systemctl mask` command to prevent all forms of sleep or hybernation when setting the keepawake, and unmasks the functions when unsetting keepawake. This command will remain active until keepawake is removed.  The flag cannot prevent sleeping from user interaction.  This action does require sudo privilages.
+The program uses the `systemctl mask` command to prevent all forms of sleep or hybernation when setting the keepawake, and unmasks the functions when unsetting keepawake. This command will remain active until keepawake is removed.  The flag cannot prevent sleeping from user interaction.  This action does require sudo privileges.
 
 ### Darwin (macOS)
 The program calls the `caffeinate` command when setting keepawake, and sends a break key-command when unsetting.  The flag does not prevent the user from manually sleeping the system or terminating the caffeinate process.
