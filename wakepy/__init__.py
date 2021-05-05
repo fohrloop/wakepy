@@ -17,6 +17,8 @@ SYSTEM = platform.system().lower()
 
 if SYSTEM == "windows":
     from ._win import set_keepawake, unset_keepawake
+elif SYSTEM == "linux":
+    from ._linux import set_keepawake, unset_keepawake
 else:
     NotImplementedError(
         f"wakepy has not yet a {SYSTEM} implementation. Pull requests welcome: https://github.com/np-8/wakepy"
