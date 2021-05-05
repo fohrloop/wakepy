@@ -1,11 +1,16 @@
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/np-8/wakepy)&nbsp;![PyPI](https://img.shields.io/pypi/v/wakepy)&nbsp;![PyPI - Downloads](https://img.shields.io/pypi/dm/wakepy)&nbsp;![GitHub](https://img.shields.io/github/license/np-8/wakepy)
 
-
 # ⏰😴 wakepy 
 
-Simple wakelock written in Python. Keeps your computer from going to sleep.
-- Command line utility
-- Can be added into your long running scripts
+Simple cross-platform wakelock written in Python. Keeps your computer from going to sleep. 
+
+
+#### Table of Contents
+- [Installing](#installing)
+- [Usage](#usage)
+  - [Start from command line](#start-from-command-line)
+  - [Set keepawake within a python script](#set-keepawake-within-a-python-script)
+- [Details](#details)
 
 ## Requirements
 Wakepy currently supports both Windows and Linux. Feel free to submit pull request(s) for other platforms.
@@ -28,12 +33,11 @@ Starts the program. While running, computer will not go to sleep. If battery run
 ### CLI 
 
 ```
-usage: wakepy [-h] [-s]
+python -m wakepy [-h] [-s]
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -s, --keep-screen-awake
-                        Keep also the screen awake.
+optional arguments:    
+  -h, --help               show this help message and exit
+  -s, --keep-screen-awake  Keep also the screen awake. On Linux, this flag is set on and cannot be disabled.
 ```
 
 ## Set keepawake within a python script
@@ -46,7 +50,7 @@ set_keepawake(keep_screen_awake=False)
 unset_keepawake()
 ```
 ### Parameters
--  `keep_screen_awake` can be used to keep also the screen awake. The default is `False`.
+-  `keep_screen_awake` can be used to keep also the screen awake. The default is `False`. On Linux, this is set to `True` and cannot be changed.
 
 ## Details
 
