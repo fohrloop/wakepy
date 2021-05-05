@@ -1,11 +1,14 @@
 import argparse
 
-parser = argparse.ArgumentParser(prog="wakepy")
+parser = argparse.ArgumentParser(
+    prog="wakepy",
+    formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=27),
+)
 
 parser.add_argument(
     "-s",
     "--keep-screen-awake",
-    help="Keep also the screen awake.",
+    help="Keep also the screen awake. On Linux, this flag is set on and cannot be disabled.",
     action="store_true",
     default=False,
 )
