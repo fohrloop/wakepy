@@ -1,15 +1,15 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
     name="wakepy",
-    version="0.3.0",
+    version="0.3.1",
     author="Niko Pasanen",
     author_email="niko@pasanen.me",
     url="https://github.com/np-8/wakepy",
-    packages=[],
+    packages=find_packages(),
     include_package_data=True,
     license="MIT",
     description="Simple wakelock / keep-awake / stay-awake",
