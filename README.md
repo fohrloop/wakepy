@@ -11,6 +11,7 @@ Simple cross-platform wakelock written in Python. Keeps your computer from going
   - [Start from command line](#start-from-command-line)
   - [Set keepawake within a python script](#set-keepawake-within-a-python-script)
 - [Details](#details)
+- [Changelog](#changelog)
 
 ## Requirements
 Wakepy currently supports Windows, Linux, and macOS. Feel free to submit pull request(s) for other platforms.
@@ -65,3 +66,5 @@ The program uses the `systemctl mask` command to prevent all forms of sleep or h
 ### Darwin (macOS)
 The program calls the `caffeinate` command when setting keepawake, and sends a break key-command when unsetting.  The flag does not prevent the user from manually sleeping the system or terminating the caffeinate process.
 
+## Changelog 
+- See [CHANGELOG.md](CHANGELOG.md)
