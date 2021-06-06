@@ -4,6 +4,11 @@ COMMAND = u'systemctl'
 ARGS = [u'sleep.target', u'suspend.target', u'hibernate.target', u'hybrid-sleep.target']
 # https://www.man7.org/linux/man-pages/man1/systemctl.1.html
 
+if not subprocess.check_output('pidof systemd'):
+    raise NotImplementedError(
+        "wakepy has not yet support for init processes other than systemd. Pull requests welcome: https://github.com/np-8/wakepy"
+    )
+
 
 def set_keepawake(keep_screen_awake=False):
     """
