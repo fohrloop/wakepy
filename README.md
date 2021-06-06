@@ -14,7 +14,12 @@ Simple cross-platform wakelock written in Python. Keeps your computer from going
 - [Changelog](#changelog)
 
 ## Requirements
-Wakepy currently supports Windows, Linux, and macOS. Feel free to submit pull request(s) for other platforms.
+Wakepy currently supports 
+- Windows
+- Linux (with `systemd`)
+- macOS
+
+Feel free to submit pull request(s) for other platforms.
 
 # Installing
 
