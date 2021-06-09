@@ -46,7 +46,9 @@ optional arguments:
   -s, --keep-screen-awake  Keep also the screen awake. On Linux, this flag is set on and cannot be disabled.
 ```
 
-## Set keepawake within a python script
+## Usage within a python script
+
+### Option 1: `set_keepawake` and `unset_keepawake` functions
 
 ```python
 from wakepy import set_keepawake, unset_keepawake
@@ -55,8 +57,9 @@ set_keepawake(keep_screen_awake=False)
 # do stuff that takes long time
 unset_keepawake()
 ```
+### Option 2: `keepawake` context manager
 
-A context manager is also available:
+*new in version 0.4.0*
 
 ```python
 from wakepy import keepawake
@@ -81,5 +84,15 @@ The program uses the `systemctl mask` command to prevent all forms of sleep or h
 ### Darwin (macOS)
 The program calls the `caffeinate` command when setting keepawake, and sends a break key-command when unsetting.  The flag does not prevent the user from manually sleeping the system or terminating the caffeinate process.
 
+# ⚖️ Pros and Cons
+### 👑💯 Advantages of wakepy
+- wakepy has zero (python) dependencies
+- wakepy is simple and it has a little amount of code. You can read the whole source code quickly
+- It has permissive MIT licence
+- It is multiplatform
+- You can use it directly from command line, or within your python scripts
+### 🔍❕ Disadvantages / pitfalls with wakepy
+- Currently multiprocessing is not well supported; the first function calling `unset_keepawake` or releasing the `keepawake` context manager will allow the PC to sleep even if you have called `set_keepawake` multiple times. For these kind of cases, perhaps an implementation making mouse movement or pressing keyboard keys would work better.
+  
 ## Changelog 
 - See [CHANGELOG.md](CHANGELOG.md)
