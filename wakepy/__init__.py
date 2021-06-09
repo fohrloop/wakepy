@@ -8,10 +8,14 @@ set_keepawake()
 unset_keepawake()
 - The lower level functions that can be used in any script to
    set or unset the keepawake.
+
+keepawake()
+- A context manager that sets and unsets keepawake.
 """
 from functools import wraps
 import platform
 import time
+from contextlib import contextmanager
 
 SYSTEM = platform.system().lower()
 
@@ -27,6 +31,16 @@ else:
     )
 
 p = ["|", "/", "-", "\\"]
+
+
+@contextmanager
+def keepawake(*args, **kwargs):
+    set_keepawake(*args, **kwargs)
+
+    try:
+        yield
+    finally:
+        unset_keepawake()
 
 
 def wait_until_keyboardinterrupt():
@@ -49,10 +63,11 @@ def start(keep_screen_awake=False):
     keep_screen_awake: bool
         If True, keeps also the screen awake.
     """
-    set_keepawake(keep_screen_awake=keep_screen_awake)
-    print(
-        "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
-    )
-    wait_until_keyboardinterrupt()
+
+    with keepawake(keep_screen_awake=keep_screen_awake):
+        print(
+            "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
+        )
+        wait_until_keyboardinterrupt()
+
     print("Stopped wakepy. Your computer is allowed to sleep.")
-    unset_keepawake()
