@@ -63,10 +63,11 @@ def start(keep_screen_awake=False):
     keep_screen_awake: bool
         If True, keeps also the screen awake.
     """
-    set_keepawake(keep_screen_awake=keep_screen_awake)
-    print(
-        "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
-    )
-    wait_until_keyboardinterrupt()
+
+    with keepawake(keep_screen_awake=keep_screen_awake):
+        print(
+            "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
+        )
+        wait_until_keyboardinterrupt()
+
     print("Stopped wakepy. Your computer is allowed to sleep.")
-    unset_keepawake()
