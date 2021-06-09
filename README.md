@@ -55,6 +55,16 @@ set_keepawake(keep_screen_awake=False)
 # do stuff that takes long time
 unset_keepawake()
 ```
+
+A context manager is also available:
+
+```python
+from wakepy import keepawake
+
+with keepawake(keep_screen_awake=False):
+  ... # do stuff that takes long time
+```
+
 ### Parameters
 -  `keep_screen_awake` can be used to keep also the screen awake. The default is `False`. On Linux, this is set to `True` and cannot be changed.
 
