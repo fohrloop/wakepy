@@ -91,9 +91,9 @@ The program calls the `caffeinate` command when setting keepawake, and sends a b
 - It has permissive MIT licence
 - It is multiplatform
 - You can use it directly from command line, or within your python scripts
-- It runs without admin/sudo priviledges
+- It runs without admin/sudo priviledges on Windows and Mac. 
 ### 🔍❕ Disadvantages / pitfalls with wakepy
 - Currently multiprocessing is not well supported; the first function calling `unset_keepawake` or releasing the `keepawake` context manager will allow the PC to sleep even if you have called `set_keepawake` multiple times. For these kind of cases, perhaps an implementation making mouse movement or pressing keyboard keys would work better.
-  
+- On Linux, the current solution using `systemctl` needs sudo priviledges
 ## Changelog 
 - See [CHANGELOG.md](CHANGELOG.md)
