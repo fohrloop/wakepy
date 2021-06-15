@@ -1,3 +1,8 @@
+## [0.4.1] (2021-06-15)
+### Fixed
+- Raising `NotImplementedError` if trying to use on Linux without `systemctl`. Previous implementation had a bug. [Issue 8](https://github.com/np-8/wakepy/issues/8)
+
+
 ## [0.4.0] (2021-06-09)
 ### Added 
 - `keepawake` context manager. [[#6](https://github.com/np-8/wakepy/pull/6)]
