@@ -6,10 +6,9 @@ ARGS = [u"sleep.target", u"suspend.target", u"hibernate.target", u"hybrid-sleep.
 
 try:
     subprocess.check_output(["pidof", "systemd"])
-except:
-    # if 'pidof' does not find a process it will return with non-zero exit status, check_output will raise an exception
-    # TODO: Check the type of exception. With shell=True this would be subprocess.CalledProcessError, but using shell=True
-    # might be a security rist.
+except subprocess.CalledProcessError:
+    # if 'pidof' does not find a process it will return with non-zero exit status, check_output will raise subprocess.CalledProcessError
+    # See: https://github.com/np-8/wakepy/pull/3
     raise NotImplementedError(
         "wakepy has not yet support for init processes other than systemd. Pull requests welcome: https://github.com/np-8/wakepy"
     )
