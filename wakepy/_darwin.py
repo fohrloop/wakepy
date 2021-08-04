@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE
 
 COMMAND = u'caffeinate'
-ARGS = u" -d"
+ARGS = u"-d"
 BREAK = '\003'
 
 _process = None
@@ -21,7 +21,7 @@ def set_keepawake(keep_screen_awake=False):
         global _process
         _process = Popen([COMMAND], stdin=PIPE, stdout=PIPE)
     else:
-        _process = Popen(COMMAND + ARGS, stdin=PIPE, stdout=PIPE)
+        _process = Popen([COMMAND, ARGS], stdin=PIPE, stdout=PIPE)
 
 
 def unset_keepawake():
