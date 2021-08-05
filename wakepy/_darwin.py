@@ -1,8 +1,13 @@
 from subprocess import Popen, PIPE
 
-COMMAND = u'caffeinate'
-ARGS = u"-d"
-BREAK = '\003'
+COMMAND = u"caffeinate"
+ARGS = [
+    "-d",
+    "-u",  # Create an assertion to declare that user is active. If the dis-
+    # play is off, this option turns the display on and prevents the
+    # display from going into idle sleep.
+]
+BREAK = "\003"
 
 _process = None
 
@@ -21,7 +26,7 @@ def set_keepawake(keep_screen_awake=False):
         global _process
         _process = Popen([COMMAND], stdin=PIPE, stdout=PIPE)
     else:
-        _process = Popen([COMMAND, ARGS], stdin=PIPE, stdout=PIPE)
+        _process = Popen([COMMAND] + ARGS, stdin=PIPE, stdout=PIPE)
 
 
 def unset_keepawake():
