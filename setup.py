@@ -5,7 +5,7 @@ with open("README.md", encoding="utf-8") as f:
 
 setup(
     name="wakepy",
-    version="0.4.1",
+    version="0.4.2",
     author="Niko Pasanen",
     author_email="niko@pasanen.me",
     url="https://github.com/np-8/wakepy",
