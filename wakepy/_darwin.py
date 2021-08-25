@@ -1,3 +1,5 @@
+import signal
+import subprocess
 from subprocess import Popen, PIPE
 
 # See: https://ss64.com/osx/caffeinate.html
@@ -8,7 +10,6 @@ ARGS = [
     # play is off, this option turns the display on and prevents the
     # display from going into idle sleep.
 ]
-BREAK = "\003"
 
 _process = None
 
@@ -32,7 +33,6 @@ def set_keepawake(keep_screen_awake=False):
 
 def unset_keepawake():
     global _process
-    _process.stdin.write(BREAK)
-    _process.stdin.flush()
-    _process.stdin.close()
+
+    _process.terminate()
     _process.wait()
