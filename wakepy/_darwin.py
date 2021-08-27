@@ -1,5 +1,3 @@
-import signal
-import subprocess
 from subprocess import Popen, PIPE
 
 # See: https://ss64.com/osx/caffeinate.html
