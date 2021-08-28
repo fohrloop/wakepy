@@ -79,10 +79,10 @@ The program simply calls the [SetThreadExecutionState](https://docs.microsoft.co
 - User selects *Sleep* from the Start menu.
 
 ### Linux
-The program uses the `systemctl mask` command to prevent all forms of sleep or hybernation when setting the keepawake, and unmasks the functions when unsetting keepawake. This command will remain active until keepawake is removed.  The flag cannot prevent sleeping from user interaction.  This action does require sudo privileges.
+The program uses the `systemctl mask` command to prevent all forms of sleep or hybernation when setting the keepawake, and unmasks the functions when unsetting keepawake. This command will remain active until keepawake is removed.  The flag cannot prevent sleeping from user interaction.  This action *does require sudo privileges*.
 
 ### Darwin (macOS)
-The program calls the [`caffeinate`](https://ss64.com/osx/caffeinate.html) command when setting keepawake, and sends a break key-command when unsetting.  The flag does not prevent the user from manually sleeping the system or terminating the caffeinate process.
+The program launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) in a subprocess when setting keepawake, and terminates the subprocess when unsetting. This does not prevent the user from manually sleeping the system or terminating the caffeinate process.
 
 # ⚖️ Pros and Cons
 ### 👑💯 Advantages of wakepy
@@ -93,7 +93,7 @@ The program calls the [`caffeinate`](https://ss64.com/osx/caffeinate.html) comma
 - You can use it directly from command line, or within your python scripts
 - It runs without admin/sudo priviledges on Windows and Mac. 
 ### 🔍❕ Disadvantages / pitfalls with wakepy
+- On Linux, the current solution using `systemctl` needs sudo priviledges. PRs to circumvent this are welcome.
 - Currently multiprocessing is not well supported; the first function calling `unset_keepawake` or releasing the `keepawake` context manager will allow the PC to sleep even if you have called `set_keepawake` multiple times. For these kind of cases, perhaps an implementation making mouse movement or pressing keyboard keys would work better.
-- On Linux, the current solution using `systemctl` needs sudo priviledges
 ## Changelog 
 - See [CHANGELOG.md](CHANGELOG.md)
