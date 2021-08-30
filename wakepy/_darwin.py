@@ -24,9 +24,9 @@ def set_keepawake(keep_screen_awake=False):
     """
     if keep_screen_awake:
         global _process
-        _process = Popen([COMMAND], stdin=PIPE, stdout=PIPE)
-    else:
         _process = Popen([COMMAND] + ARGS, stdin=PIPE, stdout=PIPE)
+    else:
+        _process = Popen([COMMAND], stdin=PIPE, stdout=PIPE)
 
 
 def unset_keepawake():
