@@ -2,11 +2,13 @@ from subprocess import Popen, PIPE
 
 # See: https://ss64.com/osx/caffeinate.html
 COMMAND = u"caffeinate"
+
 ARGS = [
-    "-d",
+    "-d",  # Prevent the display from sleeping.
     "-u",  # Create an assertion to declare that user is active. If the dis-
     # play is off, this option turns the display on and prevents the
     # display from going into idle sleep.
+    "-t 2592000",  # Set timeout to 1-month (default is 5 seconds for -u option)
 ]
 
 _process = None
