@@ -1,3 +1,6 @@
+## [0.4.4] (2021-08-30)
+### Fixed
+- Keeping screen awake on Mac [Issue 13](https://github.com/np-8/wakepy/issues/13)
 ## [0.4.3] (2021-08-28)
 ### Fixed
 - Raising `TypeError: a bytes-like object is required, not 'str'` if trying to use on MacOS (Python 3.9). [Issue 11](https://github.com/np-8/wakepy/issues/11)
