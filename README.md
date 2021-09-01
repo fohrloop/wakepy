@@ -2,7 +2,7 @@
 
 # ⏰😴 wakepy 
 
-Simple cross-platform wakelock written in Python. Keeps your computer from going to sleep. 
+Simple cross-platform wakelock written in Python. Prevent your computer from going to sleep in the middle of a long running task. 
 
 
 #### Table of Contents
