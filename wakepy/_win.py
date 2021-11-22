@@ -15,9 +15,14 @@ def set_keepawake(keep_screen_awake=False):
     -----------
     keep_screen_awake: bool
         If True, keeps also the screen awake.
-        
-    * Or, if SetThreadExecutionState is called in another way with a 
+
+    TIP: You may check the flags by running `powercfg -requests` in
+    an elevated PowerShell.
+
+    * Or, if SetThreadExecutionState is called in another way with a
       flag that clears ES_SYSTEM_REQUIRED.
+    * Or, if the Thread which called `set_keepawake` dies.
+
     """
     flags = ES_CONTINUOUS | ES_SYSTEM_REQUIRED
     if keep_screen_awake:
@@ -27,4 +32,11 @@ def set_keepawake(keep_screen_awake=False):
 
 
 def unset_keepawake():
+    """
+    Remove all flags set with set_keepawake. Can only change
+    flags set by the same thread.
+
+    TIP: You may check the flags by running `powercfg -requests` in
+    an elevated PowerShell.
+    """
     ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)
