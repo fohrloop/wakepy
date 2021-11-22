@@ -84,6 +84,20 @@ The program uses the `systemctl mask` command to prevent all forms of sleep or h
 ### Darwin (macOS)
 The program launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) in a subprocess when setting keepawake, and terminates the subprocess when unsetting. This does not prevent the user from manually sleeping the system or terminating the caffeinate process.
 
+### Summary table
+
+|                                                              | Windows                                                                                                                                                                         | Linux                                          | Mac                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------- |
+| wakepy uses                                                  | [SetThreadExecutionState](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate?redirectedfrom=MSDN) with the `ES_SYSTEM_REQUIRED` flag | `systemctl mask`                               | [`caffeinate`](https://ss64.com/osx/caffeinate.html) |
+| sudo / admin needed?                                         | No                                                                                                                                                                              | Yes                                            | No                                                   |
+| When process which called <br>`set_keepawake` dies           | All flags set by the<br>process are removed                                                                                                                                     | Nothing happens.                               | Nothing happens.                                     |
+| `keep_screen_awake` option                                   | Optional<br>Default: `False`                                                                                                                                                    | Always `True`                                  | Optional<br>Default: `False`                         |
+| When `keep_screen_awake = True`                              | Screen is kept awake. <br><br>Windows will not be locked<br><br>automatically.                                                                                                  | Screen is kept awake.<br>Automatic locking = ? | Screen is kept awake.<br>Automatic locking = ?       |
+| Multiprocessing support                                      | Yes                                                                                                                                                                             | No                                             | No                                                   |
+| When process calling `set_keepawake` dies                    | All flags set by the process are removed. See: [ How will killing while lock set affect it?](https://github.com/np-8/wakepy/issues/16)                                          |                                                |                                                      |
+| How to debug or see the changes<br>done by wakepy in the OS? | Run `powercfg -requests` in<br>elevated PowerShell                                                                                                                              | ?                                              | ?                                                    |
+| If on laptop, and battery low?                               | Sleep                                                                                                                                                                           | ?                                              | ?                                                    |
+
 # ⚖️ Pros and Cons
 ### 👑💯 Advantages of wakepy
 - wakepy has zero (python) dependencies
@@ -94,6 +108,6 @@ The program launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) in a
 - It runs without admin/sudo priviledges on Windows and Mac. 
 ### 🔍❕ Disadvantages / pitfalls with wakepy
 - On Linux, the current solution using `systemctl` needs sudo priviledges. PRs to circumvent this are welcome.
-- Currently multiprocessing is not well supported; the first function calling `unset_keepawake` or releasing the `keepawake` context manager will allow the PC to sleep even if you have called `set_keepawake` multiple times. For these kind of cases, perhaps an implementation making mouse movement or pressing keyboard keys would work better.
+- Currently multiprocessing is not well supported on Mac and Linux (?); the first function calling `unset_keepawake` or releasing the `keepawake` context manager will allow the PC to sleep even if you have called `set_keepawake` multiple times. For these kind of cases, perhaps an implementation making mouse movement or pressing keyboard keys would work better.
 ## Changelog 
 - See [CHANGELOG.md](CHANGELOG.md)
