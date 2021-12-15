@@ -12,9 +12,14 @@ parser.add_argument(
     action="store_true",
     default=False,
 )
-if __name__ == "__main__":
+
+
+def wakepy():
     from wakepy import start
 
     args = parser.parse_args()
-
     start(keep_screen_awake=args.keep_screen_awake)
+
+
+if __name__ == "__main__":
+    wakepy()

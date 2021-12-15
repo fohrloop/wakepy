@@ -19,4 +19,9 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Topic :: Utilities",
     ],
+    entry_points={
+        "console_scripts": [
+            "wakepy = wakepy.__main__:wakepy",
+        ],
+    },
 )
