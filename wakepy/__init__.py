@@ -12,7 +12,6 @@ unset_keepawake()
 keepawake()
 - A context manager that sets and unsets keepawake.
 """
-from functools import wraps
 import platform
 import time
 from contextlib import contextmanager
