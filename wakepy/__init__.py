@@ -16,6 +16,8 @@ import platform
 import time
 from contextlib import contextmanager
 
+from wakepy._common import print_on_start
+
 SYSTEM = platform.system().lower()
 
 if SYSTEM == "windows":
@@ -63,9 +65,7 @@ def start(keep_screen_awake=False):
     """
 
     with keepawake(keep_screen_awake=keep_screen_awake):
-        print(
-            "Started wakepy. Your computer will not sleep automatically (unless battery goes under critical level)"
-        )
+        print_on_start(keep_screen_awake=keep_screen_awake)
         wait_until_keyboardinterrupt()
 
-    print("Stopped wakepy. Your computer is allowed to sleep.")
+    print("\nExited.")
