@@ -31,15 +31,21 @@ pip install wakepy
 # Usage
 
 ## Start from command line
+Running*
+```
+wakepy 
+```
+or  
 ```
 python -m wakepy
 ```
-Starts the program. While running, computer will not go to sleep. If battery is running out, your OS might force laptop to sleep.
+starts the program.  While running, computer will not go to sleep. If battery is running out, your OS might force laptop to sleep.
 
-### CLI 
+<sup>\**needs wakepy >= 0.5.0*</sup>
+### CLI arguments
 
 ```
-python -m wakepy [-h] [-s]
+wakepy [-h] [-s]
 
 optional arguments:    
   -h, --help               show this help message and exit
