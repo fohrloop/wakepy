@@ -29,8 +29,6 @@ else:
         f"wakepy has not yet a {SYSTEM} implementation. Pull requests welcome: https://github.com/np-8/wakepy"
     )
 
-p = ["|", "/", "-", "\\"]
-
 
 @contextmanager
 def keepawake(*args, **kwargs):
@@ -43,10 +41,11 @@ def keepawake(*args, **kwargs):
 
 
 def wait_until_keyboardinterrupt():
+    SPINNING_CHARS = ["|", "/", "-", "\\"]
     try:
         while True:
             for i in range(0, 4):
-                print("\r" + p[i] + r" [Press Ctrl+C to exit]", end="")
+                print("\r" + SPINNING_CHARS[i] + r" [Press Ctrl+C to exit]", end="")
                 time.sleep(1)
     except KeyboardInterrupt:
         pass
