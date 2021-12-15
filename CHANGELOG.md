@@ -1,3 +1,8 @@
+## [0.5.0] (2021-12-15)
+### Added
+- wakepy ascii art text, version and options will be printed in console if wakepy launched with the CLI
+- The `wakepy` executable for CLI is installed when `wakepy` is installed with `pip`.
+
 ## [0.4.4] (2021-08-30)
 ### Fixed
 - Keeping screen awake on Mac [Issue 13](https://github.com/np-8/wakepy/issues/13)
