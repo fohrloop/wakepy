@@ -49,5 +49,5 @@ def unset_keepawake():
     try:
         pm_interface.UnInhibit(dbus_inhibit)
     except Exception as e:
-        print(f"DBus Inhibit failed with a {type(e).__name__}: {e}\nFalling back to systemctl mask...")
+        print(f"DBus UnInhibit failed with a {type(e).__name__}: {e}\nFalling back to systemctl mask...")
         subprocess.run([COMMAND, u"unmask", *ARGS])
