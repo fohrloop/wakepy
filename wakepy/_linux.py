@@ -12,8 +12,8 @@ ARGS = [u"sleep.target", u"suspend.target", u"hibernate.target", u"hybrid-sleep.
 dbus_inhibit = None  # Variable that stores the DBus inhibit for later controlled release.
 try: # Try to initialize the freedesktop inhibitor
     pm_interface = dbus.Interface(dbus.SessionBus().get_object('org.freedesktop.ScreenSaver','/org/freedesktop/ScreenSaver'), 'org.freedesktop.ScreenSaver')
-except Exception as e1:
-    print(f"Wakepy can't use DBus Inhibit on this system because of a {type(e1).__name__}: {e1}\n\
+except Exception as e:
+    print(f"Wakepy can't use DBus Inhibit on this system because of a {type(e).__name__}: {e}\n\
 root permissions will be needed to set/release the wakelock.")
 
 try:
