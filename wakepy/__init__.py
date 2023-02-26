@@ -12,6 +12,7 @@ unset_keepawake()
 keepawake()
 - A context manager that sets and unsets keepawake.
 """
+import enum
 import platform
 import time
 from contextlib import contextmanager
@@ -19,17 +20,24 @@ from contextlib import contextmanager
 from wakepy._common import print_on_start
 
 __version__ = "0.6.0dev"
-SYSTEM = platform.system().lower()
+CURRENT_SYSTEM = platform.system().lower()
 
-if SYSTEM == "windows":
+
+class System(str, enum.Enum):
+    WINDOWS = "windows"
+    LINUX = "linux"
+    DARWIN = "darwin"
+
+
+if CURRENT_SYSTEM == System.WINDOWS:
     from ._win import set_keepawake, unset_keepawake
-elif SYSTEM == "linux":
+elif CURRENT_SYSTEM == System.LINUX:
     from ._linux import set_keepawake, unset_keepawake
-elif SYSTEM == "darwin":
+elif CURRENT_SYSTEM == System.DARWIN:
     from ._darwin import set_keepawake, unset_keepawake
 else:
     raise NotImplementedError(
-        f"wakepy has not yet a {SYSTEM} implementation. "
+        f"wakepy has not yet a {CURRENT_SYSTEM} implementation. "
         "Pull requests welcome: https://github.com/np-8/wakepy"
     )
 

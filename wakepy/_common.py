@@ -26,9 +26,10 @@ def wakepy_text():
 
 
 def get_not_logging_out_automatically(keep_screen_awake: bool) -> bool:
-    system = platform.system().lower()
+    from wakepy import CURRENT_SYSTEM, System
+
     not_logging_out_automatically = None
-    if system == "windows":
+    if CURRENT_SYSTEM == System.WINDOWS:
         not_logging_out_automatically = keep_screen_awake
     return not_logging_out_automatically
 
@@ -53,7 +54,6 @@ def print_on_start(keep_screen_awake):
         The option to select if screen is to
         be kept on.
     """
-    # E.g.: 'windows', 'linux', or 'darwin'
 
     wakepy_opts_text = create_wakepy_opts_text(keep_screen_awake)
 
