@@ -28,8 +28,9 @@ elif SYSTEM == "linux":
 elif SYSTEM == "darwin":
     from ._darwin import set_keepawake, unset_keepawake
 else:
-    NotImplementedError(
-        f"wakepy has not yet a {SYSTEM} implementation. Pull requests welcome: https://github.com/np-8/wakepy"
+    raise NotImplementedError(
+        f"wakepy has not yet a {SYSTEM} implementation. "
+        "Pull requests welcome: https://github.com/np-8/wakepy"
     )
 
 
