@@ -18,7 +18,7 @@ from contextlib import contextmanager
 
 from wakepy._common import print_on_start
 
-__version__ = "0.5.0"
+__version__ = "0.6.0dev"
 SYSTEM = platform.system().lower()
 
 if SYSTEM == "windows":
