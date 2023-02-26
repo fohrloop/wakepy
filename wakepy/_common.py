@@ -59,7 +59,8 @@ def print_on_start(keep_screen_awake):
     print(" (unless battery goes under critical level)")
     if question_marks_printed:
         print(
-            """\nThe reason you are seeing "[?]" is because the feature is untested on your platform."""
-            """\nIf you wish, you can contribute and inform the behaviour at https://github.com/np-8/wakepy"""
+            """\nThe reason you are seeing "[?]" is because the feature is untested """
+            "on your platform.\nIf you wish, you can contribute and inform the "
+            "behaviour at https://github.com/np-8/wakepy"
         )
     print(" ")
