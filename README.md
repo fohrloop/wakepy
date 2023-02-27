@@ -105,9 +105,10 @@ The program uses, depending on what is installed, either (in this order)
 2. dbus-python (requires libdbus)
 3. `systemctl mask`
 
-The first two options will set the call the inhibit method of org.freedesktop.ScreenSaver. The inhibit will be released when the process dies or when unset_keepawake is called.
+The first two options will use DBus to call the inhibit method of `org.freedesktop.ScreenSaver`, which will prevent the system from suspending/speeling. The inhibit will be released when the process dies or when unset_keepawake is called. The flag cannot prevent sleeping from user interaction. This approach is multiprocessing-safe and doesn't need `sudo` privileges but you have to use a Freedesktop-compliant desktop environment, for example GNOME, KDE or Xfce. See full list in [the freedesktop.org wiki](https://freedesktop.org/wiki/Desktops/). 
 
-The `systemctl mask` command will prevent all forms of sleep or hybernation when calling `set_keepawake`, and unmasks the functions when calling `unset_keepawake`. This command will remain active until keepawake is removed.  The flag cannot prevent sleeping from user interaction.  *Using systemd requires sudo privileges*.
+The `systemctl mask` command will prevent all forms of sleep or hibernation (including sleep initialized by the user) when calling `set_keepawake`, and unmasks the functions when calling `unset_keepawake`. This command will remain active until `unset_keepawake` is called and is not multiprocessing-safe because the first process that releases the wakelock unmasks the functions and thus no longer prevents sleep.  *Using systemd requires sudo privileges*.
+
 
 ### Darwin (macOS)
 The program launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) in a subprocess when setting keepawake, and terminates the subprocess when unsetting. This does not prevent the user from manually sleeping the system or terminating the caffeinate process.
