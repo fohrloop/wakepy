@@ -8,7 +8,10 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "-s",
     "--keep-screen-awake",
-    help="Keep also the screen awake. On Linux, this flag is set on and cannot be disabled.",
+    help=(
+        "Keep also the screen awake. "
+        "On Linux, this flag is set on and cannot be disabled."
+    ),
     action="store_true",
     default=False,
 )

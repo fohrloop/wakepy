@@ -1,3 +1,9 @@
+## [0.6.0] (2023-02-27)
+### Added
+- Support for using wakepy without sudo on linux! There are now D-bus solutions (1) using  jeepney and (2) using dbus-python (libdbus). Thanks to [Stehlampe2020](https://github.com/Stehlampe2020) for the dbus-python based solution ([PR #22](https://github.com/np-8/wakepy/pull/22)) and [NicoWeio](https://github.com/NicoWeio) for raising  [Issue #17](https://github.com/np-8/wakepy/issues/17). 
+### Changed
+- Linux+systemd approach has sudo check. The program won't start without `SUDO_UID` environment variable set.
+
 ## [0.5.0] (2021-12-15)
 ### Added
 - wakepy ascii art text, version and options will be printed in console if wakepy launched with the CLI

@@ -24,7 +24,14 @@ setup(
     long_description_content_type="text/markdown",
     classifiers=[
         "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
         "Topic :: Utilities",
+    ],
+    install_requires=[
+        # Default install on linux uses jeepney
+        # use --no-deps to skip if necessary
+        "jeepney >= 0.7.1;sys_platform=='linux'",
     ],
     entry_points={
         "console_scripts": [
