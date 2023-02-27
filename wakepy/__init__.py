@@ -19,7 +19,7 @@ from contextlib import contextmanager
 
 from wakepy._common import print_on_start
 
-__version__ = "0.6.0dev"
+__version__ = "0.6.0"
 CURRENT_SYSTEM = platform.system().lower()
 
 
