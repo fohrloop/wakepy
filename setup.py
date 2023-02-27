@@ -24,6 +24,8 @@ setup(
     long_description_content_type="text/markdown",
     classifiers=[
         "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
         "Topic :: Utilities",
     ],
     entry_points={
