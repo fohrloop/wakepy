@@ -5,7 +5,7 @@ Requires dbus-python[1] and libdbus (freedesktop reference implementation)
 Untested installation instructions[2]: 
 
     sudo apt install libdbus-glib-1-dev libdbus-1-dev
-    python -m pip install dbus-python psutil
+    python -m pip install dbus-python
     
 Note: libdbus has known problems with multi-threaded use! [3]
 
@@ -17,9 +17,9 @@ Note: libdbus has known problems with multi-threaded use! [3]
 from wakepy.exceptions import NotSupportedError
 
 try:
-    import dbus, os, psutil
+    import dbus
 except ImportError as e:
-    print(f"Error when importing DBus, os and psutil module: {e}")
+    print(f"Error when importing dbus-python: {e}")
     raise NotSupportedError()
 
 
@@ -55,7 +55,7 @@ def set_keepawake(keep_screen_awake=False):
 
     global dbus_inhibit
     dbus_inhibit = pm_interface.Inhibit(
-        psutil.Process(os.getpid()).name(),
+        "wakepy",
         f"wakepy.set_keepawake(keep_screen_awake={keep_screen_awake})",
     )
 
