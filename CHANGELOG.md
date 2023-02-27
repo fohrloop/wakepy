@@ -1,3 +1,7 @@
+## [0.6.0] (2023-02-27)
+### Changed
+- Linux+systemd approach has sudo check. The program won't start without `SUDO_UID` environment variable set.
+
 ## [0.5.0] (2021-12-15)
 ### Added
 - wakepy ascii art text, version and options will be printed in console if wakepy launched with the CLI
