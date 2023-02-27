@@ -28,6 +28,11 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Topic :: Utilities",
     ],
+    install_requires=[
+        # Default install on linux uses jeepney
+        # use --no-deps to skip if necessary
+        "jeepney >= 0.7.1;sys_platform=='linux'",
+    ],
     entry_points={
         "console_scripts": [
             "wakepy = wakepy.__main__:wakepy",
