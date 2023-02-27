@@ -85,7 +85,8 @@ The program simply calls the [SetThreadExecutionState](https://docs.microsoft.co
 - User selects *Sleep* from the Start menu.
 
 ### Linux
-The program uses the `systemctl mask` command to prevent all forms of sleep or hybernation when setting the keepawake, and unmasks the functions when unsetting keepawake. This command will remain active until keepawake is removed.  The flag cannot prevent sleeping from user interaction.  This action *does require sudo privileges*.
+The program uses DBus to prevent the system from suspending/sleeping. The flag cannot prevent sleeping from user interaction. This approach is multiprocessing-safe and doesn't need `sudo` privileges but might not be available on all systems.   
+As a fallback the program uses the `systemctl mask` command to prevent all forms of sleep or hybernation (including sleep initialized by the user) when setting the keepawake, and unmasks the functions when unsetting keepawake. This command will remain active until `unset_keepawake` is called and is not multiprocessing-safe because the first process that releases the wakelock unmasks the functions and thus no longer prevents sleep. This action *does require sudo privileges*.
 
 ### Darwin (macOS)
 The program launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) in a subprocess when setting keepawake, and terminates the subprocess when unsetting. This does not prevent the user from manually sleeping the system or terminating the caffeinate process.
