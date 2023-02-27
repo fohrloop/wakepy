@@ -2,7 +2,7 @@
 functions for linux. It tries, in this order
 
 (1) jeepney (pure python solution)
-(2) dbus-python (python bindings to dbus. Needs)
+(2) dbus-python (python bindings to dbus/libdbus)
 (3) systemd (requires sudo!)
 
 Other possibilities: (not implemented)
