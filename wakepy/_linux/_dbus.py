@@ -1,17 +1,31 @@
+"""This module provides dbus-python + libdbus (aka. dbus) based set_keepawake
+and unset_keepawake for linux
+
+Requires dbus-python[1] and libdbus (freedesktop reference implementation)
+Untested installation instructions[2]: 
+
+    sudo apt install libdbus-glib-1-dev libdbus-1-dev
+    python -m pip install dbus-python psutil
+    
+Note: libdbus has known problems with multi-threaded use! [3]
+
+[1]: https://github.com/freedesktop/dbus-python
+[2]: For venvs. Many linux distributions come with pre-installed dbus-python
+[3]: https://dbus.freedesktop.org/doc/dbus-python/
+
+"""
 from wakepy.exceptions import NotSupportedError
 
 try:
     import dbus, os, psutil
 except ImportError as e:
-    print(
-        f"Error when importing DBus, os and psutil module: {e}\n\
-Root permissions will be needed to set/unset the wakelock!"
-    )
+    print(f"Error when importing DBus, os and psutil module: {e}")
     raise NotSupportedError()
 
 
 # Variable that stores the DBus inhibit for later controlled release.
 dbus_inhibit = None
+METHOD = "dbus-python (+libdbus)"
 
 try:
     pm_interface = dbus.Interface(
