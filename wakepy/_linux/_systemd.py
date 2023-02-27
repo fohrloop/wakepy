@@ -9,6 +9,7 @@ import sys
 
 from wakepy.exceptions import NotSupportedError
 
+METHOD = "systemd"
 print("wakepy: falling back using systemd. ")
 
 try:
