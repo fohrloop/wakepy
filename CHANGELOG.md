@@ -11,13 +11,15 @@
 
 ## [0.4.4] (2021-08-30)
 ### Fixed
-- Keeping screen awake on Mac [Issue 13](https://github.com/np-8/wakepy/issues/13)
+- Keeping screen awake on Mac [Issue #13](https://github.com/np-8/wakepy/issues/13) (fixed in [PR #15](https://github.com/np-8/wakepy/pull/15)). Thanks to [mikeckennedy](https://github.com/mikeckennedy).
+
 ## [0.4.3] (2021-08-28)
 ### Fixed
-- Raising `TypeError: a bytes-like object is required, not 'str'` if trying to use on MacOS (Python 3.9). [Issue 11](https://github.com/np-8/wakepy/issues/11)
+- Raising `TypeError: a bytes-like object is required, not 'str'` if trying to use on MacOS (Python 3.9). [Issue #11](https://github.com/np-8/wakepy/issues/11) Thanks to [mikeckennedy](https://github.com/mikeckennedy) for [PR #12](https://github.com/np-8/wakepy/pull/12).
+
 ## [0.4.2] (2021-08-10)
 ### Fixed
-- Raising `FileNotFoundError` if trying to use on MacOS. Previous implementation had a bug. [Issue 9](https://github.com/np-8/wakepy/issues/9)
+- Raising `FileNotFoundError` if trying to use on MacOS. Previous implementation had a bug. [Issue #9](https://github.com/np-8/wakepy/issues/9). Thanks to [matacoder](https://github.com/matacoder) for [PR #10](https://github.com/np-8/wakepy/pull/10).
 
 ## [0.4.1] (2021-06-15)
 ### Fixed
@@ -26,7 +28,7 @@
 
 ## [0.4.0] (2021-06-09)
 ### Added 
-- `keepawake` context manager. [[#6](https://github.com/np-8/wakepy/pull/6)]
+- `keepawake` context manager. [[PR #6](https://github.com/np-8/wakepy/pull/6)]. Thanks to [HoustonFortney](https://github.com/HoustonFortney).
 
 ## [0.3.2] (2021-06-06)
 ### Fixed
