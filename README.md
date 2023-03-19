@@ -92,6 +92,9 @@ with keepawake(keep_screen_awake=False):
 ### Parameters
 -  `keep_screen_awake` can be used to keep also the screen awake. The default is `False`. On Linux, this is set to `True` and cannot be changed.
 
+### Raises
+- `NotImplementedError`: If setting keepawake is not supported on your system.
+
 ## Details
 
 ### Windows
