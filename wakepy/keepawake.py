@@ -28,7 +28,38 @@ def set_keepawake(
     Parameters
     ----------
     method_win:
-        The
+        The method or methods to use on Windows. Possible values: 'esflags'
+    method_linux:
+        The method or methods to use on Linux. Possible values: 'dbus',
+        'libdbus', 'systemd'
+    method_mac:
+        The method or methods to use on Windows. Possible values: 'caffeinate'
+
+    on_method_failure:
+        Tells what to do when a method fails. Makes sense only when there are
+        multiple methods used (like on linux; see `method_linux`).
+        See also: `on_failure`. Default: 'loginfo'.
+
+    on_failure:
+        Tells what to do when setting keepawake fails. This is done when
+        *every* (selected) method has failed. See below for the list of
+        possible values. Default: 'error'.
+
+
+    Details
+    ---------
+    Possible values for `on_failure` and `on_method_failure`:
+
+        'error':  raise wakepy.KeepAwakeError
+        'warn': call warnings.warn
+        'print': print to stdout
+        'logerror': Use python logging with log level = 'error'
+        'logwarn': Use python logging with log level = 'warning'
+        'loginfo': Use python logging with log level = 'info'
+        'logdebug': Use python logging with log level = 'debug'
+        'pass': do nothing
+
+
     """
     excecutor = KeepAwakeMethodExecutor(
         method_win=method_win,
