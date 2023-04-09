@@ -24,8 +24,8 @@ from ._methods import (
 )
 
 
-class KeepAwakeTask(str, enum.Enum):
-    """The different tasks which may be performed
+class KeepAwakeModuleFunction(str, enum.Enum):
+    """The different functions which may be called (tasks).
 
     The values are also the function names in the implementation module
     """
@@ -34,13 +34,23 @@ class KeepAwakeTask(str, enum.Enum):
     UNSET_KEEPAWAKE = "unset_keepawake"
 
 
-def run_task(
-    task: KeepAwakeTask,
+def call_function(
+    func: KeepAwakeModuleFunction,
     method=None | str | list[str],
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     system: System | None = None,
 ):
+    """Calls one function (e.g. set or unset keepawake) from a specified module
+
+    Parameters
+    ----------
+    func:
+        A KeepAwakeModuleFunction (or a string). Possible values include:
+        'set_keepawake', 'unset_keepawake'. This is the name of the function
+        in the implementation module to call.
+
+    """
     # Convert method to list of strings, if it is not already
     if method is None:
         method = get_default_method_names_for_system(system)
@@ -53,7 +63,7 @@ def run_task(
             on_method_failure=on_method_failure,
             on_failure=on_failure,
         )
-        result = executor.run(task)
+        result = executor.run(func)
 
 
 def set_keepawake(
@@ -107,8 +117,8 @@ def set_keepawake(
         System.DARWIN: method_mac,
     }.get(CURRENT_SYSTEM)
 
-    outcome = run_task(
-        task=KeepAwakeTask.SET_KEEPAWAKE,
+    outcome = call_function(
+        func=KeepAwakeModuleFunction.SET_KEEPAWAKE,
         method=method,
         on_method_failure=on_method_failure,
         on_failure=on_failure,
