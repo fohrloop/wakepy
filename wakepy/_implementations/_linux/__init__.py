@@ -10,7 +10,7 @@ Other possibilities: (not implemented)
 """
 
 
-from ._jeepney_dbus import method as jeepney_method
+# from ._dbus import method as jeepney_method
 
 
 # try:
@@ -26,4 +26,4 @@ from ._jeepney_dbus import method as jeepney_method
 # except NotSupportedError:
 #     pass
 
-methods = {method.shortname: method for method in (jeepney_method,)}
+# methods = {method.shortname: method for method in (jeepney_method,)}

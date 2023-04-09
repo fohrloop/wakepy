@@ -34,6 +34,31 @@ class KeepAwakeModuleFunction(str, enum.Enum):
     UNSET_KEEPAWAKE = "unset_keepawake"
 
 
+def get_module_names(
+    method_win=None | str | list[str],
+    method_linux=None | str | list[str],
+    method_mac=None | str | list[str],
+    system: System | None = None,
+):
+    """Convert a method name to wakepy module name"""
+
+    system = system or CURRENT_SYSTEM
+
+    # Select the input argument based on system
+    method = {
+        System.WINDOWS: method_win,
+        System.LINUX: method_linux,
+        System.DARWIN: method_mac,
+    }.get(system)
+
+    # Convert method to list of strings, if it is not already
+    if method is None:
+        method = get_default_method_names_for_system(system)
+    method_names = [method] if isinstance(method, str) else method
+
+    # Convert the method names to module names
+
+
 def call_function(
     func: KeepAwakeModuleFunction,
     method=None | str | list[str],
@@ -51,10 +76,6 @@ def call_function(
         in the implementation module to call.
 
     """
-    # Convert method to list of strings, if it is not already
-    if method is None:
-        method = get_default_method_names_for_system(system)
-    method_names = [method] if isinstance(method, str) else method
 
     for method_name in method_names:
         executor = KeepAwakeMethodExecutor(
@@ -110,12 +131,6 @@ def set_keepawake(
 
 
     """
-
-    method = {
-        System.WINDOWS: method_win,
-        System.LINUX: method_linux,
-        System.DARWIN: method_mac,
-    }.get(CURRENT_SYSTEM)
 
     outcome = call_function(
         func=KeepAwakeModuleFunction.SET_KEEPAWAKE,

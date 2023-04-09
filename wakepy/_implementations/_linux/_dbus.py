@@ -9,7 +9,6 @@ See also:
 """
 
 from ...exceptions import KeepAwakeError
-from ..._methods import KeepawakeMethod
 
 
 SCREENSAVER_BUS_NAME = "org.freedesktop.ScreenSaver"
@@ -91,15 +90,9 @@ def unset_keepawake():
     connection.send_and_get_reply(msg_uninhibit)
 
 
-method = KeepawakeMethod(
-    printname="jeepney (dbus)",
-    shortname="dbus",
-    set_keepawake=set_keepawake,
-    unset_keepawake=unset_keepawake,
-    short_description="jeepney (pure python solution) + D-Bus",
-    requirements=[
-        "session message bus (dbus-daemon) running",
-        "DBUS_SESSION_BUS_ADDRESS set",
-        "jeepney (python package)",
-    ],
-)
+printname = "jeepney (dbus)"
+requirements = [
+    "session message bus (dbus-daemon) running",
+    "DBUS_SESSION_BUS_ADDRESS set",
+    "jeepney (python package)",
+]
