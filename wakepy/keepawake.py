@@ -11,7 +11,6 @@ unset_keepawake()
 
 from __future__ import annotations
 
-import enum
 from contextlib import contextmanager
 
 
