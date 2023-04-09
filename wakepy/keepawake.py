@@ -144,9 +144,9 @@ def set_keepawake(
 
 
 def unset_keepawake(
-    method_win=None | str | list[str],
-    method_linux=None | str | list[str],
-    method_mac=None | str | list[str],
+    method_win: None | str | list[str],
+    method_linux: None | str | list[str],
+    method_mac: None | str | list[str],
 ):
     raise NotImplementedError()
 
@@ -154,9 +154,9 @@ def unset_keepawake(
 @contextmanager
 def keepawake(
     *args,
-    method_win=None | str | list[str],
-    method_linux=None | str | list[str],
-    method_mac=None | str | list[str],
+    method_win: None | str | list[str],
+    method_linux: None | str | list[str],
+    method_mac: None | str | list[str],
     **kwargs,
 ):
     set_keepawake(*args, **kwargs)
