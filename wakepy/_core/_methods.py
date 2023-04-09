@@ -1,15 +1,64 @@
 from __future__ import annotations
 
-
 from dataclasses import dataclass
 import enum
 import typing
 import logging
+import platform
 import warnings
-from .exceptions import KeepAwakeError
+from ..exceptions import KeepAwakeError
+
+# from .._implementations._windows import methods as windows_methods
+from .._implementations._linux import methods as linux_methods
+
+# from .._implementations._darwin import methods as darwin_methods
 
 if typing.TYPE_CHECKING:
     from ._methods import KeepawakeMethod
+
+
+class System(str, enum.Enum):
+    WINDOWS = "windows"
+    LINUX = "linux"
+    DARWIN = "darwin"
+
+
+CURRENT_SYSTEM = platform.system().lower()
+SUPPORTED_SYSTEMS = list(x.value for x in System.__members__.values())
+
+
+def get_methods_for_current_system() -> list[KeepawakeMethod]:
+    return {
+        # System.WINDOWS: windows_methods,
+        System.LINUX: linux_methods,
+        # System.DARWIN: darwin_methods,
+    }.get(CURRENT_SYSTEM, [])
+
+
+def get_default_method_names_for_current_system() -> list[str]:
+    methods = get_methods_for_current_system()
+    return [x.name for x in methods]
+
+
+def get_method_names_from_args_for_current_system(
+    method_win=None | str | list[str],
+    method_linux=None | str | list[str],
+    method_mac=None | str | list[str],
+) -> list[str]:
+    if CURRENT_SYSTEM not in SUPPORTED_SYSTEMS:
+        return []
+
+    methodnames = {
+        System.WINDOWS: method_win,
+        System.LINUX: method_linux,
+        System.DARWIN: method_mac,
+    }.get(CURRENT_SYSTEM)
+
+    if methodnames is None:
+        methodnames = get_default_method_names_for_current_system()
+    elif isinstance(methodnames, str):
+        methodnames = [methodnames]
+    return methodnames
 
 
 class OnFailureStrategyName(str, enum.Enum):
