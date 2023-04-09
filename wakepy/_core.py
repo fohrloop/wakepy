@@ -38,6 +38,24 @@ def get_methods_for_system(system: SystemName | None = None) -> list[str]:
     return DEFAULT_METHODS.get(system, [])
 
 
+def call_a_keepawake_function_with_single_method(
+    func: KeepAwakeModuleFunctionName,
+    method: str, 
+    on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
+    system: SystemName | None = None,
+):
+    response = dict(failure=False)
+    module = import_module(system, method)
+    function_to_be_called = getattr(module, func)
+    try:
+        function_to_be_called()
+        break
+    except KeepAwakeError as exception:
+        response['failure']=True
+        handle_failure(exception, on_failure=on_failure)
+     return response
+
+
 def call_a_keepawake_function(
     func: KeepAwakeModuleFunctionName,
     methods: list[str] | None,
@@ -59,13 +77,12 @@ def call_a_keepawake_function(
 
     # TODO: make this work
     for method in methods:
-        module = import_module(system, method)
-        function_to_be_called = getattr(module, func)
-        try:
-            function_to_be_called()
-            break
-        except KeepAwakeError as exception:
-            handle_failure(exception, on_failure=on_method_failure)
+        res = call_a_keepawake_function_with_single_method(
+            func=func,
+            method=method,
+            on_failure=on_method_failure
+            system=system,
+        )
     else:
         # no break means that none of the methods worked.
         exception = KeepAwakeError(f"Could not call {str(func)}. Tried methods: ")
