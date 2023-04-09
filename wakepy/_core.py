@@ -12,8 +12,6 @@ from .constants import SystemName, CURRENT_SYSTEM, OnFailureStrategyName
 # from ._implementations._linux import methods as linux_methods
 # from .._implementations._darwin import methods as darwin_methods
 
-if typing.TYPE_CHECKING:
-    from ._methods import KeepawakeMethod
 
 warnings.warn("Not implemented win & darwin yet")
 DEFAULT_METHODS = {
