@@ -1,2 +1,6 @@
 class NotSupportedError(Exception):
     ...
+
+
+class KeepAwakeError(Exception):
+    ...

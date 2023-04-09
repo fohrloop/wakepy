@@ -1,28 +1,32 @@
-import argparse
+if __name__ == "__main__":
+    """Start wakepy keepawake with CLI
 
-parser = argparse.ArgumentParser(
-    prog="wakepy",
-    formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=27),
-)
+    This is called either with
 
-parser.add_argument(
-    "-s",
-    "--keep-screen-awake",
-    help=(
-        "Keep also the screen awake. "
-        "On Linux, this flag is set on and cannot be disabled."
-    ),
-    action="store_true",
-    default=False,
-)
+        python -m wakepy [args]
 
+    or using the executable
 
-def wakepy():
-    from wakepy import start
+        wakepy [args]
+    """
+    import argparse
 
+    from wakepy._cli import start
+
+    parser = argparse.ArgumentParser(
+        prog="wakepy",
+        formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=27),
+    )
+
+    parser.add_argument(
+        "-s",
+        "--keep-screen-awake",
+        help=(
+            "Keep also the screen awake. "
+            "On Linux, this flag is set on and cannot be disabled."
+        ),
+        action="store_true",
+        default=False,
+    )
     args = parser.parse_args()
     start(keep_screen_awake=args.keep_screen_awake)
-
-
-if __name__ == "__main__":
-    wakepy()

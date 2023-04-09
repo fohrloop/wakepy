@@ -7,23 +7,36 @@ Requires jeepney. Install with:
 See also:
     https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html
 """
-METHOD = "jeepney (dbus)"
 
-from wakepy.exceptions import NotSupportedError
+from wakepy.exceptions import KeepAwakeError
+from ..._methods import KeepawakeMethod
+
+
+SCREENSAVER_BUS_NAME = "org.freedesktop.ScreenSaver"
+SCREENSAVER_OBJECT_PATH = "/org/freedesktop/ScreenSaver"
+SCREENSAVER_INTERFACE = SCREENSAVER_BUS_NAME
+
 
 try:
     from jeepney.wrappers import MessageGenerator, new_method_call
     from jeepney.io.blocking import open_dbus_connection
 except ImportError as e:
-    print(f"Error when importing jeepney: {e}")
-    raise NotSupportedError()
+    raise KeepAwakeError("Could not import jeepney!") from e
 
 
-SCREENSAVER_BUS_NAME = "org.freedesktop.ScreenSaver"
-SCREENSAVER_OBJECT_PATH = "/org/freedesktop/ScreenSaver"
-SCREENSAVED_INTERFACE = SCREENSAVER_BUS_NAME
+try:
+    connection = open_dbus_connection(bus="SESSION")
+except KeyError as e:
+    if "DBUS_SESSION_BUS_ADDRESS" in str(e):
+        raise KeepAwakeError(
+            "DBUS_SESSION_BUS_ADDRESS environment variable not set! "
+            "If running in subprocess, make sure to pass the DBUS_SESSION_BUS_ADDRESS "
+            "environment variable."
+        ) from e
+    raise KeepAwakeError(
+        "Could not set dbus connection to session message bus. "
+    ) from e
 
-connection = open_dbus_connection(bus="SESSION")
 
 # The cookie holds represents the inhibition request
 # It is given in the response of the inhibit call and
@@ -33,7 +46,7 @@ cookie = None
 
 class ScreenSaveMessageGenerator(MessageGenerator):
     r"""DBus interface to org.freedesktop.Screensaver"""
-    interface = SCREENSAVED_INTERFACE
+    interface = SCREENSAVER_INTERFACE
 
     def __init__(
         self,
@@ -73,7 +86,20 @@ def set_keepawake(keep_screen_awake=False):
 
 def unset_keepawake():
     if cookie is None:
-        print("You must set keepawake before unsetting!")
-        return
+        raise KeepAwakeError("You must set keepawake before unsetting!")
     msg_uninhibit = messagegenerator.uninhibit(cookie)
     connection.send_and_get_reply(msg_uninhibit)
+
+
+method = KeepawakeMethod(
+    printname="jeepney (dbus)",
+    shortname="dbus",
+    set_keepawake=set_keepawake,
+    unset_keepawake=unset_keepawake,
+    short_description="jeepney (pure python solution) + D-Bus",
+    requirements=[
+        "session message bus (dbus-daemon) running",
+        "DBUS_SESSION_BUS_ADDRESS set",
+        "jeepney (python package)",
+    ],
+)
