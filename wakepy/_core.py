@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import typing
+from importlib import import_module
 import logging
 import platform
-
+import typing
 
 import warnings
 from .exceptions import KeepAwakeError
@@ -68,6 +68,10 @@ class WakepyResponse:
     failure: bool = False
 
 
+def import_module_for_method(system, method):
+    return import_module(f".._implementations._{system}._{method}", "wakepy._core")
+
+
 def call_a_keepawake_function_with_single_method(
     func: KeepAwakeModuleFunctionName,
     method: str,
@@ -75,7 +79,7 @@ def call_a_keepawake_function_with_single_method(
     system: SystemName | None = None,
 ) -> WakepyResponse:
     response = WakepyResponse()
-    module = import_module(system, method)
+    module = import_module_for_method(system, method)
     function_to_be_called = getattr(module, func)
     try:
         function_to_be_called()
