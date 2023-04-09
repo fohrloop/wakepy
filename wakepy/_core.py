@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import typing
 import logging
+import platform
+
 
 import warnings
 from .exceptions import KeepAwakeError
@@ -11,6 +13,8 @@ from .constants import SystemName, CURRENT_SYSTEM, OnFailureStrategyName
 # from .._implementations._windows import methods as windows_methods
 # from ._implementations._linux import methods as linux_methods
 # from .._implementations._darwin import methods as darwin_methods
+
+CURRENT_SYSTEM = platform.system().lower()
 
 
 warnings.warn("Not implemented win & darwin yet")

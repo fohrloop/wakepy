@@ -1,5 +1,4 @@
 import enum
-import platform
 
 
 class KeepAwakeModuleFunctionName(str, enum.Enum):
@@ -32,4 +31,3 @@ class OnFailureStrategyName(str, enum.Enum):
 
 
 SUPPORTED_SYSTEMS = list(x.value for x in SystemName.__members__.values())
-CURRENT_SYSTEM = platform.system().lower()
