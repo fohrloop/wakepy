@@ -10,7 +10,6 @@ import warnings
 from .exceptions import KeepAwakeError
 from .constants import (
     SystemName,
-    CURRENT_SYSTEM,
     OnFailureStrategyName,
     KeepAwakeModuleFunctionName,
 )
