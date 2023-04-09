@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import enum
 import typing
 import logging
-import platform
+
 import warnings
 from .exceptions import KeepAwakeError
-from .constants import System, CURRENT_SYSTEM
+from .constants import System, CURRENT_SYSTEM, OnFailureStrategyName
 
 # from .._implementations._windows import methods as windows_methods
 # from ._implementations._linux import methods as linux_methods
@@ -34,18 +33,6 @@ def get_default_method_names_for_system(system: System | None = None) -> list[st
     system = system or CURRENT_SYSTEM
     methods = get_methods_for_system(system)
     return [x.name for x in methods]
-
-
-class OnFailureStrategyName(str, enum.Enum):
-    ERROR = "error"
-    WARN = "warn"
-    PRINT = "print"
-    LOGERROR = "logerror"
-    LOGWARN = "logwarn"
-    LOGINFO = "loginfo"
-    LOGDEBUG = "logdebug"
-    PASS = "pass"
-    CALLABLE = "callable"
 
 
 class KeepAwakeMethodExecutor:

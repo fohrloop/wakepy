@@ -19,5 +19,17 @@ class System(str, enum.Enum):
     DARWIN = "darwin"
 
 
+class OnFailureStrategyName(str, enum.Enum):
+    ERROR = "error"
+    WARN = "warn"
+    PRINT = "print"
+    LOGERROR = "logerror"
+    LOGWARN = "logwarn"
+    LOGINFO = "loginfo"
+    LOGDEBUG = "logdebug"
+    PASS = "pass"
+    CALLABLE = "callable"
+
+
 SUPPORTED_SYSTEMS = list(x.value for x in System.__members__.values())
 CURRENT_SYSTEM = platform.system().lower()
