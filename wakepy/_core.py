@@ -17,12 +17,6 @@ from .constants import (
     MethodNameWindows,
 )
 
-from .exceptions import KeepAwakeError
-
-
-# from .._implementations._windows import methods as windows_methods
-# from ._implementations._linux import methods as linux_methods
-# from .._implementations._darwin import methods as darwin_methods
 
 CURRENT_SYSTEM = platform.system().lower()
 logger = logging.getLogger(__name__)
