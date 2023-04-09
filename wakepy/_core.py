@@ -27,8 +27,6 @@ from .exceptions import KeepAwakeError
 CURRENT_SYSTEM = platform.system().lower()
 logger = logging.getLogger(__name__)
 
-warnings.warn("Not implemented win & darwin yet")
-
 
 DEFAULT_METHODS = {
     SystemName.WINDOWS: [MethodNameWindows.ES_FLAGS],
