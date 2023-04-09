@@ -13,7 +13,7 @@ class KeepAwakeModuleFunctionName(str, enum.Enum):
     UNSET_KEEPAWAKE = "unset_keepawake"
 
 
-class System(str, enum.Enum):
+class SystemName(str, enum.Enum):
     WINDOWS = "windows"
     LINUX = "linux"
     DARWIN = "darwin"
@@ -31,5 +31,5 @@ class OnFailureStrategyName(str, enum.Enum):
     CALLABLE = "callable"
 
 
-SUPPORTED_SYSTEMS = list(x.value for x in System.__members__.values())
+SUPPORTED_SYSTEMS = list(x.value for x in SystemName.__members__.values())
 CURRENT_SYSTEM = platform.system().lower()

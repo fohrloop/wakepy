@@ -17,7 +17,7 @@ from contextlib import contextmanager
 from ._methods import (
     KeepAwakeMethodExecutor,
     OnFailureStrategyName,
-    System,
+    SystemName,
     CURRENT_SYSTEM,
     get_default_method_names_for_system,
 )
@@ -30,7 +30,7 @@ def method_arguments_to_list_of_methods(
     method_win=None | str | list[str],
     method_linux=None | str | list[str],
     method_mac=None | str | list[str],
-    system: System | None = None,
+    system: SystemName | None = None,
 ) -> list[str]:
     """Based on the input arguments, return the list of method names for the
     system. If the input of methods for the system is None, return the list
@@ -46,9 +46,9 @@ def method_arguments_to_list_of_methods(
 
     # Select the input argument based on system
     methods = {
-        System.WINDOWS: method_win,
-        System.LINUX: method_linux,
-        System.DARWIN: method_mac,
+        SystemName.WINDOWS: method_win,
+        SystemName.LINUX: method_linux,
+        SystemName.DARWIN: method_mac,
     }.get(system)
 
     # Convert method to list of strings, if it is not already
@@ -62,7 +62,7 @@ def call_a_keepawake_function(
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     methods: None | list[str] = None,
-    system: System | None = None,
+    system: SystemName | None = None,
 ):
     """Calls one function (e.g. set or unset keepawake) from a specified module
 

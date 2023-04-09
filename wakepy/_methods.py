@@ -6,7 +6,7 @@ import logging
 
 import warnings
 from .exceptions import KeepAwakeError
-from .constants import System, CURRENT_SYSTEM, OnFailureStrategyName
+from .constants import SystemName, CURRENT_SYSTEM, OnFailureStrategyName
 
 # from .._implementations._windows import methods as windows_methods
 # from ._implementations._linux import methods as linux_methods
@@ -16,7 +16,7 @@ if typing.TYPE_CHECKING:
     from ._methods import KeepawakeMethod
 
 
-def get_methods_for_system(system: System | None = None) -> list[KeepawakeMethod]:
+def get_methods_for_system(system: SystemName | None = None) -> list[KeepawakeMethod]:
     import warnings
 
     warnings.warn("Not implemented win & darwin yet")
@@ -24,12 +24,12 @@ def get_methods_for_system(system: System | None = None) -> list[KeepawakeMethod
 
     return {
         # System.WINDOWS: windows_methods,
-        System.LINUX: ["dbus", "libdbus"],
+        SystemName.LINUX: ["dbus", "libdbus"],
         # System.DARWIN: darwin_methods,
     }.get(system, [])
 
 
-def get_default_method_names_for_system(system: System | None = None) -> list[str]:
+def get_default_method_names_for_system(system: SystemName | None = None) -> list[str]:
     system = system or CURRENT_SYSTEM
     methods = get_methods_for_system(system)
     return [x.name for x in methods]
