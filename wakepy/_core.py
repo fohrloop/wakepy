@@ -40,7 +40,7 @@ def get_methods_for_system(system: SystemName | None = None) -> list[str]:
 
 def call_a_keepawake_function(
     func: KeepAwakeModuleFunctionName,
-    methods: list[str],
+    methods: list[str] | None,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     system: SystemName | None = None,
@@ -55,6 +55,7 @@ def call_a_keepawake_function(
         in the implementation module to call.
 
     """
+    methods = methods or get_methods_for_system(system)
 
     # TODO: make this work
     for method in methods:

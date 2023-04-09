@@ -18,20 +18,20 @@ from .constants import KeepAwakeModuleFunctionName, SystemName, OnFailureStrateg
 from ._core import call_a_keepawake_function, CURRENT_SYSTEM
 
 
-def method_arguments_to_list_of_methods(
+def method_arguments_to_list_of_methods_or_none(
     method_win=None | str | list[str],
     method_linux=None | str | list[str],
     method_mac=None | str | list[str],
     system: SystemName | None = None,
-) -> list[str]:
-    """Based on the input arguments, return the list of method names for the
-    system. If the input of methods for the system is None, return the list
-    of default methods. By default, use current system as `system`.
+) -> list[str] | None:
+    """Based on the input arguments, return the correct input arguments for the
+    system. Convert string inputs to list of strings. By default, use current
+    system as `system`.
 
     Returns
     -------
     methods:
-        List of strings, corresponding to the method names.
+        List of strings, corresponding to the method names, or None.
     """
 
     system = system or CURRENT_SYSTEM
@@ -45,7 +45,7 @@ def method_arguments_to_list_of_methods(
 
     # Convert method to list of strings, if it is not already
     methods = [methods] if isinstance(methods, str) else methods
-    methods = methods or get_default_method_names_for_system(system)
+
     return methods
 
 
@@ -91,7 +91,7 @@ def set_keepawake(
 
     """
 
-    methods = method_arguments_to_list_of_methods(
+    methods = method_arguments_to_list_of_methods_or_none(
         method_win=method_win,
         method_linux=method_linux,
         method_mac=method_mac,
