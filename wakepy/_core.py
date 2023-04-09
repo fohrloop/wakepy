@@ -12,6 +12,9 @@ from .constants import (
     SystemName,
     OnFailureStrategyName,
     KeepAwakeModuleFunctionName,
+    MethodNameLinux,
+    MethodNameMac,
+    MethodNameWindows,
 )
 
 from .exceptions import KeepAwakeError
@@ -25,10 +28,16 @@ CURRENT_SYSTEM = platform.system().lower()
 logger = logging.getLogger(__name__)
 
 warnings.warn("Not implemented win & darwin yet")
+
+
 DEFAULT_METHODS = {
-    # System.WINDOWS: windows_methods,
-    SystemName.LINUX: ["dbus", "libdbus"],
-    # System.DARWIN: darwin_methods,
+    SystemName.WINDOWS: [MethodNameWindows.ES_FLAGS],
+    SystemName.LINUX: [
+        MethodNameLinux.DBUS,
+        MethodNameLinux.LIBDBUS,
+        MethodNameLinux.SYSTEMD,
+    ],
+    SystemName.DARWIN: [MethodNameMac.CAFFEINATE],
 }
 
 
