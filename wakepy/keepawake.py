@@ -29,7 +29,7 @@ def set_keepawake(
     method_win:
         The
     """
-    method_names = get_method_names_from_args_for_current_system(
+    method_names = get_method_names_from_args_for_system(
         method_win=method_win,
         method_linux=method_linux,
         method_mac=method_mac,

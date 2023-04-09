@@ -27,38 +27,44 @@ CURRENT_SYSTEM = platform.system().lower()
 SUPPORTED_SYSTEMS = list(x.value for x in System.__members__.values())
 
 
-def get_methods_for_current_system() -> list[KeepawakeMethod]:
+def get_methods_for_system(system: System | None = None) -> list[KeepawakeMethod]:
     import warnings
 
     warnings.warn("Not implemented win & darwin yet")
+    system = system or CURRENT_SYSTEM
+
     return {
         # System.WINDOWS: windows_methods,
         System.LINUX: linux_methods,
         # System.DARWIN: darwin_methods,
-    }.get(CURRENT_SYSTEM, [])
+    }.get(system, [])
 
 
-def get_default_method_names_for_current_system() -> list[str]:
-    methods = get_methods_for_current_system()
+def get_default_method_names_for_system(system: System | None = None) -> list[str]:
+    system = system or CURRENT_SYSTEM
+    methods = get_methods_for_system(system)
     return [x.name for x in methods]
 
 
-def get_method_names_from_args_for_current_system(
+def get_method_names_from_args_for_system(
     method_win=None | str | list[str],
     method_linux=None | str | list[str],
     method_mac=None | str | list[str],
+    system: System | None = None,
 ) -> list[str]:
-    if CURRENT_SYSTEM not in SUPPORTED_SYSTEMS:
+    system = system or CURRENT_SYSTEM
+
+    if system not in SUPPORTED_SYSTEMS:
         return []
 
     methodnames = {
         System.WINDOWS: method_win,
         System.LINUX: method_linux,
         System.DARWIN: method_mac,
-    }.get(CURRENT_SYSTEM)
+    }.get(system)
 
     if methodnames is None:
-        methodnames = get_default_method_names_for_current_system()
+        methodnames = get_default_method_names_for_system(system)
     elif isinstance(methodnames, str):
         methodnames = [methodnames]
     return methodnames
