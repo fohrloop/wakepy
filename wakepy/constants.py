@@ -30,4 +30,36 @@ class OnFailureStrategyName(str, enum.Enum):
     CALLABLE = "callable"
 
 
+class MethodNameWindows(str, enum.Enum):
+    """This contains all the windows methods
+    Each method correspons to a module in the
+    wakepy._implementations._windows package
+    (underscore neglected)
+    """
+
+    ES_FLAGS = "esflags"
+
+
+class MethodNameLinux(str, enum.Enum):
+    """This contains all the linux methods
+    Each method correspons to a module in the
+    wakepy._implementations._linux package
+    (underscore neglected)
+    """
+
+    DBUS = "dbus"
+    LIBDBUS = "libdbus"
+    SYSTEMD = "systemd"
+
+
+class MethodNameMac(str, enum.Enum):
+    """This contains all the MacOS methods
+    Each method correspons to a module in the
+    wakepy._implementations._darwin package
+    (underscore neglected)
+    """
+
+    CAFFEINATE = "caffeinate"
+
+
 SUPPORTED_SYSTEMS = list(x.value for x in SystemName.__members__.values())
