@@ -32,7 +32,7 @@ def get_module_names(
     method_mac=None | str | list[str],
     system: System | None = None,
 ):
-    """Convert a method name to wakepy module name"""
+    """Convert a method name or method names to wakepy module name(s)"""
 
     system = system or CURRENT_SYSTEM
 
