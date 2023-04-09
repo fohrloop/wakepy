@@ -8,7 +8,15 @@ import platform
 
 import warnings
 from .exceptions import KeepAwakeError
-from .constants import SystemName, CURRENT_SYSTEM, OnFailureStrategyName
+from .constants import (
+    SystemName,
+    CURRENT_SYSTEM,
+    OnFailureStrategyName,
+    KeepAwakeModuleFunctionName,
+)
+
+from .exceptions import KeepAwakeError
+
 
 # from .._implementations._windows import methods as windows_methods
 # from ._implementations._linux import methods as linux_methods
@@ -28,6 +36,39 @@ DEFAULT_METHODS = {
 def get_methods_for_system(system: SystemName | None = None) -> list[str]:
     system = system or CURRENT_SYSTEM
     return DEFAULT_METHODS.get(system, [])
+
+
+def call_a_keepawake_function(
+    func: KeepAwakeModuleFunctionName,
+    methods: list[str],
+    on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
+    on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
+    system: SystemName | None = None,
+):
+    """Calls one function (e.g. set or unset keepawake) from a specified module
+
+    Parameters
+    ----------
+    func:
+        A KeepAwakeModuleFunctionName (or a string). Possible values include:
+        'set_keepawake', 'unset_keepawake'. This is the name of the function
+        in the implementation module to call.
+
+    """
+
+    # TODO: make this work
+    for method in methods:
+        module = import_module(system, method)
+        function_to_be_called = getattr(module, func)
+        try:
+            function_to_be_called()
+            break
+        except KeepAwakeError as exception:
+            handle_failure(exception, on_failure=on_method_failure)
+    else:
+        # no break means that none of the methods worked.
+        exception = KeepAwakeError(f"Could not call {str(func)}. Tried methods: ")
+        handle_failure(exception, on_failure=on_failure)
 
 
 class KeepAwakeMethodExecutor:
