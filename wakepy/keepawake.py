@@ -11,10 +11,49 @@ unset_keepawake()
 
 from __future__ import annotations
 
+import enum
 from contextlib import contextmanager
 
 
-from ._methods import OnFailureStrategyName, CURRENT_SYSTEM, KeepAwakeMethodExecutor
+from ._methods import (
+    KeepAwakeMethodExecutor,
+    OnFailureStrategyName,
+    System,
+    CURRENT_SYSTEM,
+    get_default_method_names_for_system,
+)
+
+
+class KeepAwakeTask(str, enum.Enum):
+    """The different tasks which may be performed
+
+    The values are also the function names in the implementation module
+    """
+
+    SET_KEEPAWAKE = "set_keepawake"
+    UNSET_KEEPAWAKE = "unset_keepawake"
+
+
+def run_task(
+    task: KeepAwakeTask,
+    method=None | str | list[str],
+    on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
+    on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
+    system: System | None = None,
+):
+    # Convert method to list of strings, if it is not already
+    if method is None:
+        method = get_default_method_names_for_system(system)
+    method_names = [method] if isinstance(method, str) else method
+
+    for method_name in method_names:
+        executor = KeepAwakeMethodExecutor(
+            system=system,
+            method=method_name,
+            on_method_failure=on_method_failure,
+            on_failure=on_failure,
+        )
+        result = executor.run(task)
 
 
 def set_keepawake(
@@ -61,20 +100,19 @@ def set_keepawake(
 
 
     """
-    excecutor = KeepAwakeMethodExecutor(
-        method_win=method_win,
-        method_linux=method_linux,
-        method_mac=method_mac,
+
+    method = {
+        System.WINDOWS: method_win,
+        System.LINUX: method_linux,
+        System.DARWIN: method_mac,
+    }.get(CURRENT_SYSTEM)
+
+    outcome = run_task(
+        task=KeepAwakeTask.SET_KEEPAWAKE,
+        method=method,
         on_method_failure=on_method_failure,
         on_failure=on_failure,
-    )
-
-    for method_name in method_names:
-        call_method(CURRENT_SYSTEM, method_name)
-
-    raise NotImplementedError(
-        f"wakepy has not yet a {CURRENT_SYSTEM} implementation. "
-        "Pull requests welcome: https://github.com/np-8/wakepy"
+        system=CURRENT_SYSTEM,
     )
 
 
