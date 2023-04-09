@@ -7,6 +7,7 @@ import logging
 import platform
 import warnings
 from .exceptions import KeepAwakeError
+from .constants import System, CURRENT_SYSTEM
 
 # from .._implementations._windows import methods as windows_methods
 # from ._implementations._linux import methods as linux_methods
@@ -14,16 +15,6 @@ from .exceptions import KeepAwakeError
 
 if typing.TYPE_CHECKING:
     from ._methods import KeepawakeMethod
-
-
-class System(str, enum.Enum):
-    WINDOWS = "windows"
-    LINUX = "linux"
-    DARWIN = "darwin"
-
-
-CURRENT_SYSTEM = platform.system().lower()
-SUPPORTED_SYSTEMS = list(x.value for x in System.__members__.values())
 
 
 def get_methods_for_system(system: System | None = None) -> list[KeepawakeMethod]:
