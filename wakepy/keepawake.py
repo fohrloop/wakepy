@@ -26,36 +26,42 @@ from ._methods import (
 from .constants import KeepAwakeModuleFunctionName
 
 
-def get_module_names(
+def method_arguments_to_list_of_methods(
     method_win=None | str | list[str],
     method_linux=None | str | list[str],
     method_mac=None | str | list[str],
     system: System | None = None,
-):
-    """Convert a method name or method names to wakepy module name(s)"""
+) -> list[str]:
+    """Based on the input arguments, return the list of method names for the
+    system. If the input of methods for the system is None, return the list
+    of default methods. By default, use current system as `system`.
+
+    Returns
+    -------
+    methods:
+        List of strings, corresponding to the method names.
+    """
 
     system = system or CURRENT_SYSTEM
 
     # Select the input argument based on system
-    method = {
+    methods = {
         System.WINDOWS: method_win,
         System.LINUX: method_linux,
         System.DARWIN: method_mac,
     }.get(system)
 
     # Convert method to list of strings, if it is not already
-    if method is None:
-        method = get_default_method_names_for_system(system)
-    method_names = [method] if isinstance(method, str) else method
-
-    # Convert the method names to module names
+    methods = [methods] if isinstance(methods, str) else methods
+    methods = methods or get_default_method_names_for_system(system)
+    return methods
 
 
-def call_function(
+def call_a_keepawake_function(
     func: KeepAwakeModuleFunctionName,
-    method=None | str | list[str],
-    on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
+    on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
+    methods: None | list[str] = None,
     system: System | None = None,
 ):
     """Calls one function (e.g. set or unset keepawake) from a specified module
@@ -69,10 +75,10 @@ def call_function(
 
     """
 
-    for method_name in method_names:
+    for method in methods:
         executor = KeepAwakeMethodExecutor(
             system=system,
-            method=method_name,
+            method=method,
             on_method_failure=on_method_failure,
             on_failure=on_failure,
         )
@@ -121,11 +127,18 @@ def set_keepawake(
 
     """
 
-    outcome = call_function(
+    methods = method_arguments_to_list_of_methods(
+        method_win=method_win,
+        method_linux=method_linux,
+        method_mac=method_mac,
+        system=CURRENT_SYSTEM,
+    )
+
+    outcome = call_a_keepawake_function(
         func=KeepAwakeModuleFunctionName.SET_KEEPAWAKE,
-        method=method,
-        on_method_failure=on_method_failure,
         on_failure=on_failure,
+        on_method_failure=on_method_failure,
+        methods=methods,
         system=CURRENT_SYSTEM,
     )
 
