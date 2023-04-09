@@ -117,34 +117,6 @@ def call_a_keepawake_function(
         handle_failure(exception, on_failure=on_failure)
 
 
-class KeepAwakeMethodExecutor:
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
-
-
-
-    def call_set_keepawake(
-        self,
-        method: KeepawakeMethod,
-        on_failure: OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
-        keep_screen_awake=False,
-    ):
-        try:
-            method.set_keepawake(keep_screen_awake=keep_screen_awake)
-        except KeepAwakeError as exception:
-            self.handle_failure(exception, on_failure=on_failure)
-
-    def call_unset_keepawake(
-        self,
-        method: KeepawakeMethod,
-        on_failure: OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
-    ):
-        try:
-            method.unset_keepawake()
-        except KeepAwakeError as exception:
-            self.handle_failure(exception, on_failure=on_failure)
-
-
 @dataclass(kw_only=True)
 class KeepawakeMethod:
     shortname: str
