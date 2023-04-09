@@ -24,6 +24,7 @@ from ._methods import (
 
 
 from .constants import KeepAwakeModuleFunctionName
+from .exceptions import KeepAwakeError
 
 
 def method_arguments_to_list_of_methods(
@@ -59,9 +60,9 @@ def method_arguments_to_list_of_methods(
 
 def call_a_keepawake_function(
     func: KeepAwakeModuleFunctionName,
+    methods: list[str],
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
-    methods: None | list[str] = None,
     system: SystemName | None = None,
 ):
     """Calls one function (e.g. set or unset keepawake) from a specified module
@@ -75,14 +76,19 @@ def call_a_keepawake_function(
 
     """
 
+    # TODO: make this work
     for method in methods:
-        executor = KeepAwakeMethodExecutor(
-            system=system,
-            method=method,
-            on_method_failure=on_method_failure,
-            on_failure=on_failure,
-        )
-        result = executor.run(func)
+        module = import_module(system, method)
+        function_to_be_called = getattr(module, func)
+        try:
+            function_to_be_called()
+            break
+        except KeepAwakeError as exception:
+            handle_failure(exception, on_failure=on_method_failure)
+    else:
+        # no break means that none of the methods worked.
+        exception = KeepAwakeError(f"Could not call {str(func)}. Tried methods: ")
+        handle_failure(exception, on_failure=on_failure)
 
 
 def set_keepawake(
