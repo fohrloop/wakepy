@@ -15,7 +15,7 @@ from contextlib import contextmanager
 
 
 from .constants import KeepAwakeModuleFunctionName, SystemName, OnFailureStrategyName
-from ._core import call_a_keepawake_function, CURRENT_SYSTEM
+from ._core import call_a_keepawake_function_with_methods, CURRENT_SYSTEM
 
 
 def method_arguments_to_list_of_methods_or_none(
@@ -98,7 +98,7 @@ def set_keepawake(
         system=CURRENT_SYSTEM,
     )
 
-    outcome = call_a_keepawake_function(
+    outcome = call_a_keepawake_function_with_methods(
         func=KeepAwakeModuleFunctionName.SET_KEEPAWAKE,
         on_failure=on_failure,
         on_method_failure=on_method_failure,

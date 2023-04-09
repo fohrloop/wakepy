@@ -86,7 +86,7 @@ def call_a_keepawake_function_with_single_method(
     return response
 
 
-def call_a_keepawake_function(
+def call_a_keepawake_function_with_methods(
     func: KeepAwakeModuleFunctionName,
     methods: list[str] | None,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
