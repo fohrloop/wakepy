@@ -103,18 +103,15 @@ def set_keepawake(
         The method or methods to use on Linux. Possible values: 'dbus',
         'libdbus', 'systemd'
     method_mac:
-        The method or methods to use on Windows. Possible values: 'caffeinate'
-
+        The method or methods to use on MacOS. Possible values: 'caffeinate'
     on_method_failure:
         Tells what to do when a method fails. Makes sense only when there are
         multiple methods used (like on linux; see `method_linux`).
         See also: `on_failure`. Default: 'loginfo'.
-
     on_failure:
         Tells what to do when setting keepawake fails. This is done when
         *every* (selected) method has failed. See below for the list of
         possible values. Default: 'error'.
-
 
     Details
     ---------
