@@ -88,11 +88,11 @@ def call_function(
 
 
 def set_keepawake(
-    method_win=None | str | list[str],
-    method_linux=None | str | list[str],
-    method_mac=None | str | list[str],
-    on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
+    on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
+    method_win=None | str | list[str] = None,
+    method_linux=None | str | list[str] = None,
+    method_mac=None | str | list[str] = None,
 ):
     """
     Parameters
