@@ -15,24 +15,17 @@ from .constants import SystemName, CURRENT_SYSTEM, OnFailureStrategyName
 if typing.TYPE_CHECKING:
     from ._methods import KeepawakeMethod
 
+warnings.warn("Not implemented win & darwin yet")
+DEFAULT_METHODS = {
+    # System.WINDOWS: windows_methods,
+    SystemName.LINUX: ["dbus", "libdbus"],
+    # System.DARWIN: darwin_methods,
+}
 
-def get_methods_for_system(system: SystemName | None = None) -> list[KeepawakeMethod]:
-    import warnings
 
-    warnings.warn("Not implemented win & darwin yet")
+def get_methods_for_system(system: SystemName | None = None) -> list[str]:
     system = system or CURRENT_SYSTEM
-
-    return {
-        # System.WINDOWS: windows_methods,
-        SystemName.LINUX: ["dbus", "libdbus"],
-        # System.DARWIN: darwin_methods,
-    }.get(system, [])
-
-
-def get_default_method_names_for_system(system: SystemName | None = None) -> list[str]:
-    system = system or CURRENT_SYSTEM
-    methods = get_methods_for_system(system)
-    return [x.name for x in methods]
+    return DEFAULT_METHODS.get(system, [])
 
 
 class KeepAwakeMethodExecutor:
