@@ -61,27 +61,30 @@ def handle_failure(
     elif on_failure == OnFailureStrategyName.CALLABLE:
         NotImplementedError("Using callables on failure not implemented")
     else:
-        raise ValueError(
-            f'Could not understand option: "on_failure = {on_failure}"'
-        )
+        raise ValueError(f'Could not understand option: "on_failure = {on_failure}"')
+
+
+@dataclass
+class WakepyResponse:
+    failure: bool = False
 
 
 def call_a_keepawake_function_with_single_method(
     func: KeepAwakeModuleFunctionName,
-    method: str, 
+    method: str,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     system: SystemName | None = None,
-):
-    response = dict(failure=False)
+) -> WakepyResponse:
+    response = WakepyResponse()
     module = import_module(system, method)
     function_to_be_called = getattr(module, func)
     try:
         function_to_be_called()
-        break
+        return
     except KeepAwakeError as exception:
-        response['failure']=True
+        response.failure = True
         handle_failure(exception, on_failure=on_failure)
-     return response
+    return response
 
 
 def call_a_keepawake_function(
@@ -108,9 +111,12 @@ def call_a_keepawake_function(
         res = call_a_keepawake_function_with_single_method(
             func=func,
             method=method,
-            on_failure=on_method_failure
+            on_failure=on_method_failure,
             system=system,
         )
+        if not res.failure:
+            # no failure -> assuming a success and not trying other methods
+            break
     else:
         # no break means that none of the methods worked.
         exception = KeepAwakeError(f"Could not call {str(func)}. Tried methods: ")
