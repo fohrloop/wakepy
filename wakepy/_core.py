@@ -86,9 +86,9 @@ def call_a_keepawake_function_with_single_method(
     system: SystemName | None = None,
 ) -> WakepyResponse:
     response = WakepyResponse()
-    module = import_module_for_method(system, method)
-    function_to_be_called = getattr(module, func)
     try:
+        module = import_module_for_method(system, method)
+        function_to_be_called = getattr(module, func)
         function_to_be_called()
         return
     except KeepAwakeError as exception:
