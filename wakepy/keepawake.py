@@ -24,10 +24,11 @@ from ._methods import (
 )
 
 
-class KeepAwakeModuleFunction(str, enum.Enum):
-    """The different functions which may be called (tasks).
+class KeepAwakeModuleFunctionName(str, enum.Enum):
+    """The names of the functions which may be called.
 
-    The values are also the function names in the implementation module
+    The respective functions are expected to be present in the 
+    implementation module
     """
 
     SET_KEEPAWAKE = "set_keepawake"
@@ -60,7 +61,7 @@ def get_module_names(
 
 
 def call_function(
-    func: KeepAwakeModuleFunction,
+    func: KeepAwakeModuleFunctionName,
     method=None | str | list[str],
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
@@ -71,7 +72,7 @@ def call_function(
     Parameters
     ----------
     func:
-        A KeepAwakeModuleFunction (or a string). Possible values include:
+        A KeepAwakeModuleFunctionName (or a string). Possible values include:
         'set_keepawake', 'unset_keepawake'. This is the name of the function
         in the implementation module to call.
 
@@ -130,7 +131,7 @@ def set_keepawake(
     """
 
     outcome = call_function(
-        func=KeepAwakeModuleFunction.SET_KEEPAWAKE,
+        func=KeepAwakeModuleFunctionName.SET_KEEPAWAKE,
         method=method,
         on_method_failure=on_method_failure,
         on_failure=on_failure,
