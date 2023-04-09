@@ -63,3 +63,10 @@ class MethodNameMac(str, enum.Enum):
 
 
 SUPPORTED_SYSTEMS = list(x.value for x in SystemName.__members__.values())
+
+
+DEFAULT_METHODS = {
+    # System.WINDOWS: windows_methods,
+    SystemName.LINUX: ["dbus", "libdbus"],
+    # System.DARWIN: darwin_methods,
+}
