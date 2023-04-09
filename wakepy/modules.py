@@ -1,3 +1,6 @@
+from .constants import KeepAwakeModuleFunctionName
+
+
 class KeepAwakeModuleFunction:
     name: KeepAwakeModuleFunctionName
     is_required: bool = True
