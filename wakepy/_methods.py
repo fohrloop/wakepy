@@ -6,10 +6,10 @@ import typing
 import logging
 import platform
 import warnings
-from ..exceptions import KeepAwakeError
+from .exceptions import KeepAwakeError
 
 # from .._implementations._windows import methods as windows_methods
-from .._implementations._linux import methods as linux_methods
+from ._implementations._linux import methods as linux_methods
 
 # from .._implementations._darwin import methods as darwin_methods
 
@@ -28,6 +28,9 @@ SUPPORTED_SYSTEMS = list(x.value for x in System.__members__.values())
 
 
 def get_methods_for_current_system() -> list[KeepawakeMethod]:
+    import warnings
+
+    warnings.warn("Not implemented win & darwin yet")
     return {
         # System.WINDOWS: windows_methods,
         System.LINUX: linux_methods,
@@ -127,9 +130,11 @@ class KeepAwakeMethodExecutor:
             self.handle_failure(exception, on_failure=on_failure)
 
 
-@dataclass
+@dataclass(kw_only=True)
 class KeepawakeMethod:
     shortname: str
     printname: str
     set_keepawake: typing.Callable
     unset_keepawake: typing.Callable
+    requirements: list[str] = []
+    short_description: str = ""

@@ -1,4 +1,18 @@
+"""This module provides the following core functions of wakepy:
+
+keepawake()
+    A context manager that sets and unsets keepawake.
+
+set_keepawake()
+unset_keepawake()
+    The lower level functions that can be used in any script to
+    set or unset the keepawake.
+"""
+
+from __future__ import annotations
+
 from contextlib import contextmanager
+
 
 from ._methods import OnFailureStrategyName
 
@@ -35,7 +49,7 @@ def unset_keepawake(
     method_linux=None | str | list[str],
     method_mac=None | str | list[str],
 ):
-    method
+    raise NotImplementedError()
 
 
 @contextmanager

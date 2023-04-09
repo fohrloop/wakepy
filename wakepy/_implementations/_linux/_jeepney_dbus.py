@@ -8,7 +8,7 @@ See also:
     https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html
 """
 
-from wakepy.exceptions import KeepAwakeError
+from ...exceptions import KeepAwakeError
 from ..._methods import KeepawakeMethod
 
 

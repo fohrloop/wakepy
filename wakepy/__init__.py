@@ -1,4 +1,4 @@
-from wakepy._core import keepawake, set_keepawake, unset_keepawake
+from .keepawake import keepawake, set_keepawake, unset_keepawake
 
 __version__ = "1.0.0dev"
 
