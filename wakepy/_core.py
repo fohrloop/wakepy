@@ -34,6 +34,23 @@ DEFAULT_METHODS = {
 }
 
 
+@dataclass(kw_only=True)
+class KeepawakeMethod:
+    shortname: str
+    printname: str
+    set_keepawake: typing.Callable
+    unset_keepawake: typing.Callable
+    requirements: list[str] | None = None
+    short_description: str = ""
+
+
+@dataclass
+class WakepyResponse:
+    """Used as responses in core functions"""
+
+    failure: bool = False
+
+
 def get_methods_for_system(system: SystemName | None = None) -> list[str]:
     system = system or CURRENT_SYSTEM
     return DEFAULT_METHODS.get(system, [])
@@ -63,11 +80,6 @@ def handle_failure(
         NotImplementedError("Using callables on failure not implemented")
     else:
         raise ValueError(f'Could not understand option: "on_failure = {on_failure}"')
-
-
-@dataclass
-class WakepyResponse:
-    failure: bool = False
 
 
 def import_module_for_method(system, method):
@@ -145,13 +157,3 @@ def call_a_keepawake_function_with_methods(
         # no break means that all of the methods failed
         exception = KeepAwakeError(f"Could not call {str(func)}. Tried methods: ")
         handle_failure(exception, on_failure=on_failure)
-
-
-@dataclass(kw_only=True)
-class KeepawakeMethod:
-    shortname: str
-    printname: str
-    set_keepawake: typing.Callable
-    unset_keepawake: typing.Callable
-    requirements: list[str] | None = None
-    short_description: str = ""
