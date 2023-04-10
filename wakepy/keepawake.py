@@ -16,11 +16,14 @@ unset_keepawake()
 
 from __future__ import annotations
 
-from contextlib import contextmanager
-
+from contextlib import contextmanager, AbstractContextManager
 
 from .constants import KeepAwakeModuleFunctionName, SystemName, OnFailureStrategyName
-from ._core import call_a_keepawake_function_with_methods, CURRENT_SYSTEM
+from ._core import (
+    call_a_keepawake_function_with_methods,
+    CURRENT_SYSTEM,
+    WakepyResponse,
+)
 
 
 def _method_arguments_to_list_of_methods_or_none(
@@ -183,7 +186,7 @@ def keepawake(
     method_win: None | str | list[str] = None,
     method_linux: None | str | list[str] = None,
     method_mac: None | str | list[str] = None,
-):
+) -> AbstractContextManager[WakepyResponse]:
     """Keep system awake (not susped/sleep). This is the recommended over
     set_keepawake and unset_keepawake the same (first succesful) method of
     set_keepawake should be used also on unset_keepawake.
@@ -247,17 +250,16 @@ def keepawake(
         method_mac=method_mac,
     )
 
-    try:
-        yield
-    finally:
-        # This is the same as calling unset_keepawake
-        # but forcing the method. It only makes sense to use the
-        # unset_keepawake with the same method as which was used
-        # to set the keepawake.
-        return call_a_keepawake_function_with_methods(
-            func=KeepAwakeModuleFunctionName.UNSET_KEEPAWAKE,
-            on_failure=on_failure,
-            on_method_failure=on_method_failure,
-            methods=[res.method_used],
-            system=CURRENT_SYSTEM,
-        )
+    yield res
+
+    # This is the same as calling unset_keepawake
+    # but forcing the method. It only makes sense to use the
+    # unset_keepawake with the same method as which was used
+    # to set the keepawake.
+    return call_a_keepawake_function_with_methods(
+        func=KeepAwakeModuleFunctionName.UNSET_KEEPAWAKE,
+        on_failure=on_failure,
+        on_method_failure=on_method_failure,
+        methods=[res.method_used],
+        system=CURRENT_SYSTEM,
+    )
