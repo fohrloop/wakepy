@@ -54,7 +54,13 @@ class KeepawakeMethod:
         and REQUIREMENTS
         """
         self.system = system
-        self.module = import_module_for_method(system, method)
+
+        try:
+            self.module = import_module_for_method(system, method)
+        except ModuleNotFoundError as e:
+            raise KeepAwakeError(
+                'No python module found for system "{system}" and method "{method}"'
+            ) from e
 
         self.shortname = method
         self.printname: str = getattr(self.module, "PRINT_NAME", self.shortname)
@@ -68,6 +74,11 @@ class KeepawakeMethod:
         understood by the function are passed.
         """
         function_to_be_called = getattr(self.module, func)
+
+        if function_to_be_called is None:
+            raise KeepAwakeError(
+                f'There is no function "{func}" in module "{self.module.__file__}"'
+            )
 
         # Pass only the arguments that the function understands
         sig = inspect.signature(function_to_be_called)
@@ -133,7 +144,6 @@ def call_a_keepawake_function_with_single_method(
             method=method,
         )
         keepawake_method.call(func, **func_kwargs)
-        return response
     except KeepAwakeError as exception:
         response.failure = True
         handle_failure(exception, on_failure=on_failure)
