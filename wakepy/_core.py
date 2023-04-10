@@ -93,6 +93,7 @@ class WakepyResponse:
     """Used as responses in core functions"""
 
     failure: bool = False
+    failure_reason: str = ""
     method_used: str = ""
 
 
@@ -161,6 +162,7 @@ def call_a_keepawake_function_with_single_method(
         # Although only KeepAwakeErrors should be raised, handle any type of
         # exceptions here and write a log message if it is not a KeepAwakeError
         response.failure = True
+        response.failure_reason = str(exception)
         handle_failure(exception, on_failure=on_failure)
     return response
 
@@ -195,6 +197,7 @@ def call_a_keepawake_function_with_methods(
         keyword arguments to be passed to `func`.
     """
     methods = methods or get_methods_for_system(system)
+    failure_reasons = []
 
     for method in methods:
         res = call_a_keepawake_function_with_single_method(
@@ -204,14 +207,17 @@ def call_a_keepawake_function_with_methods(
             system=system,
             **func_kwargs,
         )
+
         if not res.failure:
             # no failure -> assuming a success and not trying other methods
             break
+        failure_reasons.append((res.method_used, res.failure_reason))
     else:
         # no break means that all of the methods failed
-        exception = KeepAwakeError(
-            f"Could not call {str(func)}. Tried methods: {str(methods)} for system {system}."
-        )
+        err_text = f"Could not call {str(func)}. Tried methods: {str(methods)} for system {system}."
+        for method, failure_reason in failure_reasons:
+            err_text += f"\n\n[{method}]: {failure_reason}"
+        exception = KeepAwakeError(err_text)
         handle_failure(exception, on_failure=on_failure)
         res = WakepyResponse(failure=True)
     return res
