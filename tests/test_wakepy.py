@@ -1,5 +1,8 @@
 import pytest
 
+import time
+from wakepy import keepawake, set_keepawake, unset_keepawake
+
 from wakepy._core import import_module_for_method
 from wakepy._core import CURRENT_SYSTEM
 from wakepy.constants import (
@@ -10,11 +13,23 @@ from wakepy.constants import (
 )
 
 
-def test_run_keepawake():
-    from wakepy import set_keepawake, unset_keepawake, keepawake
-
+def test_run_set_keepawake_unset_keepawake():
     set_keepawake()
     unset_keepawake()
+
+
+def test_run_keepawake():
+    t0 = time.time()
+
+    # Test the context manager syntax
+    with keepawake():
+        time.sleep(1)
+    t1 = time.time()
+
+    # It does not return immediately
+    assert t1 - t0 >= 1.0
+
+    # Test called functions (TODO)
 
 
 @pytest.mark.skipif(
