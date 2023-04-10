@@ -2,11 +2,16 @@
 
 keepawake()
     A context manager that sets and unsets keepawake.
+    This is the recommended way of using wakepy.
 
 set_keepawake()
 unset_keepawake()
     The lower level functions that can be used in any script to
-    set or unset the keepawake.
+    set or unset the keepawake. Usage of these is discouraged as
+    when if using multiple different alternative methods for setting
+    the keepawake, one has to manually keep track which method was
+    used and use the same method for unsetting the keepawake.
+    The `keepawake` context manager does this for you.
 """
 
 from __future__ import annotations
