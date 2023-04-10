@@ -11,6 +11,7 @@ import time
 
 from wakepy import keepawake
 from wakepy.constants import OnFailureStrategyName
+from wakepy._core import CURRENT_SYSTEM, SystemName
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
@@ -38,10 +39,8 @@ def wakepy_text():
 
 
 def get_not_logging_out_automatically(keep_screen_awake: bool) -> bool:
-    from wakepy import CURRENT_SYSTEM, System
-
     not_logging_out_automatically = None
-    if CURRENT_SYSTEM == System.WINDOWS:
+    if CURRENT_SYSTEM == SystemName.WINDOWS:
         not_logging_out_automatically = keep_screen_awake
     return not_logging_out_automatically
 
