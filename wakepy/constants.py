@@ -13,6 +13,9 @@ class KeepAwakeModuleFunctionName(str, enum.Enum):
 
 
 class SystemName(str, enum.Enum):
+    """The names of supported systems. The corresponding
+    implementations are at wakepy._implementations._{system}"""
+
     WINDOWS = "windows"
     LINUX = "linux"
     DARWIN = "darwin"
@@ -63,10 +66,3 @@ class MethodNameMac(str, enum.Enum):
 
 
 SUPPORTED_SYSTEMS = list(x.value for x in SystemName.__members__.values())
-
-
-DEFAULT_METHODS = {
-    # System.WINDOWS: windows_methods,
-    SystemName.LINUX: ["dbus", "libdbus"],
-    # System.DARWIN: darwin_methods,
-}
