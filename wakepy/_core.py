@@ -18,9 +18,9 @@ from .constants import (
 )
 
 
-CURRENT_SYSTEM = platform.system().lower()
 logger = logging.getLogger(__name__)
 
+CURRENT_SYSTEM = platform.system().lower()
 
 DEFAULT_METHODS = {
     SystemName.WINDOWS: [MethodNameWindows.ES_FLAGS],
