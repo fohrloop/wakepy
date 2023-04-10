@@ -1,6 +1,5 @@
 import pytest
 
-import time
 from wakepy import keepawake, set_keepawake, unset_keepawake
 
 from wakepy._core import import_module_for_method
