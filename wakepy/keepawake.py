@@ -50,6 +50,7 @@ def method_arguments_to_list_of_methods_or_none(
 
 
 def set_keepawake(
+    keep_screen_awake: bool = False,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     method_win: None | str | list[str] = None,
@@ -59,6 +60,11 @@ def set_keepawake(
     """
     Parameters
     ----------
+    keep_screen_awake: bool
+        If True, keeps also the screen awake, if implemented on system.
+        * windows: works (default: False)
+        * linux: always True and cannot be changed.
+        * mac: ? (untested)
     method_win:
         The method or methods to use on Windows. Possible values: 'esflags'
     method_linux:
@@ -104,6 +110,7 @@ def set_keepawake(
         on_method_failure=on_method_failure,
         methods=methods,
         system=CURRENT_SYSTEM,
+        keep_screen_awake=keep_screen_awake,
     )
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from importlib import import_module
+import inspect
 import logging
 import platform
 import typing
@@ -78,13 +79,19 @@ def call_a_keepawake_function_with_single_method(
     method: str,
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     system: SystemName | None = None,
+    **func_kwargs,
 ) -> WakepyResponse:
     response = WakepyResponse()
     try:
+        # Get the function to be called
         module = import_module_for_method(system, method)
         function_to_be_called = getattr(module, func)
-        function_to_be_called()
-        return
+
+        # Pass only the arguments that the function understands
+        sig = inspect.signature(function_to_be_called)
+        params = {k: v for k, v in func_kwargs.items() if k in sig.parameters}
+        function_to_be_called(**params)
+        return response
     except KeepAwakeError as exception:
         response.failure = True
         handle_failure(exception, on_failure=on_failure)
@@ -97,6 +104,7 @@ def call_a_keepawake_function_with_methods(
     on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     system: SystemName | None = None,
+    **func_kwargs,
 ):
     """Calls one function (e.g. set or unset keepawake) from  modules
     spciefied by the `methods`.
@@ -116,6 +124,8 @@ def call_a_keepawake_function_with_methods(
         Defines what to do after a method fails.
     system:
         The system used. Used in testing.
+    func_kwargs
+        keyword arguments to be passed to `func`.
     """
     methods = methods or get_methods_for_system(system)
 
@@ -126,6 +136,7 @@ def call_a_keepawake_function_with_methods(
             method=method,
             on_failure=on_method_failure,
             system=system,
+            **func_kwargs,
         )
         if not res.failure:
             # no failure -> assuming a success and not trying other methods
