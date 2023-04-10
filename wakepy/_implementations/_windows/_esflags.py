@@ -1,10 +1,15 @@
 import ctypes
 
+# See:
+# https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate
 ES_CONTINUOUS = 0x80000000
 ES_SYSTEM_REQUIRED = 0x00000001
 ES_DISPLAY_REQUIRED = 0x00000002
-# See:
-# https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate
+
+
+# Values for wakepy.core (for error handling / logging)
+PRINT_NAME = "SetThreadExecutionState flags"
+REQUIREMENTS = []  # no known requirements
 
 
 def set_keepawake(keep_screen_awake=False):

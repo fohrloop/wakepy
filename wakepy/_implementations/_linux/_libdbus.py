@@ -16,6 +16,16 @@ Note: libdbus has known problems with multi-threaded use! [3]
 """
 from wakepy.exceptions import KeepAwakeError
 
+# Values for wakepy.core (for error handling / logging)
+PRINT_NAME = "dbus-python (+libdbus)"
+REQUIREMENTS = [
+    "session message bus (dbus-daemon) running",
+    "DBUS_SESSION_BUS_ADDRESS set",
+    "dbus-python  (python package)",
+    "libdbus installed",
+]
+
+
 try:
     import dbus
 except ImportError as e:
@@ -26,7 +36,7 @@ except ImportError as e:
 
 # Variable that stores the DBus inhibit for later controlled release.
 dbus_inhibit = None
-METHOD = "dbus-python (+libdbus)"
+
 
 try:
     pm_interface = dbus.Interface(

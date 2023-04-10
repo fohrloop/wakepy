@@ -8,7 +8,12 @@ import os
 
 from wakepy.exceptions import KeepAwakeError
 
-METHOD = "systemd"
+# Values for wakepy.core (for error handling / logging)
+PRINT_NAME = "systemd (systemctl mask)"
+REQUIREMENTS = [
+    "systemd",
+    "running with sudo",
+]
 
 try:
     subprocess.check_output(["pidof", "systemd"])
