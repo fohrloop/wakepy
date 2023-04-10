@@ -5,27 +5,24 @@ https://www.man7.org/linux/man-pages/man1/systemctl.1.html
 """
 import subprocess
 import os
-import sys
 
-from wakepy.exceptions import NotSupportedError
+from wakepy.exceptions import KeepAwakeError
 
 METHOD = "systemd"
-print("wakepy: falling back using systemd. ")
 
 try:
     subprocess.check_output(["pidof", "systemd"])
-except subprocess.CalledProcessError:
+except subprocess.CalledProcessError as e:
     # if 'pidof' does not find a process it will return with non-zero exit
     # status, check_output will raise subprocess.CalledProcessError
     # See: https://github.com/np-8/wakepy/pull/3
-    raise NotSupportedError("sysmtemd not supported")
+    raise KeepAwakeError("sysmtemd not supported") from e
 
 if not "SUDO_UID" in os.environ.keys():
-    print(
+    raise KeepAwakeError(
         "ERROR! Root permissions will be needed to set/unset the wakelock with systemd!"
         """\n\nExample: sudo -E "PATH=$PATH" python -m wakepy"""
     )
-    sys.exit()
 
 
 def run_systemctl(command):
