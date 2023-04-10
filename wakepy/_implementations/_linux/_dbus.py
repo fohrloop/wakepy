@@ -15,6 +15,14 @@ SCREENSAVER_BUS_NAME = "org.freedesktop.ScreenSaver"
 SCREENSAVER_OBJECT_PATH = "/org/freedesktop/ScreenSaver"
 SCREENSAVER_INTERFACE = SCREENSAVER_BUS_NAME
 
+# Values for wakepy.core (for error handling / logging)
+PRINT_NAME = "jeepney (dbus)"
+REQUIREMENTS = [
+    "session message bus (dbus-daemon) running",
+    "DBUS_SESSION_BUS_ADDRESS set",
+    "jeepney (python package)",
+]
+
 
 try:
     from jeepney.wrappers import MessageGenerator, new_method_call
@@ -88,11 +96,3 @@ def unset_keepawake():
         raise KeepAwakeError("You must set keepawake before unsetting!")
     msg_uninhibit = messagegenerator.uninhibit(cookie)
     connection.send_and_get_reply(msg_uninhibit)
-
-
-printname = "jeepney (dbus)"
-requirements = [
-    "session message bus (dbus-daemon) running",
-    "DBUS_SESSION_BUS_ADDRESS set",
-    "jeepney (python package)",
-]

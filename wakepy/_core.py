@@ -5,7 +5,6 @@ from importlib import import_module
 import inspect
 import logging
 import platform
-import typing
 
 import warnings
 from .exceptions import KeepAwakeError
@@ -34,14 +33,47 @@ DEFAULT_METHODS = {
 }
 
 
-@dataclass(kw_only=True)
 class KeepawakeMethod:
-    shortname: str
-    printname: str
-    set_keepawake: typing.Callable
-    unset_keepawake: typing.Callable
-    requirements: list[str] | None = None
-    short_description: str = ""
+    """instances of this class represent one module from
+    wakepy._implementations._{system}._{method}
+    """
+
+    def __init__(
+        self,
+        system: str,
+        method: str,
+    ):
+        """The input arguments define which module from
+        wakepy._implementations to import.
+
+        One module <--> one method
+
+        Modules can define additional (debug/log) information
+        about them in module level constants like PRINT_NAME
+        and REQUIREMENTS
+        """
+        self.system = system
+        self.module = import_module_for_method(system, method)
+
+        self.shortname = method
+        self.printname: str = getattr(self.module, "PRINT_NAME", self.shortname)
+        self.requirements: list[str] = getattr(self.module, "REQUIREMENTS", [])
+
+    def call(self, func: KeepAwakeModuleFunctionName | str, **func_kwargs):
+        """Call a function of the keepawake method (module).
+        Functions are typically 'set_keepawake' and 'unset_keepawake'.
+
+        The `func_kwargs` is filtered so that only the kwargs that are
+        understood by the function are passed.
+        """
+        function_to_be_called = getattr(self.module, func)
+
+        # Pass only the arguments that the function understands
+        sig = inspect.signature(function_to_be_called)
+        func_kwargs_filtered = {
+            k: v for k, v in func_kwargs.items() if k in sig.parameters
+        }
+        function_to_be_called(**func_kwargs_filtered)
 
 
 @dataclass
@@ -93,16 +125,13 @@ def call_a_keepawake_function_with_single_method(
     system: SystemName | None = None,
     **func_kwargs,
 ) -> WakepyResponse:
-    response = WakepyResponse()
+    response = WakepyResponse(failure=False)
     try:
-        # Get the function to be called
-        module = import_module_for_method(system, method)
-        function_to_be_called = getattr(module, func)
-
-        # Pass only the arguments that the function understands
-        sig = inspect.signature(function_to_be_called)
-        params = {k: v for k, v in func_kwargs.items() if k in sig.parameters}
-        function_to_be_called(**params)
+        keepawake_method = KeepawakeMethod(
+            system=system,
+            method=method,
+        )
+        keepawake_method.call(func, **func_kwargs)
         return response
     except KeepAwakeError as exception:
         response.failure = True
