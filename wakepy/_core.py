@@ -98,7 +98,8 @@ def call_a_keepawake_function_with_methods(
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     system: SystemName | None = None,
 ):
-    """Calls one function (e.g. set or unset keepawake) from a specified module
+    """Calls one function (e.g. set or unset keepawake) from  modules
+    spciefied by the `methods`.
 
     Parameters
     ----------
@@ -106,7 +107,15 @@ def call_a_keepawake_function_with_methods(
         A KeepAwakeModuleFunctionName (or a string). Possible values include:
         'set_keepawake', 'unset_keepawake'. This is the name of the function
         in the implementation module to call.
-
+    methods:
+        Specifies the modules to use for importing the `func`. If None, default
+        list of module for the system is used.
+    on_failure:
+        Defines what to do if all the methods fail.
+    on_method_fauilure:
+        Defines what to do after a method fails.
+    system:
+        The system used. Used in testing.
     """
     methods = methods or get_methods_for_system(system)
 
