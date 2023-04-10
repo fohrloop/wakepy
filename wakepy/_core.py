@@ -131,7 +131,7 @@ def call_a_keepawake_function_with_methods(
             # no failure -> assuming a success and not trying other methods
             break
     else:
-        # no break means that none of the methods worked.
+        # no break means that all of the methods failed
         exception = KeepAwakeError(f"Could not call {str(func)}. Tried methods: ")
         handle_failure(exception, on_failure=on_failure)
 
