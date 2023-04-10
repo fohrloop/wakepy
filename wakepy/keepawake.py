@@ -246,7 +246,9 @@ def keepawake(
         yield
     finally:
         # This is the same as calling unset_keepawake
-        # but forcing the method.
+        # but forcing the method. It only makes sense to use the
+        # unset_keepawake with the same method as which was used
+        # to set the keepawake.
         return call_a_keepawake_function_with_methods(
             func=KeepAwakeModuleFunctionName.UNSET_KEEPAWAKE,
             on_failure=on_failure,
