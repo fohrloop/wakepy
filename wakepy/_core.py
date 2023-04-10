@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 CURRENT_SYSTEM = platform.system().lower()
 
+# Defines the default methods and their order for each supported system
 DEFAULT_METHODS = {
     SystemName.WINDOWS: [MethodNameWindows.ES_FLAGS],
     SystemName.LINUX: [
