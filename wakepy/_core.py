@@ -104,6 +104,15 @@ def handle_failure(
     exception: Exception,
     on_failure: OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
 ):
+    if not isinstance(exception, KeepAwakeError):
+        # Only KeepAwakeErrors should be raised. If something else is raised,
+        # it is unexpected and most probably a bug.
+        # Instead of simply crashing, log it and continue with normal error
+        # handling.
+        logger.exception(
+            "Wakepy got unexcepted exception! Please submit a PR at: https://github.com/np-8/wakepy/issues"
+        )
+
     if on_failure == OnFailureStrategyName.PASS:
         return
     elif on_failure == OnFailureStrategyName.ERROR:
@@ -144,7 +153,9 @@ def call_a_keepawake_function_with_single_method(
             method=method,
         )
         keepawake_method.call(func, **func_kwargs)
-    except KeepAwakeError as exception:
+    except Exception as exception:
+        # Although only KeepAwakeErrors should be raised, handle any type of
+        # exceptions here and write a log message if it is not a KeepAwakeError
         response.failure = True
         handle_failure(exception, on_failure=on_failure)
     return response
