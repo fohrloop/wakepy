@@ -19,7 +19,9 @@ from wakepy.exceptions import KeepAwakeError
 try:
     import dbus
 except ImportError as e:
-    raise KeepAwakeError(f"Error when importing dbus-python: {e}") from e
+    raise KeepAwakeError(
+        f"Error when importing dbus-python. {e}\n\n\tMake sure that 'dbus-python' is installed."
+    ) from e
 
 
 # Variable that stores the DBus inhibit for later controlled release.
@@ -36,8 +38,8 @@ try:
 except Exception as e:
     raise KeepAwakeError(
         f"Wakepy can't use DBus Inhibit on this system because of a {type(e).__name__}:"
-        f" {e}" from e
-    )
+        f" {e}"
+    ) from e
 
 
 def set_keepawake(keep_screen_awake=False):
