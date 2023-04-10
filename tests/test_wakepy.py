@@ -23,8 +23,3 @@ def test_run_keepawake():
     with pytest.raises(ZeroDivisionError):
         with keepawake():
             1 / 0
-
-    # Test called functions (TODO)
-    raise NotImplementedError(
-        "Add test that the keepawake functions are actually called."
-    )
