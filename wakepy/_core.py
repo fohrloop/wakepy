@@ -147,6 +147,9 @@ def call_a_keepawake_function_with_single_method(
     system: SystemName | None = None,
     **func_kwargs,
 ) -> WakepyResponse:
+    """This function imports a module corresponding the sytem and method
+    and calls the `func` (e.g. 'set_keepawake'), and handles possible errors
+    with the strategy chosen in `on_failure`."""
     response = WakepyResponse(failure=False, method_used=method)
     try:
         keepawake_method = KeepawakeMethod(
