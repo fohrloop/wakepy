@@ -19,17 +19,17 @@ def test_run_set_keepawake_unset_keepawake():
 
 
 def test_run_keepawake():
-    t0 = time.time()
-
     # Test the context manager syntax
     with keepawake():
-        time.sleep(1)
-    t1 = time.time()
+        ...
 
-    # It does not return immediately
-    assert t1 - t0 >= 1.0
+    # Test that errors occured inside context manager are not suppressed
+    with pytest.raises(ZeroDivisionError):
+        with keepawake():
+            1 / 0
 
     # Test called functions (TODO)
+    NotImplementedError("Add test that the keepawake functions are actually called.")
 
 
 @pytest.mark.skipif(
