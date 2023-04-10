@@ -93,6 +93,7 @@ class WakepyResponse:
     """Used as responses in core functions"""
 
     failure: bool = False
+    method_used: str = ""
 
 
 def get_methods_for_system(system: SystemName | None = None) -> list[str]:
@@ -146,7 +147,7 @@ def call_a_keepawake_function_with_single_method(
     system: SystemName | None = None,
     **func_kwargs,
 ) -> WakepyResponse:
-    response = WakepyResponse(failure=False)
+    response = WakepyResponse(failure=False, method_used=method)
     try:
         keepawake_method = KeepawakeMethod(
             system=system,
@@ -168,7 +169,7 @@ def call_a_keepawake_function_with_methods(
     on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
     system: SystemName | None = None,
     **func_kwargs,
-):
+) -> WakepyResponse:
     """Calls one function (e.g. set or unset keepawake) from  modules
     spciefied by the `methods`.
 
@@ -192,7 +193,6 @@ def call_a_keepawake_function_with_methods(
     """
     methods = methods or get_methods_for_system(system)
 
-    # TODO: make this work
     for method in methods:
         res = call_a_keepawake_function_with_single_method(
             func=func,
@@ -206,5 +206,9 @@ def call_a_keepawake_function_with_methods(
             break
     else:
         # no break means that all of the methods failed
-        exception = KeepAwakeError(f"Could not call {str(func)}. Tried methods: ")
+        exception = KeepAwakeError(
+            f"Could not call {str(func)}. Tried methods: {str(methods)} for system {system}."
+        )
         handle_failure(exception, on_failure=on_failure)
+        res = WakepyResponse(failure=True)
+    return res
