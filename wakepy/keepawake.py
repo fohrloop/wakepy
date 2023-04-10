@@ -23,7 +23,7 @@ from .constants import KeepAwakeModuleFunctionName, SystemName, OnFailureStrateg
 from ._core import call_a_keepawake_function_with_methods, CURRENT_SYSTEM
 
 
-def method_arguments_to_list_of_methods_or_none(
+def _method_arguments_to_list_of_methods_or_none(
     method_win=None | str | list[str],
     method_linux=None | str | list[str],
     method_mac=None | str | list[str],
@@ -101,7 +101,7 @@ def set_keepawake(
 
     """
 
-    methods = method_arguments_to_list_of_methods_or_none(
+    methods = _method_arguments_to_list_of_methods_or_none(
         method_win=method_win,
         method_linux=method_linux,
         method_mac=method_mac,
@@ -159,7 +159,7 @@ def unset_keepawake(
 
     """
 
-    methods = method_arguments_to_list_of_methods_or_none(
+    methods = _method_arguments_to_list_of_methods_or_none(
         method_win=method_win,
         method_linux=method_linux,
         method_mac=method_mac,
