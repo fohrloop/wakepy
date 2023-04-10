@@ -35,7 +35,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "wakepy = wakepy.__main__:wakepy",
+            "wakepy = wakepy.__main__:main",
         ],
     },
 )

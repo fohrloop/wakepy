@@ -1,24 +1,25 @@
-if __name__ == "__main__":
-    """Start wakepy keepawake with CLI
+"""Start wakepy keepawake with CLI
 
-    This is called either with
+This is called either with
 
-        python -m wakepy [args]
+    python -m wakepy [args]
 
-    or using the executable
+or using the executable
 
-        wakepy [args]
-    """
-    import argparse
+    wakepy [args]
+"""
+import argparse
 
-    from wakepy._cli import start
-    from wakepy.constants import (
-        MethodNameLinux,
-        MethodNameMac,
-        MethodNameWindows,
-        OnFailureStrategyName,
-    )
+from wakepy._cli import start
+from wakepy.constants import (
+    MethodNameLinux,
+    MethodNameMac,
+    MethodNameWindows,
+    OnFailureStrategyName,
+)
 
+
+def main():
     parser = argparse.ArgumentParser(
         prog="wakepy",
         formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=27),
@@ -88,3 +89,7 @@ if __name__ == "__main__":
         method_win=args.method_win,
         method_mac=args.method_mac,
     )
+
+
+if __name__ == "__main__":
+    main()
