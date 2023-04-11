@@ -75,7 +75,8 @@ def get_connection(bus="SESSION"):
                 "environment variable."
             ) from e
         raise KeepAwakeError(
-            f"Could not set dbus connection to {bus} message bus. "
+            f"Could not set dbus connection to {bus} message bus.\n"
+            f"{e.__class__.__name__}: {str(e)}"
         ) from e
 
 
