@@ -31,6 +31,7 @@ method return time=1681203094.197509 sender=:1.25 -> destination=:1.684 serial=4
 """
 
 from ...exceptions import KeepAwakeError
+from ...inhibitor import KeepAwakeInfo, InhibitorInfo
 
 # There will be imported from jeepney when needed
 new_method_call = None
@@ -167,7 +168,7 @@ def _get_inhibitor_and_reason(connection, obj_path: str):
     return name, reason
 
 
-def check_keepawake():
+def check_keepawake() -> KeepAwakeInfo:
     """Checks keepawake status (dbus). Experimental."""
     try:
         return check_keepawake_gnome()
@@ -175,9 +176,9 @@ def check_keepawake():
         raise KeepAwakeError(f"Cannot check keepawake! Reason: {str(e)}") from e
 
 
-def check_keepawake_gnome():
+def check_keepawake_gnome() -> KeepAwakeInfo:
     """Checks keepawake status on gnome (dbus). Experimental."""
-    response = dict(keepawake=False, inhibitors=[])
+    info = KeepAwakeInfo()
 
     if DBusAddress is None:
         import_jeepney()
@@ -196,13 +197,10 @@ def check_keepawake_gnome():
     connection = get_connection()
     reply = connection.send_and_get_reply(msg)
 
-    for inhibitor_tuple in reply.body:
+    for inhibitor_tuple in reply.body[0]:
         inhibitor_name, inhibitor_reason = _get_inhibitor_and_reason(
-            connection, inhibitor_tuple[0]
+            connection, inhibitor_tuple
         )
-        response["inhibitors"].append(
-            dict(name=inhibitor_name, reason=inhibitor_reason)
-        )
+        info.add(InhibitorInfo(inhibitor_name, inhibitor_reason))
 
-    response["keepawake"] = True if response["inhibitors"] else False
-    return response
+    return info
