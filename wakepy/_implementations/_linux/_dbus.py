@@ -32,10 +32,10 @@ method return time=1681203094.197509 sender=:1.25 -> destination=:1.684 serial=4
 
 from ...exceptions import KeepAwakeError
 
-
-SCREENSAVER_BUS_NAME = "org.freedesktop.ScreenSaver"
-SCREENSAVER_OBJECT_PATH = "/org/freedesktop/ScreenSaver"
-SCREENSAVER_INTERFACE = SCREENSAVER_BUS_NAME
+# There will be imported from jeepney when needed
+new_method_call = None
+DBusAddress = None
+open_dbus_connection = None
 
 # Values for wakepy.core (for error handling / logging)
 PRINT_NAME = "jeepney (dbus)"
@@ -45,59 +45,28 @@ REQUIREMENTS = [
     "jeepney (python package)",
 ]
 
-module_initialized = False
-# The cookie holds represents the inhibition request
-# It is given in the response of the inhibit call and
-# used in the uninhibit call
-cookie = None
-# This can create dbus messages. Created only if needed.
-messagegenerator = None
-# This is the connection to the session message bus. Created only if needed.
-connection = None
+# The keepawake setter / unsetter object
+# Will be None until first call of methods
+setter = None
 
 
-def init_module():
-    """initializes this module. The 3rd party imports must be made when we need
-    them, not when we import this module. as we want any exceptions occur only
-    when the keepawake functions like `set_keepawake` are used, not when
-    they're imported.
-
-    We also need to subclass the imported MessageGenerator, create instance
-    of it and create a connection to the session messsage bus.
-    """
-
-    global connection, messagegenerator, module_initialized
+def import_jeepney():
+    global new_method_call, DBusAddress, open_dbus_connection
 
     try:
-        from jeepney.wrappers import MessageGenerator, new_method_call
+        from jeepney import new_method_call, DBusAddress
         from jeepney.io.blocking import open_dbus_connection
-    except ImportError as e:
+    except Exception as e:
         raise KeepAwakeError("Could not import jeepney!") from e
 
-    class ScreenSaveMessageGenerator(MessageGenerator):
-        r"""DBus interface to org.freedesktop.Screensaver"""
-        interface = SCREENSAVER_INTERFACE
 
-        def __init__(
-            self,
-            object_path=SCREENSAVER_OBJECT_PATH,
-            bus_name=SCREENSAVER_BUS_NAME,
-        ):
-            super().__init__(object_path=object_path, bus_name=bus_name)
-
-        def inhibit(self, application_name, reason_for_inhibit):
-            return new_method_call(
-                self, "Inhibit", "ss", (application_name, reason_for_inhibit)
-            )
-
-        def uninhibit(self, cookie):
-            return new_method_call(self, "UnInhibit", "u", (cookie,))
-
-    messagegenerator = ScreenSaveMessageGenerator()
+def get_connection(bus="SESSION"):
+    """Get a DBus connection. Note that any Inhibits are removed if the
+    connection is closed."""
 
     try:
-        connection = open_dbus_connection(bus="SESSION")
-    except KeyError as e:
+        return open_dbus_connection(bus=bus)
+    except Exception as e:
         if "DBUS_SESSION_BUS_ADDRESS" in str(e):
             raise KeepAwakeError(
                 "DBUS_SESSION_BUS_ADDRESS environment variable not set! "
@@ -105,39 +74,135 @@ def init_module():
                 "environment variable."
             ) from e
         raise KeepAwakeError(
-            "Could not set dbus connection to session message bus. "
+            f"Could not set dbus connection to {bus} message bus. "
         ) from e
 
-    module_initialized = True
+
+class KeepAwakeSetter:
+    def __init__(self):
+        if DBusAddress is None:
+            import_jeepney()
+
+        self.screensaver = DBusAddress(
+            "/org/freedesktop/ScreenSaver",  # DBus object path
+            bus_name="org.freedesktop.ScreenSaver",
+            interface="org.freedesktop.ScreenSaver",
+        )
+
+        # The cookie holds represents the inhibition request
+        # It is given in the response of the inhibit call and
+        # used in the uninhibit call
+        self.cookie = None
+        self.connection = get_connection("SESSION")
+
+    def set_keepawake(self, keep_screen_awake=False):
+        """
+        Set the keep-awake. During keep-awake, the CPU is not allowed to go to
+        sleep automatically until the `unset_keepawake` is called.
+
+        Parameters
+        -----------
+        keep_screen_awake: bool
+            Currently unused as the screen will remain active as a byproduct of
+            preventing sleep.
+        """
+
+        msg_inhibit = new_method_call(
+            self.screensaver,  # DBusAddress
+            "Inhibit",  # Method
+            "ss",  # Means: two strings as input for method
+            ("wakepy", "wakelock active"),
+        )
+
+        reply = self.connection.send_and_get_reply(msg_inhibit)
+        self.inhibit_cookie = reply.body[0]
+
+    def unset_keepawake(self):
+        if self.inhibit_cookie is None:
+            raise KeepAwakeError("You must set_keepawake before unsetting!")
+
+        msg_uninhibit = new_method_call(
+            self.screensaver,
+            "UnInhibit",  # Method
+            "u",  # Means: UInt32 input for method
+            (self.inhibit_cookie,),
+        )
+
+        self.connection.send_and_get_reply(msg_uninhibit)
+        self.inhibit_cookie = None
+
+
+def get_setter():
+    global setter
+    if setter is None:
+        setter = KeepAwakeSetter()
+    return setter
 
 
 def set_keepawake(keep_screen_awake=False):
-    """
-    Set the keep-awake. During keep-awake, the CPU is not allowed to go to
-    sleep automatically until the `unset_keepawake` is called.
-
-    Parameters
-    -----------
-    keep_screen_awake: bool
-        Currently unused as the screen will remain active as a byproduct of
-        preventing sleep.
-    """
-    if not module_initialized:
-        init_module()
-
-    global cookie
-    msg_inhibit = messagegenerator.inhibit("wakepy", "wakelock active")
-    reply = connection.send_and_get_reply(msg_inhibit)
-    cookie = reply.body[0]
+    setter = get_setter()
+    setter.set_keepawake(keep_screen_awake=keep_screen_awake)
 
 
 def unset_keepawake():
-    if cookie is None:
-        raise KeepAwakeError("You must set_keepawake before unsetting!")
-    msg_uninhibit = messagegenerator.uninhibit(cookie)
-    connection.send_and_get_reply(msg_uninhibit)
+    setter = get_setter()
+    setter.unset_keepawake()
+
+
+def _get_inhibitor_and_reason(connection, obj_path: str):
+    addr = DBusAddress(
+        obj_path,
+        bus_name="org.gnome.SessionManager",
+        interface="org.gnome.SessionManager.Inhibitor",
+    )
+
+    def _get(method):
+        msg = new_method_call(addr, method, "", tuple())
+        reply = connection.send_and_get_reply(msg)
+        return reply.body[0]
+
+    name = _get("GetAppId")
+    reason = _get("GetReason")
+
+    return name, reason
 
 
 def check_keepawake():
-    if not module_initialized:
-        init_module()
+    """Checks keepawake status (dbus). Experimental."""
+    try:
+        return check_keepawake_gnome()
+    except Exception as e:
+        raise KeepAwakeError(f"Cannot check keepawake! Reason: {str(e)}") from e
+
+
+def check_keepawake_gnome():
+    """Checks keepawake status on gnome (dbus). Experimental."""
+    response = dict(keepawake=False, inhibitors=[])
+
+    if DBusAddress is None:
+        import_jeepney()
+
+    gnome_session_manager_addr = DBusAddress(
+        "/org/gnome/SessionManager",  # DBus object path
+        bus_name="org.gnome.SessionManager",
+        interface="org.gnome.SessionManager",
+    )
+    msg = new_method_call(
+        gnome_session_manager_addr,  # DBusAddress
+        "GetInhibitors",  # Method
+        "",  # No input for method
+        tuple(),
+    )
+    connection = get_connection()
+    reply = connection.send_and_get_reply(msg)
+
+    for inhibitor_tuple in reply.body:
+        inhibitor_name, inhibitor_reason = _get_inhibitor_and_reason(
+            connection, inhibitor_tuple[0]
+        )
+        response["inhibitors"].append(
+            dict(name=inhibitor_name, reason=inhibitor_reason)
+        )
+
+    response["keepawake"] = True if response["inhibitors"] else False
+    return response
