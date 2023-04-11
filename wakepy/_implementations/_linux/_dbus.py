@@ -6,6 +6,28 @@ Requires jeepney. Install with:
 
 See also:
     https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html
+
+
+The inhibitors can be checked with
+    dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.GetInhibitors
+
+For example:
+
+$ dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.GetInhibitors
+method return time=1681201482.075825 sender=:1.25 -> destination=:1.559 serial=465 reply_serial=2
+   array [
+      object path "/org/gnome/SessionManager/Inhibitor7"
+   ]
+
+This can be examined further with
+
+dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager/InhibitorN org.gnome.SessionManager.Inhibitor.GetAppId
+
+For example:
+
+niko@niko-ubuntu-home:~$ dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager/Inhibitor7 org.gnome.SessionManager.Inhibitor.GetAppId
+method return time=1681203094.197509 sender=:1.25 -> destination=:1.684 serial=480 reply_serial=2
+   string "wakepy"
 """
 
 from ...exceptions import KeepAwakeError
@@ -114,3 +136,8 @@ def unset_keepawake():
         raise KeepAwakeError("You must set_keepawake before unsetting!")
     msg_uninhibit = messagegenerator.uninhibit(cookie)
     connection.send_and_get_reply(msg_uninhibit)
+
+
+def check_keepawake():
+    if not module_initialized:
+        init_module()
