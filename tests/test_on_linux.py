@@ -91,3 +91,33 @@ def test_keepawake_with_different_method_order(
     unset_keepawake_libdbus.assert_not_called()
     set_keepawake_systemd.assert_called_once()  # only this is called!
     unset_keepawake_systemd.assert_called_once()  # only this is called!
+
+
+def test_linux_dbus_implementation():
+    """This test will work only with gnome?
+    The check_keepawake relies on org.gnome.SessionManager"""
+    from wakepy._implementations._linux._dbus import (
+        set_keepawake,
+        unset_keepawake,
+        check_keepawake,
+    )
+
+    # First, check that there is no keepawake
+    res = check_keepawake()
+    assert not res.keepawake
+
+    # Then, set the keepawake
+    set_keepawake()
+
+    # Now there should be one inhibitor
+    res = check_keepawake()
+    assert res.keepawake
+    assert res.n_inhibitors == 1
+    assert res.inhibitors[0].app_name == "wakepy"
+
+    # Then, unset the keepawake
+    unset_keepawake()
+
+    # Now there should be no inhibitors
+    res = check_keepawake()
+    assert not res.keepawake
