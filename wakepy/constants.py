@@ -51,7 +51,6 @@ class MethodNameLinux(str, enum.Enum):
     """
 
     DBUS = "dbus"
-    LIBDBUS = "libdbus"
     SYSTEMD = "systemd"
 
 

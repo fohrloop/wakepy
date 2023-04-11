@@ -27,7 +27,6 @@ DEFAULT_METHODS = {
     SystemName.WINDOWS: [MethodNameWindows.ES_FLAGS],
     SystemName.LINUX: [
         MethodNameLinux.DBUS,
-        MethodNameLinux.LIBDBUS,
         MethodNameLinux.SYSTEMD,
     ],
     SystemName.DARWIN: [MethodNameMac.CAFFEINATE],

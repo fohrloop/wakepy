@@ -17,19 +17,6 @@ def run_only_on_linux(func):
     )(func)
 
 
-def run_only_if_dbus_python_installed(func):
-    try:
-        import dbus
-
-        dbus_not_installed = False
-    except ImportError:
-        dbus_not_installed = True
-    return pytest.mark.skipif(
-        dbus_not_installed,
-        reason="This should be ran only if dbus-python and libdbus are installed",
-    )(func)
-
-
 @run_only_on_linux
 def test_import_module_linux():
     module = import_module_for_method(SystemName.LINUX, MethodNameLinux.DBUS)
@@ -58,17 +45,12 @@ def test_keepawake_context_manager(set_keepawake_mock, unset_keepawake_mock):
 
 @patch("wakepy._implementations._linux._systemd.unset_keepawake")
 @patch("wakepy._implementations._linux._systemd.set_keepawake")
-@patch("wakepy._implementations._linux._libdbus.unset_keepawake")
-@patch("wakepy._implementations._linux._libdbus.set_keepawake")
 @patch("wakepy._implementations._linux._dbus.unset_keepawake")
 @patch("wakepy._implementations._linux._dbus.set_keepawake")
-@run_only_if_dbus_python_installed
 @run_only_on_linux
 def test_keepawake_with_different_method_order(
     set_keepawake_dbus,
     unset_keepawake_dbus,
-    set_keepawake_libdbus,
-    unset_keepawake_libdbus,
     set_keepawake_systemd,
     unset_keepawake_systemd,
 ):
@@ -80,15 +62,11 @@ def test_keepawake_with_different_method_order(
     with keepawake(method_linux=["systemd", "dbus"]):
         set_keepawake_dbus.assert_not_called()
         unset_keepawake_dbus.assert_not_called()
-        set_keepawake_libdbus.assert_not_called()
-        unset_keepawake_libdbus.assert_not_called()
         set_keepawake_systemd.assert_called_once()  # only this is called!
         unset_keepawake_systemd.assert_not_called()
 
     set_keepawake_dbus.assert_not_called()
     unset_keepawake_dbus.assert_not_called()
-    set_keepawake_libdbus.assert_not_called()
-    unset_keepawake_libdbus.assert_not_called()
     set_keepawake_systemd.assert_called_once()  # only this is called!
     unset_keepawake_systemd.assert_called_once()  # only this is called!
 

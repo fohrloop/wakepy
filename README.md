@@ -28,16 +28,7 @@ Note: On linux, this will install and use **[`jeepney`](https://jeepney.readthed
 ```
 pip install wakepy
 ```
-#### (B) Linux (dbus-python)
-
-If you want to install wakepy on linux and do not want to use jeepney, but **[`dbus-python`](https://dbus.freedesktop.org/doc/dbus-python/)**, the official libdbus (aka. `dbus`) Python binding, use   
-```
-pip install --no-deps wakepy
-pip install dbus-python
-```
-Please note that this requires also `libdbus` to be installed on your system. Some linux distributions come with `dbus-python`.
-
-#### (C) Linux (systemd)
+#### (B) Linux (systemd)
 
 If you want to install wakepy on linux and do not want to use jeepney, or dbus-python but systemd, install wakepy with.
 ```
@@ -105,10 +96,9 @@ The program simply calls the [SetThreadExecutionState](https://docs.microsoft.co
 ### Linux
 The program uses, depending on what is installed, either (in this order)
 1. jeepney (pure python dbus implementation. Default)
-2. dbus-python (requires libdbus)
-3. `systemctl mask`
+2. `systemctl mask`
 
-The first two options will use DBus to call the inhibit method of `org.freedesktop.ScreenSaver`, which will prevent the system from suspending/speeling. The inhibit will be released when the process dies or when unset_keepawake is called. The flag cannot prevent sleeping from user interaction. This approach is multiprocessing-safe and doesn't need `sudo` privileges but you have to use a Freedesktop-compliant desktop environment, for example GNOME, KDE or Xfce. See full list in [the freedesktop.org wiki](https://freedesktop.org/wiki/Desktops/). 
+The first option will use DBus to call the inhibit method of `org.freedesktop.ScreenSaver`, which will prevent the system from suspending/speeling. The inhibit will be released when the process dies or when unset_keepawake is called. The flag cannot prevent sleeping from user interaction. This approach is multiprocessing-safe and doesn't need `sudo` privileges but you have to use a Freedesktop-compliant desktop environment, for example GNOME, KDE or Xfce. See full list in [the freedesktop.org wiki](https://freedesktop.org/wiki/Desktops/). 
 
 The `systemctl mask` command will prevent all forms of sleep or hibernation (including sleep initialized by the user) when calling `set_keepawake`, and unmasks the functions when calling `unset_keepawake`. This command will remain active until `unset_keepawake` is called and is not multiprocessing-safe because the first process that releases the wakelock unmasks the functions and thus no longer prevents sleep.  *Using systemd requires sudo privileges*.
 

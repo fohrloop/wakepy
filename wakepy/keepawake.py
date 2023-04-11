@@ -77,7 +77,7 @@ def set_keepawake(
         The method or methods to use on Windows. Possible values: 'esflags'
     method_linux:
         The method or methods to use on Linux. Possible values: 'dbus',
-        'libdbus', 'systemd'
+        'systemd'
     method_mac:
         The method or methods to use on MacOS. Possible values: 'caffeinate'
     on_method_failure:
@@ -135,7 +135,7 @@ def unset_keepawake(
         The method or methods to use on Windows. Possible values: 'esflags'
     method_linux:
         The method or methods to use on Linux. Possible values: 'dbus',
-        'libdbus', 'systemd'
+        'systemd'
     method_mac:
         The method or methods to use on MacOS. Possible values: 'caffeinate'
     on_method_failure:
@@ -198,7 +198,7 @@ def keepawake(
         keep_screen_awake=True,
         on_failure = 'error',
         on_method_failure = 'logwarn',
-        method_linux = ['dbus', 'libdbus', 'systemd'],
+        method_linux = ['dbus', 'systemd'],
     )
 
     with keepawake(**KEEPAWAKE_OPTS):
@@ -215,7 +215,7 @@ def keepawake(
         The method or methods to use on Windows. Possible values: 'esflags'
     method_linux:
         The method or methods to use on Linux. Possible values: 'dbus',
-        'libdbus', 'systemd'
+        'systemd'
     method_mac:
         The method or methods to use on MacOS. Possible values: 'caffeinate'
     on_method_failure:
