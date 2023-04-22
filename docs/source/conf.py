@@ -34,6 +34,11 @@ release = __version__
 # ones.
 extensions = ["myst_parser"]
 
+# For supporting links to headers like:
+# [](#auto-generated-header-anchors)
+# See: https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors
+myst_heading_anchors = 3
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

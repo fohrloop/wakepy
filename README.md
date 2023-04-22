@@ -9,7 +9,7 @@ Simple cross-platform wakelock written in Python. Prevent your computer from goi
 - [Installing](#installing)
 - [Usage](#usage)
   - [Start from command line](#start-from-command-line)
-  - [Set keepawake within a python script](#set-keepawake-within-a-python-script)
+  - [Set keepawake within a python script](#usage-within-a-python-script)
 - [Details](#details)
 - [Changelog](#changelog)
 
