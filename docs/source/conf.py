@@ -17,12 +17,14 @@
 
 # -- Project information -----------------------------------------------------
 
+from wakepy import __version__
+
 project = "wakepy"
 copyright = "2023, Niko Pasanen"
 author = "Niko Pasanen"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1"
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
