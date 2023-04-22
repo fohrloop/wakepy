@@ -65,14 +65,18 @@ def set_keepawake(
     method_linux: None | str | list[str] = None,
     method_mac: None | str | list[str] = None,
 ):
-    """
+    """Set a wakelock for keeping system awake (disallow susped/sleep). This is
+    lower level function, and usage of the :func:`keepawake` context manager is
+    recommended for most situations, as to unset the keepawake, same (first
+    succesful) method should be used in :func:`unset_keepawake`.
+
     Parameters
     ----------
     keep_screen_awake: bool
         If True, keeps also the screen awake, if implemented on system.
-        * windows: works (default: False)
-        * linux: always True and cannot be changed.
-        * mac: ? (untested)
+          * windows: works (default: False)
+          * linux: always True and cannot be changed.
+          * mac: ? (untested)
     method_win:
         The method or methods to use on Windows. Possible values: 'esflags'
     method_linux:
@@ -89,18 +93,17 @@ def set_keepawake(
         *every* (selected) method has failed. See below for the list of
         possible values. Default: 'error'.
 
-    Details
-    ---------
-    Possible values for `on_failure` and `on_method_failure`:
+        Possible values:
 
-        'error':  raise wakepy.KeepAwakeError
-        'warn': call warnings.warn
-        'print': print to stdout
-        'logerror': Use python logging with log level = 'error'
-        'logwarn': Use python logging with log level = 'warning'
-        'loginfo': Use python logging with log level = 'info'
-        'logdebug': Use python logging with log level = 'debug'
-        'pass': do nothing
+        - 'error':  raise wakepy.KeepAwakeError
+        - 'warn': call warnings.warn
+        - 'print': print to stdout
+        - 'logerror': Use python logging with log level = 'error'
+        - 'logwarn': Use python logging with log level = 'warning'
+        - 'loginfo': Use python logging with log level = 'info'
+        - 'logdebug': Use python logging with log level = 'debug'
+        - 'pass': do nothing
+
 
     """
 
@@ -128,7 +131,11 @@ def unset_keepawake(
     method_linux: None | str | list[str] = None,
     method_mac: None | str | list[str] = None,
 ):
-    """
+    """Uset a wakelock (allow susped/sleep again). This is lower level
+    function, and usage of the :func:`keepawake` context manager is
+    recommended for most situations, as to unset the keepawake, same (first
+    succesful) method of :func:`set_keepawake` should be used here.
+
     Parameters
     ----------
     method_win:
@@ -145,20 +152,18 @@ def unset_keepawake(
     on_failure:
         Tells what to do when setting keepawake fails. This is done when
         *every* (selected) method has failed. See below for the list of
-        possible values. Default: 'error'.
+        possible values. Default: 'error'. Possible values:
 
-    Details
-    ---------
-    Possible values for `on_failure` and `on_method_failure`:
+        - 'error':  raise wakepy.KeepAwakeError
+        - 'warn': call warnings.warn
+        - 'print': print to stdout
+        - 'logerror': Use python logging with log level = 'error'
+        - 'logwarn': Use python logging with log level = 'warning'
+        - 'loginfo': Use python logging with log level = 'info'
+        - 'logdebug': Use python logging with log level = 'debug'
+        - 'pass': do nothing
 
-        'error':  raise wakepy.KeepAwakeError
-        'warn': call warnings.warn
-        'print': print to stdout
-        'logerror': Use python logging with log level = 'error'
-        'logwarn': Use python logging with log level = 'warning'
-        'loginfo': Use python logging with log level = 'info'
-        'logdebug': Use python logging with log level = 'debug'
-        'pass': do nothing
+
 
     """
 
@@ -187,58 +192,58 @@ def keepawake(
     method_linux: None | str | list[str] = None,
     method_mac: None | str | list[str] = None,
 ) -> AbstractContextManager[WakepyResponse]:
-    """Keep system awake (not susped/sleep). This is the recommended over
-    set_keepawake and unset_keepawake the same (first succesful) method of
-    set_keepawake should be used also on unset_keepawake.
+    """A context manager for keeping system awake (not susped/sleep). This is
+    recommended over :func:`set_keepawake` and :func:`unset_keepawake` as  the
+    same (first succesful) method of `set_keepawake` should be used also on
+    `unset_keepawake`.
 
-    Usage Example
-    -------------
-
-    KEEPAWAKE_OPTS = dict(
-        keep_screen_awake=True,
-        on_failure = 'error',
-        on_method_failure = 'logwarn',
-        method_linux = ['dbus', 'systemd'],
-    )
-
-    with keepawake(**KEEPAWAKE_OPTS):
-        # do stuff that takes a long time.
 
     Parameters
     ----------
     keep_screen_awake: bool
         If True, keeps also the screen awake, if implemented on system.
-        * windows: works (default: False)
-        * linux: always True and cannot be changed.
-        * mac: ? (untested)
-    method_win:
+          * windows: works (default: False)
+          * linux: always True and cannot be changed.
+          * mac: ? (untested)
+    method_win: str
         The method or methods to use on Windows. Possible values: 'esflags'
-    method_linux:
+    method_linux: str
         The method or methods to use on Linux. Possible values: 'dbus',
         'systemd'
-    method_mac:
+    method_mac: str
         The method or methods to use on MacOS. Possible values: 'caffeinate'
-    on_method_failure:
+    on_method_failure: str
         Tells what to do when a method fails. Makes sense only when there are
         multiple methods used (like on linux; see `method_linux`).
         See also: `on_failure`. Default: 'loginfo'.
-    on_failure:
+    on_failure: str
         Tells what to do when setting keepawake fails. This is done when
         *every* (selected) method has failed. See below for the list of
-        possible values. Default: 'error'.
+        possible values. Default: 'error'. Possible values:
 
-    Details
-    ---------
-    Possible values for `on_failure` and `on_method_failure`:
+        - 'error':  raise wakepy.KeepAwakeError
+        - 'warn': call warnings.warn
+        - 'print': print to stdout
+        - 'logerror': Use python logging with log level = 'error'
+        - 'logwarn': Use python logging with log level = 'warning'
+        - 'loginfo': Use python logging with log level = 'info'
+        - 'logdebug': Use python logging with log level = 'debug'
+        - 'pass': do nothing
 
-        'error':  raise wakepy.KeepAwakeError
-        'warn': call warnings.warn
-        'print': print to stdout
-        'logerror': Use python logging with log level = 'error'
-        'logwarn': Use python logging with log level = 'warning'
-        'loginfo': Use python logging with log level = 'info'
-        'logdebug': Use python logging with log level = 'debug'
-        'pass': do nothing
+
+
+    Example
+    -------------
+
+    >>> KEEPAWAKE_OPTS = dict(
+    ...     keep_screen_awake=True,
+    ...     on_failure = 'error',
+    ...     on_method_failure = 'logwarn',
+    ...     method_linux = ['dbus', 'systemd'],
+    ... )
+    ...
+    ...  with keepawake(**KEEPAWAKE_OPTS):
+    ...     # do stuff that takes a long time.
 
     """
     res = set_keepawake(
