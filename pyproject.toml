@@ -25,6 +25,10 @@ doc = [
     "sphinx~=4.5.0",
     "myst-parser"
 ]
+dev = [
+    "sphinx-autobuild",
+    "IPython"
+]
 
 [project.urls]
 Homepage = "https://github.com/np-8/wakepy"
