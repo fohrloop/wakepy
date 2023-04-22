@@ -20,8 +20,16 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
+[project.optional-dependencies]
+doc = [
+    "sphinx~=4.5.0",
+    "myst-parser"
+]
+
 [project.urls]
 Homepage = "https://github.com/np-8/wakepy"
+"Source Code" = "https://github.com/np-8/wakepy"
+"Issue Tracker" = "https://github.com/np-8/wakepy/issues"
 
 [project.scripts]
 wakepy = "wakepy.__main__:main"
