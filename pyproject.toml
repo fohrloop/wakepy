@@ -1,0 +1,31 @@
+[project]
+name = "wakepy"
+dynamic = ["version"]
+description = "Simple wakelock / keep-awake / stay-awake"
+authors = [
+    {name = "Niko Pasanen", email = "niko@pasanen.me"},
+]
+dependencies = [
+    # Default install on linux uses jeepney
+    # use --no-deps to skip if necessary
+    "jeepney >= 0.7.1;sys_platform=='linux'"
+]
+requires-python = ">=3.8"
+readme = "README.md"
+license = {text = "MIT"}
+classifiers = [
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/np-8/wakepy"
+
+[project.scripts]
+wakepy = "wakepy.__main__:main"
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
