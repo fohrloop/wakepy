@@ -22,7 +22,7 @@ classifiers = [
 
 [project.optional-dependencies]
 doc = [
-    "sphinx~=4.5.0",
+    "sphinx~=5.0",
     "myst-parser",
     "furo",
 ]
