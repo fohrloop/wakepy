@@ -28,7 +28,8 @@ doc = [
 ]
 dev = [
     "sphinx-autobuild",
-    "IPython"
+    "IPython",
+    "black",
 ]
 
 [project.urls]
