@@ -14,9 +14,14 @@ where `.` means the current directory (assuming cwd is at root of the repository
 
 - The documentation is done with Sphinx and the source code lives at 
  `./docs/source`.
-- **Building locally** (for debugging / testing docs): 
+- **Building locally** (for debugging / testing docs), with autobuild:
 
 ```
-sphinx-build -b html docs/source/ docs/built
+sphinx-autobuild docs/source/ docs/build/
+```
+
+or one time:
+```
+sphinx-build -b html docs/source/ docs/build
 ```
 - **Deploying**: Just push to github, and it will be automatically built by readthedocs. The settings can be adjusted [here](https://readthedocs.org/dashboard).
