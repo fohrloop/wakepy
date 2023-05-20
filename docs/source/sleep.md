@@ -4,15 +4,15 @@ So what does it mean when a computer goes to sleep? How it is sleep different fr
 
 ### Advanced Configuration and Power Interface (ACPI) States
 
-The table below shows the different ACPI states. The states are from the most active to the least active. Note that the *Standby* state can mean bit different things for different people, but people seem to agree that it is a state where computer is suspended into RAM.
-| State | What it is                                               | CPU           | Ram |
-| ----- | -------------------------------------------------------- | ------------- | --- |
-| S0    | **Active State** = Working mode   (corresponds to S0i0 ) | Active        | On  |
-| S1    | Power On Suspend = (POS) = Standby[1]                    | Clock stopped | On  |
-| S2    |                                                          | Power off     | On  |
-| S3    | **Suspend to RAM** (STR) = Standby[2]                    | Power off     | On  |
-| S4    | **Suspend to Disk** (STD) = Hibernation                  | Power off     | Off |
-| S5    | Soft Off                                                 | Power off     | Off |
+The table below shows the different ACPI states. The states are from the most active to the least active. Note that the *Standby* state can mean bit different things for different people, but people seem to agree that it is a state where computer is suspended into RAM (ACPI S1 - S3).
+| State | What it is                                               | CPU           | RAM          |
+| ----- | -------------------------------------------------------- | ------------- | ------------ |
+| S0    | **Active State** = Working mode   (corresponds to S0i0 ) | Active        | On           |
+| S1    | Power On Suspend = (POS) = Standby[1]                    | Clock stopped | Refreshed    |
+| S2    |                                                          | Power off     | Refreshed    |
+| S3    | **Suspend to RAM** (STR) = Standby[2]                    | Power off     | Slow refresh |
+| S4    | **Suspend to Disk** (STD) = Hibernation                  | Power off     | Off          |
+| S5    | Soft Off                                                 | Power off     | Off          |
 
 \*[1] According to  [wysocki2017].<br>
 \*[2] According to [wikipedia](https://en.wikipedia.org/wiki/ACPI) [2023-05-17]
