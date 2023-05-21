@@ -10,6 +10,7 @@
 
 api
 sleep
+power-management
 ```
 
 
