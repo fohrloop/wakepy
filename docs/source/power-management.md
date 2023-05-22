@@ -43,11 +43,12 @@ Desktop environment can be thought of a GUI for your Linux. It is an interchange
 - [GNOME](https://www.gnome.org/)
 - [Plasma](https://kde.org/plasma-desktop/) (KDE)
 - [Cinnamon](https://spins.fedoraproject.org/cinnamon/)
+- [MATE](https://mate-desktop.org/)
+- [LXQt](https://lxqt-project.org/)
 - [Xfce](https://www.xfce.org/)
 - [LXDE](http://www.lxde.org/)
-- [MATE](https://mate-desktop.org/)
   
-Desktop Environment itself consists of a Window Manager and bunch of other stuff, like application menu, wallpaper, file manager, GUI theming, etc. Often the desktop environment has also a power management component. A DE is optional and many server-oriented Linux distros do not have a desktop environment by default. If a system does not have a desktop environment, and it runs without a GUI. it is called *headless*. 
+Desktop Environment itself consists of a Window Manager and bunch of other stuff, like application menu, wallpaper, file manager, GUI theming, etc. Often the desktop environment has also a power management component. A DE is optional and many server-oriented Linux distros do not have a desktop environment by default. If a system does not have a desktop environment, and it runs without a GUI, it is called *headless*. 
 
 #### GNOME
 
