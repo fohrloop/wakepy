@@ -1,12 +1,22 @@
+"""This package (wakepy._deprecated) holds the following deprecated functions
+
+- set_keepawake
+- unset_keepawake
+- keepawake (context manager)
+
+These were deprecated in 0.7.0 in will be removed in a subsequent release.
+"""
+
 from __future__ import annotations
 
 from contextlib import contextmanager
 from importlib import import_module
 
-def import_module_for_method(system, method):
-    return import_module(f"._{system}._{method}", "wakepy._deprecated")
+from .._system import CURRENT_SYSTEM
 
-
+def get_function(funcname, system=CURRENT_SYSTEM):
+    module =  import_module(f"._{system}", "wakepy._deprecated")
+    return module.__getattr__(funcname)
 
 def set_keepawake(
     keep_screen_awake: bool = False,
@@ -24,7 +34,8 @@ def set_keepawake(
           * linux: always True and cannot be changed.
           * mac: ? (untested)
     """
-    ... # TODO
+    func = get_function('set_keepawake')
+    func(keep_screen_awake=keep_screen_awake)
 
 
 def unset_keepawake():
@@ -33,7 +44,8 @@ def unset_keepawake():
     recommended for most situations, as to unset the keepawake, same (first
     succesful) method of :func:`set_keepawake` should be used here.
     """
-    ... # TODO 
+    func = get_function('unset_keepawake')
+    func()
 
 @contextmanager
 def keepawake(*args, **kwargs):

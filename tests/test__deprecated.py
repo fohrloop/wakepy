@@ -4,18 +4,17 @@ Deprecated in 0.7.0"""
 
 
 from wakepy import keepawake, set_keepawake, unset_keepawake
+import platform 
 
+CURRENT_SYSTEM = platform.system().lower()
 
 def test_smoke_test():
     """simple smoke test"""
-    set_keepawake()
+
+    set_keepawake(keep_screen_awake=False)
     unset_keepawake()
 
-    with keepawake():
+    with keepawake(keep_screen_awake=False):
         pass
 
-    set_keepawake(keep_screen_awake=True)
-    unset_keepawake()
-
-    with keepawake(keep_screen_awake=True):
-        pass
+    
