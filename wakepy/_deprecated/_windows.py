@@ -7,11 +7,6 @@ ES_SYSTEM_REQUIRED = 0x00000001
 ES_DISPLAY_REQUIRED = 0x00000002
 
 
-# Values for wakepy.core (for error handling / logging)
-PRINT_NAME = "SetThreadExecutionState flags"
-REQUIREMENTS = []  # no known requirements
-
-
 def set_keepawake(keep_screen_awake=False):
     """
     Set the keep-awake. During keep-awake, the CPU is not allowed to go to

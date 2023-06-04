@@ -9,52 +9,11 @@ See also:
 
 """
 
-
-class KeepAwakeError(Exception):
-    ...
-
-from dataclasses import dataclass
-
-# temporarily here.
-# TODO: move to better place.
-@dataclass
-class InhibitorInfo:
-    # The application mame
-    app_name: str
-
-    # The reason, if any
-    reason: str
-
-
-class KeepAwakeInfo:
-    def __init__(self, inhibitors: list[InhibitorInfo] | None = None):
-        self.inhibitors = inhibitors or []
-
-    def add(self, inhibitor: InhibitorInfo):
-        self.inhibitors.append(inhibitor)
-
-    @property
-    def n_inhibitors(self) -> int:
-        return len(self.inhibitors)
-
-    @property
-    def keepawake(self) -> bool:
-        return bool(self.inhibitors)
-
-
-
 # There will be imported from jeepney when needed
 new_method_call = None
 DBusAddress = None
 open_dbus_connection = None
 
-# Values for wakepy.core (for error handling / logging)
-PRINT_NAME = "jeepney (dbus)"
-REQUIREMENTS = [
-    "session message bus (dbus-daemon) running",
-    "DBUS_SESSION_BUS_ADDRESS set",
-    "jeepney (python package)",
-]
 
 # The keepawake setter / unsetter object
 # Will be None until first call of methods
@@ -68,7 +27,7 @@ def import_jeepney():
         from jeepney import new_method_call, DBusAddress
         from jeepney.io.blocking import open_dbus_connection
     except Exception as e:
-        raise KeepAwakeError("Could not import jeepney!") from e
+        raise NotImplementedError("Could not import jeepney!") from e
 
 
 def get_connection(bus="SESSION"):
@@ -79,12 +38,12 @@ def get_connection(bus="SESSION"):
         return open_dbus_connection(bus=bus)
     except Exception as e:
         if "DBUS_SESSION_BUS_ADDRESS" in str(e):
-            raise KeepAwakeError(
+            raise NotImplementedError(
                 "DBUS_SESSION_BUS_ADDRESS environment variable not set! "
                 "If running in subprocess, make sure to pass the DBUS_SESSION_BUS_ADDRESS "
                 "environment variable."
             ) from e
-        raise KeepAwakeError(
+        raise NotImplementedError(
             f"Could not set dbus connection to {bus} message bus.\n"
             f"{e.__class__.__name__}: {str(e)}"
         ) from e
@@ -131,7 +90,7 @@ class KeepAwakeSetter:
 
     def unset_keepawake(self):
         if self.inhibit_cookie is None:
-            raise KeepAwakeError("You must set_keepawake before unsetting!")
+            raise NotImplementedError("You must set_keepawake before unsetting!")
 
         msg_uninhibit = new_method_call(
             self.screensaver,
@@ -159,59 +118,3 @@ def set_keepawake(keep_screen_awake=False):
 def unset_keepawake():
     setter = get_setter()
     setter.unset_keepawake()
-
-
-def _get_inhibitor_and_reason(connection, obj_path: str):
-    addr = DBusAddress(
-        obj_path,
-        bus_name="org.gnome.SessionManager",
-        interface="org.gnome.SessionManager.Inhibitor",
-    )
-
-    def _get(method):
-        msg = new_method_call(addr, method, "", tuple())
-        reply = connection.send_and_get_reply(msg)
-        return reply.body[0]
-
-    name = _get("GetAppId")
-    reason = _get("GetReason")
-
-    return name, reason
-
-
-def check_keepawake() -> KeepAwakeInfo:
-    """Checks keepawake status (dbus). Experimental."""
-    try:
-        return check_keepawake_gnome()
-    except Exception as e:
-        raise KeepAwakeError(f"Cannot check keepawake! Reason: {str(e)}") from e
-
-
-def check_keepawake_gnome() -> KeepAwakeInfo:
-    """Checks keepawake status on gnome (dbus). Experimental."""
-    info = KeepAwakeInfo()
-
-    if DBusAddress is None:
-        import_jeepney()
-
-    gnome_session_manager_addr = DBusAddress(
-        "/org/gnome/SessionManager",  # DBus object path
-        bus_name="org.gnome.SessionManager",
-        interface="org.gnome.SessionManager",
-    )
-    msg = new_method_call(
-        gnome_session_manager_addr,  # DBusAddress
-        "GetInhibitors",  # Method
-        "",  # No input for method
-        tuple(),
-    )
-    connection = get_connection()
-    reply = connection.send_and_get_reply(msg)
-
-    for inhibitor_tuple in reply.body[0]:
-        inhibitor_name, inhibitor_reason = _get_inhibitor_and_reason(
-            connection, inhibitor_tuple
-        )
-        info.add(InhibitorInfo(inhibitor_name, inhibitor_reason))
-
-    return info

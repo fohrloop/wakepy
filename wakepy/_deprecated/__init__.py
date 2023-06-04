@@ -11,13 +11,25 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from importlib import import_module
+import warnings
+import functools
 
 from .._system import CURRENT_SYSTEM
+
+def deprecated(func):
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        warnings.warn(f"wakepy.{func.__name__} is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy!",
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        return func(*args, **kwargs)
+    return inner
 
 def get_function(funcname, system=CURRENT_SYSTEM):
     module =  import_module(f"._{system}", "wakepy._deprecated")
     return getattr(module,funcname)
 
+@deprecated
 def set_keepawake(
     keep_screen_awake: bool = False,
 ):
@@ -37,7 +49,7 @@ def set_keepawake(
     func = get_function('set_keepawake')
     func(keep_screen_awake=keep_screen_awake)
 
-
+@deprecated
 def unset_keepawake():
     """Uset a wakelock (allow susped/sleep again). This is lower level
     function, and usage of the :func:`keepawake` context manager is
@@ -47,6 +59,7 @@ def unset_keepawake():
     func = get_function('unset_keepawake')
     func()
 
+@deprecated
 @contextmanager
 def keepawake(*args, **kwargs):
     set_keepawake(*args, **kwargs)
