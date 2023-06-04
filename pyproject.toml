@@ -30,7 +30,9 @@ dev = [
     "sphinx-autobuild",
     "IPython",
     "black",
-    "pytest"
+    "pytest",
+    "mypy",
+    "tox"
 ]
 
 [project.urls]
