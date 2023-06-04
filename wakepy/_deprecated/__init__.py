@@ -21,7 +21,10 @@ def deprecated(func):
     @functools.wraps(func)
     def inner(*args, **kwargs):
         warnings.warn(
-            f"wakepy.{func.__name__} is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy!",
+            (
+                f"wakepy.{func.__name__} is deprecated in wakepy 0.7.0 and will be "
+                "removed in a future version of wakepy!"
+            ),
             category=DeprecationWarning,
             stacklevel=2,
         )

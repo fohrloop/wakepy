@@ -50,7 +50,7 @@ def create_wakepy_opts_text(keep_screen_awake: bool) -> str:
         no_automatic_logout=get_not_logging_out_automatically(keep_screen_awake),
         screen_kept_on=keep_screen_awake,
     )
-    option_to_string = {True: "x", False: " ", None:"?"}
+    option_to_string = {True: "x", False: " ", None: "?"}
 
     return WAKEPY_TICKBOXES_TEMPLATE.format(
         **{key: option_to_string.get(val) for key, val in opts.items()}
