@@ -54,7 +54,11 @@ Desktop Environment itself consists of a Window Manager and bunch of other stuff
 
 - When session is marked idle, *GNOME Power Manager* starts its own *system* timer. When the timeout set in `gnome-power-preferences` is reached, the idle action is performed (turn screen off / suspend / hibernate).
 
+### How to prevent Linux from suspending automatically?
 
-## References
+If the system uses systemd version 183+ (released May 2012), it will have [Inhibitor locks](https://www.freedesktop.org/wiki/Software/systemd/inhibit/) available through the logind D-Bus API. 
+
+
+# References
 
 [gnome] https://help.gnome.org/users/gnome-power-manager/stable/preferences.html.en
