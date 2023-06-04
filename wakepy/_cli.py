@@ -10,7 +10,6 @@ start()
 import time
 
 from wakepy import keepawake
-from wakepy.constants import OnFailureStrategyName
 from wakepy._core import CURRENT_SYSTEM, SystemName
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
@@ -92,11 +91,6 @@ def print_on_start(keep_screen_awake):
 
 def start(
     keep_screen_awake=False,
-    on_failure: str | OnFailureStrategyName = OnFailureStrategyName.ERROR,
-    on_method_failure: str | OnFailureStrategyName = OnFailureStrategyName.LOGINFO,
-    method_win: None | str | list[str] = None,
-    method_linux: None | str | list[str] = None,
-    method_mac: None | str | list[str] = None,
 ):
     """
     Start the keep-awake. During keep-awake, the CPU is not allowed to
@@ -110,11 +104,6 @@ def start(
 
     with keepawake(
         keep_screen_awake=keep_screen_awake,
-        on_failure=on_failure,
-        on_method_failure=on_method_failure,
-        method_win=method_win,
-        method_linux=method_linux,
-        method_mac=method_mac,
     ):
         print_on_start(keep_screen_awake=keep_screen_awake)
         wait_until_keyboardinterrupt()
