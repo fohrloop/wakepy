@@ -9,10 +9,10 @@ These were deprecated in 0.7.0 in will be removed in a subsequent release.
 
 from __future__ import annotations
 
+import functools
+import warnings
 from contextlib import contextmanager
 from importlib import import_module
-import warnings
-import functools
 
 from .._system import CURRENT_SYSTEM
 

@@ -24,7 +24,7 @@ def import_jeepney():
     global new_method_call, DBusAddress, open_dbus_connection
 
     try:
-        from jeepney import new_method_call, DBusAddress
+        from jeepney import DBusAddress, new_method_call
         from jeepney.io.blocking import open_dbus_connection
     except Exception as e:
         raise NotImplementedError("Could not import jeepney!") from e

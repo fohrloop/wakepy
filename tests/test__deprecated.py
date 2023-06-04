@@ -3,8 +3,9 @@
 Deprecated in 0.7.0"""
 
 
-from wakepy import keepawake, set_keepawake, unset_keepawake
 import platform
+
+from wakepy import keepawake, set_keepawake, unset_keepawake
 
 CURRENT_SYSTEM = platform.system().lower()
 

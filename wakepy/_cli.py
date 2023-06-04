@@ -8,8 +8,8 @@ start()
 """
 
 import time
-
 from typing import Optional
+
 from wakepy import keepawake
 from wakepy._system import CURRENT_SYSTEM, SystemName
 

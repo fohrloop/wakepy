@@ -1,4 +1,4 @@
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 # See: https://ss64.com/osx/caffeinate.html
 COMMAND = "caffeinate"
