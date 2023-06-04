@@ -30,8 +30,39 @@ method return time=1681203094.197509 sender=:1.25 -> destination=:1.684 serial=4
    string "wakepy"
 """
 
-from ...exceptions import KeepAwakeError
-from ...inhibitor import KeepAwakeInfo, InhibitorInfo
+
+class KeepAwakeError(Exception):
+    ...
+
+from dataclasses import dataclass
+
+# temporarily here.
+# TODO: move to better place.
+@dataclass
+class InhibitorInfo:
+    # The application mame
+    app_name: str
+
+    # The reason, if any
+    reason: str
+
+
+class KeepAwakeInfo:
+    def __init__(self, inhibitors: list[InhibitorInfo] | None = None):
+        self.inhibitors = inhibitors or []
+
+    def add(self, inhibitor: InhibitorInfo):
+        self.inhibitors.append(inhibitor)
+
+    @property
+    def n_inhibitors(self) -> int:
+        return len(self.inhibitors)
+
+    @property
+    def keepawake(self) -> bool:
+        return bool(self.inhibitors)
+
+
 
 # There will be imported from jeepney when needed
 new_method_call = None
