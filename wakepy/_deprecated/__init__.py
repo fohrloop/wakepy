@@ -16,7 +16,7 @@ from .._system import CURRENT_SYSTEM
 
 def get_function(funcname, system=CURRENT_SYSTEM):
     module =  import_module(f"._{system}", "wakepy._deprecated")
-    return module.__getattr__(funcname)
+    return getattr(module,funcname)
 
 def set_keepawake(
     keep_screen_awake: bool = False,
