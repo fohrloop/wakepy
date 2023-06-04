@@ -10,7 +10,7 @@ start()
 import time
 
 from wakepy import keepawake
-from wakepy._core import CURRENT_SYSTEM, SystemName
+from wakepy._system import CURRENT_SYSTEM, SystemName
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
