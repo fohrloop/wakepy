@@ -29,11 +29,11 @@ doc = [
 dev = [
     "sphinx-autobuild",
     "IPython",
-    "black",
+    "black==23.3.0",
     "pytest",
     "mypy",
     "tox",
-    "ruff",
+    "ruff==0.0.270",
 ]
 
 [project.urls]
