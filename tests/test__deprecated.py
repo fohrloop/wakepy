@@ -4,9 +4,10 @@ Deprecated in 0.7.0"""
 
 
 from wakepy import keepawake, set_keepawake, unset_keepawake
-import platform 
+import platform
 
 CURRENT_SYSTEM = platform.system().lower()
+
 
 def test_smoke_test():
     """simple smoke test"""
@@ -16,5 +17,3 @@ def test_smoke_test():
 
     with keepawake(keep_screen_awake=False):
         pass
-
-    

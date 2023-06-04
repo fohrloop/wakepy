@@ -11,6 +11,7 @@ class SystemName(str, enum.Enum):
     LINUX = "linux"
     DARWIN = "darwin"
 
+
 SUPPORTED_SYSTEMS = list(x.value for x in SystemName.__members__.values())
 
 # Usually a SystemName
