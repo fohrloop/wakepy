@@ -47,6 +47,14 @@ wakepy = "wakepy.__main__:main"
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
+[tool.mypy]
+check_untyped_defs = true
+
 [[tool.mypy.overrides]]
 module = 'jeepney.*'
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# This package will be removed soon. Do not fix.
+module = 'wakepy._deprecated.*'
+check_untyped_defs = false
