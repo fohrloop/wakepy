@@ -1,9 +1,5 @@
 from subprocess import Popen, PIPE
 
-# Values for wakepy.core (for error handling / logging)
-PRINT_NAME = "caffeinate"
-REQUIREMENTS = []  # no known requirements
-
 # See: https://ss64.com/osx/caffeinate.html
 COMMAND = "caffeinate"
 
