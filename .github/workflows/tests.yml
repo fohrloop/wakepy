@@ -35,7 +35,7 @@ jobs:
           python3.10 -m pip install tox~=4.6.0
       - name: Run tests with tox
         run: tox -e linux-py310,check
-  test-linux-py36:
+  test-linux-py37:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -60,6 +60,6 @@ jobs:
           python3.7 -m pip install -U pip wheel && \
           python3.7 -m pip install tox~=4.6.0
       - name: Run tests with tox
-        run: tox -e linux-py36
+        run: tox -e linux-py37
 
     
