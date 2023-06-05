@@ -2,7 +2,7 @@ name: Run tests
 
 # Manual start only. Trying the save some minutes :) 
 on:  
-  [workflow_dispatch]
+  workflow_dispatch:
 
 # Cancel in-progress jobs/runs for the same workflow; if you push to same
 # pull request twice, the previous workflow should be canceled.
