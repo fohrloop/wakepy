@@ -35,7 +35,7 @@ jobs:
       - name: install tox
         run: |
           python3.10 -m pip install -U pip wheel && \
-          python3.10 -m pip install tox~=3.28.0
+          python3.10 -m pip install tox~=4.6.0
       - name: Run tests with tox
         run: tox -e linux-py310,check
   test-linux-py36:
@@ -43,14 +43,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      # Install python 3.6
+      # Install python 3.7
       # Ubuntu 22.04 comes with Python 3.10.6 and Ubuntu 20.04 comes with 3.8.10
-      # Ubuntu 20.04 has 3.6 as an option, though.
+      # Ubuntu 20.04 has 3.5, 3.6 and 3.7 as an option.
       # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
       - name: Install python 
         uses: actions/setup-python@v4 
         with:
-          python-version: '3.6' 
+          python-version: '3.7' 
       - name: Show OS version
         run: cat /etc/os-release
       - name: Show python version
@@ -59,8 +59,8 @@ jobs:
         run: python -c "import platform; print(platform.platform())"
       - name: install tox
         run: |
-          python3.6 -m pip install -U pip wheel && \
-          python3.6 -m pip install tox~=3.28.0
+          python3.7 -m pip install -U pip wheel && \
+          python3.7 -m pip install tox~=4.6.0
       - name: Run tests with tox
         run: tox -e linux-py36
 

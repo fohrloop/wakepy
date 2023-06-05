@@ -10,7 +10,8 @@ dependencies = [
     # use --no-deps to skip if necessary
     "jeepney >= 0.7.1;sys_platform=='linux'"
 ]
-requires-python = ">=3.6"
+# Python 3.7 introduces from __future__ import annotations
+requires-python = ">=3.7"
 readme = "README.md"
 license = {text = "MIT"}
 classifiers = [
@@ -32,7 +33,7 @@ dev = [
     "black==23.3.0",
     "pytest",
     "mypy==1.3.0",
-    "tox==3.28.0",
+    "tox==4.6.0",
     "isort==5.12.0",
     "ruff==0.0.270",
 ]
