@@ -32,7 +32,7 @@ jobs:
       - name: install tox
         run: |
           python3.10 -m pip install -U pip wheel && \
-          python3.10 -m pip install tox
+          python3.10 -m pip install tox~=3.28.0
       - name: Run tests with tox
         run: tox -e linux-py310,check
   test-linux-py36:
@@ -57,7 +57,7 @@ jobs:
       - name: install tox
         run: |
           python3.6 -m pip install -U pip wheel && \
-          python3.6 -m pip install tox
+          python3.6 -m pip install tox~=3.28.0
       - name: Run tests with tox
         run: tox -e linux-py36
 
