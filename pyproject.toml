@@ -10,7 +10,7 @@ dependencies = [
     # use --no-deps to skip if necessary
     "jeepney >= 0.7.1;sys_platform=='linux'"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.6"
 readme = "README.md"
 license = {text = "MIT"}
 classifiers = [
