@@ -24,7 +24,7 @@ def import_jeepney():
     global new_method_call, DBusAddress, open_dbus_connection
 
     try:
-        from jeepney import new_method_call, DBusAddress
+        from jeepney import DBusAddress, new_method_call
         from jeepney.io.blocking import open_dbus_connection
     except Exception as e:
         raise NotImplementedError("Could not import jeepney!") from e
@@ -40,8 +40,8 @@ def get_connection(bus="SESSION"):
         if "DBUS_SESSION_BUS_ADDRESS" in str(e):
             raise NotImplementedError(
                 "DBUS_SESSION_BUS_ADDRESS environment variable not set! "
-                "If running in subprocess, make sure to pass the DBUS_SESSION_BUS_ADDRESS "
-                "environment variable."
+                "If running in subprocess, make sure to pass the "
+                "DBUS_SESSION_BUS_ADDRESS environment variable."
             ) from e
         raise NotImplementedError(
             f"Could not set dbus connection to {bus} message bus.\n"

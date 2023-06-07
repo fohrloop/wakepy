@@ -8,6 +8,7 @@ start()
 """
 
 import time
+from typing import Optional
 
 from wakepy import keepawake
 from wakepy._system import CURRENT_SYSTEM, SystemName
@@ -37,7 +38,7 @@ def wakepy_text():
     return WAKEPY_TEXT_TEMPLATE.format(VERSION_STRING=f"{'  v.'+__version__: <20}")
 
 
-def get_not_logging_out_automatically(keep_screen_awake: bool) -> bool:
+def get_not_logging_out_automatically(keep_screen_awake: bool) -> Optional[bool]:
     not_logging_out_automatically = None
     if CURRENT_SYSTEM == SystemName.WINDOWS:
         not_logging_out_automatically = keep_screen_awake
@@ -49,10 +50,10 @@ def create_wakepy_opts_text(keep_screen_awake: bool) -> str:
         no_automatic_logout=get_not_logging_out_automatically(keep_screen_awake),
         screen_kept_on=keep_screen_awake,
     )
-    option_to_string = {True: "x", False: " "}
+    option_to_string = {True: "x", False: " ", None: "?"}
 
     return WAKEPY_TICKBOXES_TEMPLATE.format(
-        **{key: option_to_string.get(val, "?") for key, val in opts.items()}
+        **{key: option_to_string.get(val) for key, val in opts.items()}
     )
 
 

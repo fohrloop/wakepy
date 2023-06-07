@@ -1,5 +1,4 @@
 import enum
-
 import platform
 
 
@@ -10,6 +9,7 @@ class SystemName(str, enum.Enum):
     WINDOWS = "windows"
     LINUX = "linux"
     DARWIN = "darwin"
+
 
 SUPPORTED_SYSTEMS = list(x.value for x in SystemName.__members__.values())
 
