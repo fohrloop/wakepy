@@ -1,4 +1,13 @@
+## Manual additions
+
+.ruff_cache
+
+#-----------------------------------------------
+# Copied from somewhere? 
+#
 # Created by .ignore support plugin (hsz.mobi)
+#
+#
 ### VisualStudioCode template
 .vscode/*
 !.vscode/settings.json
@@ -275,5 +284,3 @@ GitHub.sublime-settings
 
 # automatically created temporary files
 inst/
-
-.vscode
