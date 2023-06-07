@@ -14,7 +14,7 @@ concurrency:
 
 
 jobs:  
-  test-windows-py310:
+  test-mac-py310:
     # macOS 12 Monterey
     # See: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
     runs-on: macos-12
