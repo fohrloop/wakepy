@@ -17,6 +17,6 @@ def fake_success() -> bool:
     should fake the successful inhibition anyway. Faking the success is done
     after every other method is tried (and failed).
     """
-    if os.environ[WAKEPY_FAKE_SUCCESS]:
+    if os.environ.get(WAKEPY_FAKE_SUCCESS):
         return True
     return False
