@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: '3.10' 
       - name: Show OS version
-        run: slmgr /dlv
+        run: systeminfo
       - name: Show environment variables
         run: "Get-ChildItem Env: | Format-Table -Wrap -AutoSize"
       - name: Show python version
