@@ -25,6 +25,8 @@ jobs:
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
+      - name: Check D-Bus
+        run: ps -ef | grep dbus | grep -v grep
       - name: Show python version
         run: python --version
       - name: Show platform information
@@ -51,6 +53,8 @@ jobs:
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
+      - name: Check D-Bus
+        run: ps -ef | grep dbus | grep -v grep
       - name: Show python version
         run: python --version
       - name: Show platform information
