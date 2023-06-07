@@ -8,7 +8,7 @@ on:
 # pull request twice, the previous workflow should be canceled.
 # From: https://docs.github.com/en/actions/using-jobs/using-concurrency#example-only-cancel-in-progress-jobs-or-runs-for-the-current-workflow
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: win-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 
