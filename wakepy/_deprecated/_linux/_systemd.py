@@ -5,7 +5,9 @@ https://www.man7.org/linux/man-pages/man1/systemctl.1.html
 """
 import subprocess
 import os
-import warnings
+import logging 
+
+logger = logging.getLogger(__name__)
 
 try:
     subprocess.check_output(["pidof", "systemd"])
@@ -16,8 +18,8 @@ except subprocess.CalledProcessError:
     raise NotImplementedError("sysmtemd not supported")
 
 if not "SUDO_UID" in os.environ.keys():
-    warnings.warn(
-        "ERROR! Root permissions will be needed to set/unset the wakelock with systemd!"
+    logger.warning(
+        "D-bus methods have failed. Root permissions will be needed to set/unset the wakelock with systemd!"
         """\n\nExample: sudo -E "PATH=$PATH" python -m wakepy"""
     )
     raise NotImplementedError('systemd mask method failed')
