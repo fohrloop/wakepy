@@ -14,8 +14,10 @@ concurrency:
 
 
 jobs:  
-  test-linux-py310:
-    runs-on: ubuntu-22.04
+  test-windows-py310:
+    # macOS 12 Monterey
+    # See: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
+    runs-on: macos-12
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,17 +26,18 @@ jobs:
         with:
           python-version: '3.10' 
       - name: Show OS version
-        run: cat /etc/os-release
-      - run: printenv
-      - name: Check D-Bus
-        run: ps -ef | grep dbus | grep -v grep
+        run: |
+          sw_vers -productVersion && \
+          system_profiler SPSoftwareDataType
+      - name: Show environment variables
+        run: printenv
       - name: Show python version
         run: python --version
       - name: Show platform information
         run: python -c "import platform; print(platform.platform())"
       - name: install tox
         run: |
-          python3.10 -m pip install -U pip wheel && \
-          python3.10 -m pip install tox~=4.6.0
+          python -m pip install -U pip wheel && \
+          python -m pip install tox~=4.6.0
       - name: Run tests with tox
-        run: tox -e linux-py310,check
+        run: tox -e mac-py310

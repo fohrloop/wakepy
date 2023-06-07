@@ -2,8 +2,7 @@ name: Run tests
 
 # Manual start only. Trying the save some minutes :) 
 on:  
-  workflow_dispatch:
-  push: # TMP (remove this)
+  [workflow_dispatch]
 
 # Cancel in-progress jobs/runs for the same workflow; if you push to same
 # pull request twice, the previous workflow should be canceled.
@@ -15,9 +14,9 @@ concurrency:
 
 jobs:  
   test-windows-py310:
-    # macOS 12 Monterey
+    # Windows Server 2022
     # See: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-    runs-on: macos-12
+    runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -26,11 +25,9 @@ jobs:
         with:
           python-version: '3.10' 
       - name: Show OS version
-        run: |
-          sw_vers -productVersion && \
-          system_profiler SPSoftwareDataType
+        run: slmgr /dlv
       - name: Show environment variables
-        run: printenv
+        run: "Get-ChildItem Env: | Format-Table -Wrap -AutoSize"
       - name: Show python version
         run: python --version
       - name: Show platform information
@@ -40,4 +37,4 @@ jobs:
           python -m pip install -U pip wheel && \
           python -m pip install tox~=4.6.0
       - name: Run tests with tox
-        run: tox -e mac-py310
+        run: tox -e win-py310
