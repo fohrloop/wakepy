@@ -1,4 +1,4 @@
-name: Run tests
+name: Run tests (Linux)
 
 # Manual start only. Trying the save some minutes :) 
 on:  

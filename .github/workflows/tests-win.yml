@@ -1,4 +1,4 @@
-name: Run tests
+name: Run tests (Win)
 
 # Manual start only. Trying the save some minutes :) 
 on:  
