@@ -42,7 +42,8 @@ def get_function(funcname, system=CURRENT_SYSTEM):
 def set_keepawake(
     keep_screen_awake: bool = False,
 ):
-    """DEPRECATED in wakepy 0.7.0. Do not use!
+    """DEPRECATED in wakepy 0.7.0. Use :func:`keep.running` or
+    :func:`keep.presenting`, instead.
 
     Set a wakelock for keeping system awake (disallow susped/sleep). This is
     lower level function, and usage of the :func:`keepawake` context manager is
@@ -63,7 +64,8 @@ def set_keepawake(
 
 @deprecated
 def unset_keepawake():
-    """DEPRECATED in wakepy 0.7.0. Do not use!
+    """DEPRECATED in wakepy 0.7.0. Use :func:`keep.running` or
+    :func:`keep.presenting`, instead.
 
     Uset a wakelock (allow susped/sleep again). This is lower level
     function, and usage of the :func:`keepawake` context manager is
@@ -77,7 +79,8 @@ def unset_keepawake():
 @deprecated
 @contextmanager
 def keepawake(*args, **kwargs):
-    """DEPRECATED in wakepy 0.7.0. Do not use!
+    """DEPRECATED in wakepy 0.7.0. Use :func:`keep.running` or
+    :func:`keep.presenting`, instead.
 
     This is the (old) context manager for setting and unsetting
     keepawake.

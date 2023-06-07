@@ -38,12 +38,17 @@ extensions = [
     "sphinx.ext.napoleon",
 ]
 
+
+
 # For supporting links to headers like:
 # [](#auto-generated-header-anchors)
 # See: https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors
 myst_heading_anchors = 3
 
-
+# Add a border around Examples. Might or might not look good, depending on the
+# used theme.
+# See: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html#confval-napoleon_use_admonition_for_examples
+napoleon_use_admonition_for_examples = True
 napoleon_google_docstring = False
 
 # Add any paths that contain templates here, relative to this directory.
