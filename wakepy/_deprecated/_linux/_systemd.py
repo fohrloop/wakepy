@@ -42,7 +42,7 @@ def set_keepawake(keep_screen_awake=False):
         preventing sleep.
     """
     run_systemctl("mask")
-
+    return True 
 
 def unset_keepawake():
     run_systemctl("unmask")

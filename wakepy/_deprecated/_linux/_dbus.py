@@ -55,6 +55,7 @@ def set_keepawake(keep_screen_awake=False):
         "wakepy",
         f"wakepy.set_keepawake(keep_screen_awake={keep_screen_awake})",
     )
+    return True 
 
 
 def unset_keepawake():

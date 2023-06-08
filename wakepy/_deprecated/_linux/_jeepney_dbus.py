@@ -78,7 +78,7 @@ def set_keepawake(keep_screen_awake=False):
     msg_inhibit = messagegenerator.inhibit("wakepy", "wakelock active")
     reply = connection.send_and_get_reply(msg_inhibit)
     cookie = reply.body[0]
-
+    return True 
 
 def unset_keepawake():
     if cookie is None:

@@ -24,8 +24,8 @@ for module in "_jeepney_dbus", "_dbus", "_systemd":
 else:
     if fake_success():
         # User asked to fake success anyway (Probably running in CI env)
-        set_keepawake = lambda keep_screen_awake=False: None
-        unset_keepawake = lambda : None
+        set_keepawake = lambda keep_screen_awake=False: False
+        unset_keepawake = lambda : False
     else:
         raise NotImplementedError(
             "You've tried to use the deprecated method to set a wakelock and all the the "
