@@ -46,8 +46,9 @@ def _temporary_solution_for_using_old_functions_with_new_api(keep_screen_awake=F
     except Exception:
         m.success = False
     else:
+        m.success = True
         if result in (True, False):
-            m.success = result
+            m.real_success = result
         else: 
             raise ValueError('Expected True or False')
         
