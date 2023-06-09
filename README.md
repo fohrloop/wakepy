@@ -96,6 +96,13 @@ options:
                            screenlock
 ```
 
+## ⚖️👑 Key selling points
+- Wakepy supports multiple operating systems and desktop environments
+- Wakepy has permissive MIT licence
+- It has a simple command line interface and a python API
+- Wakepy has very little python dependencies:
+  - Zero if using Windows or macOS or Linux + systemd
+  - One if using linux + [jeepney](https://jeepney.readthedocs.io/) or linux + [dbus-python](https://dbus.freedesktop.org/doc/dbus-python/).
 
 
 ## Details
@@ -175,13 +182,6 @@ options:
 **How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a succesful inhibit lock in tests, you may set an environment variable: `WAKEPY_FAKE_SUCCESS` to `yes`.
 
 
-# ⚖️👑 Key selling points
-- Wakepy supports multiple operating systems and desktop environments
-- Wakepy has permissive MIT licence
-- It has a simple command line interface and a python API
-- Wakepy has very little python dependencies:
-  - Zero if using Windows or macOS or Linux + systemd
-  - One if using linux + [jeepney](https://jeepney.readthedocs.io/) or linux + [dbus-python](https://dbus.freedesktop.org/doc/dbus-python/).
 
 ## Changelog 
 - See [CHANGELOG.md](CHANGELOG.md)
