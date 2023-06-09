@@ -72,7 +72,7 @@ with keep.running() as m:
     # Did not succeed inhibiting sleep. 
     # Tell it to the user?
   
-  # Do something that takes long time
+  something_which_takes_long_time()
 ```
 - **Note**: On Linux the `keep.running` currently actually does the same thing as `keep.presenting`; remember to lock the screen manually! (will be fixed in a future release)
 
@@ -88,8 +88,8 @@ with keep.presenting() as m:
   if not m.success:
     # Did not succeed inhibiting screensaver.
     # Tell it to the user?
-  else:
-    # Do something that takes long time
+
+  something_which_needs_display_on()
 ```
 
 
