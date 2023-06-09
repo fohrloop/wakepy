@@ -16,7 +16,11 @@ from wakepy._cli import start
 def get_argparser() -> argparse.ArgumentError:
     parser = argparse.ArgumentParser(
         prog="wakepy",
-        formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=27),
+        formatter_class=lambda prog: argparse.HelpFormatter(
+            prog,
+            # makes more space for the "options" area on the left
+            max_help_position=27,
+        ),
     )
 
     def add_mode(short, long, help, default=False):
