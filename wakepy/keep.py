@@ -1,4 +1,5 @@
 import contextlib
+from typing import Iterator
 
 from ._deprecated import get_function
 
@@ -37,7 +38,7 @@ class ModeInfoTemporaryImplementation:
 
 def _temporary_solution_for_using_old_functions_with_new_api(
     keep_screen_awake=False,
-) -> ModeInfoTemporaryImplementation:
+) -> Iterator[ModeInfoTemporaryImplementation]:
     # This is a toy implementation using the old, deprecated functions
     # They're only used in wakepy 0.6.x, and new, better implementation
     # will be replacing this in wakepy 0.7.0

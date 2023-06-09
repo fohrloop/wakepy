@@ -13,7 +13,7 @@ import argparse
 from wakepy._cli import start
 
 
-def get_argparser() -> argparse.ArgumentError:
+def get_argparser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="wakepy",
         formatter_class=lambda prog: argparse.HelpFormatter(
@@ -53,7 +53,7 @@ def get_argparser() -> argparse.ArgumentError:
     return parser
 
 
-def parse_arguments(parser: argparse.ArgumentParser) -> dict:
+def parse_arguments(parser: argparse.ArgumentParser) -> dict[str, bool]:
     args = parser.parse_args()
 
     if args.keep_screen_awake and any((args.keep_running, args.presentation)):
