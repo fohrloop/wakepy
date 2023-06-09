@@ -2,7 +2,8 @@
 
 # ⏰😴 wakepy 
 
-Simple cross-platform wakelock written in Python. Prevent your computer from going to sleep in the middle of a long running task. 
+Simple cross-platform wakelock written in Python. Prevent your computer from going to sleep in the middle of a long running task, or starting a screensaver automatically.
+
 
 
 #### Table of Contents
@@ -18,8 +19,6 @@ Wakepy currently supports
 - Windows
 - Linux (with DBus or systemd)
 - macOS
-
-Feel free to submit pull request(s) for other platforms.
 
 # Installing
 
@@ -61,76 +60,124 @@ optional arguments:
 
 ## Usage within a python script
 
-### Option 1: `set_keepawake` and `unset_keepawake` functions
+
+### Option 1: Keep system running your programs
+- In this mode, sleep/suspend is inhibited (not allowed), but system is allowed to switch display off and switch screenlock on normally.
+- This is ideal mode for running a task that takes a long time (video editing, training machine learning model, scraping, ...).
+```python
+from wakepy import keep.running
+
+with keep.running() as m:
+  if not m.success:
+    # Did not succeed inhibiting sleep. 
+    # Tell it to the user?
+  
+  # Do something that takes long time
+```
+- **Note**: On Linux the `keep.running` currently actually does the same thing as `keep.presenting`; remember to lock the screen manually! (will be fixed in a future release)
+
+  
+### Option 2: Keep presenting content from your screen
+- In this mode, sleep/suspend is inhibited (not allowed), like in the running mode. In addition, system is not allowed to switch screensaver or screenlock on.
+- This is ideal for watching videos or presenting some content from the screen for a long time.
 
 ```python
-from wakepy import set_keepawake, unset_keepawake
+from wakepy import keep.presenting
 
-set_keepawake(keep_screen_awake=False)
-# do stuff that takes long time
-unset_keepawake()
-```
-### Option 2: `keepawake` context manager
-
-
-```python
-from wakepy import keepawake
-
-with keepawake(keep_screen_awake=False):
-  ... # do stuff that takes long time
+with keep.presenting() as m:
+  if not m.success:
+    # Did not succeed inhibiting screensaver.
+    # Tell it to the user?
+  else:
+    # Do something that takes long time
 ```
 
-### Parameters
--  `keep_screen_awake` can be used to keep also the screen awake. The default is `False`. On Linux, this is set to `True` and cannot be changed.
 
-### Raises
-- `NotImplementedError`: If setting keepawake is not supported on your system.
 
 ## Details
 
-### Windows
-The program simply calls the [SetThreadExecutionState](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate?redirectedfrom=MSDN) with the `ES_SYSTEM_REQUIRED` flag, when setting the keepawake, and removes flag when unsetting. The flag cannot prevent sleeping if
-- User presses power button
-- User selects *Sleep* from the Start menu.
+### wakepy.keep.running
 
-### Linux
-The program uses, depending on what is installed, either (in this order)
-1. jeepney (pure python dbus implementation. Default)
-2. `systemctl mask`
+#### General / All systems
 
-The first option will use DBus to call the inhibit method of `org.freedesktop.ScreenSaver`, which will prevent the system from suspending/speeling. The inhibit will be released when the process dies or when unset_keepawake is called. The flag cannot prevent sleeping from user interaction. This approach is multiprocessing-safe and doesn't need `sudo` privileges but you have to use a Freedesktop-compliant desktop environment, for example GNOME, KDE or Xfce. See full list in [the freedesktop.org wiki](https://freedesktop.org/wiki/Desktops/). 
+**Does keep.running prevent manually putting system to sleep?** All the methods, if not otherwise specified, only prevent the *automatic, idle timer timeout based* sleeping, so it is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. One exception is systemd mask method on Linux, which prevents suspend altogether.
 
-The `systemctl mask` command will prevent all forms of sleep or hibernation (including sleep initialized by the user) when calling `set_keepawake`, and unmasks the functions when calling `unset_keepawake`. This command will remain active until `unset_keepawake` is called and is not multiprocessing-safe because the first process that releases the wakelock unmasks the functions and thus no longer prevents sleep.  *Using systemd requires sudo privileges*.
+**Can I lock my computer after entered `keep.running` mode?**: Yes, and you probably should, if you're not near your computer. The programs will continue execution regardless of the lock.
 
 
-### Darwin (macOS)
-The program launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) in a subprocess when setting keepawake, and terminates the subprocess when unsetting. This does not prevent the user from manually sleeping the system or terminating the caffeinate process.
+#### Windows
 
-### Summary table
+**How it works?**:  The [SetThreadExecutionState](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate?redirectedfrom=MSDN) is called with the `ES_CONTINUOUS` and  `ES_SYSTEM_REQUIRED` flags to acquire a lock when entering the context. On exit, these flags are removed.
 
-|                                                              | Windows                                                                                                                                                                         | Linux                                                                                                                                                                                   | Mac                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| wakepy uses                                                  | [SetThreadExecutionState](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate?redirectedfrom=MSDN) with the `ES_SYSTEM_REQUIRED` flag | DBus Inhibit/UnInhibit or as a fallback `systemctl mask`                                                                                                                                | [`caffeinate`](https://ss64.com/osx/caffeinate.html) |
-| sudo / admin needed?                                         | No                                                                                                                                                                              | No           (with dbus) / Yes (systemd)                                                                                                                                                                           | No                                                   |
-| `keep_screen_awake` option                                   | Optional<br>Default: `False`                                                                                                                                                    | Always `True`                                                                                                                                                                           | Optional<br>Default: `False`                         |
-| When `keep_screen_awake = True`                              | Screen is kept awake. <br><br>Windows will not be locked automatically.                                                                                                         | Screen is kept awake.<br>Automatic locking: on some distros, depending on how the lock screen is implemented.                                                                           | Screen is kept awake.<br>Automatic locking = ?       |
-| Multiprocessing support                                      | Yes                                                                                                                                                                             | Yes       (dbus) / No (systemd)                                                                                                                                                                              | No                                                   |
-| When process calling `set_keepawake` dies                    | All flags set by the process are removed. See: [ How will killing while lock set affect it?](https://github.com/np-8/wakepy/issues/16)                                          | The wakelock is immediately released except if the `systemctl mask` fallback is used, in which case the wakelock will be held even over a reboot until it's released.                   | Nothing happens                                      |
-| How to debug or see the changes<br>done by wakepy in the OS? | Run `powercfg -requests` in<br>elevated PowerShell                                                                                                                              | ?<br>If the `systemctl mask` fallback is used, run `sudo systemctl status sleep.target suspend.target hibernate.target hybrid-sleep.target` in Terminal.                                | ?                                                    |
-| If on laptop, and battery low?                               | Sleep                                                                                                                                                                           | Default 'when battery low' action will be triggered.<bt>If the `systemctl mask` fallback is used, most distros will do their set 'when battery low' action but fail if that is suspend. | ?                                                    |
+**How to check it?**:   Run `powercfg -requests` in an elevated PowerShell.
 
-# ⚖️ Pros and Cons
-### 👑💯 Advantages of wakepy
-- wakepy has very little python dependencies:
+**Multiprocess safe?**: Yes.
+
+
+
+#### Linux
+
+**How it works?**: Wakepy uses, depending on what is installed, either (in this order)
+1. D-Bus to call `Inhibit` method of [`org.freedesktop.ScreenSaver`](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) (try first using jeepney, and then using dbus-python)
+3. `systemctl mask`
+
+**Note**: Current D-Bus -based implementation prevents also screenlock/screensaver (remember to lock manually!)
+
+**Note 2**: The systemd mask method will inhibit all forms of sleep (including hibernation and sleep initialized by the user). It will change global system settings, so if your process exits abruptly, you'll have to undo the change.
+
+**How to check it?**:  For D-Bus  `org.freedesktop.ScreenSaver` based solution, there is no possibility to check it afterwards. You may monitor the call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html), though. For systemd mask based solution, you'll see that the Suspend option is removed from the menu altogether.
+
+**What systems are supported?** For D-Bus `org.freedesktop.ScreenSaver` method, you have to use a Freedesktop-compliant Desktop Environment, for example GNOME or KDE. The list of supported systems will be expanded in the future. For systemd solution, any Linux running systemd works, but you need sudo.
+
+**Multiprocess safe?**: DBus: yes, systemd mask: no.
+
+
+#### Darwin (macOS)
+
+**How it works?**: Wakepy launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) subprocess when setting keepawake, and terminates the subprocess when unsetting.
+
+**How to check it?**:  There should be a subprocess visible when a lock is taken, but this is untested.
+
+**Multiprocess safe?**: Not tested.
+
+### wakepy.keep.presenting
+
+#### General / All systems
+
+**Does keep.presenting prevent manually putting system to sleep?** All the methods, if not otherwise specified, only prevent the *automatic, idle timer timeout based*  sleeping and screensaver/screenlock, so it is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually start the screenlock/screensaver while presenting mode is on. 
+
+**Is my computer locked automatically in `keep.presenting` mode?**: No. Entering a screenlock automatically would stop presenting the content. 
+
+#### Windows
+
+**How it works?**:   The [SetThreadExecutionState](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate?redirectedfrom=MSDN) is called with the `ES_CONTINUOUS`, `ES_SYSTEM_REQUIRED` and `ES_DISPLAY_REQUIRED` flags to acquire a lock when entering the context. On exit, these flags are removed.
+
+**How to check it?**:   Run `powercfg -requests` in an elevated PowerShell.
+
+**Multiprocess safe?**: Yes.
+
+#### Darwin (macOS)
+
+**How it works?**: Wakepy launches a [`caffeinate`](https://ss64.com/osx/caffeinate.html) subprocess  with `-d -u -t 2592000` arguments when entering `keep.presenting` mode, and terminates the subprocess when exiting the mode.
+
+**How to check it?**:  There should be a subprocess visible when a lock is taken, but this is untested.
+
+**Multiprocess safe?**: Not tested.
+
+
+### General questions
+**What if the process holding the lock dies?**: The lock is automatically removed. With one exception: Using systemd mask method on Linux, since it alters global system settings. That will not be used unless other methods fail and you're running the process with sudo.
+
+**How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a succesful inhibit lock in tests, you may set an environment variable: `WAKEPY_FAKE_SUCCESS` to `yes`.
+
+
+# ⚖️👑 Key selling points
+- Wakepy supports multiple operating systems and desktop environments
+- Wakepy has permissive MIT licence
+- It has a simple command line interface and a python API
+- Wakepy has very little python dependencies:
   - Zero if using Windows or macOS or Linux + systemd
   - One if using linux + [jeepney](https://jeepney.readthedocs.io/) or linux + [dbus-python](https://dbus.freedesktop.org/doc/dbus-python/).
-- wakepy is simple and it has a little amount of code. You can read the whole source code quickly
-- It has permissive MIT licence
-- It is multiplatform
-- You can use it directly from command line, or within your python scripts
-- It runs without admin/sudo priviledges on Windows and Mac and Linux (with DBus)!
-### 🔍❕ Disadvantages / pitfalls with wakepy
-- On Linux, if DBus unavailable, the fallback solution using `systemctl` needs sudo priviledges.
-- Currently multiprocessing is not well supported on Mac (?); the first function calling `unset_keepawake` or releasing the `keepawake` context manager will allow the PC to sleep even if you have called `set_keepawake` multiple times. 
+
 ## Changelog 
 - See [CHANGELOG.md](CHANGELOG.md)
