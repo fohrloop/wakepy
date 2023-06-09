@@ -9,9 +9,12 @@ Simple cross-platform wakelock written in Python. Prevent your computer from goi
 #### Table of Contents
 - [Installing](#installing)
 - [Usage](#usage)
-  - [Start from command line](#start-from-command-line)
-  - [Set keepawake within a python script](#usage-within-a-python-script)
+  - [Wakepy Python API](#wakepy-python-api)
+  - [Wakepy CLI](#wakepy-command-line-interface-cli)
+- [Key selling points](#️-key-selling-points)
 - [Details](#details)
+  - [wakepy.keep.running](#wakepykeeprunning)
+  - [wakepy.keep.presenting](#wakepykeeppresenting)
 - [Changelog](#changelog)
 
 ## Requirements
