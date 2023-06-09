@@ -37,28 +37,8 @@ Please note that this requires also `systemd` to be installed on your system, an
 
 # Usage
 
-## Start from command line
-Running
-```
-wakepy 
-```
-or  
-```
-python -m wakepy
-```
-starts the program.  While running, computer will not go to sleep. If battery is running out, your OS might force laptop to sleep. 
 
-### CLI arguments
-
-```
-wakepy [-h] [-s]
-
-optional arguments:    
-  -h, --help               show this help message and exit
-  -s, --keep-screen-awake  Keep also the screen awake. On Linux, this flag is set on and cannot be disabled.
-```
-
-## Usage within a python script
+## Wakepy Python API
 
 
 ### Option 1: Keep system running your programs
@@ -90,6 +70,27 @@ with keep.presenting() as m:
     # Tell it to the user?
 
   something_which_needs_display_on()
+```
+
+## Wakepy Command Line Interface (CLI)
+Running
+```
+wakepy 
+```
+or  
+```
+python -m wakepy
+```
+starts the program.  While running, computer will not go to sleep. If battery is running out, your OS might force laptop to sleep. 
+
+### CLI arguments
+
+```
+wakepy [-h] [-s]
+
+optional arguments:    
+  -h, --help               show this help message and exit
+  -s, --keep-screen-awake  Keep also the screen awake. On Linux, this flag is set on and cannot be disabled.
 ```
 
 
