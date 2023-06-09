@@ -7,9 +7,9 @@ start()
   awake. Exit with Ctrl-C.
 """
 
-from contextlib import ExitStack
 import time
 import warnings
+from contextlib import ExitStack
 
 from wakepy import keep
 from wakepy._system import CURRENT_SYSTEM, SystemName
@@ -112,8 +112,8 @@ def start(
 
         if deprecation_warning:
             warnings.warn(
-                "The -s/--keep-screen-awake option is deprecated and will be removed in a "
-                "future release! Use the -p/--presentation flag, instead!\n"
+                "The -s/--keep-screen-awake option is deprecated and will be removed in"
+                " a future release! Use the -p/--presentation flag, instead!\n"
             )
         wait_until_keyboardinterrupt()
 

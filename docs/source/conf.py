@@ -39,7 +39,6 @@ extensions = [
 ]
 
 
-
 # For supporting links to headers like:
 # [](#auto-generated-header-anchors)
 # See: https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors

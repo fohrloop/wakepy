@@ -3,9 +3,9 @@
 See:
 https://www.man7.org/linux/man-pages/man1/systemctl.1.html
 """
-import subprocess
+import logging
 import os
-import logging 
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -17,12 +17,12 @@ except subprocess.CalledProcessError:
     # See: https://github.com/np-8/wakepy/pull/3
     raise NotImplementedError("sysmtemd not supported")
 
-if not "SUDO_UID" in os.environ.keys():
+if "SUDO_UID" not in os.environ.keys():
     logger.warning(
-        "D-bus methods have failed. Root permissions will be needed to set/unset the wakelock with systemd!"
-        """\n\nExample: sudo -E "PATH=$PATH" python -m wakepy"""
+        "D-bus methods have failed. Root permissions will be needed to set/unset the"
+        """ wakelock with systemd!\n\nExample: sudo -E "PATH=$PATH" python -m wakepy"""
     )
-    raise NotImplementedError('systemd mask method failed')
+    raise NotImplementedError("systemd mask method failed")
 
 
 def run_systemctl(command):
@@ -42,7 +42,8 @@ def set_keepawake(keep_screen_awake=False):
         preventing sleep.
     """
     run_systemctl("mask")
-    return True 
+    return True
+
 
 def unset_keepawake():
     run_systemctl("unmask")
