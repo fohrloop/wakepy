@@ -86,11 +86,14 @@ starts the program.  While running, computer will not go to sleep. If battery is
 ### CLI arguments
 
 ```
-wakepy [-h] [-s]
+wakepy [-h] [-k] [-p]
 
-optional arguments:    
+options:
   -h, --help               show this help message and exit
-  -s, --keep-screen-awake  Keep also the screen awake. On Linux, this flag is set on and cannot be disabled.
+  -k, --keep-running       Keep programs running; inhibit automatic sleep/suspend. This
+                           is used as a default if no modes are selected.
+  -p, --presentation       Presentation mode; inhibit automatic sleep, screensaver and
+                           screenlock
 ```
 
 
