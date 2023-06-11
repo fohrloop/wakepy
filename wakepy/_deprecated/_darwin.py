@@ -28,9 +28,11 @@ def set_keepawake(keep_screen_awake=False):
     global _process
     command = [COMMAND] + ARGS if keep_screen_awake else [COMMAND]
     _process = Popen(command, stdin=PIPE, stdout=PIPE)
+    return True
 
 
 def unset_keepawake():
     global _process
     _process.terminate()
     _process.wait()
+    return True

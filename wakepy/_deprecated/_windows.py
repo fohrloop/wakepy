@@ -30,6 +30,7 @@ def set_keepawake(keep_screen_awake=False):
         flags |= ES_DISPLAY_REQUIRED
 
     ctypes.windll.kernel32.SetThreadExecutionState(flags)
+    return True
 
 
 def unset_keepawake():
@@ -41,3 +42,4 @@ def unset_keepawake():
     PowerShell.
     """
     ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)
+    return True
