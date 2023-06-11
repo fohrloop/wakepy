@@ -40,7 +40,7 @@
 
 Since deprecations may affect many users, they are communicated well before and time is given for project maintainers for migration. Timeline:
 
-- **June 11th 2023**: Release wakepy 0.7.0 with DeprecationWarnings for keepawake, set_keepawake and unset_keepawake, and the CLI option -s. [Migration Guide](http://wakepy.readthedocs.io/migration.html) published.
+- **June 11th 2023**: Release wakepy 0.7.0 with DeprecationWarnings for keepawake, set_keepawake and unset_keepawake, and the CLI option -s. [Migration Guide](https://wakepy.readthedocs.io/en/stable/migration.html) published.
 - **September 1st 2023** (*or few days later*): Release wakepy without the deprecated keepawake, set_keepawake and unset_keepawake; Only new API supported.
 
 
