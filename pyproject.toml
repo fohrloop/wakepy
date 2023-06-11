@@ -24,7 +24,9 @@ classifiers = [
 [project.optional-dependencies]
 doc = [
     "sphinx~=5.0",
-    "myst-parser",
+    "sphinx_design~=0.4.1",
+    "sphinx-copybutton~=0.5.2",
+    "myst-parser~=1.0.0",
     "furo",
 ]
 dev = [

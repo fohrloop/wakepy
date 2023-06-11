@@ -1,3 +1,5 @@
+# Changelog 
+
 ## [0.7.0] (Not published)
 ### Added
 - New API: `keep.running()` and `keep.presenting()` context managers. These are currently simple wrappers of the old methods but the internals will be re-written in a future version. 

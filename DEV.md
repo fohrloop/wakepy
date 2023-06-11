@@ -17,10 +17,10 @@ where `.` means the current directory (assuming cwd is at root of the repository
 - **Building locally** (for debugging / testing docs), with autobuild:
 
 ```
-sphinx-autobuild docs/source/ docs/build/
+sphinx-autobuild docs/source/ docs/build/ -a
 ```
 
-or one time:
+The `-a` flag ensures that *all* files (not only edited files) will get rebuild. It is also possible to build just one time:
 ```
 sphinx-build -b html docs/source/ docs/build
 ```

@@ -1,16 +1,27 @@
-
 ```{include} ../../README.md
-:relative-images:
+:start-after: <!-- start short summary -->
+:end-before: <!-- end short summary -->
 ```
 
 ```{toctree}
 :caption: 'Contents:'
 :maxdepth: 2
+:numbered: -1
+:titlesonly:
 
-guide
-api
-sleep
-power-management
+user-guide/index
+python-api
+cli-api
 ```
+
+```{toctree}
+:caption: 'Development:'
+:maxdepth: 2
+:numbered: -1
+:titlesonly:
+
+changelog
+```
+
 
 

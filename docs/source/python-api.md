@@ -1,4 +1,4 @@
-# Wakepy API Documentation
+# Python API
 
 ```{eval-rst}
 .. autofunction:: wakepy.keep.running 

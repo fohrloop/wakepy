@@ -1,6 +1,3 @@
-# User Guide
-
-
 ## Wakepy in tests and CI
 
 If you're using wakepy in Continuous Integration tests, note that typically CI is running on a system where there is no Desktop Environment available. In addition, the available services and executables might be different from the services and executables you have on your machine. For this reason, even if wakepy is able to switch to a mode on your machine, it might not be able to do so in CI tests.

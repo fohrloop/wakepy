@@ -1,3 +1,4 @@
+<!-- start short summary -->
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/np-8/wakepy)&nbsp;![PyPI](https://img.shields.io/pypi/v/wakepy)&nbsp;![PyPI - Downloads](https://img.shields.io/pypi/dm/wakepy)&nbsp;![GitHub](https://img.shields.io/github/license/np-8/wakepy)
 
 # ⏰😴 wakepy 
@@ -5,6 +6,7 @@
 Simple cross-platform wakelock written in Python. Prevent your computer from going to sleep in the middle of a long running task, or starting a screensaver automatically.
 
 
+<!-- end short summary -->
 
 ## Table of Contents
 - [Installing](#installing)
@@ -23,20 +25,6 @@ Wakepy currently supports
 - Linux (with DBus or systemd)
 - macOS
 
-# Installing
-
-## (A) Windows, macOS and Linux (jeepney)
-Note: On linux, this will install and use **[`jeepney`](https://jeepney.readthedocs.io/)** for DBus communication.
-```
-pip install wakepy
-```
-## (B) Linux (systemd)
-
-If you want to install wakepy on linux and do not want to use jeepney, or dbus-python but systemd, install wakepy with.
-```
-pip install --no-deps wakepy
-```
-Please note that this requires also `systemd` to be installed on your system, and usage of `systemd` requires sudo.
 
 # Usage
 
