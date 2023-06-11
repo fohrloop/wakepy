@@ -25,3 +25,16 @@ The `-a` flag ensures that *all* files (not only edited files) will get rebuild.
 sphinx-build -b html docs/source/ docs/build
 ```
 - **Deploying**: Just push to github, and it will be automatically built by readthedocs. The settings can be adjusted [here](https://readthedocs.org/dashboard).
+
+# Deployment
+
+- Create a wheel with
+
+```
+python -m pip wheel --no-deps .
+```
+- Push to PyPI:
+
+```
+twine upload wakepy-<version>-py3-none-any.whl 
+```
