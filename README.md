@@ -6,7 +6,7 @@ Simple cross-platform wakelock written in Python. Prevent your computer from goi
 
 
 
-#### Table of Contents
+## Table of Contents
 - [Installing](#installing)
 - [Usage](#usage)
   - [Wakepy Python API](#wakepy-python-api)
@@ -25,12 +25,12 @@ Wakepy currently supports
 
 # Installing
 
-#### (A) Windows, macOS and Linux (jeepney)
+## (A) Windows, macOS and Linux (jeepney)
 Note: On linux, this will install and use **[`jeepney`](https://jeepney.readthedocs.io/)** for DBus communication.
 ```
 pip install wakepy
 ```
-#### (B) Linux (systemd)
+## (B) Linux (systemd)
 
 If you want to install wakepy on linux and do not want to use jeepney, or dbus-python but systemd, install wakepy with.
 ```
