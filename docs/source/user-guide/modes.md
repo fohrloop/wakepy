@@ -12,7 +12,7 @@ The available modes are
 
 The wakepy modes are implemented as context managers. When entering the context, a object is returned, which has following attributes:
 
-- `k.success`: True, if entering mode was succesful. Can be [faked in CI](tests-and-ci.md#wakepy-fake-success).
+- `k.success`: True, if entering mode was succesful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
 - `k.failure`: Always opposite of `success`.
 
 ```{note}
