@@ -13,11 +13,20 @@ dependencies = [
 # Python 3.7 introduces from __future__ import annotations
 requires-python = ">=3.7"
 readme = "README.md"
-license = {text = "MIT"}
+license = { file = "LICENSE.txt"}
 classifiers = [
+    "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Utilities",
 ]
 
