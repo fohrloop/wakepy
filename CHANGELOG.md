@@ -1,3 +1,17 @@
+# Changelog 
+
+## [0.7.0] (2023-06-11)
+### Added
+- New API: `keep.running()` and `keep.presenting()` context managers. These are currently simple wrappers of the old methods but the internals will be re-written in a future version. 
+- The context managers now return the result of the action, `m`. Users may check with `m.success` if changing the mode was succesful.
+- Possibility to fake succesful change of mode with `WAKEPY_FAKE_SUCCESS` (for CI / tests).
+### Fixed
+- No exceptions anymore on import-time. All exceptions should be handled now gracefully, and user is informed if switching to a `keep.running` or `keep.presenting` mode failed.
+  
+### Deprecated
+- Old Python API:  The `keepawake()`, `set_keepawake` and `unset_keepwake`. These will be removed in a future version of wakepy. Use `keep.running()`or `keep.presenting()`, instead.
+- The `-s, --keep-screen-awake` option of the `wakepy` CLI command. Use `-p, --presentation ` option, instead. 
+
 ## [0.6.0] (2023-02-27)
 ### Added
 - Support for using wakepy without sudo on linux! There are now D-bus solutions (1) using  jeepney and (2) using dbus-python (libdbus). Thanks to [Stehlampe2020](https://github.com/Stehlampe2020) for the dbus-python based solution ([PR #22](https://github.com/np-8/wakepy/pull/22)) and [NicoWeio](https://github.com/NicoWeio) for raising  [Issue #17](https://github.com/np-8/wakepy/issues/17). 

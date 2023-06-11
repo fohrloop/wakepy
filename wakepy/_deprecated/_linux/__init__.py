@@ -9,23 +9,30 @@ Other possibilities: (not implemented)
 (4) dbus-send: https://dbus.freedesktop.org/doc/dbus-send.1.html 
 """
 from importlib import import_module
-from wakepy.exceptions import NotSupportedError
 
+from ...core.fake import fake_success
 
 for module in "_jeepney_dbus", "_dbus", "_systemd":
     try:
-        my_module = import_module(f".{module}", f"wakepy._linux")
+        my_module = import_module(f".{module}", "wakepy._deprecated._linux")
         set_keepawake, unset_keepawake = (
             my_module.set_keepawake,
             my_module.unset_keepawake,
         )
         break
-    except NotSupportedError:
+    except NotImplementedError:
         pass
 else:
-    raise NotImplementedError(
-        "wakepy does only support dbus and systemd based solutions "
-        "Pull requests welcome: https://github.com/np-8/wakepy"
-    )
+    if fake_success():
+        # User asked to fake success anyway (Probably running in CI env)
+        def set_keepawake(keep_screen_awake=False):
+            return False
 
-print(f"Wakepy using: {my_module.METHOD}")
+        def unset_keepawake():
+            return False
+
+    else:
+        raise NotImplementedError(
+            "You've tried to use the deprecated method to set a wakelock and all the"
+            " methods have failed.",
+        )

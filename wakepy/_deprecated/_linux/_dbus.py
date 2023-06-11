@@ -14,18 +14,15 @@ Note: libdbus has known problems with multi-threaded use! [3]
 [3]: https://dbus.freedesktop.org/doc/dbus-python/
 
 """
-from wakepy.exceptions import NotSupportedError
 
 try:
     import dbus
 except ImportError as e:
-    print(f"Error when importing dbus-python: {e}")
-    raise NotSupportedError()
+    raise NotImplementedError(f"Error when importing dbus-python: {e}")
 
 
 # Variable that stores the DBus inhibit for later controlled release.
 dbus_inhibit = None
-METHOD = "dbus-python (+libdbus)"
 
 try:
     pm_interface = dbus.Interface(
@@ -35,7 +32,7 @@ try:
         "org.freedesktop.ScreenSaver",
     )
 except Exception as e:
-    print(
+    raise NotImplementedError(
         f"Wakepy can't use DBus Inhibit on this system because of a {type(e).__name__}:"
         f" {e}\nroot permissions will be needed to set/release the wakelock."
     )
@@ -58,6 +55,7 @@ def set_keepawake(keep_screen_awake=False):
         "wakepy",
         f"wakepy.set_keepawake(keep_screen_awake={keep_screen_awake})",
     )
+    return True
 
 
 def unset_keepawake():

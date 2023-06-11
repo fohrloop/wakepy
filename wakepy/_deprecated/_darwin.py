@@ -1,4 +1,4 @@
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 # See: https://ss64.com/osx/caffeinate.html
 COMMAND = "caffeinate"
@@ -25,15 +25,12 @@ def set_keepawake(keep_screen_awake=False):
     keep_screen_awake: bool
         If True, keeps also the screen awake.
     """
-    if keep_screen_awake:
-        global _process
-        _process = Popen([COMMAND] + ARGS, stdin=PIPE, stdout=PIPE)
-    else:
-        _process = Popen([COMMAND], stdin=PIPE, stdout=PIPE)
+    global _process
+    command = [COMMAND] + ARGS if keep_screen_awake else [COMMAND]
+    _process = Popen(command, stdin=PIPE, stdout=PIPE)
 
 
 def unset_keepawake():
     global _process
-
     _process.terminate()
     _process.wait()

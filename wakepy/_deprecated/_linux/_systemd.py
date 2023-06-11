@@ -3,14 +3,11 @@
 See:
 https://www.man7.org/linux/man-pages/man1/systemctl.1.html
 """
-import subprocess
+import logging
 import os
-import sys
+import subprocess
 
-from wakepy.exceptions import NotSupportedError
-
-METHOD = "systemd"
-print("wakepy: falling back using systemd. ")
+logger = logging.getLogger(__name__)
 
 try:
     subprocess.check_output(["pidof", "systemd"])
@@ -18,14 +15,14 @@ except subprocess.CalledProcessError:
     # if 'pidof' does not find a process it will return with non-zero exit
     # status, check_output will raise subprocess.CalledProcessError
     # See: https://github.com/np-8/wakepy/pull/3
-    raise NotSupportedError("sysmtemd not supported")
+    raise NotImplementedError("sysmtemd not supported")
 
-if not "SUDO_UID" in os.environ.keys():
-    print(
-        "ERROR! Root permissions will be needed to set/unset the wakelock with systemd!"
-        """\n\nExample: sudo -E "PATH=$PATH" python -m wakepy"""
+if "SUDO_UID" not in os.environ.keys():
+    logger.warning(
+        "D-bus methods have failed. Root permissions will be needed to set/unset the"
+        """ wakelock with systemd!\n\nExample: sudo -E "PATH=$PATH" python -m wakepy"""
     )
-    sys.exit()
+    raise NotImplementedError("systemd mask method failed")
 
 
 def run_systemctl(command):
@@ -45,6 +42,7 @@ def set_keepawake(keep_screen_awake=False):
         preventing sleep.
     """
     run_systemctl("mask")
+    return True
 
 
 def unset_keepawake():

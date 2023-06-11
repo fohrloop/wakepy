@@ -7,23 +7,32 @@ Requires jeepney. Install with:
 See also:
     https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html
 """
-METHOD = "jeepney (dbus)"
 
-from wakepy.exceptions import NotSupportedError
 
 try:
-    from jeepney.wrappers import MessageGenerator, new_method_call
     from jeepney.io.blocking import open_dbus_connection
+    from jeepney.wrappers import MessageGenerator, new_method_call
 except ImportError as e:
-    print(f"Error when importing jeepney: {e}")
-    raise NotSupportedError()
+    raise NotImplementedError(f"Error when importing jeepney: {e}")
 
 
 SCREENSAVER_BUS_NAME = "org.freedesktop.ScreenSaver"
 SCREENSAVER_OBJECT_PATH = "/org/freedesktop/ScreenSaver"
 SCREENSAVED_INTERFACE = SCREENSAVER_BUS_NAME
 
-connection = open_dbus_connection(bus="SESSION")
+try:
+    connection = open_dbus_connection(bus="SESSION")
+except Exception as e:
+    if "DBUS_SESSION_BUS_ADDRESS" in str(e):
+        raise NotImplementedError(
+            "DBUS_SESSION_BUS_ADDRESS environment variable not set! "
+            "If running in subprocess, make sure to pass the "
+            "DBUS_SESSION_BUS_ADDRESS environment variable."
+        ) from e
+    raise NotImplementedError(
+        f"Could not set dbus connection to SESSION message bus.\n"
+        f"{e.__class__.__name__}: {str(e)}"
+    ) from e
 
 # The cookie holds represents the inhibition request
 # It is given in the response of the inhibit call and
@@ -69,6 +78,7 @@ def set_keepawake(keep_screen_awake=False):
     msg_inhibit = messagegenerator.inhibit("wakepy", "wakelock active")
     reply = connection.send_and_get_reply(msg_inhibit)
     cookie = reply.body[0]
+    return True
 
 
 def unset_keepawake():
