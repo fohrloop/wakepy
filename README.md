@@ -13,6 +13,7 @@
 ## What it can do? 
   - Prevent your system from going to sleep in the middle of a long running task (e.g. training machine learning models, video encoding, web scraping, ...) 
   - Prevent starting a screensaver or screenlock automatically (showing a video, updating dashboard, monitoring apps, ...)
+<!-- end before docs link -->
 
 
 
@@ -23,7 +24,6 @@
 - [UCSD-E4E/baboon-tracking](https://github.com/UCSD-E4E/baboon-tracking) — In pipelines of a Computer Vision project tracking baboons  
 - [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI 
 - [minarca](https://github.com/ikus060/minarca) — Cross-platform data backup software
-<!-- end before docs link -->
 ## Documentation 
 ### 👉 **[wakepy.readthedocs.io](http://wakepy.readthedocs.io)**
 <!-- start after docs link -->

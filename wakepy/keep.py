@@ -75,7 +75,10 @@ def running():
 
         from wakepy import keep
 
-        with keep.running():
+        with keep.running() as m:
+            if not m.success:
+                # optional: signal to user?
+
             # Do something that takes a long time but does not need to be
             # displayed.
 
@@ -98,7 +101,10 @@ def presenting():
 
         from wakepy import keep
 
-        with keep.presenting():
+        with keep.presenting() as m:
+            if not m.success:
+                # optional: signal to user?
+
             # Do something that takes a long time and needs
             # to be shown to user; no automatic screen lock
 

@@ -56,24 +56,12 @@ with keep.running() as k:
 :::{tab-item} Linux
 :sync: linux 
 
-**How it works?**: Wakepy uses, depending on what is installed, either (in this order)
-1. D-Bus to call `Inhibit` method of [`org.freedesktop.ScreenSaver`](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) (try first using jeepney, and then using dbus-python)
-3. `systemctl mask`
+On wakepy 0.7.0, the current implementation of `keep.presenting` is same as of  `keep.running`. This is to be changed in a future release.
 
 
 ```{warning}
-Current D-Bus -based implementation (v.0.7.0) prevents also screenlock/screensaver (remember to lock manually!). This will be fixed in a future release.
+Current D-Bus -based implementation (v.0.7.0) incorrectly prevents also screenlock/screensaver (remember to lock manually!). This will be fixed in a future release.
 ```
-
-```{warning}
-The systemd mask method will inhibit all forms of sleep (including hibernation and sleep initialized by the user). It will change global system settings, so if your process exits abruptly, you'll have to undo the change.
-```
-
-**How to check it?**:  For D-Bus  `org.freedesktop.ScreenSaver` based solution, there is no possibility to check it afterwards. You may monitor the call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html), though. For systemd mask based solution, you'll see that the Suspend option is removed from the menu altogether.
-
-**What systems are supported?** For D-Bus `org.freedesktop.ScreenSaver` method, you have to use a Freedesktop-compliant Desktop Environment, for example GNOME or KDE. The list of supported systems will be expanded in the future. For systemd solution, any Linux running systemd works, but you need sudo.
-
-**Multiprocess safe?**: DBus: yes, systemd mask: no.
 
 
 :::
@@ -119,7 +107,23 @@ The systemd mask method will inhibit all forms of sleep (including hibernation a
 :::{tab-item} Linux
 :sync: linux 
 
-On wakepy 0.7.0, the current implementation of `keep.presenting` is same as of  `keep.running`. This is to be changed in a future release.
+
+
+**How it works?**: Wakepy uses, depending on what is installed, either (in this order)
+1. D-Bus to call `Inhibit` method of [`org.freedesktop.ScreenSaver`](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) (try first using jeepney, and then using dbus-python)
+3. `systemctl mask`
+
+
+```{warning}
+The systemd mask method will inhibit all forms of sleep (including hibernation and sleep initialized by the user). It will change global system settings, so if your process exits abruptly, you'll have to undo the change.
+```
+
+**How to check it?**:  For D-Bus  `org.freedesktop.ScreenSaver` based solution, there is no possibility to check it afterwards. You may monitor the call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html), though. For systemd mask based solution, you'll see that the Suspend option is removed from the menu altogether.
+
+**What systems are supported?** For D-Bus `org.freedesktop.ScreenSaver` method, you have to use a Freedesktop-compliant Desktop Environment, for example GNOME or KDE. The list of supported systems will be expanded in the future. For systemd solution, any Linux running systemd works, but you need sudo.
+
+**Multiprocess safe?**: DBus: yes, systemd mask: no.
+
 
 :::
 
