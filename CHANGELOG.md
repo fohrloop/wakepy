@@ -1,6 +1,6 @@
 # Changelog 
 
-## [0.7.0] (Not published)
+## [0.7.0] (2023-06-11)
 ### Added
 - New API: `keep.running()` and `keep.presenting()` context managers. These are currently simple wrappers of the old methods but the internals will be re-written in a future version. 
 - The context managers now return the result of the action, `m`. Users may check with `m.success` if changing the mode was succesful.
