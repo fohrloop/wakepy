@@ -1,5 +1,9 @@
 # Changelog 
 
+## [0.7.1] (2023-06-11)
+### Fixed
+- `keep.running` and `keep.presenting` return an object `m` with `success` value of `True`.
+   
 ## [0.7.0] (2023-06-11)
 ### Added
 - New API: `keep.running()` and `keep.presenting()` context managers. These are currently simple wrappers of the old methods but the internals will be re-written in a future version. 
