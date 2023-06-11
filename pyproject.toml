@@ -13,18 +13,29 @@ dependencies = [
 # Python 3.7 introduces from __future__ import annotations
 requires-python = ">=3.7"
 readme = "README.md"
-license = {text = "MIT"}
+license = { file = "LICENSE.txt"}
 classifiers = [
+    "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Utilities",
 ]
 
 [project.optional-dependencies]
 doc = [
     "sphinx~=5.0",
-    "myst-parser",
+    "sphinx_design~=0.4.1",
+    "sphinx-copybutton~=0.5.2",
+    "myst-parser~=1.0.0",
     "furo",
 ]
 dev = [
@@ -61,6 +72,7 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
+exclude = "wakepy/_deprecated/"
 
 [[tool.mypy.overrides]]
 module = 'jeepney.*'

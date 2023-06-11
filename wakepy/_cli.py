@@ -8,9 +8,10 @@ start()
 """
 
 import time
-from typing import Optional
+import warnings
+from contextlib import ExitStack
 
-from wakepy import keepawake
+from wakepy import keep
 from wakepy._system import CURRENT_SYSTEM, SystemName
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
@@ -23,10 +24,9 @@ WAKEPY_TEXT_TEMPLATE = r"""                  _
                             |_|     |___/ """
 
 WAKEPY_TICKBOXES_TEMPLATE = """
- [x] Your computer will not sleep automatically
- [{screen_kept_on}] Screen is kept on
- [{no_automatic_logout}] You will not be logged out automatically
- (unless battery goes under critical level)
+ [{no_auto_suspend}] System will continue running programs
+ [{presentation_mode}] Presentation mode is on 
+
 """.strip(
     "\n"
 )
@@ -38,17 +38,10 @@ def wakepy_text():
     return WAKEPY_TEXT_TEMPLATE.format(VERSION_STRING=f"{'  v.'+__version__: <20}")
 
 
-def get_not_logging_out_automatically(keep_screen_awake: bool) -> Optional[bool]:
-    not_logging_out_automatically = None
-    if CURRENT_SYSTEM == SystemName.WINDOWS:
-        not_logging_out_automatically = keep_screen_awake
-    return not_logging_out_automatically
-
-
-def create_wakepy_opts_text(keep_screen_awake: bool) -> str:
+def create_wakepy_opts_text(keep_running: bool, presentation_mode: bool) -> str:
     opts = dict(
-        no_automatic_logout=get_not_logging_out_automatically(keep_screen_awake),
-        screen_kept_on=keep_screen_awake,
+        no_auto_suspend=keep_running or presentation_mode,
+        presentation_mode=presentation_mode,
     )
     option_to_string = {True: "x", False: " ", None: "?"}
 
@@ -68,16 +61,17 @@ def wait_until_keyboardinterrupt():
         pass
 
 
-def print_on_start(keep_screen_awake):
+def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
     """
     Parameters
     ----------
-    keep_screen_awake: bool
-        The option to select if screen is to
-        be kept on.
+    presentation_mode: bool
+        The option to select if screen is to be kept on.
     """
 
-    wakepy_opts_text = create_wakepy_opts_text(keep_screen_awake)
+    wakepy_opts_text = create_wakepy_opts_text(
+        keep_running=keep_running, presentation_mode=presentation_mode
+    )
 
     print(wakepy_text())
     print(wakepy_opts_text)
@@ -91,22 +85,36 @@ def print_on_start(keep_screen_awake):
 
 
 def start(
-    keep_screen_awake=False,
+    keep_running: bool = False,
+    presentation_mode: bool = False,
+    deprecation_warning: bool = False,
 ):
     """
     Start the keep-awake. During keep-awake, the CPU is not allowed to
     go to sleep automatically until the CTRL+C is pressed.
-
-    Parameters
-    -----------
-    keep_screen_awake: bool
-        If True, keeps also the screen awake.
     """
 
-    with keepawake(
-        keep_screen_awake=keep_screen_awake,
-    ):
-        print_on_start(keep_screen_awake=keep_screen_awake)
+    real_successes = dict()
+    with ExitStack() as stack:
+        if keep_running:
+            m = stack.enter_context(keep.running())
+            real_successes["keep_running"] = m.real_success
+        if presentation_mode:
+            m = stack.enter_context(keep.presenting())
+            real_successes["presentation_mode"] = m.real_success
+
+        # A quick fix (Fix this better in next release)
+        # On linux, D-Bus methods for keep_running use presentation_mode.
+        if CURRENT_SYSTEM == SystemName.LINUX and real_successes.get("keep_running"):
+            real_successes["presentation_mode"] = True
+
+        print_on_start(**real_successes)
+
+        if deprecation_warning:
+            warnings.warn(
+                "The -s/--keep-screen-awake option is deprecated and will be removed in"
+                " a future release! Use the -p/--presentation flag, instead!\n"
+            )
         wait_until_keyboardinterrupt()
 
     print("\nExited.")

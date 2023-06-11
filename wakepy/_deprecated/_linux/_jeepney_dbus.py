@@ -10,8 +10,8 @@ See also:
 
 
 try:
-    from jeepney.wrappers import MessageGenerator, new_method_call
     from jeepney.io.blocking import open_dbus_connection
+    from jeepney.wrappers import MessageGenerator, new_method_call
 except ImportError as e:
     raise NotImplementedError(f"Error when importing jeepney: {e}")
 
@@ -21,7 +21,7 @@ SCREENSAVER_OBJECT_PATH = "/org/freedesktop/ScreenSaver"
 SCREENSAVED_INTERFACE = SCREENSAVER_BUS_NAME
 
 try:
-    connection =  open_dbus_connection(bus='SESSION')
+    connection = open_dbus_connection(bus="SESSION")
 except Exception as e:
     if "DBUS_SESSION_BUS_ADDRESS" in str(e):
         raise NotImplementedError(
@@ -78,6 +78,7 @@ def set_keepawake(keep_screen_awake=False):
     msg_inhibit = messagegenerator.inhibit("wakepy", "wakelock active")
     reply = connection.send_and_get_reply(msg_inhibit)
     cookie = reply.body[0]
+    return True
 
 
 def unset_keepawake():

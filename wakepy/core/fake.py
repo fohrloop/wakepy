@@ -1,14 +1,15 @@
-import os 
+import os
 
 # Some environment variables
-WAKEPY_FAKE_SUCCESS = 'WAKEPY_FAKE_SUCCESS'
+WAKEPY_FAKE_SUCCESS = "WAKEPY_FAKE_SUCCESS"
+
 
 def fake_success() -> bool:
     """Function which says if fake success should be enabled
 
     Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
     If that variable is set to non-empty value, fake success is activated.
-    
+
     Motivation:
     -----------
     When running on CI system, wakepy might fail to acquire an inhibitor lock
