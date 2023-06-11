@@ -21,6 +21,7 @@ cli-api
 :titlesonly:
 
 changelog
+migration
 ```
 
 
