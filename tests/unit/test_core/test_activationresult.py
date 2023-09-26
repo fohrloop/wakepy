@@ -54,3 +54,5 @@ def test_activation_result_with_one_method():
             )
         )
         put_to_queue((StageName.WAITING_EXIT,))
+
+    assert ar.success
