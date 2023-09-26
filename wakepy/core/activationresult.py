@@ -165,6 +165,11 @@ class ActivationResult:
 
         self._queue_thread = queue_thread
         self._results_set = False
+
+        # Same methods as in .used_methods, .unused_methods and
+        # .failed_methods combined, in priority order.
+        self.all_methods: Tuple[Method, ...] = tuple(candidate_methods)
+
         self._timeout = (
             timeout
             if timeout is not None
@@ -177,9 +182,6 @@ class ActivationResult:
         self.failed_methods: Tuple[Method, ...] | None = None
 
         self.failure_reasons: Tuple[Tuple[StageName, str], ...] | None = None
-
-        # Same methods as in used, unused and failed. In priority order.
-        self.all_methods: Tuple[Method, ...] | None = None
 
     @property
     def real_success(self) -> bool:
