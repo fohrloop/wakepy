@@ -8,9 +8,29 @@ functions for linux. It tries, in this order
 Other possibilities: (not implemented)
 (4) dbus-send: https://dbus.freedesktop.org/doc/dbus-send.1.html 
 """
+import os
 from importlib import import_module
 
-from ...core.fake import fake_success
+# Some environment variables
+WAKEPY_FAKE_SUCCESS = "WAKEPY_FAKE_SUCCESS"
+
+
+def should_fake_success() -> bool:
+    """Function which says if fake success should be enabled
+
+    Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
+    If that variable is set to non-empty value, fake success is activated.
+
+    Motivation:
+    -----------
+    When running on CI system, wakepy might fail to acquire an inhibitor lock
+    just because there is no Desktop Environment running. In these cases, it
+    might be useful to just tell with an environment variable that wakepy
+    should fake the successful inhibition anyway. Faking the success is done
+    after every other method is tried (and failed).
+    """
+    return bool(os.environ.get(WAKEPY_FAKE_SUCCESS))
+
 
 for module in "_jeepney_dbus", "_dbus", "_systemd":
     try:
@@ -23,7 +43,7 @@ for module in "_jeepney_dbus", "_dbus", "_systemd":
     except NotImplementedError:
         pass
 else:
-    if fake_success():
+    if should_fake_success():
         # User asked to fake success anyway (Probably running in CI env)
         def set_keepawake(keep_screen_awake=False):
             return False

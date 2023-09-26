@@ -1,4 +1,4 @@
-from wakepy import keep
+from wakepy.modes import keep
 
 
 def test_keep_running():

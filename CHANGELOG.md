@@ -7,10 +7,10 @@
 ## [0.7.0] (2023-06-11)
 ### Added
 - New API: `keep.running()` and `keep.presenting()` context managers. These are currently simple wrappers of the old methods but the internals will be re-written in a future version. 
-- The context managers now return the result of the action, `m`. Users may check with `m.success` if changing the mode was succesful.
-- Possibility to fake succesful change of mode with `WAKEPY_FAKE_SUCCESS` (for CI / tests).
+- The context managers now return the result of the action, `m`. Users may check with `m.success` if changing the mode was successful.
+- Possibility to fake successful change of mode with `WAKEPY_FAKE_SUCCESS` (for CI / tests).
 ### Fixed
-- No exceptions anymore on import-time. All exceptions should be handled now gracefully, and user is informed if switching to a `keep.running` or `keep.presenting` mode failed.
+- No exceptions anymore on import-time. All exceptions should be handled now gracefully, and user is informed if activating a `keep.running` or `keep.presenting` mode failed.
   
 ### Deprecated
 - Old Python API:  The `keepawake()`, `set_keepawake` and `unset_keepwake`. These will be removed in a future version of wakepy. Use `keep.running()`or `keep.presenting()`, instead.

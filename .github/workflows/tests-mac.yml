@@ -39,4 +39,4 @@ jobs:
           python -m pip install -U pip wheel && \
           python -m pip install tox~=4.6.0
       - name: Run tests with tox
-        run: tox -e mac-py310
+        run: tox -e py310
