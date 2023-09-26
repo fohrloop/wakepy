@@ -181,7 +181,7 @@ class ActivationResult:
 
     @property
     def real_success(self) -> bool:
-        return len(self.success) > 0
+        return isinstance(self.used_methods, tuple) and len(self.used_methods) > 0
 
     @property
     def success(self) -> bool:
