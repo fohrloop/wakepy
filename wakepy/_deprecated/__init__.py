@@ -14,7 +14,7 @@ import warnings
 from contextlib import contextmanager
 from importlib import import_module
 
-from .._system import CURRENT_SYSTEM
+from wakepy.core import CURRENT_SYSTEM
 
 
 def deprecated(func):
@@ -48,7 +48,7 @@ def set_keepawake(
     Set a wakelock for keeping system awake (disallow susped/sleep). This is
     lower level function, and usage of the :func:`keepawake` context manager is
     recommended for most situations, as to unset the keepawake, same (first
-    succesful) method should be used in :func:`unset_keepawake`.
+    successful) method should be used in :func:`unset_keepawake`.
 
     Parameters
     ----------
@@ -70,7 +70,7 @@ def unset_keepawake():
     Uset a wakelock (allow susped/sleep again). This is lower level
     function, and usage of the :func:`keepawake` context manager is
     recommended for most situations, as to unset the keepawake, same (first
-    succesful) method of :func:`set_keepawake` should be used here.
+    successful) method of :func:`set_keepawake` should be used here.
     """
     func = get_function("unset_keepawake")
     func()

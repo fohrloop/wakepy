@@ -1,10 +1,11 @@
 <!-- start before docs link -->
-![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/np-8/wakepy)&nbsp;![PyPI](https://img.shields.io/pypi/v/wakepy)&nbsp;![PyPI - Downloads](https://img.shields.io/pypi/dm/wakepy)&nbsp;![GitHub](https://img.shields.io/github/license/np-8/wakepy)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/fohrloop/wakepy)&nbsp;![PyPI](https://img.shields.io/pypi/v/wakepy)&nbsp;![PyPI - Downloads](https://img.shields.io/pypi/dm/wakepy)&nbsp;![GitHub](https://img.shields.io/github/license/fohrloop/wakepy)
 
 # ⏰😴 wakepy 
 
-  Simple cross-platform wakelock written in Python. Comes with python API and a single executable for CLI usage.
-
+ Cross-platform wakelock written in Python. 
+ - It has a sans-IO core and zero required python dependencies
+ - Can be used though the python API and the wakepy CLI. 
 
 ## Supports
 - Python: 3.7 to 3.12 
@@ -31,9 +32,8 @@
 - Wakepy supports multiple operating systems and desktop environments
 - Wakepy has permissive MIT licence
 - It has a simple command line interface and a python API
-- Wakepy has very little python dependencies:
-  - Zero if using Windows or macOS or Linux + systemd
-  - One if using linux + [jeepney](https://jeepney.readthedocs.io/) or linux + [dbus-python](https://dbus.freedesktop.org/doc/dbus-python/).
+- Wakepy has very zero required python dependencies
+  - For using the D-Bus methods on Linux, one may use [jeepney](https://jeepney.readthedocs.io/) (optional)
 
 
 ## Deprecation timeline (wakepy 0.7.0+) 
@@ -41,7 +41,7 @@
 Since deprecations may affect many users, they are communicated well before and time is given for project maintainers for migration. Timeline:
 
 - **June 11th 2023**: Release wakepy 0.7.0 with DeprecationWarnings for keepawake, set_keepawake and unset_keepawake, and the CLI option -s. [Migration Guide](https://wakepy.readthedocs.io/en/stable/migration.html) published.
-- **September 1st 2023** (*Update: more probably during October 2023*): Release wakepy without the deprecated keepawake, set_keepawake and unset_keepawake; Only new API supported.
+- **September 1st 2023** (*or few days later*): Release wakepy without the deprecated keepawake, set_keepawake and unset_keepawake; Only new API supported.
 
 
 

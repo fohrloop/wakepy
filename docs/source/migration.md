@@ -2,7 +2,7 @@
 ## Migration Guide: 0.7.0
 
 - When migrating from wakepy <=0.6.0 to >=0.7.0 
--  `set_keepawake` and `unset_keepawake` and `keepawake`: Replace with [`keep.running`](python-api.md#wakepy.keep.running) or [`keep.presenting`](python-api.md#wakepy.keep.presenting) whichever makes sense in the application.
+-  `set_keepawake` and `unset_keepawake` and `keepawake`: Replace with `keep.running` or `keep.presenting`, whichever makes sense in the application.
 
 ### Python API
 #### wakepy <=0.6.0

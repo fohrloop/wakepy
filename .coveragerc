@@ -1,0 +1,13 @@
+[run]
+omit =
+    */site-packages/*
+    */dist-packages/*
+    */distutils/*
+    tests/*
+
+[report]
+exclude_lines = 
+    pragma: no cover
+    if typing.TYPE_CHECKING:
+
+    @abstractmethod

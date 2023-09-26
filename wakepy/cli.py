@@ -11,8 +11,8 @@ import time
 import warnings
 from contextlib import ExitStack
 
-from wakepy import keep
-from wakepy._system import CURRENT_SYSTEM, SystemName
+from wakepy.core.system import CURRENT_SYSTEM, SystemName
+from wakepy.modes import keep
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
