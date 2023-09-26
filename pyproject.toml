@@ -58,9 +58,9 @@ dbus = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/np-8/wakepy"
-"Source Code" = "https://github.com/np-8/wakepy"
-"Issue Tracker" = "https://github.com/np-8/wakepy/issues"
+Homepage = "https://github.com/fohrloop/wakepy"
+"Source Code" = "https://github.com/fohrloop/wakepy"
+"Issue Tracker" = "https://github.com/fohrloop/wakepy/issues"
 
 [project.scripts]
 wakepy = "wakepy.__main__:main"

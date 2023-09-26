@@ -79,7 +79,7 @@ def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
         print(
             """\nThe reason you are seeing "[?]" is because the feature is untested """
             "on your platform.\nIf you wish, you can contribute and inform the "
-            "behaviour at https://github.com/np-8/wakepy"
+            "behaviour at https://github.com/fohrloop/wakepy"
         )
     print(" ")
 
