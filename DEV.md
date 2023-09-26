@@ -46,7 +46,7 @@ sphinx-build -b html docs/source/ docs/build
 - To run tests with coverage, use
 
 ```
-coverage run -m pytest <path-to-test> coverage html && open htmlcov/index.html & python -m webbrowser -t htmlcov/index.html 
+coverage run -m pytest <test-target> coverage html && python -m webbrowser -t htmlcov/index.html 
 ```
 
 
