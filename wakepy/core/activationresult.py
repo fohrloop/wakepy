@@ -84,10 +84,20 @@ class ActivationStagesInfo:
 
 
 class StageName(StringConstant):
-    ALL_METHODS = "1-get-all-methods"
-    PLATFORM_SUPPORT = "2-check-platform-support"
-    REQUIREMENTS = "3-check-requirements"
-    ACTIVATION = "4-try-activation"
+    # These are stages which occur in order for each of the methods
+    # until the mode has been succesfully activated with "max number" of
+    # methods
+    PLATFORM_SUPPORT = "(1)-check-platform-support"
+    REQUIREMENTS = "(2)-check-requirements"
+    ACTIVATION = "(3)-try-activation"
+
+    # One of these happens after the "try activation" stage.
+    # a) Successful method(s) with heartbeat
+    HEARTBEAT_LOOP = "(4)-started-heartbeat-loop"
+    # b) Successful method without any methods using a heartbeat
+    WAITING_EXIT = "(4)-waiting-exit"
+    # c) No successful methods
+    COULD_NOT_ACTIVATE = "(4)-could-not-activate-mode"
 
 
 class ActivationResult:
