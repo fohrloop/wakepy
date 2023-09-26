@@ -11,7 +11,7 @@ or using the executable
 import argparse
 from typing import Dict
 
-from wakepy._cli import start
+from wakepy.cli import start
 
 
 def get_argparser() -> argparse.ArgumentParser:

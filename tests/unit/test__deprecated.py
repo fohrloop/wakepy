@@ -7,8 +7,6 @@ import platform
 
 from wakepy import keepawake, set_keepawake, unset_keepawake
 
-CURRENT_SYSTEM = platform.system().lower()
-
 
 def test_smoke_test():
     """simple smoke test"""

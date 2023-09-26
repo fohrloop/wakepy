@@ -11,8 +11,8 @@ import time
 import warnings
 from contextlib import ExitStack
 
-from wakepy import keep
-from wakepy._system import CURRENT_SYSTEM, SystemName
+from wakepy.core.system import CURRENT_SYSTEM, SystemName
+from wakepy.modes import keep
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
@@ -79,7 +79,7 @@ def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
         print(
             """\nThe reason you are seeing "[?]" is because the feature is untested """
             "on your platform.\nIf you wish, you can contribute and inform the "
-            "behaviour at https://github.com/np-8/wakepy"
+            "behaviour at https://github.com/fohrloop/wakepy"
         )
     print(" ")
 

@@ -12,7 +12,7 @@ The available modes are
 
 The wakepy modes are implemented as context managers. When entering the context, a object is returned, which has following attributes:
 
-- `k.success`: True, if entering mode was succesful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
+- `k.success`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
 - `k.failure`: Always opposite of `success`.
 
 ```{note}
@@ -20,7 +20,7 @@ The new wakepy python API is under development, and once ready, the returned obj
 ```  
 
 ````{tip} 
-You may want to inform user about failure in switching a state. For example:
+You may want to inform user about failure in activating a mode. For example:
 
 ```{code-block} python
 with keep.running() as k:
@@ -149,4 +149,4 @@ The systemd mask method will inhibit all forms of sleep (including hibernation a
 ## General questions
 **What if the process holding the lock dies?**: The lock is automatically removed. With one exception: Using systemd mask method on Linux, since it alters global system settings. That will not be used unless other methods fail and you're running the process with sudo.
 
-**How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a succesful inhibit lock in tests, you may set an environment variable: `WAKEPY_FAKE_SUCCESS` to `yes`.
+**How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a successful inhibit lock in tests, you may set an environment variable: `WAKEPY_FAKE_SUCCESS` to `yes`.

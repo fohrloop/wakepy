@@ -8,8 +8,9 @@
 ```
 
 ## Links
-- GitHub: [github.com/np-8/wakepy](https://github.com/np-8/wakepy)
+- GitHub: [github.com/fohrloop/wakepy](https://github.com/fohrloop/wakepy)
 - PyPI: [pypi.org/project/wakepy](https://pypi.org/project/wakepy/)
+
 ## Documentation TOC
 ```{toctree}
 :caption: 'Contents:'
@@ -18,7 +19,7 @@
 :titlesonly:
 
 user-guide/index
-python-api
+mode-activation
 cli-api
 ```
 
@@ -31,6 +32,3 @@ cli-api
 changelog
 migration
 ```
-
-
-

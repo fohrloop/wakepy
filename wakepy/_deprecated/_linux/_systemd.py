@@ -14,7 +14,7 @@ try:
 except subprocess.CalledProcessError:
     # if 'pidof' does not find a process it will return with non-zero exit
     # status, check_output will raise subprocess.CalledProcessError
-    # See: https://github.com/np-8/wakepy/pull/3
+    # See: https://github.com/fohrloop/wakepy/pull/3
     raise NotImplementedError("sysmtemd not supported")
 
 if "SUDO_UID" not in os.environ.keys():
