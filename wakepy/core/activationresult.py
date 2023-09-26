@@ -128,9 +128,9 @@ class ActivationResult:
     # (seconds). These are used to calculate the timeout, if timeout is not
     # provided
 
-    _default_timeout_minimum = 3
-    _default_timeout_maximum = 8
-    _default_time_per_method = 0.3  # 300ms
+    timeout_minimum = 3
+    timeout_maximum = 8
+    timeout_per_method = 0.3  # 300ms
 
     def require_results(func):
         # TODO: add docs
@@ -170,11 +170,7 @@ class ActivationResult:
         # .failed_methods combined, in priority order.
         self.all_methods: Tuple[Method, ...] = tuple(candidate_methods)
 
-        self._timeout = (
-            timeout
-            if timeout is not None
-            else self._get_default_timeout(len(candidate_methods))
-        )
+        self.timeout = timeout
 
         self.stages: ActivationStagesInfo | None = None
         self.used_methods: Tuple[Method, ...] | None = None
@@ -217,12 +213,21 @@ class ActivationResult:
                 "The length of `failure_reasons` must equal to the length of `failed_methods`."
             )
 
-    def _get_default_timeout(self, n_methods: int) -> float:
-        """Calculates some sort of sane timeout for the blocking Queue.get
-        calls. Depends on the number of candidate methods `n_methods`.
+    def get_timeout(self) -> float | int:
+        """Gets the timeout for the blocking Queue.get calls.
+
+        Either returns the timeout given in init, or, if that is missing,
+        calculates some sort of sane value for it using the number of
+        candidate methods `self.timeout_per_method`, `self.timeout_minimum` and
+        `self.timeout_maximum`.
         """
-        timeout_based_on_number_of_methods = n_methods * self._default_time_per_method
+        if self.timeout is not None:
+            return self.timeout
+
+        timeout_based_on_number_of_methods = (
+            len(self.all_methods) * self.timeout_per_method
+        )
         return min(
-            self._default_timeout_maximum,
-            max(self._default_timeout_minimum, timeout_based_on_number_of_methods),
+            self.timeout_maximum,
+            max(self.timeout_minimum, timeout_based_on_number_of_methods),
         )
