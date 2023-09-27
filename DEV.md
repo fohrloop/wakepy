@@ -2,12 +2,13 @@
 
 This document serves as documentation for the package developers.
 
-## Branches
+## Branches and tags
 
-- wakepy uses the `main` branch for development. All PRs should be against it. This is the only long-lived branch in the repo.
+
+- `main` branch: for development. All PRs should be against it. 
+- `latest-release` branch: The latest wakepy release. This is used to select the where [wakepy.readthedocs.io](https://wakepy.readthedocs.io/) redirects to (the "latest" version). 
 - Use a local short-lived feature branch for development.
-- Release versions are use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the main branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
-
+- Release versions use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the main branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
 
 
 ## Installing for development
@@ -34,8 +35,8 @@ The `-a` flag ensures that *all* files (not only edited files) will get rebuild.
 sphinx-build -b html docs/source/ docs/build
 ```
 - **Deploying**: Just push to github, and it will be automatically built by readthedocs. The settings can be adjusted [here](https://readthedocs.org/dashboard).
-
 - Versions selected for documentation are selected in the readthedocs UI. Select one version per `major.minor` version (latest of them) from the git tags. 
+- The `latest` version (default versio) in readthedocs follows the `latest-release` branch automatically.
   
 
 
@@ -57,9 +58,31 @@ coverage run -m pytest <test-target> coverage html && python -m webbrowser -t ht
 ```
 python -m pip wheel --no-deps .
 ```
-- Push to PyPI 
-  - Once per system: (1) get a PyPI token for the *project* from [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) 
+- Push to PyPI  (assuming the one-time setup below done)
+```
+python -m twine  upload wakepy-<version>-py3-none-any.whl --repository wakepy
+```
+- If made a new version, remember to update the `latest-release` branch so ReadTheDocs may update the documentation. 
+- Also, check that readthedocs has included all the correct versions (git tags)
+
+
+## Setting up twine/pip for uploading to PyPI
+- This should be done once per system
+- (1) Get a PyPI token for the *project* from [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) 
+- (2) Create a `$HOME/.pypirc` file with following contents:
 
 ```
-twine upload wakepy-<version>-py3-none-any.whl 
+[distutils]
+  index-servers =
+    pypi
+    wakepy
+
+[pypi]
+  username = __token__
+  password = # either a user-scoped token or a project-scoped token you want to set as the default
+
+[wakepy]
+  repository = https://upload.pypi.org/legacy/
+  username = __token__
+  password = # the wakepy project scoped token here.
 ```
