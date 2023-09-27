@@ -1,5 +1,9 @@
 # Changelog 
 
+## [0.7.2] (2023-09-27)
+### Fixed
+- The CLI API on python 3.7 and python 3.8. Thanks to [Aymane11](https://github.com/Aymane11) for [PR #50](https://github.com/fohrloop/wakepy/pull/50)
+
 ## [0.7.1] (2023-06-11)
 ### Fixed
 - `keep.running` and `keep.presenting` return an object `m` with `success` value of `True`.
