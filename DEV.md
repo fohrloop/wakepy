@@ -4,9 +4,9 @@ This document serves as documentation for the package developers.
 
 ## Branches
 
-- wakepy uses the `master` branch for development. All PRs should be against it. This is the only long-lived branch in the repo.
+- wakepy uses the `main` branch for development. All PRs should be against it. This is the only long-lived branch in the repo.
 - Use a local short-lived feature branch for development.
-- Release versions are use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the master branch) with format `major.minor.patch`; e.g. 1.2.0 or 2.2.0.
+- Release versions are use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the main branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
 
 
 
@@ -46,7 +46,7 @@ sphinx-build -b html docs/source/ docs/build
 - To run tests with coverage, use
 
 ```
-coverage run -m pytest <path-to-test> coverage html && open htmlcov/index.html & python -m webbrowser -t htmlcov/index.html 
+coverage run -m pytest <test-target> coverage html && python -m webbrowser -t htmlcov/index.html 
 ```
 
 

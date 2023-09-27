@@ -9,6 +9,7 @@ or using the executable
     wakepy [args]
 """
 import argparse
+from typing import Dict
 
 from wakepy.cli import start
 
@@ -53,7 +54,7 @@ def get_argparser() -> argparse.ArgumentParser:
     return parser
 
 
-def parse_arguments(parser: argparse.ArgumentParser) -> dict[str, bool]:
+def parse_arguments(parser: argparse.ArgumentParser) -> Dict[str, bool]:
     args = parser.parse_args()
 
     if args.keep_screen_awake and any((args.keep_running, args.presentation)):
