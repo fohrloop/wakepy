@@ -57,9 +57,29 @@ coverage run -m pytest <test-target> coverage html && python -m webbrowser -t ht
 ```
 python -m pip wheel --no-deps .
 ```
-- Push to PyPI 
-  - Once per system: (1) get a PyPI token for the *project* from [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) 
+- Push to PyPI  (assuming the one-time setup below done)
 
 ```
-twine upload wakepy-<version>-py3-none-any.whl 
+python -m twine  upload wakepy-<version>-py3-none-any.whl --repository wakepy
+```
+
+## Setting up twine/pip for uploading to PyPI
+- This should be done once per system
+- (1) Get a PyPI token for the *project* from [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) 
+- (2) Create a `$HOME/.pypirc` file with following contents:
+
+```
+[distutils]
+  index-servers =
+    pypi
+    wakepy
+
+[pypi]
+  username = __token__
+  password = # either a user-scoped token or a project-scoped token you want to set as the default
+
+[wakepy]
+  repository = https://upload.pypi.org/legacy/
+  username = __token__
+  password = # the wakepy project scoped token here.
 ```
