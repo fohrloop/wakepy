@@ -57,7 +57,8 @@ coverage run -m pytest <test-target> coverage html && python -m webbrowser -t ht
 ```
 python -m pip wheel --no-deps .
 ```
-- Push to PyPI:
+- Push to PyPI 
+  - Once per system: (1) get a PyPI token for the *project* from [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) 
 
 ```
 twine upload wakepy-<version>-py3-none-any.whl 
