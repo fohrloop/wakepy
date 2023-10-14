@@ -9,7 +9,7 @@ Activating a Mode is a three-stage process. With each Method, in the order of pr
 
 
 :::{figure} ./img/methods-after-check-platform.svg 
-:w: 300px
+:width: 800px
 :name: fig-methods-after-check-platform
 :alt: wakepy mode activation check platform
 
