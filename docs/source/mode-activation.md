@@ -7,6 +7,7 @@ Activating a Mode is a three-stage process. With each Method, in the order of pr
 2. Checks requirements
 3. Tries to activate a Mode using the Method
 
+If `max_methods` is not `None` and number of successful Mode activations reaches `max_methods`, no more methods are tried. Otherwise, all Methods of the Mode are tried.
 
 :::{figure} ./img/methods-after-check-platform.svg 
 :width: 800px
