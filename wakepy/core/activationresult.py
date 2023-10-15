@@ -5,11 +5,11 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 
-from .constant import StringConstant
+from .constant import StringConstant, auto
 from .definitions import WorkerThreadMsgType
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Optional, Tuple
+    from typing import Any, List, Optional, Tuple, Sequence
 
     from .method import Method
     from queue import Queue
@@ -32,105 +32,48 @@ def should_fake_success() -> bool:
     return bool(os.environ.get("WAKEPY_FAKE_SUCCESS"))
 
 
-@dataclass(frozen=True)
-class PlatformSupportStageInfo:
-    failed: Tuple[Method, ...]
-    passed: Tuple[Method, ...]
-
-
-@dataclass(frozen=True)
-class RequirementsStageInfo:
-    failed: Tuple[Method, ...]
-    passed: Tuple[Method, ...]
-    unknown: Tuple[Method, ...]
-    failure_reasons: Tuple[str, ...]
-
-    def __post_init__(self):
-        if not len(self.failure_reasons) == len(self.failed):
-            raise ValueError(
-                "The length of failure_reasons must equal to the length of failed Methods."
-            )
-
-
-@dataclass(frozen=True)
-class BeforeActivateStageInfo:
-    # This is another view to same data as available already from
-    # PlatformSupportStageInfo and RequirementsStageInfo
-    unsuitable: Tuple[Method, ...]
-    unsuitability_reasons: Tuple[str, ...]
-    potentially_suitable: Tuple[Method, ...]
-
-
-@dataclass(frozen=True)
-class ActivateStageInfo:
-    passed: Tuple[Method, ...]
-    failed: Tuple[Method, ...]
-    failure_exceptions: Tuple[Exception, ...]
-    unused: Tuple[Method, ...]
-
-    def __post_init__(self):
-        if not len(self.failure_exceptions) == len(self.failed):
-            raise ValueError(
-                "The length of failure_exceptions must equal to the length of failed Methods."
-            )
-
-
-@dataclass(frozen=True)
-class ActivationStagesInfo:
-    platform_support: PlatformSupportStageInfo
-    requirements: RequirementsStageInfo
-    _before_activate: BeforeActivateStageInfo
-    activate: ActivateStageInfo
+class UsageStatus(StringConstant):
+    FAIL = auto()
+    SUCCESS = auto()
+    UNUSED = auto()
 
 
 class StageName(StringConstant):
-    ALL_METHODS = "1-get-all-methods"
-    PLATFORM_SUPPORT = "2-check-platform-support"
-    REQUIREMENTS = "3-check-requirements"
-    ACTIVATION = "4-try-activation"
+    # These are stages which occur in order for each of the methods
+    # until the mode has been succesfully activated with "max number" of
+    # methods
+
+    NONE = auto()  # No stage at all.
+
+    # The stages in the activation process in order
+    PLATFORM_SUPPORT = auto()
+    REQUIREMENTS = auto()
+    ACTIVATION = auto()
 
 
-class ActivationResult:
-    """The result returned by activating a mode, i.e. the `x` in
-    `with mode as x: ...`.
+@dataclass(frozen=True)
+class MethodUsageResult:
+    status: UsageStatus
+    # None if the method did not fail. Otherwise, the name of the stage where
+    # the method failed.
+    method_name: str
+    failure_stage: Optional[StageName] = None
+    message: str = ""
 
-    The ActivationResult is responsible of track of successful and failed
-    methods and providing different views on the results of the activation
-    process. All results are lazily loaded; if you access any of the
-    ActivationResult attributes, you will have to wait until the results
-    are ready.
+    def __repr__(self):
+        error_at = " @" + self.failure_stage if self.failure_stage else ""
+        message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
+        return f"({self.status}{error_at}, {self.method_name}{message_part})"
 
-    Attributes
-    ----------
-    TODO: update these
 
-    success: bool
-        Tells is entering into a mode was successful. Note that this
-        may be faked with WAKEPY_FAKE_SUCCESS environment variable.
-    real_success: bool
-        Tells is entering into a mode was successful. This
-        may not faked with WAKEPY_FAKE_SUCCESS environment variable.
-    failure: bool
-        Always opposite of `success`. Included for convenience.
-    """
-
+class ModeSwitcher:
     # The minimum and maximum waiting times for waiting data from Queue
     # (seconds). These are used to calculate the timeout, if timeout is not
     # provided
 
-    _default_timeout_minimum = 3
-    _default_timeout_maximum = 8
-    _default_time_per_method = 0.3  # 300ms
-
-    def require_results(func):
-        # TODO: add docs
-        @wraps(func)
-        def decorated_function(self, *args, **kwargs):
-            if not self._results_set:
-                self._get_and_set_mode_enter_results()
-            return func(self, *args, **kwargs)
-
-        return decorated_function
+    timeout_minimum = 3
+    timeout_maximum = 8
+    timeout_per_method = 0.3  # 300ms
 
     def __init__(
         self,
@@ -152,36 +95,39 @@ class ActivationResult:
             a default timeout is calculated based on the number of given
             `candidate_method`s.
         """
-
-        self._queue_thread = queue_thread
         self._results_set = False
-        self._timeout = (
-            timeout
-            if timeout is not None
-            else self._get_default_timeout(len(candidate_methods))
+        self._queue_thread = queue_thread
+        self.timeout = timeout
+        self._all_methods: Tuple[Method, ...] = tuple(candidate_methods)
+
+    def require_results(func):
+        # TODO: add docs
+        @wraps(func)
+        def decorated_function(self, *args, **kwargs):
+            if not self._results_set:
+                self._get_and_set_mode_enter_results()
+            return func(self, *args, **kwargs)
+
+        return decorated_function
+
+    def get_timeout(self) -> float | int:
+        """Gets the timeout for the blocking Queue.get calls.
+
+        Either returns the timeout given in init, or, if that is missing,
+        calculates some sort of sane value for it using the number of
+        candidate methods `self.timeout_per_method`, `self.timeout_minimum` and
+        `self.timeout_maximum`.
+        """
+        if self.timeout is not None:
+            return self.timeout
+
+        timeout_based_on_number_of_methods = (
+            len(self.all_methods) * self.timeout_per_method
         )
-
-        self.stages: ActivationStagesInfo | None = None
-        self.used_methods: Tuple[Method, ...] | None = None
-        self.unused_methods: Tuple[Method, ...] | None = None
-        self.failed_methods: Tuple[Method, ...] | None = None
-
-        self.failure_reasons: Tuple[Tuple[StageName, str], ...] | None = None
-
-        # Same methods as in used, unused and failed. In priority order.
-        self.all_methods: Tuple[Method, ...] | None = None
-
-    @property
-    def real_success(self) -> bool:
-        return len(self.success) > 0
-
-    @property
-    def success(self) -> bool:
-        return self.real_success or should_fake_success()
-
-    @property
-    def failure(self) -> bool:
-        return not self.success
+        return min(
+            self.timeout_maximum,
+            max(self.timeout_minimum, timeout_based_on_number_of_methods),
+        )
 
     def _get_and_set_mode_enter_results(self):
         msg_type: WorkerThreadMsgType
@@ -205,12 +151,167 @@ class ActivationResult:
                 "The length of `failure_reasons` must equal to the length of `failed_methods`."
             )
 
-    def _get_default_timeout(self, n_methods: int) -> float:
-        """Calculates some sort of sane timeout for the blocking Queue.get
-        calls. Depends on the number of candidate methods `n_methods`.
+
+class ActivationResult:
+    """The result returned by activating a mode, i.e. the `x` in
+    `with mode as x: ...`.
+
+    The ActivationResult is responsible of keeping track on successful and
+    failed methods and providing different views on the results of the
+    activation process. All results are lazily loaded; if you access any of the
+    ActivationResult attributes, you will have to wait until the results
+    are ready.
+
+    Attributes
+    ----------
+    success: bool
+        Tells is entering into a mode was successful. Note that this may be
+        faked with WAKEPY_FAKE_SUCCESS environment variable e.g. for testing
+        purposes.
+    real_success: bool
+        Tells is entering into a mode was successful. This
+        may not faked with WAKEPY_FAKE_SUCCESS environment variable.
+    failure: bool
+        Always opposite of `success`. Included for convenience.
+    active_methods: list[str]
+        List of the names of all the successful (active) methods.
+    active_methods_string: str
+        A single string containing the names of all the successful (active)
+        methods.
+
+
+    Methods
+    -------
+    get_details:
+        Get details of the activation results. This is the higher-level
+        interface. If you want more control, use .get_detailed_results().
+    get_detailed_results:
+        Lower-level interface for getting details of the activation results.
+        If you want easier access, use .get_details().
+    """
+
+    def __init__(self, switcher: ModeSwitcher):
         """
-        timeout_based_on_number_of_methods = n_methods * self._default_time_per_method
-        return min(
-            self._default_timeout_maximum,
-            max(self._default_timeout_minimum, timeout_based_on_number_of_methods),
-        )
+        Parameters
+        ---------
+        switcher:
+            The mode switcher.
+        """
+        self._switcher = switcher
+        self._results: list[MethodUsageResult] = []
+
+    @property
+    def real_success(self) -> bool:
+        """Tells is entering into a mode was successful. This
+        may not faked with WAKEPY_FAKE_SUCCESS environment variable.
+        """
+        for res in self._results:
+            if res.status == UsageStatus.SUCCESS:
+                return True
+        return False
+
+    @property
+    def success(self) -> bool:
+        """Tells is entering into a mode was successful.
+
+        Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
+        variable (for tests). See also: real_success.
+
+        """
+        return self.real_success or should_fake_success()
+
+    @property
+    def failure(self) -> bool:
+        """Always opposite of `success`. Included for convenience."""
+        return not self.success
+
+    @property
+    def active_methods(self) -> list[str]:
+        """List of the names of all the successful (active) methods"""
+        return [
+            res.method_name
+            for res in self._results
+            if res.status == UsageStatus.SUCCESS
+        ]
+
+    @property
+    def active_methods_string(self) -> str:
+        """A single string containing the names of all the successful (active)
+        methods. For example:
+
+        if `active_methods` is ['fist-method', 'SecondMethod',
+        'some.third.Method'], the `active_methods_string` will be:
+        'fist-method, SecondMethod & some.third.Method'
+        """
+        active_methods = self.active_methods
+        if len(active_methods) == 1:
+            return active_methods[0]
+        return ", ".join(active_methods[:-1]) + f" & {active_methods[-1]}"
+
+    def get_details(
+        self,
+        ignore_platform_fails: bool = True,
+        ignore_unused: bool = False,
+    ) -> list[MethodUsageResult]:
+        """Get details of the activation results. This is the higher-level
+        interface. If you want more control, use .get_detailed_results().
+
+        Parameters
+        ----------
+        ignore_platform_fails:
+            If True, ignores plaform support check fail. This is the default as
+            usually one is not interested in methods which are meant for other
+            platforms. If False, includes also platform fails. Default: True.
+        ignore_unused:
+            If True, ignores all unused / remaining methods. Default: False.
+        """
+
+        statuses = [
+            UsageStatus.FAIL,
+            UsageStatus.SUCCESS,
+        ]
+        if not ignore_unused:
+            statuses.append(UsageStatus.UNUSED)
+
+        fail_stages = [
+            StageName.REQUIREMENTS,
+            StageName.ACTIVATION,
+        ]
+        if not ignore_platform_fails:
+            fail_stages.insert(0, StageName.PLATFORM_SUPPORT)
+        return self.get_detailed_results(statuses=statuses, fail_stages=fail_stages)
+
+    def get_detailed_results(
+        self,
+        statuses: Sequence[UsageStatus] = (
+            UsageStatus.FAIL,
+            UsageStatus.SUCCESS,
+            UsageStatus.UNUSED,
+        ),
+        fail_stages: Sequence[StageName] = (
+            StageName.PLATFORM_SUPPORT,
+            StageName.REQUIREMENTS,
+            StageName.ACTIVATION,
+        ),
+    ) -> list[MethodUsageResult]:
+        """Get details of the activation results. This is the lower-level
+        interface. If you want easier access, use .get_details().
+
+        Parameters
+        ----------
+        statuses:
+            The method usage statuses to include in the output. The options
+            are "FAIL", "SUCCESS" and "UNUSED".
+        fail_stages:
+            The fail stages to include in the output. The options are
+            "PLATFORM_SUPPORT", "REQUIREMENTS" and "ACTIVATION".
+        """
+        out = []
+        for res in self._results:
+            if res.status not in statuses:
+                continue
+            if res.status == UsageStatus.FAIL and res.failure_stage not in fail_stages:
+                continue
+            out.append(res)
+
+        return out
