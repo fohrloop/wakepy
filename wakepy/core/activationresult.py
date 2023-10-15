@@ -60,6 +60,10 @@ class MethodUsageResult:
     failure_stage: Optional[StageName] = None
     message: str = ""
 
+    def __repr__(self):
+        error_at = "@" + self.failure_stage if self.failure_stage else ""
+        return f'({self.status}{error_at}, {self.method_name}, "{self.message}")'
+
 
 class ModeSwitcher:
     # The minimum and maximum waiting times for waiting data from Queue
