@@ -1,10 +1,9 @@
 from unittest.mock import Mock
-from wakepy.core import ActivationResult, Method, StageName
+from wakepy.core import ActivationResult, StageName
 from wakepy.core.activationresult import (
     ModeSwitcher,
     MethodUsageResult,
     SuccessStatus,
-    StageName,
 )
 
 switcher = Mock(spec_set=ModeSwitcher)
