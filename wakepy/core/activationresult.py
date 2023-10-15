@@ -176,8 +176,9 @@ class ActivationResult:
         switcher:
             The mode switcher.
         """
-
         self._switcher = switcher
+        self._data: list[MethodUsageResult] = []
+
         self.active_methods: list[str] = []
 
     @property
