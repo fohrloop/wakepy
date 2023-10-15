@@ -224,3 +224,39 @@ def test_activation_result_get_details():
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
     ]
+
+
+def test_activation_result_get_usage_results():
+    ar = ActivationResult(switcher)
+    ar._results = [
+        PLATFORM_SUPPORT_FAIL,
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
+        UNUSED_RESULT,
+    ]
+
+    # When no arguments given, return everything
+    assert ar.get_usage_results() == [
+        PLATFORM_SUPPORT_FAIL,
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
+        UNUSED_RESULT,
+    ]
+
+    # Possible to filter with status
+    assert ar.get_usage_results(statuses=("FAIL",)) == [
+        PLATFORM_SUPPORT_FAIL,
+        REQUIREMENTS_FAIL,
+    ]
+
+    # Possible to filter with fail_stage
+    assert ar.get_usage_results(fail_stages=("REQUIREMENTS",)) == [
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
+        UNUSED_RESULT,
+    ]
+
+    # or with both
+    assert ar.get_usage_results(statuses=("FAIL",), fail_stages=("REQUIREMENTS",)) == [
+        REQUIREMENTS_FAIL,
+    ]
