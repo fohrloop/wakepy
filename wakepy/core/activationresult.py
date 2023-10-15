@@ -159,8 +159,6 @@ class ActivationResult:
 
     Attributes
     ----------
-    TODO: update these
-
     success: bool
         Tells is entering into a mode was successful. Note that this
         may be faked with WAKEPY_FAKE_SUCCESS environment variable.
@@ -185,12 +183,25 @@ class ActivationResult:
 
     @property
     def real_success(self) -> bool:
-        return isinstance(self.used_methods, tuple) and len(self.used_methods) > 0
+        """Tells is entering into a mode was successful. This
+        may not faked with WAKEPY_FAKE_SUCCESS environment variable.
+        """
+        for res in self._data:
+            if res.status == SuccessStatus.SUCCESS:
+                return True
+        return False
 
     @property
     def success(self) -> bool:
+        """Tells is entering into a mode was successful.
+
+        Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
+        variable (for tests). See also: real_success.
+
+        """
         return self.real_success or should_fake_success()
 
     @property
     def failure(self) -> bool:
+        """Always opposite of `success`. Included for convenience."""
         return not self.success
