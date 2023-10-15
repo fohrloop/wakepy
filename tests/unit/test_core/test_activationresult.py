@@ -3,7 +3,7 @@ from wakepy.core import ActivationResult, StageName
 from wakepy.core.activationresult import (
     ModeSwitcher,
     MethodUsageResult,
-    SuccessStatus,
+    UsageStatus,
 )
 
 switcher = Mock(spec_set=ModeSwitcher)
@@ -14,23 +14,23 @@ def test_activation_result():
 
     ar._results = [
         MethodUsageResult(
-            status=SuccessStatus.FAIL,
+            status=UsageStatus.FAIL,
             failure_stage=StageName.PLATFORM_SUPPORT,
             method_name="fail-platform",
             message="Platform XYZ not supported!",
         ),
         MethodUsageResult(
-            status=SuccessStatus.FAIL,
+            status=UsageStatus.FAIL,
             failure_stage=StageName.REQUIREMENTS,
             method_name="fail-requirements",
             message="Missing requirement: Some SW v.1.2.3",
         ),
         MethodUsageResult(
-            status=SuccessStatus.SUCCESS,
+            status=UsageStatus.SUCCESS,
             method_name="a-successful-method",
         ),
         MethodUsageResult(
-            status=SuccessStatus.UNUSED,
+            status=UsageStatus.UNUSED,
             method_name="some-unused-method",
         ),
     ]
@@ -48,21 +48,21 @@ def test_activation_result_three_successful():
 
     ar._results = [
         MethodUsageResult(
-            status=SuccessStatus.SUCCESS,
+            status=UsageStatus.SUCCESS,
             method_name="1st.successfull.method",
         ),
         MethodUsageResult(
-            status=SuccessStatus.FAIL,
+            status=UsageStatus.FAIL,
             failure_stage=StageName.REQUIREMENTS,
             method_name="fail-requirements",
             message="Missing requirement: Some SW v.1.2.3",
         ),
         MethodUsageResult(
-            status=SuccessStatus.SUCCESS,
+            status=UsageStatus.SUCCESS,
             method_name="2nd-successful-method",
         ),
         MethodUsageResult(
-            status=SuccessStatus.SUCCESS,
+            status=UsageStatus.SUCCESS,
             method_name="last-successful-method",
         ),
     ]

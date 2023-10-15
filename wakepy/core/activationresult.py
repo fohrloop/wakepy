@@ -32,7 +32,7 @@ def should_fake_success() -> bool:
     return bool(os.environ.get("WAKEPY_FAKE_SUCCESS"))
 
 
-class SuccessStatus(StringConstant):
+class UsageStatus(StringConstant):
     FAIL = auto()
     SUCCESS = auto()
     UNUSED = auto()
@@ -53,7 +53,7 @@ class StageName(StringConstant):
 
 @dataclass(frozen=True)
 class MethodUsageResult:
-    status: SuccessStatus
+    status: UsageStatus
     # None if the method did not fail. Otherwise, the name of the stage where
     # the method failed.
     method_name: str
@@ -185,7 +185,7 @@ class ActivationResult:
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
         """
         for res in self._results:
-            if res.status == SuccessStatus.SUCCESS:
+            if res.status == UsageStatus.SUCCESS:
                 return True
         return False
 
@@ -210,7 +210,7 @@ class ActivationResult:
         return [
             res.method_name
             for res in self._results
-            if res.status == SuccessStatus.SUCCESS
+            if res.status == UsageStatus.SUCCESS
         ]
 
     @property
