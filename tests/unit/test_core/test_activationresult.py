@@ -6,77 +6,91 @@ from wakepy.core.activationresult import (
     UsageStatus,
 )
 
+import pytest
+
 switcher = Mock(spec_set=ModeSwitcher)
 
+RESULTS_1 = [
+    MethodUsageResult(
+        status=UsageStatus.FAIL,
+        failure_stage=StageName.PLATFORM_SUPPORT,
+        method_name="fail-platform",
+        message="Platform XYZ not supported!",
+    ),
+    MethodUsageResult(
+        status=UsageStatus.FAIL,
+        failure_stage=StageName.REQUIREMENTS,
+        method_name="fail-requirements",
+        message="Missing requirement: Some SW v.1.2.3",
+    ),
+    MethodUsageResult(
+        status=UsageStatus.SUCCESS,
+        method_name="a-successful-method",
+    ),
+    MethodUsageResult(
+        status=UsageStatus.UNUSED,
+        method_name="some-unused-method",
+    ),
+]
 
-def test_activation_result():
+RESULTS_2 = [
+    MethodUsageResult(
+        status=UsageStatus.SUCCESS,
+        method_name="1st.successfull.method",
+    ),
+    MethodUsageResult(
+        status=UsageStatus.FAIL,
+        failure_stage=StageName.REQUIREMENTS,
+        method_name="fail-requirements",
+        message="Missing requirement: Some SW v.1.2.3",
+    ),
+    MethodUsageResult(
+        status=UsageStatus.SUCCESS,
+        method_name="2nd-successful-method",
+    ),
+    MethodUsageResult(
+        status=UsageStatus.SUCCESS,
+        method_name="last-successful-method",
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "results, expected_success, expected_failure",
+    [
+        (RESULTS_1, True, False),
+        (RESULTS_2, True, False),
+    ],
+)
+def test_activation_result_success(results, expected_success, expected_failure):
     ar = ActivationResult(switcher)
+    ar._results = results
 
-    ar._results = [
-        MethodUsageResult(
-            status=UsageStatus.FAIL,
-            failure_stage=StageName.PLATFORM_SUPPORT,
-            method_name="fail-platform",
-            message="Platform XYZ not supported!",
+    assert ar.success == expected_success
+    assert ar.real_success == expected_success
+    assert ar.failure == expected_failure
+
+
+@pytest.mark.parametrize(
+    "results, expected_active_methods, expected_active_methods_string",
+    [
+        (RESULTS_1, ["a-successful-method"], "a-successful-method"),
+        (
+            RESULTS_2,
+            [
+                "1st.successfull.method",
+                "2nd-successful-method",
+                "last-successful-method",
+            ],
+            "1st.successfull.method, 2nd-successful-method & last-successful-method",
         ),
-        MethodUsageResult(
-            status=UsageStatus.FAIL,
-            failure_stage=StageName.REQUIREMENTS,
-            method_name="fail-requirements",
-            message="Missing requirement: Some SW v.1.2.3",
-        ),
-        MethodUsageResult(
-            status=UsageStatus.SUCCESS,
-            method_name="a-successful-method",
-        ),
-        MethodUsageResult(
-            status=UsageStatus.UNUSED,
-            method_name="some-unused-method",
-        ),
-    ]
-
-    assert ar.success
-    assert ar.real_success
-    assert not ar.failure
-
-    assert ar.active_methods == ["a-successful-method"]
-    assert ar.active_methods_string == "a-successful-method"
-
-
-def test_activation_result_three_successful():
+    ],
+)
+def test_active_methods(
+    results, expected_active_methods, expected_active_methods_string
+):
     ar = ActivationResult(switcher)
+    ar._results = results
 
-    ar._results = [
-        MethodUsageResult(
-            status=UsageStatus.SUCCESS,
-            method_name="1st.successfull.method",
-        ),
-        MethodUsageResult(
-            status=UsageStatus.FAIL,
-            failure_stage=StageName.REQUIREMENTS,
-            method_name="fail-requirements",
-            message="Missing requirement: Some SW v.1.2.3",
-        ),
-        MethodUsageResult(
-            status=UsageStatus.SUCCESS,
-            method_name="2nd-successful-method",
-        ),
-        MethodUsageResult(
-            status=UsageStatus.SUCCESS,
-            method_name="last-successful-method",
-        ),
-    ]
-
-    assert ar.success
-    assert ar.real_success
-    assert not ar.failure
-
-    assert ar.active_methods == [
-        "1st.successfull.method",
-        "2nd-successful-method",
-        "last-successful-method",
-    ]
-    assert (
-        ar.active_methods_string
-        == "1st.successfull.method, 2nd-successful-method & last-successful-method"
-    )
+    assert ar.active_methods == expected_active_methods
+    assert ar.active_methods_string == expected_active_methods_string
