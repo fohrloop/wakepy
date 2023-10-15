@@ -12,7 +12,7 @@ switcher = Mock(spec_set=ModeSwitcher)
 def test_activation_result():
     ar = ActivationResult(switcher)
 
-    ar._data = [
+    ar._results = [
         MethodUsageResult(
             status=SuccessStatus.FAIL,
             failure_stage=StageName.PLATFORM_SUPPORT,

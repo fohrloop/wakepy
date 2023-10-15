@@ -177,16 +177,14 @@ class ActivationResult:
             The mode switcher.
         """
         self._switcher = switcher
-        self._data: list[MethodUsageResult] = []
-
-        self.active_methods: list[str] = []
+        self._results: list[MethodUsageResult] = []
 
     @property
     def real_success(self) -> bool:
         """Tells is entering into a mode was successful. This
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
         """
-        for res in self._data:
+        for res in self._results:
             if res.status == SuccessStatus.SUCCESS:
                 return True
         return False
@@ -205,3 +203,26 @@ class ActivationResult:
     def failure(self) -> bool:
         """Always opposite of `success`. Included for convenience."""
         return not self.success
+
+    @property
+    def active_methods(self) -> list[str]:
+        """List of the names of all the successful (active) methods"""
+        return [
+            res.method_name
+            for res in self._results
+            if res.status == SuccessStatus.SUCCESS
+        ]
+
+    @property
+    def active_methods_string(self) -> str:
+        """A single string containing the names of all the successful (active)
+        methods. For example:
+
+        if `active_methods` is ['fist-method', 'SecondMethod',
+        'some.third.Method'], the `active_methods_string` will be:
+        'fist-method, SecondMethod & some.third.Method'
+        """
+        active_methods = self.active_methods
+        if len(active_methods) == 1:
+            return active_methods[0]
+        return ", ".join(active_methods[:-1]) + f"& {active_methods[-1]}"
