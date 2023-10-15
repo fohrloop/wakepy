@@ -61,8 +61,9 @@ class MethodUsageResult:
     message: str = ""
 
     def __repr__(self):
-        error_at = "@" + self.failure_stage if self.failure_stage else ""
-        return f'({self.status}{error_at}, {self.method_name}, "{self.message}")'
+        error_at = " @" + self.failure_stage if self.failure_stage else ""
+        message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
+        return f"({self.status}{error_at}, {self.method_name}{message_part})"
 
 
 class ModeSwitcher:
