@@ -104,7 +104,30 @@ def test_active_methods(
             StageName.PLATFORM_SUPPORT,
             "fail-platform",
             "Platform XYZ not supported!",
-            '(FAIL@PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!")',
+            '(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!")',
+        ),
+        (
+            UsageStatus.FAIL,
+            StageName.REQUIREMENTS,
+            "other-fail-method",
+            "Need SW X version >= 8.9!",
+            '(FAIL @REQUIREMENTS, other-fail-method, "Need SW X version >= 8.9!")',
+        ),
+        (
+            UsageStatus.SUCCESS,
+            None,
+            "successfulMethod",
+            "",
+            # Succesful methods do not print empty message
+            "(SUCCESS, successfulMethod)",
+        ),
+        (
+            UsageStatus.UNUSED,
+            None,
+            "SomeMethod",
+            "",
+            # Unused methods do not print empty message
+            "(UNUSED, SomeMethod)",
         ),
     ],
 )
