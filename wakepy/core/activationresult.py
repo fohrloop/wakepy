@@ -59,6 +59,92 @@ class MethodUsageResult:
     message: str = ""
 
 
+class ModeSwitcher:
+    # The minimum and maximum waiting times for waiting data from Queue
+    # (seconds). These are used to calculate the timeout, if timeout is not
+    # provided
+
+    timeout_minimum = 3
+    timeout_maximum = 8
+    timeout_per_method = 0.3  # 300ms
+
+    def __init__(
+        self,
+        candidate_methods: List[Method],
+        queue_thread: Queue,
+        timeout: Optional[float | int] = None,
+    ):
+        """
+        Parameters
+        ---------
+        candidate_methods:
+            The list of candidate methods to be used to activate a Mode.
+            These should be in priority order.
+        queue_thread:
+            The queue which is used to read data send by a ModeWorkerThread
+        timeout:
+            Timeout used when communicating with the associated thread (for
+            example, when getting data from queues). In seconds. If not given,
+            a default timeout is calculated based on the number of given
+            `candidate_method`s.
+        """
+        self._results_set = False
+        self._queue_thread = queue_thread
+        self.timeout = timeout
+        self._all_methods: Tuple[Method, ...] = tuple(candidate_methods)
+
+    def require_results(func):
+        # TODO: add docs
+        @wraps(func)
+        def decorated_function(self, *args, **kwargs):
+            if not self._results_set:
+                self._get_and_set_mode_enter_results()
+            return func(self, *args, **kwargs)
+
+        return decorated_function
+
+    def get_timeout(self) -> float | int:
+        """Gets the timeout for the blocking Queue.get calls.
+
+        Either returns the timeout given in init, or, if that is missing,
+        calculates some sort of sane value for it using the number of
+        candidate methods `self.timeout_per_method`, `self.timeout_minimum` and
+        `self.timeout_maximum`.
+        """
+        if self.timeout is not None:
+            return self.timeout
+
+        timeout_based_on_number_of_methods = (
+            len(self.all_methods) * self.timeout_per_method
+        )
+        return min(
+            self.timeout_maximum,
+            max(self.timeout_minimum, timeout_based_on_number_of_methods),
+        )
+
+    def _get_and_set_mode_enter_results(self):
+        msg_type: WorkerThreadMsgType
+        arg: Any
+
+        msg_type, arg = self._queue_thread.get(timeout=self._timeout)
+        if msg_type == WorkerThreadMsgType.EXCEPTION:
+            exc: Exception = arg
+
+            raise RuntimeError(
+                "Error during activating a mode. See the traceback for details"
+            ) from exc
+        if msg_type != WorkerThreadMsgType.OK:
+            # Should never happen
+            raise RuntimeError(f"Thread sent unknown data: {msg_type}, {arg}")
+
+        self._results_set = True
+
+        if not len(self.failure_reasons) == len(self.failed_methods):
+            raise ValueError(
+                "The length of `failure_reasons` must equal to the length of `failed_methods`."
+            )
+
+
 class ActivationResult:
     """The result returned by activating a mode, i.e. the `x` in
     `with mode as x: ...`.
@@ -83,60 +169,16 @@ class ActivationResult:
         Always opposite of `success`. Included for convenience.
     """
 
-    # The minimum and maximum waiting times for waiting data from Queue
-    # (seconds). These are used to calculate the timeout, if timeout is not
-    # provided
-
-    timeout_minimum = 3
-    timeout_maximum = 8
-    timeout_per_method = 0.3  # 300ms
-
-    def require_results(func):
-        # TODO: add docs
-        @wraps(func)
-        def decorated_function(self, *args, **kwargs):
-            if not self._results_set:
-                self._get_and_set_mode_enter_results()
-            return func(self, *args, **kwargs)
-
-        return decorated_function
-
-    def __init__(
-        self,
-        candidate_methods: List[Method],
-        queue_thread: Queue,
-        timeout: Optional[float | int] = None,
-    ):
+    def __init__(self, switcher: ModeSwitcher):
         """
         Parameters
         ---------
-        candidate_methods:
-            The list of candidate methods to be used to activate a Mode.
-            These should be in priority order.
-        queue_thread:
-            The queue which is used to read data send by a ModeWorkerThread
-        timeout:
-            Timeout used when communicating with the associated thread (for
-            example, when getting data from queues). In seconds. If not given,
-            a default timeout is calculated based on the number of given
-            `candidate_method`s.
+        switcher:
+            The mode switcher.
         """
 
-        self._queue_thread = queue_thread
-        self._results_set = False
-
-        # Same methods as in .used_methods, .unused_methods and
-        # .failed_methods combined, in priority order.
-        self.all_methods: Tuple[Method, ...] = tuple(candidate_methods)
-
-        self.timeout = timeout
-
-        self.stages: ActivationStagesInfo | None = None
-        self.used_methods: Tuple[Method, ...] | None = None
-        self.unused_methods: Tuple[Method, ...] | None = None
-        self.failed_methods: Tuple[Method, ...] | None = None
-
-        self.failure_reasons: Tuple[Tuple[StageName, str], ...] | None = None
+        self._switcher = switcher
+        self.active_methods: list[str] = []
 
     @property
     def real_success(self) -> bool:
@@ -149,44 +191,3 @@ class ActivationResult:
     @property
     def failure(self) -> bool:
         return not self.success
-
-    def _get_and_set_mode_enter_results(self):
-        msg_type: WorkerThreadMsgType
-        arg: Any
-
-        msg_type, arg = self._queue_thread.get(timeout=self._timeout)
-        if msg_type == WorkerThreadMsgType.EXCEPTION:
-            exc: Exception = arg
-
-            raise RuntimeError(
-                "Error during activating a mode. See the traceback for details"
-            ) from exc
-        if msg_type != WorkerThreadMsgType.OK:
-            # Should never happen
-            raise RuntimeError(f"Thread sent unknown data: {msg_type}, {arg}")
-
-        self._results_set = True
-
-        if not len(self.failure_reasons) == len(self.failed_methods):
-            raise ValueError(
-                "The length of `failure_reasons` must equal to the length of `failed_methods`."
-            )
-
-    def get_timeout(self) -> float | int:
-        """Gets the timeout for the blocking Queue.get calls.
-
-        Either returns the timeout given in init, or, if that is missing,
-        calculates some sort of sane value for it using the number of
-        candidate methods `self.timeout_per_method`, `self.timeout_minimum` and
-        `self.timeout_maximum`.
-        """
-        if self.timeout is not None:
-            return self.timeout
-
-        timeout_based_on_number_of_methods = (
-            len(self.all_methods) * self.timeout_per_method
-        )
-        return min(
-            self.timeout_maximum,
-            max(self.timeout_minimum, timeout_based_on_number_of_methods),
-        )
