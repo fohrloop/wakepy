@@ -5,7 +5,7 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 
-from .constant import StringConstant
+from .constant import StringConstant, auto
 from .definitions import WorkerThreadMsgType
 
 if typing.TYPE_CHECKING:
@@ -32,72 +32,31 @@ def should_fake_success() -> bool:
     return bool(os.environ.get("WAKEPY_FAKE_SUCCESS"))
 
 
-@dataclass(frozen=True)
-class PlatformSupportStageInfo:
-    failed: Tuple[Method, ...]
-    passed: Tuple[Method, ...]
-
-
-@dataclass(frozen=True)
-class RequirementsStageInfo:
-    failed: Tuple[Method, ...]
-    passed: Tuple[Method, ...]
-    unknown: Tuple[Method, ...]
-    failure_reasons: Tuple[str, ...]
-
-    def __post_init__(self):
-        if not len(self.failure_reasons) == len(self.failed):
-            raise ValueError(
-                "The length of failure_reasons must equal to the length of failed Methods."
-            )
-
-
-@dataclass(frozen=True)
-class BeforeActivateStageInfo:
-    # This is another view to same data as available already from
-    # PlatformSupportStageInfo and RequirementsStageInfo
-    unsuitable: Tuple[Method, ...]
-    unsuitability_reasons: Tuple[str, ...]
-    potentially_suitable: Tuple[Method, ...]
-
-
-@dataclass(frozen=True)
-class ActivateStageInfo:
-    passed: Tuple[Method, ...]
-    failed: Tuple[Method, ...]
-    failure_exceptions: Tuple[Exception, ...]
-    unused: Tuple[Method, ...]
-
-    def __post_init__(self):
-        if not len(self.failure_exceptions) == len(self.failed):
-            raise ValueError(
-                "The length of failure_exceptions must equal to the length of failed Methods."
-            )
-
-
-@dataclass(frozen=True)
-class ActivationStagesInfo:
-    platform_support: PlatformSupportStageInfo
-    requirements: RequirementsStageInfo
-    _before_activate: BeforeActivateStageInfo
-    activate: ActivateStageInfo
+class SuccessStatus(StringConstant):
+    FAIL = auto()
+    SUCCESS = auto()
+    UNUSED = auto()
 
 
 class StageName(StringConstant):
     # These are stages which occur in order for each of the methods
     # until the mode has been succesfully activated with "max number" of
     # methods
-    PLATFORM_SUPPORT = "(1)-check-platform-support"
-    REQUIREMENTS = "(2)-check-requirements"
-    ACTIVATION = "(3)-try-activation"
 
-    # One of these happens after the "try activation" stage.
-    # a) Successful method(s) with heartbeat
-    HEARTBEAT_LOOP = "(4)-started-heartbeat-loop"
-    # b) Successful method without any methods using a heartbeat
-    WAITING_EXIT = "(4)-waiting-exit"
-    # c) No successful methods
-    COULD_NOT_ACTIVATE = "(4)-could-not-activate-mode"
+    NONE = auto()  # No stage at all.
+
+    # The stages in the activation process in order
+    PLATFORM_SUPPORT = auto()
+    REQUIREMENTS = auto()
+    ACTIVATION = auto()
+
+
+@dataclass(frozen=True)
+class MethodUsageResult:
+    status: SuccessStatus
+    stage: StageName
+    method_name: str
+    message: str = ""
 
 
 class ActivationResult:
