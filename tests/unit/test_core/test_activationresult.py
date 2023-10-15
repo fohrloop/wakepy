@@ -186,3 +186,27 @@ def test_usagestatus():
     assert UsageStatus.FAIL == "FAIL"
     assert UsageStatus.SUCCESS == "SUCCESS"
     assert UsageStatus.UNUSED == "UNUSED"
+
+
+def test_activation_result_get_details():
+    ar = ActivationResult(switcher)
+    ar._results = RESULTS_1
+
+    # By default, the get_details drops out failures occuring in the
+    # platform stage
+    assert ar.get_details() == [
+        MethodUsageResult(
+            status=UsageStatus.FAIL,
+            failure_stage=StageName.REQUIREMENTS,
+            method_name="fail-requirements",
+            message="Missing requirement: Some SW v.1.2.3",
+        ),
+        MethodUsageResult(
+            status=UsageStatus.SUCCESS,
+            method_name="a-successful-method",
+        ),
+        MethodUsageResult(
+            status=UsageStatus.UNUSED,
+            method_name="some-unused-method",
+        ),
+    ]

@@ -9,7 +9,7 @@ from .constant import StringConstant, auto
 from .definitions import WorkerThreadMsgType
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Optional, Tuple
+    from typing import Any, List, Optional, Tuple, Sequence
 
     from .method import Method
     from queue import Queue
@@ -231,3 +231,71 @@ class ActivationResult:
         if len(active_methods) == 1:
             return active_methods[0]
         return ", ".join(active_methods[:-1]) + f" & {active_methods[-1]}"
+
+    def get_details(
+        self,
+        ignore_platform_fails: bool = True,
+        ignore_unused: bool = False,
+    ) -> list[MethodUsageResult]:
+        """Get details of the activation results. This is the higher-level
+        interface. If you want more control, use .get_usage_results().
+
+        Parameters
+        ----------
+        ignore_platform_fails:
+            If True, ignores plaform support check fail. This is the default as
+            usually one is not interested in methods which are meant for other
+            platforms. If False, includes also platform fails. Default: True.
+        ignore_unused:
+            If True, ignores all unused / remaining methods. Default: False.
+        """
+
+        statuses = [
+            UsageStatus.FAIL,
+            UsageStatus.SUCCESS,
+        ]
+        if not ignore_unused:
+            statuses.append(UsageStatus.UNUSED)
+
+        fail_stages = [
+            StageName.REQUIREMENTS,
+            StageName.ACTIVATION,
+        ]
+        if not ignore_platform_fails:
+            fail_stages.insert(0, StageName.PLATFORM_SUPPORT)
+        return self.get_usage_results(statuses=statuses, fail_stages=fail_stages)
+
+    def get_usage_results(
+        self,
+        statuses: Sequence[UsageStatus] = (
+            UsageStatus.FAIL,
+            UsageStatus.SUCCESS,
+            UsageStatus.UNUSED,
+        ),
+        fail_stages: Sequence[StageName] = (
+            StageName.PLATFORM_SUPPORT,
+            StageName.REQUIREMENTS,
+            StageName.ACTIVATION,
+        ),
+    ) -> list[MethodUsageResult]:
+        """Get details of the activation results. This is the lower-level
+        interface. If you want easier access, use .get_details().
+
+        Parameters
+        ----------
+        statuses:
+            The method usage statuses to include in the output. The options
+            are "FAIL", "SUCCESS" and "UNUSED".
+        fail_stages:
+            The fail stages to include in the output. The options are
+            "PLATFORM_SUPPORT", "REQUIREMENTS" and "ACTIVATION".
+        """
+        out = []
+        for res in self._results:
+            if res.status not in statuses:
+                continue
+            if res.status == UsageStatus.FAIL and res.failure_stage not in fail_stages:
+                continue
+            out.append(res)
+
+        return out
