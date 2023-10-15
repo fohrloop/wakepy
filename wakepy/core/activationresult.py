@@ -56,8 +56,8 @@ class MethodUsageResult:
     status: SuccessStatus
     # None if the method did not fail. Otherwise, the name of the stage where
     # the method failed.
-    failure_stage: Optional[StageName] = None
     method_name: str
+    failure_stage: Optional[StageName] = None
     message: str = ""
 
 
