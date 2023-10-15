@@ -54,7 +54,9 @@ class StageName(StringConstant):
 @dataclass(frozen=True)
 class MethodUsageResult:
     status: SuccessStatus
-    stage: StageName
+    # None if the method did not fail. Otherwise, the name of the stage where
+    # the method failed.
+    failure_stage: Optional[StageName] = None
     method_name: str
     message: str = ""
 
