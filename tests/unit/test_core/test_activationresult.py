@@ -11,28 +11,31 @@ import pytest
 
 switcher = Mock(spec_set=ModeSwitcher)
 
-
+PLATFORM_SUPPORT_FAIL = MethodUsageResult(
+    status=UsageStatus.FAIL,
+    failure_stage=StageName.PLATFORM_SUPPORT,
+    method_name="fail-platform",
+    message="Platform XYZ not supported!",
+)
+REQUIREMENTS_FAIL = MethodUsageResult(
+    status=UsageStatus.FAIL,
+    failure_stage=StageName.REQUIREMENTS,
+    method_name="fail-requirements",
+    message="Missing requirement: Some SW v.1.2.3",
+)
+SUCCESS_RESULT = MethodUsageResult(
+    status=UsageStatus.SUCCESS,
+    method_name="a-successful-method",
+)
+UNUSED_RESULT = MethodUsageResult(
+    status=UsageStatus.UNUSED,
+    method_name="some-unused-method",
+)
 RESULTS_1 = [
-    MethodUsageResult(
-        status=UsageStatus.FAIL,
-        failure_stage=StageName.PLATFORM_SUPPORT,
-        method_name="fail-platform",
-        message="Platform XYZ not supported!",
-    ),
-    MethodUsageResult(
-        status=UsageStatus.FAIL,
-        failure_stage=StageName.REQUIREMENTS,
-        method_name="fail-requirements",
-        message="Missing requirement: Some SW v.1.2.3",
-    ),
-    MethodUsageResult(
-        status=UsageStatus.SUCCESS,
-        method_name="a-successful-method",
-    ),
-    MethodUsageResult(
-        status=UsageStatus.UNUSED,
-        method_name="some-unused-method",
-    ),
+    PLATFORM_SUPPORT_FAIL,
+    REQUIREMENTS_FAIL,
+    SUCCESS_RESULT,
+    UNUSED_RESULT,
 ]
 
 RESULTS_2 = [
@@ -40,12 +43,7 @@ RESULTS_2 = [
         status=UsageStatus.SUCCESS,
         method_name="1st.successfull.method",
     ),
-    MethodUsageResult(
-        status=UsageStatus.FAIL,
-        failure_stage=StageName.REQUIREMENTS,
-        method_name="fail-requirements",
-        message="Missing requirement: Some SW v.1.2.3",
-    ),
+    REQUIREMENTS_FAIL,
     MethodUsageResult(
         status=UsageStatus.SUCCESS,
         method_name="2nd-successful-method",
@@ -190,23 +188,39 @@ def test_usagestatus():
 
 def test_activation_result_get_details():
     ar = ActivationResult(switcher)
-    ar._results = RESULTS_1
+    ar._results = [
+        PLATFORM_SUPPORT_FAIL,
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
+        UNUSED_RESULT,
+    ]
 
     # By default, the get_details drops out failures occuring in the
     # platform stage
     assert ar.get_details() == [
-        MethodUsageResult(
-            status=UsageStatus.FAIL,
-            failure_stage=StageName.REQUIREMENTS,
-            method_name="fail-requirements",
-            message="Missing requirement: Some SW v.1.2.3",
-        ),
-        MethodUsageResult(
-            status=UsageStatus.SUCCESS,
-            method_name="a-successful-method",
-        ),
-        MethodUsageResult(
-            status=UsageStatus.UNUSED,
-            method_name="some-unused-method",
-        ),
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
+        UNUSED_RESULT,
+    ]
+
+    # The same as above but with explicit arguments.
+    assert ar.get_details(ignore_platform_fails=True) == [
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
+        UNUSED_RESULT,
+    ]
+
+    # Do not ignore platform fails
+    assert ar.get_details(ignore_platform_fails=False) == [
+        PLATFORM_SUPPORT_FAIL,
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
+        UNUSED_RESULT,
+    ]
+
+    # ignore unused
+    assert ar.get_details(ignore_platform_fails=False, ignore_unused=True) == [
+        PLATFORM_SUPPORT_FAIL,
+        REQUIREMENTS_FAIL,
+        SUCCESS_RESULT,
     ]
