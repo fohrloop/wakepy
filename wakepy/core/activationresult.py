@@ -156,22 +156,38 @@ class ActivationResult:
     """The result returned by activating a mode, i.e. the `x` in
     `with mode as x: ...`.
 
-    The ActivationResult is responsible of track of successful and failed
-    methods and providing different views on the results of the activation
-    process. All results are lazily loaded; if you access any of the
+    The ActivationResult is responsible of keeping track on successful and
+    failed methods and providing different views on the results of the
+    activation process. All results are lazily loaded; if you access any of the
     ActivationResult attributes, you will have to wait until the results
     are ready.
 
     Attributes
     ----------
     success: bool
-        Tells is entering into a mode was successful. Note that this
-        may be faked with WAKEPY_FAKE_SUCCESS environment variable.
+        Tells is entering into a mode was successful. Note that this may be
+        faked with WAKEPY_FAKE_SUCCESS environment variable e.g. for testing
+        purposes.
     real_success: bool
         Tells is entering into a mode was successful. This
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
     failure: bool
         Always opposite of `success`. Included for convenience.
+    active_methods: list[str]
+        List of the names of all the successful (active) methods.
+    active_methods_string: str
+        A single string containing the names of all the successful (active)
+        methods.
+
+
+    Methods
+    -------
+    get_details:
+        Get details of the activation results. This is the higher-level
+        interface. If you want more control, use .get_detailed_results().
+    get_detailed_results:
+        Lower-level interface for getting details of the activation results.
+        If you want easier access, use .get_details().
     """
 
     def __init__(self, switcher: ModeSwitcher):
@@ -238,7 +254,7 @@ class ActivationResult:
         ignore_unused: bool = False,
     ) -> list[MethodUsageResult]:
         """Get details of the activation results. This is the higher-level
-        interface. If you want more control, use .get_usage_results().
+        interface. If you want more control, use .get_detailed_results().
 
         Parameters
         ----------
@@ -263,9 +279,9 @@ class ActivationResult:
         ]
         if not ignore_platform_fails:
             fail_stages.insert(0, StageName.PLATFORM_SUPPORT)
-        return self.get_usage_results(statuses=statuses, fail_stages=fail_stages)
+        return self.get_detailed_results(statuses=statuses, fail_stages=fail_stages)
 
-    def get_usage_results(
+    def get_detailed_results(
         self,
         statuses: Sequence[UsageStatus] = (
             UsageStatus.FAIL,
