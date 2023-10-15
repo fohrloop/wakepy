@@ -50,7 +50,7 @@ def test_activation_result_with_one_method():
             (
                 StageName.ACTIVATION,
                 id(method),
-                mock_check_requirements_support(method),
+                mock_activate_mode(method),
             )
         )
         put_to_queue((StageName.WAITING_EXIT,))
