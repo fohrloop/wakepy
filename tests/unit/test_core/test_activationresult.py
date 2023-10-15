@@ -94,3 +94,49 @@ def test_active_methods(
 
     assert ar.active_methods == expected_active_methods
     assert ar.active_methods_string == expected_active_methods_string
+
+
+@pytest.mark.parametrize(
+    "status, failure_stage, method_name, message, expected_string_representation",
+    [
+        (
+            UsageStatus.FAIL,
+            StageName.PLATFORM_SUPPORT,
+            "fail-platform",
+            "Platform XYZ not supported!",
+            '(FAIL@PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!")',
+        ),
+    ],
+)
+def test_method_usage_result(
+    status,
+    failure_stage,
+    method_name,
+    message,
+    expected_string_representation,
+):
+    mur = MethodUsageResult(
+        status=status,
+        failure_stage=failure_stage,
+        method_name=method_name,
+        message=message,
+    )
+    # These attributes are available
+    assert mur.status == status
+    assert mur.failure_stage == failure_stage
+    assert mur.method_name == method_name
+    assert mur.message == message
+
+    assert str(mur) == expected_string_representation
+
+
+def test_stagename():
+    assert StageName.PLATFORM_SUPPORT == "PLATFORM_SUPPORT"
+    assert StageName.ACTIVATION == "ACTIVATION"
+    assert StageName.REQUIREMENTS == "REQUIREMENTS"
+
+
+def test_usagestatus():
+    assert UsageStatus.FAIL == "FAIL"
+    assert UsageStatus.SUCCESS == "SUCCESS"
+    assert UsageStatus.UNUSED == "UNUSED"
