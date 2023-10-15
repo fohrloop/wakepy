@@ -225,4 +225,4 @@ class ActivationResult:
         active_methods = self.active_methods
         if len(active_methods) == 1:
             return active_methods[0]
-        return ", ".join(active_methods[:-1]) + f"& {active_methods[-1]}"
+        return ", ".join(active_methods[:-1]) + f" & {active_methods[-1]}"
