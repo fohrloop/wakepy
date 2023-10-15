@@ -8,7 +8,9 @@ from wakepy.core.activationresult import (
 
 import pytest
 
+
 switcher = Mock(spec_set=ModeSwitcher)
+
 
 RESULTS_1 = [
     MethodUsageResult(
@@ -54,21 +56,42 @@ RESULTS_2 = [
     ),
 ]
 
+RESULTS_3_FAIL = [
+    MethodUsageResult(
+        status=UsageStatus.FAIL,
+        failure_stage=StageName.PLATFORM_SUPPORT,
+        method_name="fail-platform",
+        message="Platform XYZ not supported!",
+    ),
+    MethodUsageResult(
+        status=UsageStatus.FAIL,
+        failure_stage=StageName.REQUIREMENTS,
+        method_name="fail-requirements",
+        message="Missing requirement: Some SW v.1.2.3",
+    ),
+]
+
 
 @pytest.mark.parametrize(
-    "results, expected_success, expected_failure",
+    "results, success, real_success, failure, faking_success",
     [
-        (RESULTS_1, True, False),
-        (RESULTS_2, True, False),
+        (RESULTS_1, True, True, False, "0"),
+        (RESULTS_2, True, True, False, "0"),
+        (RESULTS_3_FAIL, False, False, True, "0"),
+        (RESULTS_3_FAIL, False, False, True, "1"),
     ],
 )
-def test_activation_result_success(results, expected_success, expected_failure):
+def test_activation_result_success(
+    results, success, real_success, failure, faking_success
+):
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setenv("WAKEPY_FAKE_SUCCESS", str(faking_success))
     ar = ActivationResult(switcher)
     ar._results = results
 
-    assert ar.success == expected_success
-    assert ar.real_success == expected_success
-    assert ar.failure == expected_failure
+    assert ar.success == success
+    assert ar.real_success == real_success
+    assert ar.failure == failure
 
 
 @pytest.mark.parametrize(
