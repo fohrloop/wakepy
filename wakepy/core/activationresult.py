@@ -54,10 +54,13 @@ class StageName(StringConstant):
 @dataclass(frozen=True)
 class MethodUsageResult:
     status: UsageStatus
+
+    method_name: str
+
     # None if the method did not fail. Otherwise, the name of the stage where
     # the method failed.
-    method_name: str
     failure_stage: Optional[StageName] = None
+
     message: str = ""
 
     def __repr__(self):
