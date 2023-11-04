@@ -5,8 +5,7 @@ from dataclasses import dataclass
 
 if typing.TYPE_CHECKING:
     from typing import Any, List, Tuple
-
-    from wakepy.core.dbus import DbusMethod
+    from .dbus import DbusAdapter, DbusMethod, DbusAdapterSeq
 
 
 class Call:
@@ -31,3 +30,32 @@ class DbusMethodCall(Call):
             raise ValueError(
                 f"{self.__class__.__name__} requires completely defined DBusMethod!"
             )
+
+
+# TODO: Define a Caller class
+
+
+def _to_tuple_of_dbus_adapter(
+    dbus_adapter: DbusAdapter | DbusAdapterSeq | None,
+) -> tuple[DbusAdapter, ...] | None:
+    """Makes sure that dbus_adapter is a tuple of DbusAdapter instances."""
+    if not dbus_adapter:
+        return None
+
+    elif isinstance(dbus_adapter, DbusAdapter):
+        return (dbus_adapter,)
+
+    if isinstance(dbus_adapter, (list, tuple)):
+        if not all(isinstance(a, DbusAdapter) for a in dbus_adapter):
+            raise ValueError("dbus_adapter can only consist of DbusAdapters!")
+        return tuple(dbus_adapter)
+
+    raise ValueError("dbus_adapter type not understood")
+
+
+def get_default_dbus_adapter() -> tuple[DbusAdapter, ...]:
+    try:
+        from wakepy.io.dbus.jeepney import JeepneyDbusAdapter
+    except ImportError:
+        return tuple()
+    return (JeepneyDbusAdapter(),)

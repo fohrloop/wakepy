@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import typing
 from enum import auto
-from typing import NamedTuple
+from typing import NamedTuple, List, Tuple, Type, Union
 
 from wakepy.core import StringConstant
 
 if typing.TYPE_CHECKING:
-    from typing import Optional, Union
-
+    from typing import Optional
     from .calls import DbusMethodCall
 
 
@@ -170,3 +169,9 @@ class DbusAdapter:
 
     def create_connection(self):
         ...
+
+
+DbusAdapterSeq = typing.Union[List[DbusAdapter], Tuple[DbusAdapter, ...]]
+DbusAdapterTypeSeq = typing.Union[
+    List[Type[DbusAdapter]], Tuple[Type[DbusAdapter], ...]
+]
