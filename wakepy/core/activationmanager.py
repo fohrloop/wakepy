@@ -40,6 +40,7 @@ class ModeActivationManager:
             use a custom DBus implementation. Wakepy is in no means tightly
             coupled to any specific python dbus package.
         """
+        self._dbus_adapter = dbus_adapter
         self._thread: ModeWorkerThread | None = None
         self._queue_in: Queue | None = None
         self._queue_out: Queue | None = None
