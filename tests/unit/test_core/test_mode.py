@@ -1,6 +1,8 @@
 from unittest.mock import Mock, call
 
-from wakepy.core.mode import Mode, ActivationResult
+import pytest
+
+from wakepy.core.mode import Mode, ActivationResult, ModeExit
 from wakepy.core.modemanager import ModeActivationManager
 from wakepy.core.method import Method
 
@@ -71,3 +73,97 @@ def test_mode_contextmanager_protocol():
     # manager.deactivate() is called during __exit__
     assert len(mocks.mock_calls) == 3
     assert mocks.mock_calls[2] == call.manager_cls().deactivate()
+
+
+def get_mocks_and_testmode():
+    # Setup mocks
+    mocks = mocks_for_test_mode()
+
+    class TestMode(Mode):
+        _manager_class = mocks.manager_cls
+
+    return mocks, TestMode
+
+    assert mocks.mock_calls == [
+        call.manager_cls(dbus_adapter=None),
+        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().deactivate(),
+    ]
+
+
+def test_mode_exits():
+    mocks, TestMode = get_mocks_and_testmode()
+
+    # Normal exit
+    with TestMode(mocks.methods):
+        testval = 1
+
+    assert testval == 1
+
+    # The deactivate is also called!
+    assert mocks.mock_calls == [
+        call.manager_cls(dbus_adapter=None),
+        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().deactivate(),
+    ]
+
+
+def test_mode_exits_with_modeexit():
+    mocks, TestMode = get_mocks_and_testmode()
+
+    # Exit with ModeExit
+    with TestMode(mocks.methods):
+        testval = 2
+        raise ModeExit
+        testval = 0  # never hit
+
+    assert testval == 2
+
+    # The deactivate is also called!
+    assert mocks.mock_calls == [
+        call.manager_cls(dbus_adapter=None),
+        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().deactivate(),
+    ]
+
+
+def test_mode_exits_with_modeexit_with_args():
+    mocks, TestMode = get_mocks_and_testmode()
+
+    # Exit with ModeExit with args
+    with TestMode(mocks.methods):
+        testval = 3
+        raise ModeExit("FOOO")
+        testval = 0  # never hit
+
+    assert testval == 3
+
+    # The deactivate is also called!
+    assert mocks.mock_calls == [
+        call.manager_cls(dbus_adapter=None),
+        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().deactivate(),
+    ]
+
+
+def test_mode_exits_with_other_exception():
+    mocks, TestMode = get_mocks_and_testmode()
+
+    # Other exceptions are passed through
+    class MyException(Exception):
+        ...
+
+    with pytest.raises(MyException):
+        with TestMode(mocks.methods):
+            testval = 4
+            raise MyException
+            testval = 0
+
+    assert testval == 4
+
+    # The deactivate is also called!
+    assert mocks.mock_calls == [
+        call.manager_cls(dbus_adapter=None),
+        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().deactivate(),
+    ]
