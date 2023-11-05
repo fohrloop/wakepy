@@ -16,7 +16,6 @@ if typing.TYPE_CHECKING:
 class ModeActivationManager:
     def __init__(
         self,
-        prioritize: Optional[List[Type[Method]]] = None,
         dbus_adapter: DbusAdapter | DbusAdapterSeq | None = None,
     ):
         """
@@ -28,17 +27,35 @@ class ModeActivationManager:
             use a custom DBus implementation. Wakepy is in no means tightly
             coupled to any specific python dbus package.
         """
-
-        self._prioritize = prioritize
         self._thread: ModeWorkerThread | None = None
         self._queue_in: Queue | None = None
         self._queue_out: Queue | None = None
         self.results: ActivationResult | None = None
 
-    def activate(self, methods: List[Type[Method]]) -> ActivationResult:
+    def activate(
+        self,
+        methods: List[Type[Method]],
+        prioritize: Optional[List[Type[Method]]] = None,
+    ) -> ActivationResult:
+        """Activate a mode defined by the methods.
+
+        Parameters
+        -----------
+        methods:
+            The list of Methods to be used for activating this Mode.
+        prioritize:
+            If given a list of Methods (classes), this list will be used to
+            order the returned Methods in the order given in `prioritize`. Any
+            Method in `prioritize` but not in the `methods` list will be
+            disregarded. Any method in `methods` but not in `prioritize`, will
+            be placed in the output list just after all prioritized methods, in
+            same order as in the original `methods`.
+        """
         # The actual mode activation happens in a separate thread
         self._queue_in = Queue()
         self._queue_out = Queue()
+
+        # TODO: Replace with ModeActivator
         self._thread = ModeWorkerThread(
             methods, queue_in=self._queue_out, queue_out=self._queue_in
         )
