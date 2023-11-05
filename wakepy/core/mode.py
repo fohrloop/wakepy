@@ -8,7 +8,7 @@ from .activationresult import ActivationResult
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Optional, Type, List
+    from typing import List, Optional, Type
 
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
     from .method import Method
