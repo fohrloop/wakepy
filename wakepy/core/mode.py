@@ -109,6 +109,12 @@ class Mode(ABC):
         Will swallow any ModeExit exception. Other exceptions will be
         re-raised.
         """
+
+        # These are not used but are part of context manager protocol.
+        #  make linters happy
+        _ = exc_type
+        _ = traceback
+
         self.manager.deactivate()
 
         if exception is None or isinstance(exception, ModeExit):
@@ -118,4 +124,5 @@ class Mode(ABC):
         # returning False will tell python to re-raise the exception. Can't
         # return None as type-checkers will mark code after with block
         # unreachable
+
         return False
