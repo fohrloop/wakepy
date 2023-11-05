@@ -14,10 +14,6 @@ if typing.TYPE_CHECKING:
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
 
 
-class ModeManagerNotSetError(RuntimeError):
-    ...
-
-
 class Mode(ABC):
     """A mode is something that is entered into, kept, and exited from. Modes
     are implemented as context managers, and user code (inside the with
