@@ -12,10 +12,10 @@ if typing.TYPE_CHECKING:
     from ..core.method import Method
 
 
-running_methods: List[Method] = [
+running_methods: List[Type[Method]] = [
     GnomeSessionManagerNoSuspend,
 ]
-presenting_methods: List[Method] = [
+presenting_methods: List[Type[Method]] = [
     GnomeSessionManagerNoIdle,
 ]
 
