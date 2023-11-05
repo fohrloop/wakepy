@@ -81,9 +81,6 @@ class Mode(ABC):
         )
 
     def __enter__(self) -> ActivationResult:
-        if self.manager is None:
-            self.__call__()
-
         return self.manager.activate(methods=self.methods)
 
     def __exit__(
