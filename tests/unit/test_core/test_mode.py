@@ -84,12 +84,6 @@ def get_mocks_and_testmode():
 
     return mocks, TestMode
 
-    assert mocks.mock_calls == [
-        call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
-        call.manager_cls().deactivate(),
-    ]
-
 
 def test_mode_exits():
     mocks, TestMode = get_mocks_and_testmode()
