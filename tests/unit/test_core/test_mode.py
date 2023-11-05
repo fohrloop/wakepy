@@ -13,6 +13,7 @@ def mocks_for_test_mode():
     manager = Mock(spec_set=ModeActivationManager)
     result = Mock(spec_set=ActivationResult)
     methods = [Mock(spec_set=type(Method)) for _ in range(3)]
+    dbus_adapter = Mock()
 
     manager_cls.return_value = manager
     manager.activate.return_value = result
@@ -22,6 +23,7 @@ def mocks_for_test_mode():
     mocks.manager = manager
     mocks.result = result
     mocks.methods = methods
+    mocks.dbus_adapter = dbus_adapter
     return mocks
 
 
@@ -46,14 +48,14 @@ def test_mode_contextmanager_protocol():
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
-    mode = TestMode(mocks.methods)
+    mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter)
 
     # Here we have one call. During init, the ModeActivationManager
     # instance is created
     assert len(mocks.mock_calls) == 1
 
     # We have now created a new manager instance
-    assert mocks.mock_calls[0] == call.manager_cls(dbus_adapter=None)
+    assert mocks.mock_calls[0] == call.manager_cls(dbus_adapter=mocks.dbus_adapter)
 
     # Test that the context manager protocol works
     with mode as m:
