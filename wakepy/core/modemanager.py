@@ -48,3 +48,6 @@ class ModeActivationManager:
             queue_thread=self._queue_in, candidate_methods=methods
         )
         return self.results
+
+    def deactivate(self):
+        """TODO: Implement this."""
