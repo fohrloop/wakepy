@@ -8,14 +8,30 @@ from .modemanager import ModeActivationManager
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Optional, Type
+    from typing import Optional, Type, Tuple
 
     from .method import Method
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
 
 
-class ModeManagerNotSetError(RuntimeError):
-    ...
+class ModeExit(Exception):
+    """This can be used to exit from any wakepy mode with block. Just raise it
+    within any with block which is a wakepy mode, and no code below it will
+    be executed.
+
+    Example
+    -------
+    ```
+    with keep.running() as k:
+        if not k.success:
+            print('failure')
+            raise ModeExit
+        print('success')
+    ```
+
+    This will print just "failure" in case entering a Mode did not succeed and
+    just "success" in case it did succeed (never both).
+    """
 
 
 class Mode(ABC):
@@ -72,11 +88,30 @@ class Mode(ABC):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> Optional[bool]:
+        *exc_info: Tuple[
+            Optional[Type[BaseException]],
+            Optional[BaseException],
+            Optional[TracebackType],
+        ],
+    ) -> bool:
+        """Called when exiting the with block.
+
+        If with block completed normally, called with (None, None, None)
+        If with block had an exception, called with (exc_type, exc_value,
+        traceback), which is the same as *sys.exc_info
+
+        Will swallow any ModeExit exception. Other exceptions will be
+        re-raised.
+        """
+
         self.manager.deactivate()
 
-        if not exc_value:
+        exception = exc_info[1]
+        if exception is None or isinstance(exception, ModeExit):
             return True
+
+        # Other types of exceptions are not handled; ignoring them here and
+        # returning False will tell python to re-raise the exception. Can't
+        # return None as type-checkers will mark code after with block
+        # unreachable
+        return False
