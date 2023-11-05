@@ -45,37 +45,24 @@ class Mode(ABC):
     def __init__(
         self,
         methods: list[Type[Method]],
+        dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
-        """
+        """Initialize a MOde using Methods.
+
+        This is also where the ModeActivationManager settings, such as the dbus
+        adapter to be used, are defined.
+
         Parameters
         ----------
         methods:
             The list of Methods to be used for activating this Mode.
+        dbus_adapter:
+            For using a custom dbus-adapter. Optional.
         """
         self.methods = methods
-        self.manager: ModeActivationManager | None = None
-
-    def __call__(
-        self,
-        dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
-    ):
-        """
-        Provides an easy way to define ModeActivationManager settings, such as
-        the dbus adapter to be used. The call is optional. In other words, if
-        the mode is called keep.running, one may either use
-
-        with keep.running() as k:
-            ...
-
-        or, identically
-
-        with keep.running as k:
-            ...
-
-        but with the first option it is possible to give additional arguments
-        to the ModeActivationManager, such as a custom dbus adapter.
-        """
-        self.manager = self._manager_class(dbus_adapter=dbus_adapter)
+        self.manager: ModeActivationManager = self._manager_class(
+            dbus_adapter=dbus_adapter
+        )
 
     def __enter__(self) -> ActivationResult:
         if self.manager is None:
