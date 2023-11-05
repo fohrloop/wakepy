@@ -13,6 +13,7 @@ if typing.TYPE_CHECKING:
     from typing import Any, List, Optional, Sequence, Tuple
 
     from .method import Method
+    from .activationmanager import ModeActivationManager
 
 
 def should_fake_success() -> bool:
@@ -69,6 +70,7 @@ class MethodUsageResult:
         return f"({self.status}{error_at}, {self.method_name}{message_part})"
 
 
+# TODO:_ Move functionality to ModeActivationManager?
 class ModeSwitcher:
     # The minimum and maximum waiting times for waiting data from Queue
     # (seconds). These are used to calculate the timeout, if timeout is not
@@ -194,14 +196,15 @@ class ActivationResult:
         If you want easier access, use .get_details().
     """
 
-    def __init__(self, switcher: ModeSwitcher):
+    def __init__(self, manager: ModeActivationManager):
         """
         Parameters
         ---------
-        switcher:
-            The mode switcher.
+        manager:
+            The mode activation manager, which has methods for controlling and
+            getting information about the mode activation process.
         """
-        self._switcher = switcher
+        self._manager = manager
         self._results: list[MethodUsageResult] = []
 
     @property
