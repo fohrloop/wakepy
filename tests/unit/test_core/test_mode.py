@@ -15,6 +15,8 @@ def mocks_for_test_mode():
     manager = Mock(spec_set=ModeActivationManager)
     result = Mock(spec_set=ActivationResult)
     methods = [Mock(spec_set=type(Method)) for _ in range(3)]
+    prioritize = methods[::-1]
+
     dbus_adapter = Mock()
 
     manager_cls.return_value = manager
@@ -26,6 +28,7 @@ def mocks_for_test_mode():
     mocks.result = result
     mocks.methods = methods
     mocks.dbus_adapter = dbus_adapter
+    mocks.prioritize = prioritize
     return mocks
 
 
@@ -50,7 +53,9 @@ def test_mode_contextmanager_protocol():
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
-    mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter)
+    mode = TestMode(
+        mocks.methods, prioritize=mocks.prioritize, dbus_adapter=mocks.dbus_adapter
+    )
 
     # Here we have one call. During init, the ModeActivationManager
     # instance is created
@@ -64,7 +69,9 @@ def test_mode_contextmanager_protocol():
         # The second call
         # We have also called activate
         assert len(mocks.mock_calls) == 2
-        assert mocks.mock_calls[1] == call.manager_cls().activate(methods=mocks.methods)
+        assert mocks.mock_calls[1] == call.manager_cls().activate(
+            methods=mocks.methods, prioritize=mocks.prioritize
+        )
         # The __enter__ returns the value from the manager.activate()
         # call
         assert m == mocks.result
@@ -97,7 +104,7 @@ def test_mode_exits():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
         call.manager_cls().deactivate(),
     ]
 
@@ -116,7 +123,7 @@ def test_mode_exits_with_modeexit():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
         call.manager_cls().deactivate(),
     ]
 
@@ -135,7 +142,7 @@ def test_mode_exits_with_modeexit_with_args():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
         call.manager_cls().deactivate(),
     ]
 
@@ -158,6 +165,6 @@ def test_mode_exits_with_other_exception():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
+        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
         call.manager_cls().deactivate(),
     ]
