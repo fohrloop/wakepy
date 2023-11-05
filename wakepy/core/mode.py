@@ -3,15 +3,15 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
+from .activationmanager import ModeActivationManager
 from .activationresult import ActivationResult
-from .modemanager import ModeActivationManager
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Optional, Type, Tuple
+    from typing import Optional, Type
 
-    from .method import Method
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
+    from .method import Method
 
 
 class ModeExit(Exception):
@@ -81,18 +81,13 @@ class Mode(ABC):
         )
 
     def __enter__(self) -> ActivationResult:
-        if self.manager is None:
-            self.__call__()
-
         return self.manager.activate(methods=self.methods)
 
     def __exit__(
         self,
-        *exc_info: Tuple[
-            Optional[Type[BaseException]],
-            Optional[BaseException],
-            Optional[TracebackType],
-        ],
+        exc_type: Optional[Type[BaseException]],
+        exception: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> bool:
         """Called when exiting the with block.
 
@@ -103,10 +98,8 @@ class Mode(ABC):
         Will swallow any ModeExit exception. Other exceptions will be
         re-raised.
         """
-
         self.manager.deactivate()
 
-        exception = exc_info[1]
         if exception is None or isinstance(exception, ModeExit):
             return True
 

@@ -7,7 +7,6 @@ from typing import Any
 
 from wakepy.core import DbusMethodCall
 
-from . import CURRENT_SYSTEM
 from . import SystemName as SystemName
 from .constant import StringConstant, auto
 
@@ -302,7 +301,8 @@ class Method(ABC, metaclass=MethodMeta):
         # A final check: At least one success
         if MethodOutcome.SUCCESS not in (enter_outcome, heartbeat_outcome):
             self.mode_switch_exception = MethodError(
-                f"There was no implementation for enter_mode() or heartbeat() in {self}."
+                "There was no implementation for enter_mode() or heartbeat() in"
+                f" {self}."
             )
             self.switch_success = False
             return self.switch_success
@@ -334,7 +334,8 @@ class Method(ABC, metaclass=MethodMeta):
             return Suitability(
                 SuitabilityCheckResult.UNSUITABLE,
                 UnsuitabilityTag.SYSTEM,
-                f"Supported systems are: {self.supported_systems}. (detected system: {system})",
+                f"Supported systems are: {self.supported_systems}. "
+                f"(detected system: {system})",
             )
 
         canuse = self.caniuse()

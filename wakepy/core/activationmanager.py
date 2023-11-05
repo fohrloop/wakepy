@@ -9,8 +9,8 @@ from .modeactivator import ModeWorkerThread
 if typing.TYPE_CHECKING:
     from typing import List, Optional, Type
 
-    from .method import Method
     from .dbus import DbusAdapter, DbusAdapterSeq
+    from .method import Method
 
 
 class ModeActivationManager:

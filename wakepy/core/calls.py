@@ -5,7 +5,8 @@ from dataclasses import dataclass
 
 if typing.TYPE_CHECKING:
     from typing import Any, List, Tuple
-    from .dbus import DbusAdapter, DbusMethod, DbusAdapterSeq
+
+    from .dbus import DbusAdapter, DbusAdapterSeq, DbusMethod
 
 
 class Call:
