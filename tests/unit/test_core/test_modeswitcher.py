@@ -1,7 +1,7 @@
 import queue
 import pytest
 
-from wakepy.core.modemanager import ModeManager, ModeWorkerThread
+from wakepy.core.activationmanager import ModeManager, ModeWorkerThread
 from wakepy.core.method import ExitModeError, EnterModeError
 
 from testmethods import get_method_class, MethodIs

@@ -4,7 +4,7 @@ import typing
 from abc import ABC
 
 from .activationresult import ActivationResult
-from .modemanager import ModeActivationManager
+from .activationmanager import ModeActivationManager
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
