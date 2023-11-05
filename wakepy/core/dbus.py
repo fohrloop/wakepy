@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import typing
 from enum import auto
-from typing import NamedTuple, List, Tuple, Type, Union
+from typing import List, NamedTuple, Tuple, Type, Union
 
 from wakepy.core import StringConstant
 
 if typing.TYPE_CHECKING:
     from typing import Optional
+
     from .calls import DbusMethodCall
 
 

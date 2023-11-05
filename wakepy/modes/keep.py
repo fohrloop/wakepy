@@ -6,10 +6,10 @@ from ..core.mode import Mode
 from ..methods.gnome import GnomeSessionManagerNoIdle, GnomeSessionManagerNoSuspend
 
 if typing.TYPE_CHECKING:
-    from typing import Type, List
+    from typing import List, Type
 
-    from ..core.method import Method
     from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
+    from ..core.method import Method
 
 
 running_methods: List[Method] = [

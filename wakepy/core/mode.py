@@ -3,15 +3,15 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activationresult import ActivationResult
 from .activationmanager import ModeActivationManager
+from .activationresult import ActivationResult
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Optional, Type, Tuple
+    from typing import Optional, Tuple, Type
 
-    from .method import Method
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
+    from .method import Method
 
 
 class ModeExit(Exception):

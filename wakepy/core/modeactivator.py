@@ -64,7 +64,7 @@ class ModeWorkerThread(Thread):
     def run(self):
         try:
             candidate_methods = self.check_suitability(self.methods)
-            succesful_methods = self.try_activate_mode(candidate_methods)
+            self.try_activate_mode(candidate_methods)
 
             self.queue_out.put((WorkerThreadMsgType.OK, None))
         except Exception as exc:

@@ -9,10 +9,10 @@ from .constant import StringConstant, auto
 from .definitions import WorkerThreadMsgType
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Optional, Tuple, Sequence
+    from queue import Queue
+    from typing import Any, List, Optional, Sequence, Tuple
 
     from .method import Method
-    from queue import Queue
 
 
 def should_fake_success() -> bool:

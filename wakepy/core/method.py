@@ -7,7 +7,6 @@ from typing import Any
 
 from wakepy.core import DbusMethodCall
 
-from . import CURRENT_SYSTEM
 from . import SystemName as SystemName
 from .constant import StringConstant, auto
 
