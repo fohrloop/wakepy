@@ -14,6 +14,19 @@ if typing.TYPE_CHECKING:
 
 
 class ModeActivationManager:
+    """Mode Activation Manager
+
+    Purpose:
+    (1) Manage activation of a mode using a collection of methods. Do this by
+      creating a separate thread for the mode activation, and communicate with
+      that thread using Queues.
+    (2) Form an ActivationResult from the result of the activation process and
+      provide it to the user.
+
+    The manager itself is always running in the "main" thread; The thread where
+    a wakepy mode is entered in.
+    """
+
     def __init__(
         self,
         dbus_adapter: DbusAdapter | DbusAdapterSeq | None = None,
