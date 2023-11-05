@@ -20,7 +20,7 @@ presenting_methods: List[Method] = [
 ]
 
 
-def running(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None):
+def running(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None) -> Mode:
     """The keep.running mode context manager.
 
     Usage:
@@ -37,11 +37,19 @@ def running(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None):
     ----------
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
+
+    Returns
+    -------
+    keep_running_mode: Mode
+        The context manager for keeping a system running.
+
     """
     return Mode(methods=running_methods, dbus_adapter=dbus_adapter)
 
 
-def presenting(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None):
+def presenting(
+    dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+) -> Mode:
     """The keep.presenting mode context manager.
 
     Usage:
@@ -58,5 +66,10 @@ def presenting(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = Non
     ----------
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
+
+    Returns
+    -------
+    keep_presenting_mode: Mode
+        The context manager for keeping a system presenting content.
     """
     return Mode(methods=presenting_methods, dbus_adapter=dbus_adapter)
