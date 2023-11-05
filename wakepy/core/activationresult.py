@@ -151,7 +151,8 @@ class ModeSwitcher:
 
         if not len(self.failure_reasons) == len(self.failed_methods):
             raise ValueError(
-                "The length of `failure_reasons` must equal to the length of `failed_methods`."
+                "The length of `failure_reasons` must equal to the length of"
+                " `failed_methods`."
             )
 
 
