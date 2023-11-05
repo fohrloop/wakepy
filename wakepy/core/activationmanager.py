@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import typing
 from queue import Queue
+from threading import Thread
 
 from .activationresult import ActivationResult
-from .modeactivator import ModeWorkerThread
+from .modeactivator import activate
 
 if typing.TYPE_CHECKING:
     from typing import List, Optional, Type
 
-    from .dbus import DbusAdapter, DbusAdapterSeq
+    from .dbus import DbusAdapter, DbusAdapterTypeSeq
     from .method import Method
 
 
@@ -29,19 +30,19 @@ class ModeActivationManager:
 
     def __init__(
         self,
-        dbus_adapter: DbusAdapter | DbusAdapterSeq | None = None,
+        dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
         """
         Parameters
         ---------
-        dbus_adapter
+        dbus_adapter:
             Determines, which Dbus library / implementation is to be used, if
             Dbus-based methods are to be used with a mode. You may use this to
             use a custom DBus implementation. Wakepy is in no means tightly
             coupled to any specific python dbus package.
         """
         self._dbus_adapter = dbus_adapter
-        self._thread: ModeWorkerThread | None = None
+        self._activation_thread: Thread | None = None
         self._queue_in: Queue | None = None
         self._queue_out: Queue | None = None
         self.results: ActivationResult | None = None
@@ -65,20 +66,31 @@ class ModeActivationManager:
             be placed in the output list just after all prioritized methods, in
             same order as in the original `methods`.
         """
-        # The actual mode activation happens in a separate thread
+
+        # Used for communicating to the mode activation thread
         self._queue_in = Queue()
         self._queue_out = Queue()
 
-        # TODO: Replace with ModeActivator
-        self._thread = ModeWorkerThread(
-            methods, queue_in=self._queue_out, queue_out=self._queue_in
+        self._activation_thread = Thread(
+            target=activate,
+            kwargs=dict(
+                methods=methods,
+                prioritize=prioritize,
+                queue_in=self._queue_out,
+                queue_out=self._queue_in,
+                dbus_adapter=self._dbus_adapter,
+            ),
         )
-        self._thread.start()
+        self._activation_thread.start()
 
-        self.results = ActivationResult(
-            queue_thread=self._queue_in, candidate_methods=methods
-        )
+        # The results. These need a reference to the manager, as all results
+        # are lazy-loaded, and the ActivationResult should not need to know
+        # anything about threads or queues. If it has a question, it will ask
+        # it from the manager.
+        self.results = ActivationResult(manager=self)
         return self.results
 
     def deactivate(self):
         """TODO: Implement this."""
+        self._queue_out.put("EXIT")
+        self._activation_thread.join()
