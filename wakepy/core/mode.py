@@ -64,7 +64,7 @@ class Mode(ABC):
         prioritize: Optional[List[Type[Method]]] = None,
         dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
-        """Initialize a MOde using Methods.
+        """Initialize a Mode using Methods.
 
         This is also where the ModeActivationManager settings, such as the dbus
         adapter to be used, are defined.
