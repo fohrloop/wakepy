@@ -39,25 +39,33 @@ def test_mode_contextmanager_protocol():
 
     # Setup mocks
     mocks = mocks_for_test_mode()
-    mode = Mode(mocks.methods)
-    mode._manager_class = mocks.manager_cls
 
-    # Test that the context manager protocol works
+    class TestMode(Mode):
+        _manager_class = mocks.manager_cls
 
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
+    mode = TestMode(mocks.methods)
+
+    # Here we have one call. During init, the ModeActivationManager
+    # instance is created
+    assert len(mocks.mock_calls) == 1
+
+    # We have now created a new manager instance
+    assert mocks.mock_calls[0] == call.manager_cls(dbus_adapter=None)
+
+    # Test that the context manager protocol works
     with mode as m:
-        assert mocks.mock_calls == [
-            # We have now created a new manager instance
-            call.manager_cls(dbus_adapter=None),
-            # We have also called activate
-            call.manager_cls().activate(methods=mocks.methods),
-        ]
+        # The second call
+        # We have also called activate
+        assert len(mocks.mock_calls) == 2
+        assert mocks.mock_calls[1] == call.manager_cls().activate(methods=mocks.methods)
         # The __enter__ returns the value from the manager.activate()
         # call
         assert m == mocks.result
 
     # If we get here, the __exit__ works without errors
-    assert mocks.mock_calls[2] == call.manager_cls().deactivate()
+    # manager.deactivate() is called during __exit__
     assert len(mocks.mock_calls) == 3
+    assert mocks.mock_calls[2] == call.manager_cls().deactivate()
