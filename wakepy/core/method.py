@@ -243,7 +243,7 @@ class Method(ABC, metaclass=MethodMeta):
             raise ExitModeError from exc
         return MethodOutcome.SUCCESS
 
-    def switch_to_the_mode(self) -> bool:
+    def activate_the_mode(self) -> bool:
         """Try to use the Method to switch to a mode. Calls `enter_mode()` and
         `heartbeat()` and at least one of them must be implemented in the used
         Method subclass.

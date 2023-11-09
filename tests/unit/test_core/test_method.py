@@ -1,3 +1,5 @@
+import itertools
+
 import pytest
 
 from wakepy.core.method import (
@@ -8,7 +10,7 @@ from wakepy.core.method import (
     MethodError,
 )
 
-pytest.skip("These need to be fixed", allow_module_level=True)
+from testmethods import MethodIs, get_method_class
 
 
 def test_overridden_methods_autodiscovery():
@@ -96,11 +98,10 @@ def test_method_has_x_is_not_writeable():
         MethodWithEnter.has_enter = False
 
 
-def test_all_combinations_with_switch_to_the_mode(test_method_classes):
-    """This test uses a pytest fixture with automatically generated different
-    Method subclasses to test that each of following combinations:
+def test_all_combinations_with_switch_to_the_mode():
+    """Test that each of following combinations:
 
-        M{enter_mode}{heartbeat}{exit_mode}
+        {enter_mode} {heartbeat} {exit_mode}
 
     where each of {enter_mode}, {heartbeat} and {exit_mode} is either
     0: not implemented (missing method)
@@ -109,36 +110,45 @@ def test_all_combinations_with_switch_to_the_mode(test_method_classes):
 
     works as expected.
     """
-    exception = 2
 
-    for cls_name, method_cls in test_method_classes.items():
-        enter_mode, heartbeat, exit_mode = (int(x) for x in cls_name[1:4])
-        method = method_cls()
+    for enter_mode, heartbeat, exit_mode in itertools.product(
+        (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
+        (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
+        (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
+    ):
+        method = get_method_class(
+            enter_mode=enter_mode, heartbeat=heartbeat, exit_mode=exit_mode
+        )()
 
-        if cls_name.startswith("M00"):
+        if enter_mode == heartbeat == MethodIs.MISSING:
             # enter_mode and heartbeat both missing -> not possible to switch
             assert not method.activate_the_mode()
             assert isinstance(method.mode_switch_exception, MethodError)
-        elif exception not in (enter_mode, heartbeat):
-            # When neither enter_mode or heartbeat will cause exception, the
-            # switch should be successful
+            continue
+        elif MethodIs.RAISING_EXCEPTION not in (enter_mode, heartbeat):
+            # When neither enter_mode or heartbeat will cause exception,
+            # the switch should be successful
             assert method.activate_the_mode()
             assert method.mode_switch_exception is None
-        elif enter_mode == exception:
+        elif enter_mode == MethodIs.RAISING_EXCEPTION:
             # If enter_mode has exception, switch is not successful
             # .. and the exception type is EnterModeError
             assert not method.activate_the_mode()
             assert isinstance(method.mode_switch_exception, EnterModeError)
-        elif (heartbeat == exception) and (exit_mode != exception):
+        elif (heartbeat == MethodIs.RAISING_EXCEPTION) and (
+            exit_mode != MethodIs.RAISING_EXCEPTION
+        ):
             # If heartbeat has exception, switch is not successful
             # .. and the exception type is HeartbeatCallError
             assert not method.activate_the_mode()
             assert isinstance(method.mode_switch_exception, HeartbeatCallError)
-        elif (heartbeat == exception) and (exit_mode == exception):
+        elif (heartbeat == MethodIs.RAISING_EXCEPTION) and (
+            exit_mode == MethodIs.RAISING_EXCEPTION
+        ):
             # If heartbeat has exception, we try to back off by calling
             # exit_mode. If that fails, there should be exception raised.
             with pytest.raises(ExitModeError):
                 method.activate_the_mode()
         else:
             # Test case missing? Should not happen ever.
-            raise Exception(cls_name)
+            raise Exception(method.__class__.__name__)
