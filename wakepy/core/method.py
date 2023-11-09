@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 import warnings
 from abc import ABC, ABCMeta
-from typing import Any
+from typing import Any, Type
 
 from wakepy.core import DbusMethodCall
 
@@ -367,3 +367,7 @@ class Method(ABC, metaclass=MethodMeta):
             )
         )
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
+
+
+# type annotation shorthand
+MethodCls = Type[Method]
