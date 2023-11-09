@@ -3,7 +3,7 @@
 import pytest
 
 from wakepy.core import CURRENT_SYSTEM
-from wakepy.core.method import Method, SystemName
+from wakepy.core.method import Method
 from wakepy.core.mode import Mode
 
 pytest.skip("These need to be fixed", allow_module_level=True)

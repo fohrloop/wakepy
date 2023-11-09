@@ -1,11 +1,9 @@
 import queue
+
 import pytest
+from testmethods import MethodIs, get_method_class
 
-from wakepy.core.activationmanager import ModeActivationManager
-from wakepy.core.method import ExitModeError, EnterModeError
-
-from testmethods import get_method_class, MethodIs
-
+from wakepy.core.method import EnterModeError, ExitModeError
 
 pytest.skip("These need to be fixed", allow_module_level=True)
 

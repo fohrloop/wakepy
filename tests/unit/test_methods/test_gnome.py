@@ -1,12 +1,12 @@
-from wakepy.core import BusType, DbusAddress, DbusMethod, DbusMethodCall
+import pytest
+
+from wakepy.core import BusType, DbusAddress, DbusMethod
 from wakepy.core.dbus import DbusAdapter
 from wakepy.methods.gnome import (
-    GnomeSessionManagerNoSuspend,
-    GnomeSessionManagerNoIdle,
     GnomeFlag,
+    GnomeSessionManagerNoIdle,
+    GnomeSessionManagerNoSuspend,
 )
-
-import pytest
 
 session_manager = DbusAddress(
     bus=BusType.SESSION,

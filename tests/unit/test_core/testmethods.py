@@ -1,7 +1,8 @@
-import itertools
-from wakepy.core.method import Method
-from wakepy.core.configuration import CURRENT_SYSTEM
 import enum
+import itertools
+
+from wakepy.core.configuration import CURRENT_SYSTEM
+from wakepy.core.method import Method
 
 
 class MethodIs(enum.IntEnum):
