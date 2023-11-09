@@ -1,5 +1,5 @@
-from wakepy.core.modeactivator import sort_methods_by_priority
 from wakepy.core.method import Method
+from wakepy.core.modeactivator import sort_methods_by_priority
 
 
 def test_sort_methods_by_priority():

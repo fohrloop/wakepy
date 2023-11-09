@@ -1,11 +1,12 @@
+import pytest
+
 from wakepy.core.method import (
+    EnterModeError,
+    ExitModeError,
+    HeartbeatCallError,
     Method,
     MethodError,
-    EnterModeError,
-    HeartbeatCallError,
-    ExitModeError,
 )
-import pytest
 
 pytest.skip("These need to be fixed", allow_module_level=True)
 

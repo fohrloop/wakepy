@@ -1,6 +1,6 @@
-from wakepy.modes import keep
-
 import pytest
+
+from wakepy.modes import keep
 
 pytest.skip("These need to be fixed", allow_module_level=True)
 

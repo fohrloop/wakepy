@@ -3,8 +3,6 @@
 Deprecated in 0.7.0"""
 
 
-import platform
-
 from wakepy import keepawake, set_keepawake, unset_keepawake
 
 

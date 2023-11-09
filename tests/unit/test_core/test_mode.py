@@ -2,9 +2,9 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from wakepy.core.mode import Mode, ActivationResult, ModeExit
 from wakepy.core.activationmanager import ModeActivationManager
 from wakepy.core.method import Method
+from wakepy.core.mode import ActivationResult, Mode, ModeExit
 
 
 def mocks_for_test_mode():
