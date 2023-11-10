@@ -1,9 +1,15 @@
+import os
 from unittest.mock import Mock
 
 import pytest
 
 from wakepy.core import ActivationResult, StageName
-from wakepy.core.activationresult import MethodUsageResult, ModeSwitcher, UsageStatus
+from wakepy.core.activationresult import (
+    MethodUsageResult,
+    ModeSwitcher,
+    UsageStatus,
+    should_fake_success,
+)
 
 switcher = Mock(spec_set=ModeSwitcher)
 
@@ -67,25 +73,25 @@ RESULTS_3_FAIL = [
 
 
 @pytest.mark.parametrize(
-    "results, success, real_success, failure, faking_success",
+    "results, success_expected, real_success_expected, faking_success",
     [
-        (RESULTS_1, True, True, False, "0"),
-        (RESULTS_2, True, True, False, "0"),
-        (RESULTS_3_FAIL, False, False, True, "0"),
-        (RESULTS_3_FAIL, False, False, True, "1"),
+        (RESULTS_1, True, True, "0"),
+        (RESULTS_2, True, True, "0"),
+        (RESULTS_3_FAIL, False, False, "0"),
+        (RESULTS_3_FAIL, True, False, "1"),
     ],
 )
 def test_activation_result_success(
-    results, success, real_success, failure, faking_success
+    results, success_expected, real_success_expected, faking_success
 ):
     with pytest.MonkeyPatch.context() as mp:
         mp.setenv("WAKEPY_FAKE_SUCCESS", str(faking_success))
-    ar = ActivationResult(switcher)
-    ar._results = results
+        ar = ActivationResult(switcher)
+        ar._results = results
 
-    assert ar.success == success
-    assert ar.real_success == real_success
-    assert ar.failure == failure
+        assert ar.success == success_expected
+        assert ar.real_success == real_success_expected
+        assert ar.failure == (not success_expected)
 
 
 @pytest.mark.parametrize(
@@ -258,3 +264,18 @@ def test_activation_result_get_detailed_results():
     ) == [
         REQUIREMENTS_FAIL,
     ]
+
+
+def test_should_fake_success(monkeypatch):
+    for val in ("1", "yes", "True", "anystring"):
+        with monkeypatch.context() as mp:
+            mp.setenv("WAKEPY_FAKE_SUCCESS", val)
+            val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
+            assert val_from_env == str(val)
+            assert should_fake_success() is True
+    for val in ("0", "no", "NO", "False", "false", "FALSE"):
+        with monkeypatch.context() as mp:
+            mp.setenv("WAKEPY_FAKE_SUCCESS", val)
+            val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
+            assert val_from_env == str(val)
+            assert should_fake_success() is False
