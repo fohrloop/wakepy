@@ -235,7 +235,7 @@ class Method(ABC, metaclass=MethodMeta):
         if call is None:
             return
 
-        if isinstance(call, DbusMethodCall):
+        if isinstance(call, DbusMethodCall) and self._dbus_adapters:
             for dbus_adapter in self._dbus_adapters:
                 try:
                     return dbus_adapter.process(call)
