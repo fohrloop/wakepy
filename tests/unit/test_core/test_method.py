@@ -1,4 +1,5 @@
 import itertools
+import re
 
 import pytest
 
@@ -8,9 +9,11 @@ from wakepy.core.method import (
     HeartbeatCallError,
     Method,
     MethodError,
+    MethodDefinitionError,
+    get_method_class,
 )
 
-from testmethods import MethodIs, get_method_class
+from testmethods import MethodIs, get_test_method_class
 
 
 def test_overridden_methods_autodiscovery():
@@ -98,6 +101,47 @@ def test_method_has_x_is_not_writeable():
         MethodWithEnter.has_enter = False
 
 
+def test_get_method_class_which_is_not_yet_defined(monkeypatch):
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # The method registry is empty so there is no Methods with the name
+    with pytest.raises(
+        KeyError, match=re.escape('No Method with name "Some name" found!')
+    ):
+        get_method_class("Some name")
+
+
+def test_get_method_class_working_example(monkeypatch):
+    somename = "Some name"
+    # Make the registry empty
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # Create a method
+    class SomeMethod(Method):
+        name = somename
+
+    # Check that we can retrieve the method
+    method_class = get_method_class(somename)
+    assert method_class is SomeMethod
+
+
+def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
+    somename = "Some name"
+    # Make the registry empty
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class SomeMethod(Method):
+        name = somename
+
+    # It is not possible to define two methods if same name
+    with pytest.raises(
+        MethodDefinitionError, match=re.escape('Duplicate Method name "Some name"')
+    ):
+
+        class SomeMethod(Method):
+            name = somename
+
+
 def test_all_combinations_with_switch_to_the_mode():
     """Test that each of following combinations:
 
@@ -116,7 +160,7 @@ def test_all_combinations_with_switch_to_the_mode():
         (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
         (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
     ):
-        method = get_method_class(
+        method = get_test_method_class(
             enter_mode=enter_mode, heartbeat=heartbeat, exit_mode=exit_mode
         )()
 

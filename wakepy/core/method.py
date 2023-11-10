@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 import warnings
 from abc import ABC, ABCMeta
-from typing import Any
+from typing import Any, Type
 
 from wakepy.core import DbusMethodCall
 
@@ -16,8 +16,40 @@ if typing.TYPE_CHECKING:
     from wakepy.core import Call
     from wakepy.io.dbus import DbusAdapter
 
+METHOD_REGISTRY: dict[str, Type[Method]] = dict()
+"""A name -> Method class mapping. Updated automatically; when python loads
+a module with a subclass of Method, the Method class is added to this registry.
+"""
 
-class MethodError(Exception):
+
+def get_method_class(method_name: str) -> Type[Method]:
+    """Get a Method class based on its name."""
+    if method_name not in METHOD_REGISTRY:
+        raise KeyError(
+            f'No Method with name "{method_name}" found!'
+            " Check that the name is correctly spelled and that the module containing"
+            " the class is being imported."
+        )
+    return METHOD_REGISTRY[method_name]
+
+
+def _register_method(cls: Type[Method]):
+    """Registers a subclass of Method to the method registry"""
+
+    if cls.name is None:
+        # Methods without a name will not be registered
+        return
+
+    if cls.name in METHOD_REGISTRY:
+        raise MethodDefinitionError(
+            f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
+            f"(already registered to {METHOD_REGISTRY[cls.name].__qualname__})"
+        )
+
+    METHOD_REGISTRY[cls.name] = cls
+
+
+class MethodError(RuntimeError):
     """Occurred inside wakepy.core.method.Method"""
 
 
@@ -31,6 +63,10 @@ class ExitModeError(MethodError):
 
 class HeartbeatCallError(MethodError):
     """Occurred during method.heartbeat()"""
+
+
+class MethodDefinitionError(RuntimeError):
+    """Any error which is part of the Method (subclass) definition."""
 
 
 class MethodMeta(ABCMeta):
@@ -102,6 +138,13 @@ class Method(ABC, metaclass=MethodMeta):
     create documentation.
     """
 
+    name: str | None = None
+    """Human-readable name for the method. Used by end-users to define
+    the Methods used for entering a Mode, for example. If not None, must be
+    unique across all Methods available in the python process. Set to None if
+    the Method should not be listed anywhere (e.g. when Method is meant to be
+    subclassed)."""
+
     def __init__(self, dbus_adapters: Optional[Tuple[DbusAdapter, ...]] = None):
         self._dbus_adapters = dbus_adapters
         self.mode_switch_exception: Exception | None = None
@@ -121,16 +164,14 @@ class Method(ABC, metaclass=MethodMeta):
         cls._has_enter = cls.enter_mode is not Method.enter_mode
         cls._has_exit = cls.exit_mode is not Method.exit_mode
         cls._has_heartbeat = cls.heartbeat is not Method.heartbeat
+        _register_method(cls)
+
         return super().__init_subclass__(**kwargs)
 
     heartbeat_period: int | float = 55
     """This is the amount of time (in seconds) between two consecutive calls of
     `heartbeat()`.
     """
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__qualname__
 
     def caniuse(
         self,
@@ -367,3 +408,7 @@ class Method(ABC, metaclass=MethodMeta):
             )
         )
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
+
+
+# type annotation shorthand
+MethodCls = Type[Method]
