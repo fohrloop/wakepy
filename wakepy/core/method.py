@@ -127,7 +127,7 @@ class Method(ABC, metaclass=MethodMeta):
     but also the hybrid option is possible.
     """
 
-    supported_systems: Tuple[SystemName] = tuple()
+    supported_systems: Tuple[SystemName, ...] = tuple()
     """All the supported systems. If a system is not listed here, this method
     if not going to be used on the system (when used as part of a Mode)
     
@@ -144,6 +144,12 @@ class Method(ABC, metaclass=MethodMeta):
     unique across all Methods available in the python process. Set to None if
     the Method should not be listed anywhere (e.g. when Method is meant to be
     subclassed)."""
+
+    # Set automatically. See __init_subclass__ and the properties named
+    # similarly but without underscores.
+    _has_enter: bool
+    _has_exit: bool
+    _has_heartbeat: bool
 
     def __init__(self, dbus_adapters: Optional[Tuple[DbusAdapter, ...]] = None):
         self._dbus_adapters = dbus_adapters
