@@ -73,25 +73,25 @@ RESULTS_3_FAIL = [
 
 
 @pytest.mark.parametrize(
-    "results, success, real_success, failure, faking_success",
+    "results, success_expected, real_success_expected, faking_success",
     [
-        (RESULTS_1, True, True, False, "0"),
-        (RESULTS_2, True, True, False, "0"),
-        (RESULTS_3_FAIL, False, False, True, "0"),
-        (RESULTS_3_FAIL, False, False, True, "1"),
+        (RESULTS_1, True, True, "0"),
+        (RESULTS_2, True, True, "0"),
+        (RESULTS_3_FAIL, False, False, "0"),
+        (RESULTS_3_FAIL, True, False, "1"),
     ],
 )
 def test_activation_result_success(
-    results, success, real_success, failure, faking_success
+    results, success_expected, real_success_expected, faking_success
 ):
     with pytest.MonkeyPatch.context() as mp:
         mp.setenv("WAKEPY_FAKE_SUCCESS", str(faking_success))
-    ar = ActivationResult(switcher)
-    ar._results = results
+        ar = ActivationResult(switcher)
+        ar._results = results
 
-    assert ar.success == success
-    assert ar.real_success == real_success
-    assert ar.failure == failure
+        assert ar.success == success_expected
+        assert ar.real_success == real_success_expected
+        assert ar.failure == (not success_expected)
 
 
 @pytest.mark.parametrize(
