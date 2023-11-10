@@ -43,11 +43,34 @@ sphinx-build -b html docs/source/ docs/build
 
 # Testing 
 
-- wakepy uses pytest
+- wakepy uses pytest for tests and tox for testing the library with multiple python versions.
+
+## Running tests with single environment
+
+- Use pytest to run tests within a single environment:
+
+```
+python -m pytest
+```
+
 - To run tests with coverage, use
 
 ```
 coverage run -m pytest <test-target> && coverage html && python -m webbrowser -t htmlcov/index.html 
+```
+
+## Running tests with multiple environments
+
+- To run the tests with multiple python versions, use tox:
+
+```
+python -m tox 
+```
+
+- To start a debugger on error with a specific python version, select the tox environment with "-e <envname>" and add "-- --pdb" to start the python debugger on error. For example:
+
+```
+python -m tox -e py310 -- --pdb
 ```
 
 
