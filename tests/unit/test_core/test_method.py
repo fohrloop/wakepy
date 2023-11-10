@@ -119,7 +119,7 @@ def test_get_method_class():
 
     # Now the class can be queried with get_method_class:
     method_cls = get_method_class("foo")
-    assert isinstance(method_cls, Method)
+    assert issubclass(method_cls, Method)
     assert method_cls.name == "foo"
 
 
