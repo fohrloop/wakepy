@@ -231,7 +231,7 @@ class Method(ABC, metaclass=MethodMeta):
          until you reboot").
         """
 
-    def process_call(self, call: Call):
+    def process_call(self, call: Optional[Call]):
         if call is None:
             return
 
