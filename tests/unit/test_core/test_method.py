@@ -10,7 +10,7 @@ from wakepy.core.method import (
     MethodError,
 )
 
-from testmethods import MethodIs, get_method_class
+from testmethods import MethodIs, get_test_method_class
 
 
 def test_overridden_methods_autodiscovery():
@@ -116,7 +116,7 @@ def test_all_combinations_with_switch_to_the_mode():
         (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
         (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
     ):
-        method = get_method_class(
+        method = get_test_method_class(
             enter_mode=enter_mode, heartbeat=heartbeat, exit_mode=exit_mode
         )()
 

@@ -1,7 +1,7 @@
 import queue
 
 import pytest
-from testmethods import MethodIs, get_method_class
+from testmethods import MethodIs, get_test_method_class
 
 from wakepy.core.method import EnterModeError, ExitModeError
 
@@ -11,7 +11,7 @@ ModeManager._timeout_maximum = 0.1  # make tests fail faster
 
 
 def test_mode_switch_thread():
-    method_ok = get_method_class(
+    method_ok = get_test_method_class(
         enter_mode=MethodIs.SUCCESSFUL,
         exit_mode=MethodIs.SUCCESSFUL,
     )()
@@ -28,8 +28,8 @@ def test_mode_switch_thread():
 
 def test_mode_switcher_two_methods():
     """Test normal (OK case) mode switching with two methods"""
-    method_ok = get_method_class(heartbeat=MethodIs.SUCCESSFUL)()
-    method_ok2 = get_method_class(
+    method_ok = get_test_method_class(heartbeat=MethodIs.SUCCESSFUL)()
+    method_ok2 = get_test_method_class(
         enter_mode=MethodIs.SUCCESSFUL,
         heartbeat=MethodIs.SUCCESSFUL,
         exit_mode=MethodIs.SUCCESSFUL,
@@ -80,7 +80,7 @@ def test_mode_switcher_with_exception(monkeypatch):
     Make sure that this situation is handled correctly.
     """
 
-    method_ok = get_method_class(
+    method_ok = get_test_method_class(
         enter_mode=MethodIs.SUCCESSFUL,
         exit_mode=MethodIs.SUCCESSFUL,
     )()

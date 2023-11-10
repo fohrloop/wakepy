@@ -12,7 +12,7 @@ class MethodIs(enum.IntEnum):
 
 
 def create_test_method_classes():
-    """Helper function for get_method_class. (See docs there)"""
+    """Helper function for get_test_method_class. (See docs there)"""
     test_method_classes = dict()
 
     class TestException(Exception):
@@ -45,7 +45,7 @@ def create_test_method_classes():
 _test_method_classes = create_test_method_classes()
 
 
-def get_method_class(
+def get_test_method_class(
     enter_mode: MethodIs = MethodIs.MISSING,
     heartbeat: MethodIs = MethodIs.MISSING,
     exit_mode: MethodIs = MethodIs.MISSING,
