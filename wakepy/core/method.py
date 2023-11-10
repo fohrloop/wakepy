@@ -393,7 +393,7 @@ class Method(ABC, metaclass=MethodMeta):
         elif canuse is False:
             return Suitability(
                 SuitabilityCheckResult.UNSUITABLE,
-                UnsuitabilityTag.UNSPECIFIED,
+                UnsuitabilityTag.OTHER,
                 None,
             )
         elif isinstance(canuse, UnsuitabilityTag):
