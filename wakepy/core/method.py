@@ -16,6 +16,22 @@ if typing.TYPE_CHECKING:
     from wakepy.core import Call
     from wakepy.io.dbus import DbusAdapter
 
+METHOD_REGISTRY: dict[str, Type[Method]] = dict()
+"""A name -> Method class mapping. Updated automatically; when python loads
+a module with a subclass of Method, the Method class is added to this registry.
+"""
+
+
+def get_method_class(method_name: str):
+    """Get a Method class based on its name."""
+    if method_name not in METHOD_REGISTRY:
+        raise KeyError(
+            f'No Method with name "{method_name}" found!'
+            " Check that the name is correctly spelled and that the module containing"
+            " the class is being imported."
+        )
+    return METHOD_REGISTRY[method_name]
+
 
 class MethodError(Exception):
     """Occurred inside wakepy.core.method.Method"""

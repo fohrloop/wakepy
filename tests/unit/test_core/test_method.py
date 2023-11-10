@@ -1,4 +1,5 @@
 import itertools
+import re
 
 import pytest
 
@@ -8,6 +9,7 @@ from wakepy.core.method import (
     HeartbeatCallError,
     Method,
     MethodError,
+    get_method_class,
 )
 
 from testmethods import MethodIs, get_test_method_class
@@ -96,6 +98,29 @@ def test_method_has_x_is_not_writeable():
     # Same holds for classes
     with pytest.raises(AttributeError):
         MethodWithEnter.has_enter = False
+
+
+@pytest.mark.skip("WIP")
+def test_get_method_class():
+    """Test the function get_method_class"""
+
+    # Before defining the class, there is no such class with name 'foo'.
+    with pytest.raises(
+        KeyError,
+        match=re.escape(
+            'No Method with name "foo" found! Check that the name is correctly spelled and that the module containing the class is being imported'
+        ),
+    ):
+        get_method_class("foo")
+
+    # Define a class with name = 'foo'
+    class MyFooMethod(Method):
+        name = "foo"
+
+    # Now the class can be queried with get_method_class:
+    method_cls = get_method_class("foo")
+    assert isinstance(method_cls, Method)
+    assert method_cls.name == "foo"
 
 
 def test_all_combinations_with_switch_to_the_mode():
