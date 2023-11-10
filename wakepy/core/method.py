@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
     from typing import Optional, Tuple
 
     from wakepy.core import Call
-    from wakepy.io.dbus import DbusAdapter
+    from wakepy.core.dbus import DbusAdapter
 
 METHOD_REGISTRY: dict[str, Type[Method]] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
