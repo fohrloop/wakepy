@@ -9,6 +9,7 @@ from wakepy.core.method import (
     HeartbeatCallError,
     Method,
     MethodError,
+    MethodDefinitionError,
     get_method_class,
 )
 
@@ -100,27 +101,45 @@ def test_method_has_x_is_not_writeable():
         MethodWithEnter.has_enter = False
 
 
-@pytest.mark.skip("WIP")
-def test_get_method_class():
-    """Test the function get_method_class"""
+def test_get_method_class_which_is_not_yet_defined(monkeypatch):
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
 
-    # Before defining the class, there is no such class with name 'foo'.
+    # The method registry is empty so there is no Methods with the name
     with pytest.raises(
-        KeyError,
-        match=re.escape(
-            'No Method with name "foo" found! Check that the name is correctly spelled and that the module containing the class is being imported'
-        ),
+        KeyError, match=re.escape('No Method with name "Some name" found!')
     ):
-        get_method_class("foo")
+        get_method_class("Some name")
 
-    # Define a class with name = 'foo'
-    class MyFooMethod(Method):
-        name = "foo"
 
-    # Now the class can be queried with get_method_class:
-    method_cls = get_method_class("foo")
-    assert issubclass(method_cls, Method)
-    assert method_cls.name == "foo"
+def test_get_method_class_working_example(monkeypatch):
+    somename = "Some name"
+    # Make the registry empty
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # Create a method
+    class SomeMethod(Method):
+        name = somename
+
+    # Check that we can retrieve the method
+    method_class = get_method_class(somename)
+    assert method_class is SomeMethod
+
+
+def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
+    somename = "Some name"
+    # Make the registry empty
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class SomeMethod(Method):
+        name = somename
+
+    # It is not possible to define two methods if same name
+    with pytest.raises(
+        MethodDefinitionError, match=re.escape('Duplicate Method name "Some name"')
+    ):
+
+        class SomeMethod(Method):
+            name = somename
 
 
 def test_all_combinations_with_switch_to_the_mode():

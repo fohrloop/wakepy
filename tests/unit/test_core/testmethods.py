@@ -26,7 +26,7 @@ def create_test_method_classes():
 
     for enter_mode, heartbeat, exit_mode in itertools.product(MethodIs, repeat=3):
         clsname = f"M{enter_mode.value}{heartbeat.value}{exit_mode.value}"
-        clskwargs = {"supported_systems": CURRENT_SYSTEM}
+        clskwargs = {"supported_systems": CURRENT_SYSTEM, "name": clsname}
         for mode, name in zip(
             (enter_mode, heartbeat, exit_mode), ("enter_mode", "heartbeat", "exit_mode")
         ):

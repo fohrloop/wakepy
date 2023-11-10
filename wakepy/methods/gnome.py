@@ -23,6 +23,8 @@ class _GnomeSessionManager(Method, ABC):
     https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit
     """
 
+    name = None  # Not listed. This class is subclassed.
+
     session_manager = DbusAddress(
         bus=BusType.SESSION,
         service="org.gnome.SessionManager",
@@ -88,8 +90,10 @@ class _GnomeSessionManager(Method, ABC):
 
 
 class GnomeSessionManagerNoSuspend(_GnomeSessionManager):
+    name = "org.gnome.SessionManager:Inhibit:Suspend"
     flags = GnomeFlag.INHIBIT_SUSPEND
 
 
 class GnomeSessionManagerNoIdle(_GnomeSessionManager):
+    name = "org.gnome.SessionManager:Inhibit:Idle"
     flags = GnomeFlag.INHIBIT_IDLE
