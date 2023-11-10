@@ -12,8 +12,8 @@ if typing.TYPE_CHECKING:
     from queue import Queue
     from typing import Any, List, Optional, Sequence, Tuple
 
-    from .method import Method
     from .activationmanager import ModeActivationManager
+    from .method import Method
 
 
 def should_fake_success() -> bool:
