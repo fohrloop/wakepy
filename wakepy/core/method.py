@@ -42,7 +42,8 @@ def _register_method(cls: Type[Method]):
 
     if cls.name in METHOD_REGISTRY:
         raise MethodDefinitionError(
-            f'Duplicate Method name "{cls.name}": {cls.__qualname__} (already registered to {METHOD_REGISTRY[cls.name].__qualname__})'
+            f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
+            f"(already registered to {METHOD_REGISTRY[cls.name].__qualname__})"
         )
 
     METHOD_REGISTRY[cls.name] = cls
