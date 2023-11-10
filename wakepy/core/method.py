@@ -33,7 +33,7 @@ def get_method_class(method_name: str):
     return METHOD_REGISTRY[method_name]
 
 
-class MethodError(Exception):
+class MethodError(RuntimeError):
     """Occurred inside wakepy.core.method.Method"""
 
 
