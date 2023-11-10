@@ -23,8 +23,6 @@ class _GnomeSessionManager(Method, ABC):
     https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit
     """
 
-    name = None  # Not listed. This class is subclassed.
-
     session_manager = DbusAddress(
         bus=BusType.SESSION,
         service="org.gnome.SessionManager",
