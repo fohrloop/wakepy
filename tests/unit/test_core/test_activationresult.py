@@ -1,9 +1,15 @@
+import os
 from unittest.mock import Mock
 
 import pytest
 
 from wakepy.core import ActivationResult, StageName
-from wakepy.core.activationresult import MethodUsageResult, ModeSwitcher, UsageStatus
+from wakepy.core.activationresult import (
+    MethodUsageResult,
+    ModeSwitcher,
+    UsageStatus,
+    should_fake_success,
+)
 
 switcher = Mock(spec_set=ModeSwitcher)
 
@@ -258,3 +264,18 @@ def test_activation_result_get_detailed_results():
     ) == [
         REQUIREMENTS_FAIL,
     ]
+
+
+def test_should_fake_success(monkeypatch):
+    for val in ("1", "yes", "True", "anystring"):
+        with monkeypatch.context() as mp:
+            mp.setenv("WAKEPY_FAKE_SUCCESS", val)
+            val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
+            assert val_from_env == str(val)
+            assert should_fake_success() is True
+    for val in ("0", "no", "NO", "False", "false", "FALSE"):
+        with monkeypatch.context() as mp:
+            mp.setenv("WAKEPY_FAKE_SUCCESS", val)
+            val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
+            assert val_from_env == str(val)
+            assert should_fake_success() is False

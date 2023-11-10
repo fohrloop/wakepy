@@ -20,7 +20,10 @@ def should_fake_success() -> bool:
     """Function which says if fake success should be enabled
 
     Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
-    If that variable is set to non-empty value, fake success is activated.
+    If that variable is set to a truthy value,fake success is activated.
+
+    Falsy values: '0', 'no', 'false' (case ignored)
+    Truthy values: everything else
 
     Motivation:
     -----------
@@ -30,7 +33,13 @@ def should_fake_success() -> bool:
     should fake the successful inhibition anyway. Faking the success is done
     after every other method is tried (and failed).
     """
-    return bool(os.environ.get("WAKEPY_FAKE_SUCCESS"))
+    if "WAKEPY_FAKE_SUCCESS" not in os.environ:
+        return False
+
+    val_from_env = os.environ["WAKEPY_FAKE_SUCCESS"].lower()
+    if val_from_env in ("0", "no", "false"):
+        return False
+    return True
 
 
 class UsageStatus(StringConstant):
