@@ -478,6 +478,16 @@ class MethodCurationOpts:
                 f" (Methods: {{{','.join(m.name for m in methods_in_both)}}})"
             )
 
+        methods_with_set_priority = set(self.lower_priority).union(
+            set(self.higher_priority)
+        )
+        skipped_with_priority = set(self.skip).intersection(methods_with_set_priority)
+        if skipped_with_priority:
+            raise ValueError(
+                f"Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+                f" (See methods: {{{','.join(m.name for m in skipped_with_priority)}}})"
+            )
+
     @classmethod
     def from_names(
         cls,
@@ -487,8 +497,8 @@ class MethodCurationOpts:
         higher_priority: Optional[StrCollection] = None,
     ):
         return cls(
-            skip=get_method_classes(skip),
-            use_only=get_method_classes(use_only),
-            lower_priority=get_method_classes(lower_priority),
-            higher_priority=get_method_classes(higher_priority),
+            skip=get_method_classes(skip) or [],
+            use_only=get_method_classes(use_only) or [],
+            lower_priority=get_method_classes(lower_priority) or [],
+            higher_priority=get_method_classes(higher_priority) or [],
         )

@@ -278,3 +278,19 @@ def test_method_curation_opts_constructor(monkeypatch):
         ),
     ):
         MethodCurationOpts.from_names(higher_priority=["A"], lower_priority=["A"])
+
+    # Cannot skip and prioritize methods
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+        ),
+    ):
+        MethodCurationOpts.from_names(higher_priority=["A"], skip=["A"])
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+        ),
+    ):
+        MethodCurationOpts.from_names(lower_priority=["A"], skip=["A"])
