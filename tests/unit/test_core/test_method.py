@@ -10,6 +10,7 @@ from wakepy.core.method import (
     Method,
     MethodError,
     MethodDefinitionError,
+    MethodCurationOpts,
     get_method_class,
     get_method_classes,
 )
@@ -244,3 +245,22 @@ def test_all_combinations_with_switch_to_the_mode():
         else:
             # Test case missing? Should not happen ever.
             raise Exception(method.__class__.__name__)
+
+
+def test_skip_and_use_only_both_given(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class Foo(Method):
+        name = "foo"
+
+    class MethodA(Method):
+        name = "A"
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Can only define skip (blacklist) or use_only (whitelist), not both!"
+        ),
+    ):
+        MethodCurationOpts.from_names(skip=["A"], use_only=["foo"])

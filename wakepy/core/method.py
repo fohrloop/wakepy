@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import typing
 import warnings
 from abc import ABC, ABCMeta
@@ -19,7 +20,8 @@ if typing.TYPE_CHECKING:
 MethodCls = Type["Method"]
 T = TypeVar("T")
 Collection = List[T] | Tuple[T, ...] | Set[T]
-
+MethodClsCollection = Collection[MethodCls]
+StrCollection = Collection[str]
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
@@ -437,3 +439,40 @@ class Method(ABC, metaclass=MethodMeta):
             )
         )
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
+
+
+@dataclass
+class MethodCurationOpts:
+    """A container for options for selecting and prioritizing Methods.
+
+    * Act as a data storage to method selection and prioritization parameters.
+    * Provide basic validation for those input parameters
+    * Convert the input parameters from strings to Method classes (constructor
+      MethodCurationOpts.from_names)
+    """
+
+    skip: Optional[MethodClsCollection]
+    use_only: Optional[MethodClsCollection]
+    lower_priority: Optional[MethodClsCollection]
+    higher_priority: Optional[MethodClsCollection]
+
+    def __post_init__(self):
+        if self.skip and self.use_only:
+            raise ValueError(
+                "Can only define skip (blacklist) or use_only (whitelist), not both!"
+            )
+
+    @classmethod
+    def from_names(
+        cls,
+        skip: Optional[StrCollection] = None,
+        use_only: Optional[StrCollection] = None,
+        lower_priority: Optional[StrCollection] = None,
+        higher_priority: Optional[StrCollection] = None,
+    ):
+        return cls(
+            skip=get_method_classes(skip),
+            use_only=get_method_classes(use_only),
+            lower_priority=get_method_classes(lower_priority),
+            higher_priority=get_method_classes(higher_priority),
+        )
