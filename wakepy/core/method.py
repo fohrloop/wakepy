@@ -445,6 +445,8 @@ class Method(ABC, metaclass=MethodMeta):
 class MethodCurationOpts:
     """A container for options for selecting and prioritizing Methods.
 
+    Purpose
+    -------
     * Act as a data storage to method selection and prioritization parameters.
     * Provide basic validation for those input parameters
     * Convert the input parameters from strings to Method classes (constructor
@@ -455,7 +457,7 @@ class MethodCurationOpts:
     1) Only possible to define one: `skip` ("blacklist") or `use_only`
       ("whitelist"), not both!
     2) A method can only be in `lower_priority` OR `higher_priority`, not both.
-
+    3) A method can not be simultaneously skipped and prioritized
     """
 
     skip: MethodClsCollection = field(default_factory=list)
