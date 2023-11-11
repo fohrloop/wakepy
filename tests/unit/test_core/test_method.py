@@ -269,3 +269,12 @@ def test_method_curation_opts_constructor(monkeypatch):
         ),
     ):
         MethodCurationOpts.from_names(skip=["A"], use_only=["foo"])
+
+    # Should not be possible to define same method in lower and higher priority
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            'Cannot have same method  ("A") in higher_priority and lower_priority!'
+        ),
+    ):
+        MethodCurationOpts.from_names(higher_priority=["A"], lower_priority=["A"])

@@ -453,14 +453,19 @@ class MethodCurationOpts:
 
     skip: Optional[MethodClsCollection]
     use_only: Optional[MethodClsCollection]
-    lower_priority: Optional[MethodClsCollection]
-    higher_priority: Optional[MethodClsCollection]
+    lower_priority: MethodClsCollection
+    higher_priority: MethodClsCollection
 
     def __post_init__(self):
         if self.skip and self.use_only:
             raise ValueError(
                 "Can only define skip (blacklist) or use_only (whitelist), not both!"
             )
+        for method in self.lower_priority:
+            if method in self.higher_priority:
+                raise ValueError(
+                    f'Cannot have same method  ("{method.name}") in higher_priority and lower_priority!'
+                )
 
     @classmethod
     def from_names(
@@ -473,6 +478,6 @@ class MethodCurationOpts:
         return cls(
             skip=get_method_classes(skip),
             use_only=get_method_classes(use_only),
-            lower_priority=get_method_classes(lower_priority),
-            higher_priority=get_method_classes(higher_priority),
+            lower_priority=get_method_classes(lower_priority) or [],
+            higher_priority=get_method_classes(higher_priority) or [],
         )
