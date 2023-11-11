@@ -449,6 +449,13 @@ class MethodCurationOpts:
     * Provide basic validation for those input parameters
     * Convert the input parameters from strings to Method classes (constructor
       MethodCurationOpts.from_names)
+
+    Rules
+    -----
+    1) Only possible to define one: `skip` ("blacklist") or `use_only`
+      ("whitelist"), not both!
+    2) A method can only be in `lower_priority` OR `higher_priority`, not both.
+
     """
 
     skip: Optional[MethodClsCollection]
@@ -461,6 +468,7 @@ class MethodCurationOpts:
             raise ValueError(
                 "Can only define skip (blacklist) or use_only (whitelist), not both!"
             )
+
         for method in self.lower_priority:
             if method in self.higher_priority:
                 raise ValueError(
