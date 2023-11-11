@@ -247,7 +247,7 @@ def test_all_combinations_with_switch_to_the_mode():
             raise Exception(method.__class__.__name__)
 
 
-def test_skip_and_use_only_both_given(monkeypatch):
+def test_method_curation_opts_constructor(monkeypatch):
     # empty method registry
     monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
 
@@ -257,6 +257,11 @@ def test_skip_and_use_only_both_given(monkeypatch):
     class MethodA(Method):
         name = "A"
 
+    opts = MethodCurationOpts.from_names(skip=["A"], higher_priority=["foo"])
+    assert opts.skip == [MethodA]
+    assert opts.higher_priority == [Foo]
+
+    # Should not be possible to define both: use_only and skip
     with pytest.raises(
         ValueError,
         match=re.escape(
