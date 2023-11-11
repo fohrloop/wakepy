@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import typing
 import warnings
 from abc import ABC, ABCMeta
@@ -458,10 +458,10 @@ class MethodCurationOpts:
 
     """
 
-    skip: Optional[MethodClsCollection]
-    use_only: Optional[MethodClsCollection]
-    lower_priority: MethodClsCollection
-    higher_priority: MethodClsCollection
+    skip: MethodClsCollection = field(default_factory=list)
+    use_only: MethodClsCollection = field(default_factory=list)
+    lower_priority: MethodClsCollection = field(default_factory=list)
+    higher_priority: MethodClsCollection = field(default_factory=list)
 
     def __post_init__(self):
         if self.skip and self.use_only:
@@ -489,6 +489,6 @@ class MethodCurationOpts:
         return cls(
             skip=get_method_classes(skip),
             use_only=get_method_classes(use_only),
-            lower_priority=get_method_classes(lower_priority) or [],
-            higher_priority=get_method_classes(higher_priority) or [],
+            lower_priority=get_method_classes(lower_priority),
+            higher_priority=get_method_classes(higher_priority),
         )
