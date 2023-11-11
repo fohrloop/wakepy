@@ -10,7 +10,9 @@ from wakepy.core.method import (
     Method,
     MethodError,
     MethodDefinitionError,
+    MethodCurationOpts,
     get_method_class,
+    get_method_classes,
 )
 
 from testmethods import MethodIs, get_test_method_class
@@ -141,6 +143,53 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
         class SomeMethod(Method):
             name = somename
 
+    # sanity check: The monkeypatching works as we expect
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # Now as the registry is empty it is possible to define method with
+    # the same name again
+    class SomeMethod(Method):
+        name = somename
+
+
+def test_get_method_classes(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class A(Method):
+        name = "A"
+
+    class B(Method):
+        name = "B"
+
+    class C(Method):
+        name = "C"
+
+    # Asking for a list, getting a list
+    assert get_method_classes(["A", "B"]) == [A, B]
+    # The order of returned items matches the order of input params
+    assert get_method_classes(["C", "B", "A"]) == [C, B, A]
+    assert get_method_classes(["B", "A", "C"]) == [B, A, C]
+
+    # Asking a tuple, getting a tuple
+    assert get_method_classes(("A", "B")) == (A, B)
+    assert get_method_classes(("C", "B", "A")) == (C, B, A)
+
+    # Asking a set, getting a set
+    assert get_method_classes({"A", "B"}) == {A, B}
+    assert get_method_classes({"C", "B"}) == {C, B}
+
+    # Asking None, getting None
+    assert get_method_classes(None) is None
+
+    # Asking something that does not exists will raise KeyError
+    with pytest.raises(KeyError, match=re.escape('No Method with name "D" found!')):
+        get_method_classes(["A", "D"])
+
+    # Using unsupported type raises TypeError
+    with pytest.raises(TypeError):
+        get_method_classes(4123)
+
 
 def test_all_combinations_with_switch_to_the_mode():
     """Test that each of following combinations:
@@ -196,3 +245,52 @@ def test_all_combinations_with_switch_to_the_mode():
         else:
             # Test case missing? Should not happen ever.
             raise Exception(method.__class__.__name__)
+
+
+def test_method_curation_opts_constructor(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class Foo(Method):
+        name = "foo"
+
+    class MethodA(Method):
+        name = "A"
+
+    opts = MethodCurationOpts.from_names(skip=["A"], higher_priority=["foo"])
+    assert opts.skip == [MethodA]
+    assert opts.higher_priority == [Foo]
+
+    # Should not be possible to define both: use_only and skip
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Can only define skip (blacklist) or use_only (whitelist), not both!"
+        ),
+    ):
+        MethodCurationOpts.from_names(skip=["A"], use_only=["foo"])
+
+    # Should not be possible to define same method in lower and higher priority
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Cannot have same methods in higher_priority and lower_priority! (Methods: {A})"
+        ),
+    ):
+        MethodCurationOpts.from_names(higher_priority=["A"], lower_priority=["A"])
+
+    # Cannot skip and prioritize methods
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+        ),
+    ):
+        MethodCurationOpts.from_names(higher_priority=["A"], skip=["A"])
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+        ),
+    ):
+        MethodCurationOpts.from_names(lower_priority=["A"], skip=["A"])

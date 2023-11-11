@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 import typing
 import warnings
 from abc import ABC, ABCMeta
-from typing import Any, Type
+from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
 
 from wakepy.core import DbusMethodCall
 
@@ -11,18 +12,24 @@ from . import SystemName as SystemName
 from .constant import StringConstant, auto
 
 if typing.TYPE_CHECKING:
-    from typing import Optional, Tuple
-
     from wakepy.core import Call
     from wakepy.core.dbus import DbusAdapter
 
-METHOD_REGISTRY: dict[str, Type[Method]] = dict()
+
+# type annotation shorthands
+MethodCls = Type["Method"]
+T = TypeVar("T")
+Collection = List[T] | Tuple[T, ...] | Set[T]
+MethodClsCollection = Collection[MethodCls]
+StrCollection = Collection[str]
+
+METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
 a module with a subclass of Method, the Method class is added to this registry.
 """
 
 
-def get_method_class(method_name: str) -> Type[Method]:
+def get_method_class(method_name: str) -> MethodCls:
     """Get a Method class based on its name."""
     if method_name not in METHOD_REGISTRY:
         raise KeyError(
@@ -31,6 +38,24 @@ def get_method_class(method_name: str) -> Type[Method]:
             " the class is being imported."
         )
     return METHOD_REGISTRY[method_name]
+
+
+def get_method_classes(
+    names: Collection[str] | None = None,
+) -> Collection[MethodCls] | None:
+    """Convert a collection (list, tuple or set) of method names to a
+    collection of method classes"""
+    if names is None:
+        return None
+
+    if isinstance(names, list):
+        return [get_method_class(name) for name in names]
+    elif isinstance(names, tuple):
+        return tuple(get_method_class(name) for name in names)
+    elif isinstance(names, set):
+        return set(get_method_class(name) for name in names)
+
+    raise TypeError("`names` must be a list, tuple or set")
 
 
 def _register_method(cls: Type[Method]):
@@ -416,5 +441,66 @@ class Method(ABC, metaclass=MethodMeta):
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
 
 
-# type annotation shorthand
-MethodCls = Type[Method]
+@dataclass
+class MethodCurationOpts:
+    """A container for options for selecting and prioritizing Methods.
+
+    Purpose
+    -------
+    * Act as a data storage to method selection and prioritization parameters.
+    * Provide basic validation for those input parameters
+    * Convert the input parameters from strings to Method classes (constructor
+      MethodCurationOpts.from_names)
+
+    Rules
+    -----
+    1) Only possible to define one: `skip` ("blacklist") or `use_only`
+      ("whitelist"), not both!
+    2) A method can only be in `lower_priority` OR `higher_priority`, not both.
+    3) A method can not be simultaneously skipped and prioritized
+    """
+
+    skip: MethodClsCollection = field(default_factory=list)
+    use_only: MethodClsCollection = field(default_factory=list)
+    lower_priority: MethodClsCollection = field(default_factory=list)
+    higher_priority: MethodClsCollection = field(default_factory=list)
+
+    def __post_init__(self):
+        if self.skip and self.use_only:
+            raise ValueError(
+                "Can only define skip (blacklist) or use_only (whitelist), not both!"
+            )
+
+        methods_in_both = set(self.lower_priority).intersection(
+            set(self.higher_priority)
+        )
+        if methods_in_both:
+            raise ValueError(
+                f"Cannot have same methods in higher_priority and lower_priority!"
+                f" (Methods: {{{','.join(m.name for m in methods_in_both)}}})"
+            )
+
+        methods_with_set_priority = set(self.lower_priority).union(
+            set(self.higher_priority)
+        )
+        skipped_with_priority = set(self.skip).intersection(methods_with_set_priority)
+        if skipped_with_priority:
+            raise ValueError(
+                f"Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+                f" (See methods: {{{','.join(m.name for m in skipped_with_priority)}}})"
+            )
+
+    @classmethod
+    def from_names(
+        cls,
+        skip: Optional[StrCollection] = None,
+        use_only: Optional[StrCollection] = None,
+        lower_priority: Optional[StrCollection] = None,
+        higher_priority: Optional[StrCollection] = None,
+    ):
+        return cls(
+            skip=get_method_classes(skip) or [],
+            use_only=get_method_classes(use_only) or [],
+            lower_priority=get_method_classes(lower_priority) or [],
+            higher_priority=get_method_classes(higher_priority) or [],
+        )
