@@ -11,6 +11,7 @@ from wakepy.core.method import (
     MethodError,
     MethodDefinitionError,
     get_method_class,
+    get_method_classes,
 )
 
 from testmethods import MethodIs, get_test_method_class
@@ -148,6 +149,45 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
     # the same name again
     class SomeMethod(Method):
         name = somename
+
+
+def test_get_method_classes(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class A(Method):
+        name = "A"
+
+    class B(Method):
+        name = "B"
+
+    class C(Method):
+        name = "C"
+
+    # Asking for a list, getting a list
+    assert get_method_classes(["A", "B"]) == [A, B]
+    # The order of returned items matches the order of input params
+    assert get_method_classes(["C", "B", "A"]) == [C, B, A]
+    assert get_method_classes(["B", "A", "C"]) == [B, A, C]
+
+    # Asking a tuple, getting a tuple
+    assert get_method_classes(("A", "B")) == (A, B)
+    assert get_method_classes(("C", "B", "A")) == (C, B, A)
+
+    # Asking a set, getting a set
+    assert get_method_classes({"A", "B"}) == {A, B}
+    assert get_method_classes({"C", "B"}) == {C, B}
+
+    # Asking None, getting None
+    assert get_method_classes(None) is None
+
+    # Asking something that does not exists will raise KeyError
+    with pytest.raises(KeyError, match=re.escape('No Method with name "D" found!')):
+        get_method_classes(["A", "D"])
+
+    # Using unsupported type raises TypeError
+    with pytest.raises(TypeError):
+        get_method_classes(4123)
 
 
 def test_all_combinations_with_switch_to_the_mode():

@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 import warnings
 from abc import ABC, ABCMeta
-from typing import Any, Type
+from typing import Any, List, Optional, Set, Tuple, Type
 
 from wakepy.core import DbusMethodCall
 
@@ -11,18 +11,23 @@ from . import SystemName as SystemName
 from .constant import StringConstant, auto
 
 if typing.TYPE_CHECKING:
-    from typing import Optional, Tuple
-
     from wakepy.core import Call
     from wakepy.core.dbus import DbusAdapter
 
-METHOD_REGISTRY: dict[str, Type[Method]] = dict()
+
+# type annotation shorthands
+MethodCls = Type["Method"]
+MethodClassCollection = List[MethodCls] | Tuple[MethodCls, ...] | Set[MethodCls]
+StrCollection = List[str] | Tuple[str, ...] | Set[str]
+
+
+METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
 a module with a subclass of Method, the Method class is added to this registry.
 """
 
 
-def get_method_class(method_name: str) -> Type[Method]:
+def get_method_class(method_name: str) -> MethodCls:
     """Get a Method class based on its name."""
     if method_name not in METHOD_REGISTRY:
         raise KeyError(
@@ -31,6 +36,24 @@ def get_method_class(method_name: str) -> Type[Method]:
             " the class is being imported."
         )
     return METHOD_REGISTRY[method_name]
+
+
+def get_method_classes(
+    names: Optional[StrCollection] = None,
+) -> Optional[MethodClassCollection]:
+    """Convert a collection (list, tuple or set) of method names to a
+    collection of method classes"""
+    if names is None:
+        return None
+
+    if isinstance(names, list):
+        return [get_method_class(name) for name in names]
+    elif isinstance(names, tuple):
+        return tuple(get_method_class(name) for name in names)
+    elif isinstance(names, set):
+        return set(get_method_class(name) for name in names)
+
+    raise TypeError("`names` must be a list, tuple or set")
 
 
 def _register_method(cls: Type[Method]):
@@ -414,7 +437,3 @@ class Method(ABC, metaclass=MethodMeta):
             )
         )
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
-
-
-# type annotation shorthand
-MethodCls = Type[Method]
