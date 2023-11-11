@@ -274,7 +274,7 @@ def test_method_curation_opts_constructor(monkeypatch):
     with pytest.raises(
         ValueError,
         match=re.escape(
-            'Cannot have same method  ("A") in higher_priority and lower_priority!'
+            "Cannot have same methods in higher_priority and lower_priority! (Methods: {A})"
         ),
     ):
         MethodCurationOpts.from_names(higher_priority=["A"], lower_priority=["A"])

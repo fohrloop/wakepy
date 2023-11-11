@@ -469,11 +469,14 @@ class MethodCurationOpts:
                 "Can only define skip (blacklist) or use_only (whitelist), not both!"
             )
 
-        for method in self.lower_priority:
-            if method in self.higher_priority:
-                raise ValueError(
-                    f'Cannot have same method  ("{method.name}") in higher_priority and lower_priority!'
-                )
+        methods_in_both = set(self.lower_priority).intersection(
+            set(self.higher_priority)
+        )
+        if methods_in_both:
+            raise ValueError(
+                f"Cannot have same methods in higher_priority and lower_priority!"
+                f" (Methods: {{{','.join(m.name for m in methods_in_both)}}})"
+            )
 
     @classmethod
     def from_names(
