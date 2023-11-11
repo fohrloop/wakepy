@@ -141,6 +141,14 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
         class SomeMethod(Method):
             name = somename
 
+    # sanity check: The monkeypatching works as we expect
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # Now as the registry is empty it is possible to define method with
+    # the same name again
+    class SomeMethod(Method):
+        name = somename
+
 
 def test_all_combinations_with_switch_to_the_mode():
     """Test that each of following combinations:
