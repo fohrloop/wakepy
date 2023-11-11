@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 import warnings
 from abc import ABC, ABCMeta
-from typing import Any, List, Optional, Set, Tuple, Type
+from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
 
 from wakepy.core import DbusMethodCall
 
@@ -17,8 +17,8 @@ if typing.TYPE_CHECKING:
 
 # type annotation shorthands
 MethodCls = Type["Method"]
-MethodClassCollection = List[MethodCls] | Tuple[MethodCls, ...] | Set[MethodCls]
-StrCollection = List[str] | Tuple[str, ...] | Set[str]
+T = TypeVar("T")
+Collection = List[T] | Tuple[T, ...] | Set[T]
 
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
@@ -39,8 +39,8 @@ def get_method_class(method_name: str) -> MethodCls:
 
 
 def get_method_classes(
-    names: Optional[StrCollection] = None,
-) -> Optional[MethodClassCollection]:
+    names: Collection[str] | None = None,
+) -> Collection[MethodCls] | None:
     """Convert a collection (list, tuple or set) of method names to a
     collection of method classes"""
     if names is None:

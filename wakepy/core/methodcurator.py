@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import typing
 
+from .method import get_method_classes
+
 if typing.TYPE_CHECKING:
-    from typing import List, Optional, Set, Tuple
+    from typing import List, Optional, Set, Tuple, Type, TypeVar
 
-    from .method import MethodCls
+    from .method import Method
 
-    MethodClassCollection = List[MethodCls] | Tuple[MethodCls, ...] | Set[MethodCls]
-    StrCollection = List[str] | Tuple[str, ...] | Set[str]
+    MethodCls = Type[Method]
+    T = TypeVar("T")
+    Collection = List[T] | Tuple[T, ...] | Set[T]
+    StrCollection = Collection[str]
+    MethodClsCollection = Collection[MethodCls]
 
 
 class MethodCurator:
@@ -28,10 +33,10 @@ class MethodCurator:
     * Provide means to prioritize a collection of methods.
     """
 
-    skip: Optional[MethodClassCollection]
-    use_only: Optional[MethodClassCollection]
-    lower_priority: MethodClassCollection
-    higher_priority: MethodClassCollection
+    skip: Optional[MethodClsCollection]
+    use_only: Optional[MethodClsCollection]
+    lower_priority: Optional[MethodClsCollection]
+    higher_priority: Optional[MethodClsCollection]
 
     def __init__(
         self,
@@ -44,3 +49,7 @@ class MethodCurator:
             raise ValueError(
                 "Can only define skip (blacklist) or use_only (whitelist), not both!"
             )
+        self.skip = get_method_classes(skip)
+        self.use_only = get_method_classes(use_only)
+        self.lower_priority = get_method_classes(lower_priority)
+        self.higher_priority = get_method_classes(higher_priority)
