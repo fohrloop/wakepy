@@ -9,7 +9,7 @@ from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
 from wakepy.core import DbusMethodCall
 
 from . import SystemName as SystemName
-from .constant import StringConstant, auto
+from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
@@ -101,12 +101,12 @@ class MethodMeta(ABCMeta):
         return super().__setattr__(name, value)
 
 
-class MethodOutcome(StringConstant):
+class MethodOutcome(StrEnum):
     NOT_IMPLEMENTED = auto()
     SUCCESS = auto()
 
 
-class SuitabilityCheckResult(StringConstant):
+class SuitabilityCheckResult(StrEnum):
     # Uused when it is known for sure that a method is not suitable
     UNSUITABLE = auto()
     # Used when it can't be proben that a method is not suitable, but still it
@@ -121,7 +121,7 @@ class SuitabilityCheckResult(StringConstant):
     SUITABLE = auto()
 
 
-class UnsuitabilityTag(StringConstant):
+class UnsuitabilityTag(StrEnum):
     """These are used to distiguish between different reasons for unsuitability
 
     SYSTEM: Used when system is not supported by the method.

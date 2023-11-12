@@ -5,7 +5,7 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 
-from .constant import StringConstant, auto
+from .strenum import StrEnum, auto
 from .definitions import WorkerThreadMsgType
 
 if typing.TYPE_CHECKING:
@@ -42,13 +42,13 @@ def should_fake_success() -> bool:
     return True
 
 
-class UsageStatus(StringConstant):
+class UsageStatus(StrEnum):
     FAIL = auto()
     SUCCESS = auto()
     UNUSED = auto()
 
 
-class StageName(StringConstant):
+class StageName(StrEnum):
     # These are stages which occur in order for each of the methods
     # until the mode has been succesfully activated with "max number" of
     # methods

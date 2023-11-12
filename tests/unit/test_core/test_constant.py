@@ -2,11 +2,11 @@ from enum import auto
 
 import pytest
 
-from wakepy.core.constant import StringConstant
+from wakepy.core.strenum import StrEnum
 
 
 def test_constant_basic_functionality():
-    class MyConst(StringConstant):
+    class MyConst(StrEnum):
         FOO = "fooval"
 
     # Any string valued constant is
@@ -24,7 +24,7 @@ def test_constant_basic_functionality():
 
 
 def test_constant_auto():
-    class MyConst(StringConstant):
+    class MyConst(StrEnum):
         BAR = auto()
 
     # Any auto() value is turned into a string which is same as
@@ -38,7 +38,7 @@ def test_constant_uniqueness():
     # from the enum package
 
     # This should cause no problems
-    class MyConst(StringConstant, unique=True):
+    class MyConst(StrEnum, unique=True):
         FOO = "fooval"
         BAR = "barval"
         BAZ = auto()
@@ -55,13 +55,13 @@ def test_constant_uniqueness():
     # uniqueness is asked
     with pytest.raises(ValueError):
 
-        class MyConst(StringConstant, unique=True):
+        class MyConst(StrEnum, unique=True):
             FOO = "fooval"
             BAR = "fooval"
 
     # It should be possible to define duplicate values if uniqueness is not
     # asked
-    class MyConst(StringConstant):
+    class MyConst(StrEnum):
         FOO = "fooval"
         ANOTHER_FOO = "fooval"
 
