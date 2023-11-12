@@ -5,8 +5,8 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 
+from .constants import WorkerThreadMsgType
 from .strenum import StrEnum, auto
-from .definitions import WorkerThreadMsgType
 
 if typing.TYPE_CHECKING:
     from queue import Queue

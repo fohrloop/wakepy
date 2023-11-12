@@ -9,9 +9,9 @@ from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
 from wakepy.core import DbusMethodCall
 
 from .calls import DbusMethodCall
-from .strenum import StrEnum, auto
-from .definitions import SystemName as SystemName
+from .constants import SystemName as SystemName
 from .mode import ModeName
+from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
