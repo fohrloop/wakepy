@@ -8,8 +8,11 @@ from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
 
 from wakepy.core import DbusMethodCall
 
-from . import SystemName as SystemName
+from .calls import DbusMethodCall
 from .strenum import StrEnum, auto
+from .definitions import SystemName as SystemName
+from .mode import ModeName
+
 
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
@@ -151,6 +154,10 @@ class Method(ABC, metaclass=MethodMeta):
 
     but also the hybrid option is possible.
     """
+
+    mode: ModeName | None = None
+    """The mode for the method. Each method may be connected to single mode.
+    Use None for methods which do not implement any mode."""
 
     supported_systems: Tuple[SystemName, ...] = tuple()
     """All the supported systems. If a system is not listed here, this method
