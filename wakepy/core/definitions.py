@@ -1,8 +1,8 @@
 """Common terms and definitions used in many places"""
-from .constant import StringConstant, auto
+from .strenum import StrEnum, auto
 
 
-class SystemName(StringConstant):
+class SystemName(StrEnum):
     """The names of supported systems"""
 
     WINDOWS = "windows"
@@ -10,13 +10,13 @@ class SystemName(StringConstant):
     DARWIN = "darwin"
 
 
-class ControlMsg(StringConstant):
+class ControlMsg(StrEnum):
     """Send to worker threads"""
 
     TERMINATE = auto()
 
 
-class WorkerThreadMsgType(StringConstant):
+class WorkerThreadMsgType(StrEnum):
     """Send from worker threads"""
 
     OK = auto()

@@ -4,7 +4,7 @@ import typing
 from enum import auto
 from typing import List, NamedTuple, Tuple, Type, Union
 
-from wakepy.core import StringConstant
+from wakepy.core import StrEnum
 
 if typing.TYPE_CHECKING:
     from typing import Optional
@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
     from .calls import DbusMethodCall
 
 
-class BusType(StringConstant):
+class BusType(StrEnum):
     SESSION = auto()
     SYSTEM = auto()
 

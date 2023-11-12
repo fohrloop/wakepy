@@ -68,7 +68,7 @@ class EnumMemberString(str):
     """
 
 
-class StringConstant(Enum, metaclass=ConstantEnumMeta):
+class StrEnum(Enum, metaclass=ConstantEnumMeta):
     """A string constant / enumeration. For creating reusable, typed constants.
 
     Properties
@@ -82,7 +82,7 @@ class StringConstant(Enum, metaclass=ConstantEnumMeta):
 
     >>> from enum import auto
     >>>
-    >>> class MyConst(StringConstant):
+    >>> class MyConst(StrEnum):
     ...     BAR = auto()
 
     >>> MyConst.BAR == "BAR"
@@ -90,7 +90,7 @@ class StringConstant(Enum, metaclass=ConstantEnumMeta):
 
     3) Possibility to make values unique; for example
 
-    >>> class MyConst(StringConstant, unique=True):
+    >>> class MyConst(StrEnum, unique=True):
     ...     FIRST = 'foo'
     ...     SECOND = 'foo'
 
@@ -99,7 +99,7 @@ class StringConstant(Enum, metaclass=ConstantEnumMeta):
 
     4) Testing for containment looks for *values*; for example
 
-    >>> class MyConst(StringConstant):
+    >>> class MyConst(StrEnum):
     ...     FOO = 'bar'
 
     >>> 'bar' in MyConst
@@ -118,12 +118,12 @@ class StringConstant(Enum, metaclass=ConstantEnumMeta):
     def __new__(cls, val=None, *args):
         """This is used to get rid of need for ".value" access:
 
-        >>> StringConstant.FOO.value
+        >>> StrEnum.FOO.value
         'foo'
 
         It is possible to use
 
-        >>> StringConstant.FOO
+        >>> StrEnum.FOO
         'foo'
 
         instead
@@ -132,6 +132,6 @@ class StringConstant(Enum, metaclass=ConstantEnumMeta):
 
 
 __all__ = [
-    "StringConstant",
+    "StrEnum",
     "auto",
 ]
