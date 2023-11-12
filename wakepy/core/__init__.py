@@ -8,8 +8,7 @@ from .activationresult import ActivationResult as ActivationResult
 from .calls import Call as Call
 from .calls import DbusMethodCall as DbusMethodCall
 from .configuration import CURRENT_SYSTEM as CURRENT_SYSTEM
-from .constants import SystemName as SystemName
-from .dbus import BusType as BusType
+from .constants import SystemName as SystemName, BusType as BusType
 from .dbus import DbusAddress as DbusAddress
 from .dbus import DbusMethod as DbusMethod
 from .method import Method as Method
