@@ -1,6 +1,6 @@
-"""This module defines StringConstant for making string enumerations.
+"""This module defines StrEnum for making string enumerations.
 
-NOTE: The enum.StrEnum could be used in place of StringConstant on Python 3.11
+NOTE: The enum.StrEnum could be used in place of StrEnum on Python 3.11
 onwards, so consider removing this module when python 3.10 is no longer
 supported."""
 
