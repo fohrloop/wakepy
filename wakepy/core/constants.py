@@ -11,6 +11,11 @@ class SystemName(StrEnum):
 
 
 class ModeName(StrEnum):
+    """The names of the modes wakepy supports
+
+    See: wakepy/modes/keep.py for full definitions of the modes.
+    """
+
     KEEP_RUNNING = "keep.running"
     KEEP_PRESENTING = "keep.presenting"
 
