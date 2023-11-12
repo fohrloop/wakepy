@@ -17,6 +17,7 @@ if typing.TYPE_CHECKING:
 
 class ModeName(StringConstant):
     KEEP_RUNNING = "keep.running"
+    KEEP_PRESENTING = "keep.presenting"
 
 
 class ModeExit(Exception):
