@@ -21,9 +21,24 @@ presenting_methods: List[Type[Method]] = [
 
 
 def running(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None) -> Mode:
-    """The keep.running mode context manager.
+    """A wakepy mode and context manager for keeping programs running.
 
-    Usage:
+    Properties
+    ----------
+    1) The system may not go to sleep meaning that programs will continue
+       running and can use CPU.
+    2) Does prevent only the automatical, idle timer timeout based sleep /
+       suspend; Will not prevent user manually entering sleep from a menu, by
+       closing a laptop lid or by pressing a power button, for example.
+    3) System may still automatically log out user, enable lockscreen
+       or turn off the display.
+    4) If the process holding the lock dies, the lock is automatically removed.
+       There are no methods in keep.running mode which for example would
+       perform system-wide configuration changes or anything which would need
+       manual reversal.
+
+    Usage
+    -----
 
     ```
     with keep.running() as k:
