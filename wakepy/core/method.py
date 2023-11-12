@@ -41,7 +41,7 @@ def get_method(method_name: str) -> MethodCls:
     return METHOD_REGISTRY[method_name]
 
 
-def get_methods(
+def method_names_to_classes(
     names: Collection[str] | None = None,
 ) -> Collection[MethodCls] | None:
     """Convert a collection (list, tuple or set) of method names to a
@@ -523,8 +523,8 @@ class MethodCurationOpts:
         higher_priority: Optional[StrCollection] = None,
     ):
         return cls(
-            skip=get_methods(skip) or [],
-            use_only=get_methods(use_only) or [],
-            lower_priority=get_methods(lower_priority) or [],
-            higher_priority=get_methods(higher_priority) or [],
+            skip=method_names_to_classes(skip) or [],
+            use_only=method_names_to_classes(use_only) or [],
+            lower_priority=method_names_to_classes(lower_priority) or [],
+            higher_priority=method_names_to_classes(higher_priority) or [],
         )

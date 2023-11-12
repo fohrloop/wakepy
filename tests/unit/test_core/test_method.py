@@ -12,7 +12,7 @@ from wakepy.core.method import (
     MethodDefinitionError,
     MethodCurationOpts,
     get_method,
-    get_methods,
+    method_names_to_classes,
 )
 
 from testmethods import MethodIs, get_test_method_class
@@ -152,7 +152,7 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
         name = somename
 
 
-def test_get_methods(monkeypatch):
+def test_method_names_to_classes(monkeypatch):
     # empty method registry
     monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
 
@@ -166,29 +166,29 @@ def test_get_methods(monkeypatch):
         name = "C"
 
     # Asking for a list, getting a list
-    assert get_methods(["A", "B"]) == [A, B]
+    assert method_names_to_classes(["A", "B"]) == [A, B]
     # The order of returned items matches the order of input params
-    assert get_methods(["C", "B", "A"]) == [C, B, A]
-    assert get_methods(["B", "A", "C"]) == [B, A, C]
+    assert method_names_to_classes(["C", "B", "A"]) == [C, B, A]
+    assert method_names_to_classes(["B", "A", "C"]) == [B, A, C]
 
     # Asking a tuple, getting a tuple
-    assert get_methods(("A", "B")) == (A, B)
-    assert get_methods(("C", "B", "A")) == (C, B, A)
+    assert method_names_to_classes(("A", "B")) == (A, B)
+    assert method_names_to_classes(("C", "B", "A")) == (C, B, A)
 
     # Asking a set, getting a set
-    assert get_methods({"A", "B"}) == {A, B}
-    assert get_methods({"C", "B"}) == {C, B}
+    assert method_names_to_classes({"A", "B"}) == {A, B}
+    assert method_names_to_classes({"C", "B"}) == {C, B}
 
     # Asking None, getting None
-    assert get_methods(None) is None
+    assert method_names_to_classes(None) is None
 
     # Asking something that does not exists will raise KeyError
     with pytest.raises(KeyError, match=re.escape('No Method with name "D" found!')):
-        get_methods(["A", "D"])
+        method_names_to_classes(["A", "D"])
 
     # Using unsupported type raises TypeError
     with pytest.raises(TypeError):
-        get_methods(4123)
+        method_names_to_classes(4123)
 
 
 def test_all_combinations_with_switch_to_the_mode():
