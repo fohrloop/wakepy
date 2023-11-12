@@ -1,5 +1,9 @@
 # Changelog 
 
+## Not published
+### Changed
+- Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: `keep.running` and `keep.presenting` context managers.
+  
 ## [0.7.2] (2023-09-27)
 ### Fixed
 - The CLI API on python 3.7 and python 3.8. Thanks to [Aymane11](https://github.com/Aymane11) for [PR #50](https://github.com/fohrloop/wakepy/pull/50)
