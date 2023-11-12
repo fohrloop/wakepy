@@ -59,6 +59,25 @@ def get_methods(
     raise TypeError("`names` must be a list, tuple or set")
 
 
+def get_selected_methods(
+    modename: ModeName,
+) -> dict[str, MethodCls]:
+    """Get the Method classes registered for a Mode.
+
+    Returns
+    -------
+    methods: dict[str, MethodCls]
+        The method classes in a dictionary. The keys are the method names (str)
+        and values are the Method classes.
+    )"""
+    methods = dict()
+    for name, method_cls in METHOD_REGISTRY.items():
+        if method_cls.mode != modename:
+            continue
+        methods[name] = method_cls
+    return methods
+
+
 def _register_method(cls: Type[Method]):
     """Registers a subclass of Method to the method registry"""
 
