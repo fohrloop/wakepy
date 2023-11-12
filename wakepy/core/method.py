@@ -30,7 +30,7 @@ a module with a subclass of Method, the Method class is added to this registry.
 """
 
 
-def get_method_class(method_name: str) -> MethodCls:
+def get_method(method_name: str) -> MethodCls:
     """Get a Method class based on its name."""
     if method_name not in METHOD_REGISTRY:
         raise KeyError(
@@ -41,7 +41,7 @@ def get_method_class(method_name: str) -> MethodCls:
     return METHOD_REGISTRY[method_name]
 
 
-def get_method_classes(
+def get_methods(
     names: Collection[str] | None = None,
 ) -> Collection[MethodCls] | None:
     """Convert a collection (list, tuple or set) of method names to a
@@ -50,11 +50,11 @@ def get_method_classes(
         return None
 
     if isinstance(names, list):
-        return [get_method_class(name) for name in names]
+        return [get_method(name) for name in names]
     elif isinstance(names, tuple):
-        return tuple(get_method_class(name) for name in names)
+        return tuple(get_method(name) for name in names)
     elif isinstance(names, set):
-        return set(get_method_class(name) for name in names)
+        return set(get_method(name) for name in names)
 
     raise TypeError("`names` must be a list, tuple or set")
 
@@ -504,8 +504,8 @@ class MethodCurationOpts:
         higher_priority: Optional[StrCollection] = None,
     ):
         return cls(
-            skip=get_method_classes(skip) or [],
-            use_only=get_method_classes(use_only) or [],
-            lower_priority=get_method_classes(lower_priority) or [],
-            higher_priority=get_method_classes(higher_priority) or [],
+            skip=get_methods(skip) or [],
+            use_only=get_methods(use_only) or [],
+            lower_priority=get_methods(lower_priority) or [],
+            higher_priority=get_methods(higher_priority) or [],
         )
