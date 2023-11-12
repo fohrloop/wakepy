@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import typing
 import warnings
 from abc import ABC, ABCMeta
+from dataclasses import dataclass, field
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
 
 from wakepy.core import DbusMethodCall
@@ -12,7 +12,6 @@ from .calls import DbusMethodCall
 from .strenum import StrEnum, auto
 from .definitions import SystemName as SystemName
 from .mode import ModeName
-
 
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
