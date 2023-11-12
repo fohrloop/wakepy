@@ -5,6 +5,7 @@ from abc import ABC
 
 from .activationmanager import ModeActivationManager
 from .activationresult import ActivationResult
+from .constant import StringConstant
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
@@ -12,6 +13,10 @@ if typing.TYPE_CHECKING:
 
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
     from .method import Method
+
+
+class ModeName(StringConstant):
+    KEEP_RUNNING = "keep.running"
 
 
 class ModeExit(Exception):
