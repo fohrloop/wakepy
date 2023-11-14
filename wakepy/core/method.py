@@ -4,7 +4,7 @@ import typing
 import warnings
 from abc import ABC, ABCMeta
 from dataclasses import dataclass, field
-from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
+from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from wakepy.core import DbusMethodCall
 
@@ -21,7 +21,7 @@ if typing.TYPE_CHECKING:
 # type annotation shorthands
 MethodCls = Type["Method"]
 T = TypeVar("T")
-Collection = List[T] | Tuple[T, ...] | Set[T]
+Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
 
