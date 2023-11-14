@@ -3,11 +3,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from wakepy.core import ActivationResult, StageName
+from wakepy.core import ActivationResult
 from wakepy.core.activationresult import (
     MethodUsageResult,
     ModeSwitcher,
     UsageStatus,
+    StageName,
     should_fake_success,
 )
 

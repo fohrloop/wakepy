@@ -5,7 +5,7 @@ from queue import Empty, Queue
 from threading import Thread
 
 from . import CURRENT_SYSTEM, SystemName
-from .definitions import ControlMsg, WorkerThreadMsgType
+from .constants import ControlMsg, WorkerThreadMsgType
 from .method import Suitability
 
 if typing.TYPE_CHECKING:

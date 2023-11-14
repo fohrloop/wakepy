@@ -10,6 +10,16 @@ class SystemName(StrEnum):
     DARWIN = "darwin"
 
 
+class ModeName(StrEnum):
+    """The names of the modes wakepy supports
+
+    See: wakepy/modes/keep.py for full definitions of the modes.
+    """
+
+    KEEP_RUNNING = "keep.running"
+    KEEP_PRESENTING = "keep.presenting"
+
+
 class ControlMsg(StrEnum):
     """Send to worker threads"""
 
@@ -21,3 +31,10 @@ class WorkerThreadMsgType(StrEnum):
 
     OK = auto()
     EXCEPTION = auto()
+
+
+class BusType(StrEnum):
+    """Type of D-Bus bus."""
+
+    SESSION = auto()
+    SYSTEM = auto()

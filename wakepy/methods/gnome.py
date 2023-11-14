@@ -2,8 +2,14 @@ import enum
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from wakepy.core import BusType, DbusAddress, DbusMethod, DbusMethodCall
-from wakepy.core.method import Method, SystemName
+from wakepy.core import (
+    BusType,
+    DbusAddress,
+    DbusMethod,
+    DbusMethodCall,
+    Method,
+    SystemName,
+)
 
 
 class GnomeFlag(enum.IntFlag):

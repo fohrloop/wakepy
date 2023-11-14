@@ -1,20 +1,14 @@
 from __future__ import annotations
 
 import typing
-from enum import auto
 from typing import List, NamedTuple, Tuple, Type, Union
 
-from wakepy.core import StrEnum
+from . import BusType
 
 if typing.TYPE_CHECKING:
     from typing import Optional
 
     from .calls import DbusMethodCall
-
-
-class BusType(StrEnum):
-    SESSION = auto()
-    SYSTEM = auto()
 
 
 class DbusAddress(NamedTuple):

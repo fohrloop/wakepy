@@ -11,8 +11,10 @@ from wakepy.core.method import (
     MethodError,
     MethodDefinitionError,
     MethodCurationOpts,
-    get_method_class,
-    get_method_classes,
+    get_method,
+    method_names_to_classes,
+    get_methods_for_mode,
+    get_selected_methods,
 )
 
 from testmethods import MethodIs, get_test_method_class
@@ -103,17 +105,17 @@ def test_method_has_x_is_not_writeable():
         MethodWithEnter.has_enter = False
 
 
-def test_get_method_class_which_is_not_yet_defined(monkeypatch):
+def test_get_method_which_is_not_yet_defined(monkeypatch):
     monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
 
     # The method registry is empty so there is no Methods with the name
     with pytest.raises(
         KeyError, match=re.escape('No Method with name "Some name" found!')
     ):
-        get_method_class("Some name")
+        get_method("Some name")
 
 
-def test_get_method_class_working_example(monkeypatch):
+def test_get_method_working_example(monkeypatch):
     somename = "Some name"
     # Make the registry empty
     monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
@@ -123,7 +125,7 @@ def test_get_method_class_working_example(monkeypatch):
         name = somename
 
     # Check that we can retrieve the method
-    method_class = get_method_class(somename)
+    method_class = get_method(somename)
     assert method_class is SomeMethod
 
 
@@ -152,7 +154,7 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
         name = somename
 
 
-def test_get_method_classes(monkeypatch):
+def test_method_names_to_classes(monkeypatch):
     # empty method registry
     monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
 
@@ -166,29 +168,29 @@ def test_get_method_classes(monkeypatch):
         name = "C"
 
     # Asking for a list, getting a list
-    assert get_method_classes(["A", "B"]) == [A, B]
+    assert method_names_to_classes(["A", "B"]) == [A, B]
     # The order of returned items matches the order of input params
-    assert get_method_classes(["C", "B", "A"]) == [C, B, A]
-    assert get_method_classes(["B", "A", "C"]) == [B, A, C]
+    assert method_names_to_classes(["C", "B", "A"]) == [C, B, A]
+    assert method_names_to_classes(["B", "A", "C"]) == [B, A, C]
 
     # Asking a tuple, getting a tuple
-    assert get_method_classes(("A", "B")) == (A, B)
-    assert get_method_classes(("C", "B", "A")) == (C, B, A)
+    assert method_names_to_classes(("A", "B")) == (A, B)
+    assert method_names_to_classes(("C", "B", "A")) == (C, B, A)
 
     # Asking a set, getting a set
-    assert get_method_classes({"A", "B"}) == {A, B}
-    assert get_method_classes({"C", "B"}) == {C, B}
+    assert method_names_to_classes({"A", "B"}) == {A, B}
+    assert method_names_to_classes({"C", "B"}) == {C, B}
 
     # Asking None, getting None
-    assert get_method_classes(None) is None
+    assert method_names_to_classes(None) is None
 
     # Asking something that does not exists will raise KeyError
     with pytest.raises(KeyError, match=re.escape('No Method with name "D" found!')):
-        get_method_classes(["A", "D"])
+        method_names_to_classes(["A", "D"])
 
     # Using unsupported type raises TypeError
     with pytest.raises(TypeError):
-        get_method_classes(4123)
+        method_names_to_classes(4123)
 
 
 def test_all_combinations_with_switch_to_the_mode():
@@ -245,6 +247,114 @@ def test_all_combinations_with_switch_to_the_mode():
         else:
             # Test case missing? Should not happen ever.
             raise Exception(method.__class__.__name__)
+
+
+def test_get_methods_for_mode(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # B, D, E
+    first_mode = "first_mode"
+    # A, F
+    second_mode = "second_mode"
+
+    # The register is empty at start
+    assert get_methods_for_mode(first_mode) == []
+    assert get_methods_for_mode(second_mode) == []
+
+    class MethodA(Method):
+        name = "A"
+        mode = second_mode
+
+    class MethodB(Method):
+        name = "B"
+        mode = first_mode
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+        mode = first_mode
+
+    class MethodE(Method):
+        name = "E"
+        mode = first_mode
+
+    class MethodF(Method):
+        name = "F"
+        mode = second_mode
+
+    # Now, there are methods
+    assert get_methods_for_mode(first_mode) == [
+        MethodB,
+        MethodD,
+        MethodE,
+    ]
+    assert get_methods_for_mode(second_mode) == [
+        MethodA,
+        MethodF,
+    ]
+
+
+def test_get_methods_for_mode(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # B, D, E
+    first_mode = "first_mode"
+    # A, F
+    second_mode = "second_mode"
+
+    # The register is empty at start
+    assert get_selected_methods(first_mode) == []
+    assert get_selected_methods(second_mode) == []
+
+    class MethodA(Method):
+        name = "A"
+        mode = second_mode
+
+    class MethodB(Method):
+        name = "B"
+        mode = first_mode
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+        mode = first_mode
+
+    class MethodE(Method):
+        name = "E"
+        mode = first_mode
+
+    class MethodF(Method):
+        name = "F"
+        mode = second_mode
+
+    # Now, there are methods
+    assert get_selected_methods(first_mode) == [MethodB, MethodD, MethodE]
+    assert get_selected_methods(second_mode) == [MethodA, MethodF]
+
+    # These can also be filtered with a blacklist
+    assert get_selected_methods(first_mode, skip=["B"]) == [MethodD, MethodE]
+    assert get_selected_methods(first_mode, skip=["B", "E"]) == [MethodD]
+    # Extra 'skip' methods do not matter
+    assert get_selected_methods(first_mode, skip=["B", "E", "foo", "bar"]) == [
+        MethodD,
+    ]
+
+    # These can be filtered with a whitelist
+    assert get_selected_methods(first_mode, use_only=["B", "E"]) == [MethodB, MethodE]
+    # If a whitelist contains extra methods, raise exception
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Methods ['bar', 'foo'] in `use_only` are not part of Mode 'first_mode'!"
+        ),
+    ):
+        get_selected_methods(first_mode, use_only=["foo", "bar"])
 
 
 def test_method_curation_opts_constructor(monkeypatch):

@@ -1,6 +1,6 @@
 import platform
 
-from .definitions import SystemName
+from .constants import SystemName
 
 # E.g.: 'windows', 'linux' or 'darwin'
 # TODO: consider splitting this information to "platform", which would also include wsl

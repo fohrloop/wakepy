@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import typing
 import warnings
 from abc import ABC, ABCMeta
-from typing import Any, List, Optional, Set, Tuple, Type, TypeVar
+from dataclasses import dataclass, field
+from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
-from wakepy.core import DbusMethodCall
-
-from . import SystemName as SystemName
+from .calls import DbusMethodCall
+from .constants import ModeName, SystemName
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
@@ -19,9 +18,10 @@ if typing.TYPE_CHECKING:
 # type annotation shorthands
 MethodCls = Type["Method"]
 T = TypeVar("T")
-Collection = List[T] | Tuple[T, ...] | Set[T]
+Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
+
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
@@ -29,7 +29,7 @@ a module with a subclass of Method, the Method class is added to this registry.
 """
 
 
-def get_method_class(method_name: str) -> MethodCls:
+def get_method(method_name: str) -> MethodCls:
     """Get a Method class based on its name."""
     if method_name not in METHOD_REGISTRY:
         raise KeyError(
@@ -40,7 +40,7 @@ def get_method_class(method_name: str) -> MethodCls:
     return METHOD_REGISTRY[method_name]
 
 
-def get_method_classes(
+def method_names_to_classes(
     names: Collection[str] | None = None,
 ) -> Collection[MethodCls] | None:
     """Convert a collection (list, tuple or set) of method names to a
@@ -49,13 +49,90 @@ def get_method_classes(
         return None
 
     if isinstance(names, list):
-        return [get_method_class(name) for name in names]
+        return [get_method(name) for name in names]
     elif isinstance(names, tuple):
-        return tuple(get_method_class(name) for name in names)
+        return tuple(get_method(name) for name in names)
     elif isinstance(names, set):
-        return set(get_method_class(name) for name in names)
+        return set(get_method(name) for name in names)
 
     raise TypeError("`names` must be a list, tuple or set")
+
+
+def get_methods_for_mode(
+    modename: ModeName,
+) -> List[MethodCls]:
+    """Get the Method classes belonging to a Mode; Methods with
+    Method.mode = `modename`.
+
+    Parameters
+    ----------
+    modename: str | ModeName
+        The name of the Mode from which to select the Methods.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The Method classes for the Mode.
+    """
+    methods = []
+    for method_cls in METHOD_REGISTRY.values():
+        if method_cls.mode != modename:
+            continue
+        methods.append(method_cls)
+
+    return methods
+
+
+def get_selected_methods(
+    modename: ModeName,
+    skip: Optional[StrCollection] = None,
+    use_only: Optional[StrCollection] = None,
+) -> List[MethodCls]:
+    """Get the Method classes belonging to a Mode[1] optionally filtering with
+    a blacklist (skip) or whitelist (use_only). If `skip` and `use_only` are
+    both None, will return all the methods for the selected `modename`.
+
+    [1] Methods with Method.mode = `modename`.
+
+    Parameters
+    ----------
+    modename: str | ModeName
+        The name of the Mode from which to select the Methods.
+    skip: list, tuple or set of str or None
+        The names of Methods to remove from the results; a "blacklist" filter.
+        Any Method in `skip` but not part of the selected Mode will be silently
+        ignored. Cannot be used same time with `use_only`. Optional.
+    use_only: list, tuple or set of str
+        The names of Methods to restrict the returned Methods to; a "whitelist"
+        filter. Means "use these and only these Method". Any Methods in
+        `use_only` but not in the selected Mode will raise an exception. Cannot
+        be used same time with `skip`. Optional.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The selected method classes.
+    """
+
+    if skip and use_only:
+        raise ValueError(
+            "Can only define skip (blacklist) or use_only (whitelist), not both!"
+        )
+
+    all_methods = get_methods_for_mode(modename)
+
+    if skip is None and use_only is None:
+        selected_methods = all_methods
+    elif skip:
+        selected_methods = [m for m in all_methods if m.name not in skip]
+    elif use_only:
+        selected_methods = [m for m in all_methods if m.name in use_only]
+        if not set(use_only).issubset(m.name for m in selected_methods):
+            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
+            raise ValueError(
+                f"Methods {missing} in `use_only` are not part of Mode '{modename}'!"
+            )
+    return selected_methods
 
 
 def _register_method(cls: Type[Method]):
@@ -151,6 +228,10 @@ class Method(ABC, metaclass=MethodMeta):
 
     but also the hybrid option is possible.
     """
+
+    mode: ModeName | None = None
+    """The mode for the method. Each method may be connected to single mode.
+    Use None for methods which do not implement any mode."""
 
     supported_systems: Tuple[SystemName, ...] = tuple()
     """All the supported systems. If a system is not listed here, this method
@@ -499,8 +580,8 @@ class MethodCurationOpts:
         higher_priority: Optional[StrCollection] = None,
     ):
         return cls(
-            skip=get_method_classes(skip) or [],
-            use_only=get_method_classes(use_only) or [],
-            lower_priority=get_method_classes(lower_priority) or [],
-            higher_priority=get_method_classes(higher_priority) or [],
+            skip=method_names_to_classes(skip) or [],
+            use_only=method_names_to_classes(use_only) or [],
+            lower_priority=method_names_to_classes(lower_priority) or [],
+            higher_priority=method_names_to_classes(higher_priority) or [],
         )
