@@ -22,6 +22,7 @@ Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
 
+
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
 a module with a subclass of Method, the Method class is added to this registry.
@@ -121,18 +122,17 @@ def get_selected_methods(
     all_methods = get_methods_for_mode(modename)
 
     if skip is None and use_only is None:
-        return all_methods
-
-    if skip:
-        return [m for m in all_methods if m.name not in skip]
-
-    methods = [m for m in all_methods if m.name in use_only]
-    if not set(use_only).issubset(m.name for m in methods):
-        missing = sorted(set(use_only) - set(m.name for m in methods))
-        raise ValueError(
-            f"Methods {missing} in `use_only` are not part of Mode '{modename}'!"
-        )
-    return methods
+        selected_methods = all_methods
+    elif skip:
+        selected_methods = [m for m in all_methods if m.name not in skip]
+    elif use_only:
+        selected_methods = [m for m in all_methods if m.name in use_only]
+        if not set(use_only).issubset(m.name for m in selected_methods):
+            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
+            raise ValueError(
+                f"Methods {missing} in `use_only` are not part of Mode '{modename}'!"
+            )
+    return selected_methods
 
 
 def _register_method(cls: Type[Method]):
