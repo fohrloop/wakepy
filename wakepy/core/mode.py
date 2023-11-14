@@ -5,7 +5,6 @@ from abc import ABC
 
 from .activationmanager import ModeActivationManager
 from .activationresult import ActivationResult
-from .constants import ModeName
 
 if typing.TYPE_CHECKING:
     from types import TracebackType

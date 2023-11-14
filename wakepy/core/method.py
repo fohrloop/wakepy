@@ -6,8 +6,6 @@ from abc import ABC, ABCMeta
 from dataclasses import dataclass, field
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
-from wakepy.core import DbusMethodCall
-
 from .calls import DbusMethodCall
 from .constants import ModeName, SystemName
 from .strenum import StrEnum, auto
@@ -15,7 +13,6 @@ from .strenum import StrEnum, auto
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
     from wakepy.core.dbus import DbusAdapter
-    from typing import Dict
 
 
 # type annotation shorthands
