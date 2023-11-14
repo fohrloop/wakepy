@@ -15,6 +15,7 @@ from .strenum import StrEnum, auto
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
     from wakepy.core.dbus import DbusAdapter
+    from typing import Dict
 
 
 # type annotation shorthands
@@ -59,22 +60,81 @@ def method_names_to_classes(
     raise TypeError("`names` must be a list, tuple or set")
 
 
-def get_selected_methods(
+def get_methods_for_mode(
     modename: ModeName,
-) -> dict[str, MethodCls]:
-    """Get the Method classes registered for a Mode.
+) -> List[MethodCls]:
+    """Get the Method classes belonging to a Mode; Methods with
+    Method.mode = `modename`.
+
+    Parameters
+    ----------
+    modename: str | ModeName
+        The name of the Mode from which to select the Methods.
 
     Returns
     -------
-    methods: dict[str, MethodCls]
-        The method classes in a dictionary. The keys are the method names (str)
-        and values are the Method classes.
-    )"""
-    methods = dict()
-    for name, method_cls in METHOD_REGISTRY.items():
+    methods: list[MethodCls]
+        The Method classes for the Mode.
+    """
+    methods = []
+    for method_cls in METHOD_REGISTRY.values():
         if method_cls.mode != modename:
             continue
-        methods[name] = method_cls
+        methods.append(method_cls)
+
+    return methods
+
+
+def get_selected_methods(
+    modename: ModeName,
+    skip: Optional[StrCollection] = None,
+    use_only: Optional[StrCollection] = None,
+) -> List[MethodCls]:
+    """Get the Method classes belonging to a Mode[1] optionally filtering with
+    a blacklist (skip) or whitelist (use_only). If `skip` and `use_only` are
+    both None, will return all the methods for the selected `modename`.
+
+    [1] Methods with Method.mode = `modename`.
+
+    Parameters
+    ----------
+    modename: str | ModeName
+        The name of the Mode from which to select the Methods.
+    skip: list, tuple or set of str or None
+        The names of Methods to remove from the results; a "blacklist" filter.
+        Any Method in `skip` but not part of the selected Mode will be silently
+        ignored. Cannot be used same time with `use_only`. Optional.
+    use_only: list, tuple or set of str
+        The names of Methods to restrict the returned Methods to; a "whitelist"
+        filter. Means "use these and only these Method". Any Methods in
+        `use_only` but not in the selected Mode will raise an exception. Cannot
+        be used same time with `skip`. Optional.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The selected method classes.
+    """
+
+    if skip and use_only:
+        raise ValueError(
+            "Can only define skip (blacklist) or use_only (whitelist), not both!"
+        )
+
+    all_methods = get_methods_for_mode(modename)
+
+    if skip is None and use_only is None:
+        return all_methods
+
+    if skip:
+        return [m for m in all_methods if m.name not in skip]
+
+    methods = [m for m in all_methods if m.name in use_only]
+    if not set(use_only).issubset(m.name for m in methods):
+        missing = sorted(set(use_only) - set(m.name for m in methods))
+        raise ValueError(
+            f"Methods {missing} in `use_only` are not part of Mode '{modename}'!"
+        )
     return methods
 
 

@@ -13,6 +13,8 @@ from wakepy.core.method import (
     MethodCurationOpts,
     get_method,
     method_names_to_classes,
+    get_methods_for_mode,
+    get_selected_methods,
 )
 
 from testmethods import MethodIs, get_test_method_class
@@ -245,6 +247,114 @@ def test_all_combinations_with_switch_to_the_mode():
         else:
             # Test case missing? Should not happen ever.
             raise Exception(method.__class__.__name__)
+
+
+def test_get_methods_for_mode(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # B, D, E
+    first_mode = "first_mode"
+    # A, F
+    second_mode = "second_mode"
+
+    # The register is empty at start
+    assert get_methods_for_mode(first_mode) == []
+    assert get_methods_for_mode(second_mode) == []
+
+    class MethodA(Method):
+        name = "A"
+        mode = second_mode
+
+    class MethodB(Method):
+        name = "B"
+        mode = first_mode
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+        mode = first_mode
+
+    class MethodE(Method):
+        name = "E"
+        mode = first_mode
+
+    class MethodF(Method):
+        name = "F"
+        mode = second_mode
+
+    # Now, there are methods
+    assert get_methods_for_mode(first_mode) == [
+        MethodB,
+        MethodD,
+        MethodE,
+    ]
+    assert get_methods_for_mode(second_mode) == [
+        MethodA,
+        MethodF,
+    ]
+
+
+def test_get_methods_for_mode(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    # B, D, E
+    first_mode = "first_mode"
+    # A, F
+    second_mode = "second_mode"
+
+    # The register is empty at start
+    assert get_selected_methods(first_mode) == []
+    assert get_selected_methods(second_mode) == []
+
+    class MethodA(Method):
+        name = "A"
+        mode = second_mode
+
+    class MethodB(Method):
+        name = "B"
+        mode = first_mode
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+        mode = first_mode
+
+    class MethodE(Method):
+        name = "E"
+        mode = first_mode
+
+    class MethodF(Method):
+        name = "F"
+        mode = second_mode
+
+    # Now, there are methods
+    assert get_selected_methods(first_mode) == [MethodB, MethodD, MethodE]
+    assert get_selected_methods(second_mode) == [MethodA, MethodF]
+
+    # These can also be filtered with a blacklist
+    assert get_selected_methods(first_mode, skip=["B"]) == [MethodD, MethodE]
+    assert get_selected_methods(first_mode, skip=["B", "E"]) == [MethodD]
+    # Extra 'skip' methods do not matter
+    assert get_selected_methods(first_mode, skip=["B", "E", "foo", "bar"]) == [
+        MethodD,
+    ]
+
+    # These can be filtered with a whitelist
+    assert get_selected_methods(first_mode, use_only=["B", "E"]) == [MethodB, MethodE]
+    # If a whitelist contains extra methods, raise exception
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Methods ['bar', 'foo'] in `use_only` are not part of Mode 'first_mode'!"
+        ),
+    ):
+        get_selected_methods(first_mode, use_only=["foo", "bar"])
 
 
 def test_method_curation_opts_constructor(monkeypatch):
