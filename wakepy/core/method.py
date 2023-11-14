@@ -83,29 +83,27 @@ def get_methods_for_mode(
     return methods
 
 
-def get_selected_methods(
-    modename: ModeName,
+def select_methods(
+    methods: MethodClsCollection,
     skip: Optional[StrCollection] = None,
     use_only: Optional[StrCollection] = None,
 ) -> List[MethodCls]:
-    """Get the Method classes belonging to a Mode[1] optionally filtering with
-    a blacklist (skip) or whitelist (use_only). If `skip` and `use_only` are
-    both None, will return all the methods for the selected `modename`.
-
-    [1] Methods with Method.mode = `modename`.
+    """Selects Methods from from `methods` using a blacklist (skip) or
+    whitelist (use_only). If `skip` and `use_only` are both None, will return
+    all the original methods.
 
     Parameters
     ----------
-    modename: str | ModeName
-        The name of the Mode from which to select the Methods.
+    methods: collection of Method classes
+        The collection of methods from which to make the selection.
     skip: list, tuple or set of str or None
-        The names of Methods to remove from the results; a "blacklist" filter.
-        Any Method in `skip` but not part of the selected Mode will be silently
+        The names of Methods to remove from the `methods`; a "blacklist"
+        filter. Any Method in `skip` but not in `methods` will be silently
         ignored. Cannot be used same time with `use_only`. Optional.
     use_only: list, tuple or set of str
-        The names of Methods to restrict the returned Methods to; a "whitelist"
-        filter. Means "use these and only these Method". Any Methods in
-        `use_only` but not in the selected Mode will raise an exception. Cannot
+        The names of Methods to select from the `methods`; a "whitelist"
+        filter. Means "use these and only these Methods". Any Methods in
+        `use_only` but not in `methods` will raise a ValueError. Cannot
         be used same time with `skip`. Optional.
 
     Returns
@@ -119,18 +117,16 @@ def get_selected_methods(
             "Can only define skip (blacklist) or use_only (whitelist), not both!"
         )
 
-    all_methods = get_methods_for_mode(modename)
-
     if skip is None and use_only is None:
-        selected_methods = all_methods
+        selected_methods = list(methods)
     elif skip:
-        selected_methods = [m for m in all_methods if m.name not in skip]
+        selected_methods = [m for m in methods if m.name not in skip]
     elif use_only:
-        selected_methods = [m for m in all_methods if m.name in use_only]
+        selected_methods = [m for m in methods if m.name in use_only]
         if not set(use_only).issubset(m.name for m in selected_methods):
             missing = sorted(set(use_only) - set(m.name for m in selected_methods))
             raise ValueError(
-                f"Methods {missing} in `use_only` are not part of Mode '{modename}'!"
+                f"Methods {missing} in `use_only` are not part of `methods`!"
             )
     return selected_methods
 
