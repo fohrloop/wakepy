@@ -14,11 +14,36 @@ from wakepy.core.method import (
     MethodError,
     check_priority_order,
     get_method,
+    get_methods,
     get_methods_for_mode,
     method_names_to_classes,
     get_prioritized_methods_groups,
     select_methods,
 )
+
+
+@pytest.fixture(scope="function")
+def provide_methods_a_f(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class MethodA(Method):
+        name = "A"
+
+    class MethodB(Method):
+        name = "B"
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+
+    class MethodE(Method):
+        name = "E"
+
+    class MethodF(Method):
+        name = "F"
 
 
 def test_overridden_methods_autodiscovery():
@@ -382,29 +407,10 @@ def test_method_curation_opts_constructor(monkeypatch):
         MethodCurationOpts.from_names(lower_priority=["A"], skip=["A"])
 
 
-def test_check_priority_order(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
-
-    class MethodA(Method):
-        name = "A"
-
-    class MethodB(Method):
-        name = "B"
-
-    class MethodC(Method):
-        name = "C"
-
-    class MethodD(Method):
-        name = "D"
-
-    class MethodE(Method):
-        name = "E"
-
-    class MethodF(Method):
-        name = "F"
-
-    methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_check_priority_order():
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+    (MethodA, *_) = methods
 
     # These should be fine
     check_priority_order(priority_order=None, methods=methods)
@@ -448,29 +454,10 @@ def test_check_priority_order(monkeypatch):
         check_priority_order(priority_order=[MethodA], methods=methods)
 
 
-def test_get_prioritized_methods_groups(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
-
-    class MethodA(Method):
-        name = "A"
-
-    class MethodB(Method):
-        name = "B"
-
-    class MethodC(Method):
-        name = "C"
-
-    class MethodD(Method):
-        name = "D"
-
-    class MethodE(Method):
-        name = "E"
-
-    class MethodF(Method):
-        name = "F"
-
-    methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_get_prioritized_methods_groups():
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+    (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
     # Case: Select some methods as more important, with '*'
     methods_prioritised = get_prioritized_methods_groups(
