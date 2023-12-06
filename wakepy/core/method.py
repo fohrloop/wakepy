@@ -607,10 +607,11 @@ def check_priority_order(
     Parameters
     ----------
     priority_order: list[str | set[str]]
-        The priority order, which is a list of method names or asterisk ('*').
-        The asterisk means "all rest methods" and may occur only once in the
-        priority order, and cannot be part of a set. All method names must be
-        unique and must be part of the `methods`.
+        The priority order, which is a list of where items are method names,
+        sets of methods names or the asterisk ('*'). The asterisk means "all
+        rest methods" and may occur only once in the priority order, and cannot
+        be part of a set. All method names must be unique and must be part of
+        the `methods`.
     methods: list[MethodCls]
         The methods which the `priority_order` is validated against.
 
