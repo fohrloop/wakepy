@@ -680,6 +680,19 @@ def get_prioritized_methods_groups(
         The prioritized methods. Each set in the output represents a group of
         equal priority. All Methods from the input `methods` are always
         included in the output
+
+
+    Example
+    -------
+    Say there are methods MethodA, MethodB, MethodC, MethodD, MethodE, MethodF
+    with names "A", "B", "C", "D", "E", "F":
+    >>> get_prioritized_methods_groups(methods, priority_order=["A", "F", "*"])
+    [
+        {MethodA},
+        {MethodF},
+        {MethodB, MethodC, MethodD, MethodE},
+    ]
+
     """
 
     priority_order = priority_order or []
