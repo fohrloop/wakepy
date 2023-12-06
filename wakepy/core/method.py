@@ -21,6 +21,7 @@ T = TypeVar("T")
 Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
+# The strings in PriorityOrder are names of Methods or the asterisk ('*')
 PriorityOrder = List[Union[str, Set[str]]]
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
