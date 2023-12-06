@@ -455,6 +455,22 @@ def test_check_priority_order():
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
+def test_get_prioritized_methods_groups_does_not_edit_args():
+    """Test that the prioriry_order argument is not modified by the function"""
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+    priority_order = ["A", "F"]
+    get_prioritized_methods_groups(
+        methods,
+        priority_order=priority_order,
+    )
+    # The results should be exactly the same as with asterisk in the end
+    assert priority_order == [
+        "A",
+        "F",
+    ], "The priority_order argument should not be modified by the function"
+
+
+@pytest.mark.usefixtures("provide_methods_a_f")
 def test_get_prioritized_methods_groups():
     methods = get_methods(["A", "B", "C", "D", "E", "F"])
     (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
