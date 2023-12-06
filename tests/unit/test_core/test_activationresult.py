@@ -7,8 +7,8 @@ from wakepy.core import ActivationResult
 from wakepy.core.activationresult import (
     MethodUsageResult,
     ModeSwitcher,
-    UsageStatus,
     StageName,
+    UsageStatus,
     should_fake_success,
 )
 
