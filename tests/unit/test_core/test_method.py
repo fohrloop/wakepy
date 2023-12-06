@@ -499,3 +499,30 @@ def test_get_prioritized_methods_groups():
         {MethodC, MethodD, MethodE, MethodF},
         {MethodB},
     ]
+
+    # Case: asterisk at the start
+    assert get_prioritized_methods_groups(methods, priority_order=["*", "A", "B"]) == [
+        {MethodC, MethodD, MethodE, MethodF},
+        {MethodA},
+        {MethodB},
+    ]
+
+    # Case: Using sets
+    assert get_prioritized_methods_groups(
+        methods, priority_order=[{"A", "B"}, "*", {"E", "F"}]
+    ) == [
+        {MethodA, MethodB},
+        {MethodC, MethodD},
+        {MethodE, MethodF},
+    ]
+
+    # Case: Using sets, no asterisk -> implicit asterisk at the end
+    assert get_prioritized_methods_groups(methods, priority_order=[{"A", "B"}]) == [
+        {MethodA, MethodB},
+        {MethodC, MethodD, MethodE, MethodF},
+    ]
+
+    # Case: priority_order is None -> Should return all methods as one set
+    assert get_prioritized_methods_groups(methods, priority_order=None) == [
+        {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
+    ]
