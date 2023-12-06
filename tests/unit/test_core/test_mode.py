@@ -53,9 +53,7 @@ def test_mode_contextmanager_protocol():
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
-    mode = TestMode(
-        mocks.methods, prioritize=mocks.prioritize, dbus_adapter=mocks.dbus_adapter
-    )
+    mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter)
 
     # Here we have one call. During init, the ModeActivationManager
     # instance is created
@@ -70,7 +68,7 @@ def test_mode_contextmanager_protocol():
         # We have also called activate
         assert len(mocks.mock_calls) == 2
         assert mocks.mock_calls[1] == call.manager_cls().activate(
-            methods=mocks.methods, prioritize=mocks.prioritize
+            methods=mocks.methods,
         )
         # The __enter__ returns the value from the manager.activate()
         # call
@@ -104,7 +102,7 @@ def test_mode_exits():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
+        call.manager_cls().activate(methods=mocks.methods),
         call.manager_cls().deactivate(),
     ]
 
@@ -123,7 +121,7 @@ def test_mode_exits_with_modeexit():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
+        call.manager_cls().activate(methods=mocks.methods),
         call.manager_cls().deactivate(),
     ]
 
@@ -142,7 +140,7 @@ def test_mode_exits_with_modeexit_with_args():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
+        call.manager_cls().activate(methods=mocks.methods),
         call.manager_cls().deactivate(),
     ]
 
@@ -165,6 +163,6 @@ def test_mode_exits_with_other_exception():
     # The deactivate is also called!
     assert mocks.mock_calls == [
         call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods, prioritize=None),
+        call.manager_cls().activate(methods=mocks.methods),
         call.manager_cls().deactivate(),
     ]
