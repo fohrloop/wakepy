@@ -600,7 +600,6 @@ def iterate_priority_order(
     def check_isstr(method_name: str):
         if not isinstance(method_name, str):
             raise TypeError("priority_order must be a list[str | set[str]]!")
-        yield method_name
 
     def iterate_over_set(item: set):
         for method_name in item:
@@ -608,13 +607,15 @@ def iterate_priority_order(
                 raise ValueError(
                     "Asterisk (*) may not be a part of a set in priority_order!"
                 )
-            yield from check_isstr(method_name)
+            check_isstr(method_name)
+            yield method_name
 
     for item in priority_order:
         if isinstance(item, set):
             yield from iterate_over_set(item)
         else:
-            yield from check_isstr(item)
+            check_isstr(item)
+            yield item
 
 
 def check_priority_order(
