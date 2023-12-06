@@ -41,6 +41,11 @@ def get_method(method_name: str) -> MethodCls:
     return METHOD_REGISTRY[method_name]
 
 
+def get_methods(method_names: List[str]) -> MethodCls:
+    """Get Method classes based on their names."""
+    return [get_method(name) for name in method_names]
+
+
 def method_names_to_classes(
     names: Collection[str] | None = None,
 ) -> Collection[MethodCls] | None:
