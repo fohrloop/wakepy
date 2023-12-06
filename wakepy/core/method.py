@@ -634,7 +634,7 @@ def check_priority_order(
 
     Raises
     ------
-    ValueError if the `priority_order` is not valid.
+    ValueError or TypeError if the `priority_order` is not valid.
     """
     if priority_order is None:
         return
