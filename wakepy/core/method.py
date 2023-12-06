@@ -660,7 +660,26 @@ def get_prioritized_methods_groups(
     methods: List[MethodCls], priority_order: Optional[PriorityOrder]
 ) -> List[Set[MethodCls]]:
     """Prioritizes Methods in `methods` based on priority order defined by
-    `priority_order`."""
+    `priority_order`. This function does not validate the priority_order in
+    any way; use `check_priority_order` for validation of needed.
+
+    Parameters
+    ----------
+    methods: list[MethodCls]
+        The source list of methods. These methods are returned as prioritized
+        groups.
+    priority_order: list[str | set[str]]
+        The names of the methods in `methods`. This specifies the priority
+        order; the order of method classes in the returned list. An asterisk
+        ('*') can be used to denote "all other methods".
+
+
+    Returns
+    -------
+    method_groups: list[set[MethodCls]]
+        The prioritized methods. Each set in the output represents a group of
+        equal priority. All Methods from the input `methods` are always
+        included in the output"""
     priority_order = priority_order or []
 
     # Make this a list of sets just to make things simpler
