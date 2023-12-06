@@ -2,23 +2,22 @@ import itertools
 import re
 
 import pytest
+from testmethods import MethodIs, get_test_method_class
 
 from wakepy.core.method import (
     EnterModeError,
     ExitModeError,
     HeartbeatCallError,
     Method,
-    MethodError,
-    MethodDefinitionError,
     MethodCurationOpts,
-    get_method,
-    method_names_to_classes,
-    get_methods_for_mode,
-    select_methods,
+    MethodDefinitionError,
+    MethodError,
     check_priority_order,
+    get_method,
+    get_methods_for_mode,
+    method_names_to_classes,
+    select_methods,
 )
-
-from testmethods import MethodIs, get_test_method_class
 
 
 def test_overridden_methods_autodiscovery():
