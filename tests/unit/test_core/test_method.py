@@ -14,10 +14,36 @@ from wakepy.core.method import (
     MethodError,
     check_priority_order,
     get_method,
+    get_methods,
     get_methods_for_mode,
     method_names_to_classes,
+    get_prioritized_methods_groups,
     select_methods,
 )
+
+
+@pytest.fixture(scope="function")
+def provide_methods_a_f(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class MethodA(Method):
+        name = "A"
+
+    class MethodB(Method):
+        name = "B"
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+
+    class MethodE(Method):
+        name = "E"
+
+    class MethodF(Method):
+        name = "F"
 
 
 def test_overridden_methods_autodiscovery():
@@ -381,29 +407,10 @@ def test_method_curation_opts_constructor(monkeypatch):
         MethodCurationOpts.from_names(lower_priority=["A"], skip=["A"])
 
 
-def test_check_priority_order(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
-
-    class MethodA(Method):
-        name = "A"
-
-    class MethodB(Method):
-        name = "B"
-
-    class MethodC(Method):
-        name = "C"
-
-    class MethodD(Method):
-        name = "D"
-
-    class MethodE(Method):
-        name = "E"
-
-    class MethodF(Method):
-        name = "F"
-
-    methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_check_priority_order():
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+    (MethodA, *_) = methods
 
     # These should be fine
     check_priority_order(priority_order=None, methods=methods)
@@ -445,3 +452,79 @@ def test_check_priority_order(monkeypatch):
         match=re.escape("priority_order must be a list[str | set[str]]!"),
     ):
         check_priority_order(priority_order=[MethodA], methods=methods)
+
+
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_get_prioritized_methods_groups_does_not_edit_args():
+    """Test that the prioriry_order argument is not modified by the function"""
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+
+    priority_order = ["A", "F"]
+
+    _ = get_prioritized_methods_groups(
+        methods,
+        priority_order=priority_order,
+    )
+
+    assert priority_order == [
+        "A",
+        "F",
+    ], "The priority_order argument should not be modified by the function"
+
+
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_get_prioritized_methods_groups():
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+    (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+
+    # Case: Select some methods as more important, with '*'
+    assert get_prioritized_methods_groups(methods, priority_order=["A", "F", "*"]) == [
+        {MethodA},
+        {MethodF},
+        {MethodB, MethodC, MethodD, MethodE},
+    ]
+
+    # Case: Select some methods as more important, without '*'
+    # The results should be exactly the same as with asterisk in the end
+    assert get_prioritized_methods_groups(
+        methods,
+        priority_order=["A", "F"],
+    ) == [
+        {MethodA},
+        {MethodF},
+        {MethodB, MethodC, MethodD, MethodE},
+    ]
+
+    # Case: asterisk in the middle
+    assert get_prioritized_methods_groups(methods, priority_order=["A", "*", "B"]) == [
+        {MethodA},
+        {MethodC, MethodD, MethodE, MethodF},
+        {MethodB},
+    ]
+
+    # Case: asterisk at the start
+    assert get_prioritized_methods_groups(methods, priority_order=["*", "A", "B"]) == [
+        {MethodC, MethodD, MethodE, MethodF},
+        {MethodA},
+        {MethodB},
+    ]
+
+    # Case: Using sets
+    assert get_prioritized_methods_groups(
+        methods, priority_order=[{"A", "B"}, "*", {"E", "F"}]
+    ) == [
+        {MethodA, MethodB},
+        {MethodC, MethodD},
+        {MethodE, MethodF},
+    ]
+
+    # Case: Using sets, no asterisk -> implicit asterisk at the end
+    assert get_prioritized_methods_groups(methods, priority_order=[{"A", "B"}]) == [
+        {MethodA, MethodB},
+        {MethodC, MethodD, MethodE, MethodF},
+    ]
+
+    # Case: priority_order is None -> Should return all methods as one set
+    assert get_prioritized_methods_groups(methods, priority_order=None) == [
+        {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
+    ]

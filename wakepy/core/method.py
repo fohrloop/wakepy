@@ -21,6 +21,7 @@ T = TypeVar("T")
 Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
+# The strings in PriorityOrder are names of Methods or the asterisk ('*')
 PriorityOrder = List[Union[str, Set[str]]]
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
@@ -38,6 +39,11 @@ def get_method(method_name: str) -> MethodCls:
             " the class is being imported."
         )
     return METHOD_REGISTRY[method_name]
+
+
+def get_methods(method_names: List[str]) -> MethodCls:
+    """Get Method classes based on their names."""
+    return [get_method(name) for name in method_names]
 
 
 def method_names_to_classes(
@@ -648,3 +654,76 @@ def check_priority_order(
                     "The asterisk (*) can only occur once in priority_order!"
                 )
         seen_method_names.add(method_name)
+
+
+def get_prioritized_methods_groups(
+    methods: List[MethodCls], priority_order: Optional[PriorityOrder]
+) -> List[Set[MethodCls]]:
+    """Prioritizes Methods in `methods` based on priority order defined by
+    `priority_order`. This function does not validate the priority_order in
+    any way; use `check_priority_order` for validation of needed.
+
+    Parameters
+    ----------
+    methods: list[MethodCls]
+        The source list of methods. These methods are returned as prioritized
+        groups.
+    priority_order: list[str | set[str]]
+        The names of the methods in `methods`. This specifies the priority
+        order; the order of method classes in the returned list. An asterisk
+        ('*') can be used to denote "all other methods".
+
+
+    Returns
+    -------
+    method_groups: list[set[MethodCls]]
+        The prioritized methods. Each set in the output represents a group of
+        equal priority. All Methods from the input `methods` are always
+        included in the output
+
+
+    Example
+    -------
+    Say there are methods MethodA, MethodB, MethodC, MethodD, MethodE, MethodF
+    with names "A", "B", "C", "D", "E", "F":
+
+    >>> methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
+    >>> get_prioritized_methods_groups(methods, priority_order=["A", "F", "*"])
+    [
+        {MethodA},
+        {MethodF},
+        {MethodB, MethodC, MethodD, MethodE},
+    ]
+
+    """
+
+    priority_order = priority_order or []
+
+    # Make this a list of sets just to make things simpler
+    priority_order: List[Set[str]] = [
+        {item} if isinstance(item, str) else item for item in priority_order
+    ]
+
+    method_dct = {m.name: m for m in methods}
+
+    asterisk = {"*"}
+    asterisk_index = None
+    out = []
+
+    for item in priority_order:
+        if item == asterisk:
+            # Save the location where to add the rest of the methods ('*')
+            asterisk_index = len(out)
+        elif isinstance(item, set):
+            out.append({method_dct[name] for name in item})
+
+    out_flattened = {m for group in out for m in group}
+    rest_of_the_methods = {m for m in methods if m not in out_flattened}
+
+    if rest_of_the_methods:
+        if asterisk_index is not None:
+            out.insert(asterisk_index, rest_of_the_methods)
+        else:
+            out.append(rest_of_the_methods)
+
+    return out
