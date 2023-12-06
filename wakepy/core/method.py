@@ -585,36 +585,18 @@ class MethodCurationOpts:
 
 def iterate_priority_order(
     priority_order: Optional[PriorityOrder],
-) -> typing.Iterator[str]:
-    """Provides an iterator over the items in priority_order.
-
-    Raises
-    ------
-    ValueError if asterisk (*) is part of a set. For example, if the input
-    priority_list is ['A', {'B', '*'}]
-
-    TypeError if the items in the priority order are not either str or set of
-    str.
-    """
-
-    def check_isstr(method_name: str):
-        if not isinstance(method_name, str):
-            raise TypeError("priority_order must be a list[str | set[str]]!")
-        yield method_name
-
-    def iterate_over_set(item: set):
-        for method_name in item:
-            if method_name == "*":
-                raise ValueError(
-                    "Asterisk (*) may not be a part of a set in priority_order!"
-                )
-            yield from check_isstr(method_name)
+) -> typing.Iterator[Tuple[str, bool]]:
+    """Provides an iterator over the items in priority_order. The items in the
+    iterator are (method_name, in_set) 2-tuples, where the method_name is the
+    method name (str) and the in_set is a boolean which is True if the returned
+    method_name is part of a set and False otherwise."""
 
     for item in priority_order:
         if isinstance(item, set):
-            yield from iterate_over_set(item)
+            for method_name in item:
+                yield method_name, True
         else:
-            yield from check_isstr(item)
+            yield item, False
 
 
 def check_priority_order(
@@ -625,10 +607,11 @@ def check_priority_order(
     Parameters
     ----------
     priority_order: list[str | set[str]]
-        The priority order, which is a list of method names or asterisk ('*').
-        The asterisk means "all rest methods" and may occur only once in the
-        priority order, and cannot be part of a set. All method names must be
-        unique and must be part of the `methods`.
+        The priority order, which is a list of where items are method names,
+        sets of methods names or the asterisk ('*'). The asterisk means "all
+        rest methods" and may occur only once in the priority order, and cannot
+        be part of a set. All method names must be unique and must be part of
+        the `methods`.
     methods: list[MethodCls]
         The methods which the `priority_order` is validated against.
 
@@ -639,11 +622,19 @@ def check_priority_order(
     if priority_order is None:
         return
 
-    known_methods = {m.name: m for m in methods}
+    known_method_names = {m.name for m in methods}
+    known_method_names.add("*")
     seen_method_names = set()
 
-    for method_name in iterate_priority_order(priority_order):
-        if method_name not in known_methods and method_name != "*":
+    for method_name, in_set in iterate_priority_order(priority_order):
+        if not isinstance(method_name, str):
+            raise TypeError("priority_order must be a list[str | set[str]]!")
+
+        if in_set and method_name == "*":
+            raise ValueError(
+                "Asterisk (*) may not be a part of a set in priority_order!"
+            )
+        if method_name not in known_method_names:
             raise ValueError(
                 f'Method "{method_name}" in priority_order not in selected methods!'
             )

@@ -439,3 +439,10 @@ def test_check_priority_order(monkeypatch):
         match=re.escape("Asterisk (*) may not be a part of a set in priority_order!"),
     ):
         check_priority_order(priority_order=[{"*"}], methods=methods)
+
+    # Unsupported type
+    with pytest.raises(
+        TypeError,
+        match=re.escape("priority_order must be a list[str | set[str]]!"),
+    ):
+        check_priority_order(priority_order=[MethodA], methods=methods)
