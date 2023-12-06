@@ -620,6 +620,22 @@ def iterate_priority_order(
 def check_priority_order(
     priority_order: Optional[PriorityOrder], methods: List[MethodCls]
 ) -> None:
+    """Checks against `methods` that the `priority_order` is valid.
+
+    Parameters
+    ----------
+    priority_order: list[str | set[str]]
+        The priority order, which is a list of method names or asterisk ('*').
+        The asterisk means "all rest methods" and may occur only once in the
+        priority order, and cannot be part of a set. All method names must be
+        unique and must be part of the `methods`.
+    methods: list[MethodCls]
+        The methods which the `priority_order` is validated against.
+
+    Raises
+    ------
+    ValueError if the `priority_order` is not valid.
+    """
     if priority_order is None:
         return
 
