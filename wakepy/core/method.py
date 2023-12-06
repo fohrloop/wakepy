@@ -695,7 +695,7 @@ def get_prioritized_methods_groups(
 
     for item in priority_order:
         if item == asterisk:
-            # do something
+            # Save the location where to add the rest of the methods ('*')
             asterisk_index = len(out)
         elif isinstance(item, set):
             out.append({method_dct[name] for name in item})
