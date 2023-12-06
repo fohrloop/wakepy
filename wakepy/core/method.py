@@ -21,7 +21,7 @@ T = TypeVar("T")
 Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
-
+PriorityOrder = List[Union[str, Set[str]]]
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
@@ -581,3 +581,63 @@ class MethodCurationOpts:
             lower_priority=method_names_to_classes(lower_priority) or [],
             higher_priority=method_names_to_classes(higher_priority) or [],
         )
+
+
+def iterate_priority_order(
+    priority_order: Optional[PriorityOrder],
+) -> typing.Iterator[str]:
+    """Provides an iterator over the items in priority_order.
+
+    Raises
+    ------
+    ValueError if asterisk (*) is part of a set. For example, if the input
+    priority_list is ['A', {'B', '*'}]
+
+    TypeError if the items in the priority order are not either str or set of
+    str.
+    """
+
+    def check_isstr(method_name: str):
+        if not isinstance(method_name, str):
+            raise TypeError("priority_order must be a list[str | set[str]]!")
+        yield method_name
+
+    def iterate_over_set(item: set):
+        for method_name in item:
+            if method_name == "*":
+                raise ValueError(
+                    "Asterisk (*) may not be a part of a set in priority_order!"
+                )
+            yield from check_isstr(method_name)
+
+    for item in priority_order:
+        if isinstance(item, set):
+            yield from iterate_over_set(item)
+        else:
+            yield from check_isstr(item)
+
+
+def check_priority_order(
+    priority_order: Optional[PriorityOrder], methods: List[MethodCls]
+) -> None:
+    if priority_order is None:
+        return
+
+    known_methods = {m.name: m for m in methods}
+    seen_method_names = set()
+
+    for method_name in iterate_priority_order(priority_order):
+        if method_name not in known_methods and method_name != "*":
+            raise ValueError(
+                f'Method "{method_name}" in priority_order not in selected methods!'
+            )
+        if method_name in seen_method_names:
+            if method_name != "*":
+                raise ValueError(
+                    f'Duplicate method name "{method_name}" in priority_order'
+                )
+            else:
+                raise ValueError(
+                    "The asterisk (*) can only occur once in priority_order!"
+                )
+        seen_method_names.add(method_name)

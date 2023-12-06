@@ -15,6 +15,7 @@ from wakepy.core.method import (
     method_names_to_classes,
     get_methods_for_mode,
     select_methods,
+    check_priority_order,
 )
 
 from testmethods import MethodIs, get_test_method_class
@@ -379,3 +380,62 @@ def test_method_curation_opts_constructor(monkeypatch):
         ),
     ):
         MethodCurationOpts.from_names(lower_priority=["A"], skip=["A"])
+
+
+def test_check_priority_order(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class MethodA(Method):
+        name = "A"
+
+    class MethodB(Method):
+        name = "B"
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+
+    class MethodE(Method):
+        name = "E"
+
+    class MethodF(Method):
+        name = "F"
+
+    methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
+
+    # These should be fine
+    check_priority_order(priority_order=None, methods=methods)
+    check_priority_order(priority_order=["*"], methods=methods)
+    # Simple list of methods
+    check_priority_order(priority_order=["A", "B", "F"], methods=methods)
+    # Simple list of methods with asterisk
+    check_priority_order(priority_order=["A", "B", "*", "F"], methods=methods)
+    # Simple set + strings
+    check_priority_order(priority_order=[{"A", "B"}, "*", "F"], methods=methods)
+    # Simple set + strings
+    check_priority_order(priority_order=[{"A", "B"}, "*", "E", {"F"}], methods=methods)
+
+    # These are not fine
+    # There is no Method with name "X" in methods
+    with pytest.raises(
+        ValueError,
+        match=re.escape('Method "X" in priority_order not in selected methods!'),
+    ):
+        check_priority_order(priority_order=["X"], methods=methods)
+
+    # two asterisks
+    with pytest.raises(
+        ValueError,
+        match=re.escape("The asterisk (*) can only occur once in priority_order!"),
+    ):
+        check_priority_order(priority_order=["A", "*", "B", "*"], methods=methods)
+
+    # Asterisk inside a set
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Asterisk (*) may not be a part of a set in priority_order!"),
+    ):
+        check_priority_order(priority_order=[{"*"}], methods=methods)
