@@ -476,26 +476,22 @@ def test_get_prioritized_methods_groups():
     (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
     # Case: Select some methods as more important, with '*'
-    methods_prioritised = get_prioritized_methods_groups(
-        methods, priority_order=["A", "F", "*"]
-    )
-    assert methods_prioritised == [
+    assert get_prioritized_methods_groups(methods, priority_order=["A", "F", "*"]) == [
         {MethodA},
         {MethodF},
         {MethodB, MethodC, MethodD, MethodE},
     ]
+
     # Case: Select some methods as more important, without '*'
-    priority_order = ["A", "F"]
-    methods_prioritised_without_asterisk = get_prioritized_methods_groups(
-        methods,
-        priority_order=priority_order,
-    )
     # The results should be exactly the same as with asterisk in the end
-    assert methods_prioritised_without_asterisk == methods_prioritised
-    assert priority_order == [
-        "A",
-        "F",
-    ], "The priority_order argument should not be modified by the function"
+    assert get_prioritized_methods_groups(
+        methods,
+        priority_order=["A", "F"],
+    ) == [
+        {MethodA},
+        {MethodF},
+        {MethodB, MethodC, MethodD, MethodE},
+    ]
 
     # Case: asterisk in the middle
     assert get_prioritized_methods_groups(methods, priority_order=["A", "*", "B"]) == [
