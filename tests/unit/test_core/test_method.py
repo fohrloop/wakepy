@@ -16,6 +16,7 @@ from wakepy.core.method import (
     get_method,
     get_methods_for_mode,
     method_names_to_classes,
+    get_prioritized_methods_groups,
     select_methods,
 )
 
@@ -445,3 +446,50 @@ def test_check_priority_order(monkeypatch):
         match=re.escape("priority_order must be a list[str | set[str]]!"),
     ):
         check_priority_order(priority_order=[MethodA], methods=methods)
+
+
+def test_get_prioritized_methods_groups(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class MethodA(Method):
+        name = "A"
+
+    class MethodB(Method):
+        name = "B"
+
+    class MethodC(Method):
+        name = "C"
+
+    class MethodD(Method):
+        name = "D"
+
+    class MethodE(Method):
+        name = "E"
+
+    class MethodF(Method):
+        name = "F"
+
+    methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
+
+    # Case: Select some methods as more important, with '*'
+    methods_prioritised = get_prioritized_methods_groups(
+        methods, priority_order=["A", "F", "*"]
+    )
+    assert len(methods_prioritised) == 3
+    assert methods_prioritised[:2] == [{MethodA}, {MethodF}]
+    assert isinstance(methods_prioritised[2], set)
+    assert len(methods_prioritised[2]) == 4
+
+    # Case: Select some methods as more important, without '*'
+    priority_order = ["A", "F"]
+    methods_prioritised_without_asterisk = get_prioritized_methods_groups(
+        methods,
+        priority_order=priority_order,
+    )
+    # The results should be exactly the same as with asterisk in the end
+    assert methods_prioritised_without_asterisk == methods_prioritised
+    assert priority_order == [
+        "A",
+        "F",
+    ], "The priority_order argument should not be modified by the function"

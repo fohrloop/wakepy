@@ -649,3 +649,39 @@ def check_priority_order(
                     "The asterisk (*) can only occur once in priority_order!"
                 )
         seen_method_names.add(method_name)
+
+
+def get_prioritized_methods_groups(
+    methods: List[MethodCls], priority_order: Optional[PriorityOrder]
+) -> List[Set[MethodCls]]:
+    """Prioritizes Methods in `methods` based on priority order defined by
+    `priority_order`."""
+
+    # Make this a list of sets just to make things simpler
+    priority_order: List[Set[str]] = [
+        {item} if isinstance(item, str) else item for item in priority_order
+    ]
+
+    method_dct = {m.name: m for m in methods}
+
+    asterisk = {"*"}
+    asterisk_index = None
+    out = []
+
+    for item in priority_order:
+        if item == asterisk:
+            # do something
+            asterisk_index = len(out)
+        elif isinstance(item, set):
+            out.append({method_dct[name] for name in item})
+
+    out_flattened = {m for group in out for m in group}
+    rest_of_the_methods = {m for m in methods if m not in out_flattened}
+
+    if rest_of_the_methods:
+        if asterisk_index is not None:
+            out.insert(asterisk_index, rest_of_the_methods)
+        else:
+            out.append(rest_of_the_methods)
+
+    return out
