@@ -687,7 +687,7 @@ def get_prioritized_methods_groups(
     Say there are methods MethodA, MethodB, MethodC, MethodD, MethodE, MethodF
     with names "A", "B", "C", "D", "E", "F":
 
-    >>> methods = MethodA, MethodB, MethodC, MethodD, MethodE, MethodF
+    >>> methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
     >>> get_prioritized_methods_groups(methods, priority_order=["A", "F", "*"])
     [
         {MethodA},
