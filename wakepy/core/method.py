@@ -661,6 +661,7 @@ def get_prioritized_methods_groups(
 ) -> List[Set[MethodCls]]:
     """Prioritizes Methods in `methods` based on priority order defined by
     `priority_order`."""
+    priority_order = priority_order or []
 
     # Make this a list of sets just to make things simpler
     priority_order: List[Set[str]] = [
