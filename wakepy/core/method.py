@@ -679,7 +679,9 @@ def get_prioritized_methods_groups(
     method_groups: list[set[MethodCls]]
         The prioritized methods. Each set in the output represents a group of
         equal priority. All Methods from the input `methods` are always
-        included in the output"""
+        included in the output
+    """
+
     priority_order = priority_order or []
 
     # Make this a list of sets just to make things simpler
