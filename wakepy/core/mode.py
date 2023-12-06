@@ -5,13 +5,14 @@ from abc import ABC
 
 from .activationmanager import ModeActivationManager
 from .activationresult import ActivationResult
+from .method import check_priority_order
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
     from typing import List, Optional, Type
 
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
-    from .method import Method
+    from .method import Method, PriorityOrder
 
 
 class ModeExit(Exception):
@@ -61,7 +62,7 @@ class Mode(ABC):
     def __init__(
         self,
         methods: list[Type[Method]],
-        prioritize: Optional[List[Type[Method]]] = None,
+        priority_order: Optional[PriorityOrder] = None,
         dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
         """Initialize a Mode using Methods.
@@ -73,26 +74,25 @@ class Mode(ABC):
         ----------
         methods:
             The list of Methods to be used for activating this Mode.
-        prioritize:
-            If given a list of Methods (classes), this list will be used to
-            order the returned Methods in the order given in `prioritize`. Any
-            Method in `prioritize` but not in the `methods` list will be
-            disregarded. Any method in `methods` but not in `prioritize`, will
-            be placed in the output list just after all prioritized methods, in
-            same order as in the original `methods`.
+        priority_order: list[str | set[str]]
+            The priority order, which is a list of method names or asterisk
+            ('*'). The asterisk means "all rest methods" and may occur only
+            once in the priority order, and cannot be part of a set. All method
+            names must be unique and must be part of the `methods`.
         dbus_adapter:
             For using a custom dbus-adapter. Optional.
         """
+        check_priority_order(priority_order, methods)
+
         self.methods = methods
-        self.prioritized_methods = prioritize
+        self.priority_order = priority_order
         self.manager: ModeActivationManager = self._manager_class(
             dbus_adapter=dbus_adapter
         )
 
     def __enter__(self) -> ActivationResult:
-        return self.manager.activate(
-            methods=self.methods, prioritize=self.prioritized_methods
-        )
+        # TODO: pass the priority_order
+        return self.manager.activate(methods=self.methods)
 
     def __exit__(
         self,
