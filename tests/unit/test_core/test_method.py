@@ -476,11 +476,11 @@ def test_get_prioritized_methods_groups(monkeypatch):
     methods_prioritised = get_prioritized_methods_groups(
         methods, priority_order=["A", "F", "*"]
     )
-    assert len(methods_prioritised) == 3
-    assert methods_prioritised[:2] == [{MethodA}, {MethodF}]
-    assert isinstance(methods_prioritised[2], set)
-    assert len(methods_prioritised[2]) == 4
-
+    assert methods_prioritised == [
+        {MethodA},
+        {MethodF},
+        {MethodB, MethodC, MethodD, MethodE},
+    ]
     # Case: Select some methods as more important, without '*'
     priority_order = ["A", "F"]
     methods_prioritised_without_asterisk = get_prioritized_methods_groups(
@@ -493,3 +493,10 @@ def test_get_prioritized_methods_groups(monkeypatch):
         "A",
         "F",
     ], "The priority_order argument should not be modified by the function"
+
+    # Case: asterisk in the middle
+    assert get_prioritized_methods_groups(methods, priority_order=["A", "*", "B"]) == [
+        {MethodA},
+        {MethodC, MethodD, MethodE, MethodF},
+        {MethodB},
+    ]
