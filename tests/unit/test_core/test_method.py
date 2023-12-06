@@ -458,12 +458,14 @@ def test_check_priority_order():
 def test_get_prioritized_methods_groups_does_not_edit_args():
     """Test that the prioriry_order argument is not modified by the function"""
     methods = get_methods(["A", "B", "C", "D", "E", "F"])
+
     priority_order = ["A", "F"]
-    get_prioritized_methods_groups(
+
+    _ = get_prioritized_methods_groups(
         methods,
         priority_order=priority_order,
     )
-    # The results should be exactly the same as with asterisk in the end
+
     assert priority_order == [
         "A",
         "F",
