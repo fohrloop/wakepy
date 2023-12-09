@@ -10,6 +10,7 @@ from .calls import DbusMethodCall as DbusMethodCall
 from .configuration import CURRENT_SYSTEM as CURRENT_SYSTEM
 from .constants import BusType as BusType
 from .constants import SystemName as SystemName
+from .constants import ModeName as ModeName
 from .dbus import DbusAddress as DbusAddress
 from .dbus import DbusMethod as DbusMethod
 from .method import Method as Method
