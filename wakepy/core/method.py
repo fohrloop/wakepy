@@ -3,7 +3,6 @@ from __future__ import annotations
 import typing
 import warnings
 from abc import ABC, ABCMeta
-from dataclasses import dataclass, field
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from . import CURRENT_SYSTEM
@@ -523,72 +522,6 @@ class Method(ABC, metaclass=MethodMeta):
             )
         )
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
-
-
-@dataclass
-class MethodCurationOpts:
-    """A container for options for selecting and prioritizing Methods.
-
-    Purpose
-    -------
-    * Act as a data storage to method selection and prioritization parameters.
-    * Provide basic validation for those input parameters
-    * Convert the input parameters from strings to Method classes (constructor
-      MethodCurationOpts.from_names)
-
-    Rules
-    -----
-    1) Only possible to define one: `skip` ("blacklist") or `use_only`
-      ("whitelist"), not both!
-    2) A method can only be in `lower_priority` OR `higher_priority`, not both.
-    3) A method can not be simultaneously skipped and prioritized
-    """
-
-    skip: MethodClsCollection = field(default_factory=list)
-    use_only: MethodClsCollection = field(default_factory=list)
-    lower_priority: MethodClsCollection = field(default_factory=list)
-    higher_priority: MethodClsCollection = field(default_factory=list)
-
-    def __post_init__(self):
-        if self.skip and self.use_only:
-            raise ValueError(
-                "Can only define skip (blacklist) or use_only (whitelist), not both!"
-            )
-
-        methods_in_both = set(self.lower_priority).intersection(
-            set(self.higher_priority)
-        )
-        if methods_in_both:
-            raise ValueError(
-                f"Cannot have same methods in higher_priority and lower_priority!"
-                f" (Methods: {{{','.join(m.name for m in methods_in_both)}}})"
-            )
-
-        methods_with_set_priority = set(self.lower_priority).union(
-            set(self.higher_priority)
-        )
-        skipped_with_priority = set(self.skip).intersection(methods_with_set_priority)
-        if skipped_with_priority:
-            raise ValueError(
-                f"Cannot have same methods in `skip` and `higher_priority` or "
-                "`lower_priority`!"
-                f" (See methods: {{{','.join(m.name for m in skipped_with_priority)}}})"
-            )
-
-    @classmethod
-    def from_names(
-        cls,
-        skip: Optional[StrCollection] = None,
-        use_only: Optional[StrCollection] = None,
-        lower_priority: Optional[StrCollection] = None,
-        higher_priority: Optional[StrCollection] = None,
-    ):
-        return cls(
-            skip=method_names_to_classes(skip) or [],
-            use_only=method_names_to_classes(use_only) or [],
-            lower_priority=method_names_to_classes(lower_priority) or [],
-            higher_priority=method_names_to_classes(higher_priority) or [],
-        )
 
 
 def iterate_priority_order(

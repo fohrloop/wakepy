@@ -9,7 +9,6 @@ from wakepy.core.method import (
     ExitModeError,
     HeartbeatCallError,
     Method,
-    MethodCurationOpts,
     MethodDefinitionError,
     MethodError,
     SystemName,
@@ -353,49 +352,6 @@ def test_select_methods():
         ),
     ):
         select_methods(methods, use_only=["foo", "bar"])
-
-
-@pytest.mark.usefixtures("provide_methods_a_f")
-def test_method_curation_opts_constructor():
-    MethodA, MethodF = get_methods(["A", "F"])
-
-    opts = MethodCurationOpts.from_names(skip=["A"], higher_priority=["F"])
-    assert opts.skip == [MethodA]
-    assert opts.higher_priority == [MethodF]
-
-    # Should not be possible to define both: use_only and skip
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Can only define skip (blacklist) or use_only (whitelist), not both!"
-        ),
-    ):
-        MethodCurationOpts.from_names(skip=["A"], use_only=["F"])
-
-    # Should not be possible to define same method in lower and higher priority
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Cannot have same methods in higher_priority and lower_priority! (Methods: {A})"
-        ),
-    ):
-        MethodCurationOpts.from_names(higher_priority=["A"], lower_priority=["A"])
-
-    # Cannot skip and prioritize methods
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
-        ),
-    ):
-        MethodCurationOpts.from_names(higher_priority=["A"], skip=["A"])
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
-        ),
-    ):
-        MethodCurationOpts.from_names(lower_priority=["A"], skip=["A"])
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
