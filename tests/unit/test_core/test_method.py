@@ -22,6 +22,12 @@ from wakepy.core.method import (
 )
 
 
+# B, D, E
+FIRST_MODE = "first_mode"
+# A, F
+SECOND_MODE = "second_mode"
+
+
 @pytest.fixture(scope="function")
 def provide_methods_a_f(monkeypatch):
     # empty method registry
@@ -29,21 +35,26 @@ def provide_methods_a_f(monkeypatch):
 
     class MethodA(Method):
         name = "A"
+        mode = SECOND_MODE
 
     class MethodB(Method):
         name = "B"
+        mode = FIRST_MODE
 
     class MethodC(Method):
         name = "C"
 
     class MethodD(Method):
         name = "D"
+        mode = FIRST_MODE
 
     class MethodE(Method):
         name = "E"
+        mode = FIRST_MODE
 
     class MethodF(Method):
         name = "F"
+        mode = SECOND_MODE
 
 
 def test_overridden_methods_autodiscovery():
@@ -180,18 +191,9 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
         name = somename
 
 
-def test_method_names_to_classes(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
-
-    class A(Method):
-        name = "A"
-
-    class B(Method):
-        name = "B"
-
-    class C(Method):
-        name = "C"
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_method_names_to_classes():
+    (A, B, C) = get_methods(["A", "B", "C"])
 
     # Asking for a list, getting a list
     assert method_names_to_classes(["A", "B"]) == [A, B]
@@ -211,8 +213,8 @@ def test_method_names_to_classes(monkeypatch):
     assert method_names_to_classes(None) is None
 
     # Asking something that does not exists will raise KeyError
-    with pytest.raises(KeyError, match=re.escape('No Method with name "D" found!')):
-        method_names_to_classes(["A", "D"])
+    with pytest.raises(KeyError, match=re.escape('No Method with name "foo" found!')):
+        method_names_to_classes(["A", "foo"])
 
     # Using unsupported type raises TypeError
     with pytest.raises(TypeError):
@@ -275,66 +277,25 @@ def test_all_combinations_with_switch_to_the_mode():
             raise Exception(method.__class__.__name__)
 
 
-def test_get_methods_for_mode(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_get_methods_for_mode():
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+    (MethodA, MethodB, _, MethodD, MethodE, MethodF) = methods
 
-    # B, D, E
-    first_mode = "first_mode"
-    # A, F
-    second_mode = "second_mode"
-
-    # The register is empty at start
-    assert get_methods_for_mode(first_mode) == []
-    assert get_methods_for_mode(second_mode) == []
-
-    class MethodA(Method):
-        name = "A"
-        mode = second_mode
-
-    class MethodB(Method):
-        name = "B"
-        mode = first_mode
-
-    class MethodC(Method):
-        name = "C"
-
-    class MethodD(Method):
-        name = "D"
-        mode = first_mode
-
-    class MethodE(Method):
-        name = "E"
-        mode = first_mode
-
-    class MethodF(Method):
-        name = "F"
-        mode = second_mode
-
-    # Now, there are methods
-    assert get_methods_for_mode(first_mode) == [
+    assert get_methods_for_mode(FIRST_MODE) == [
         MethodB,
         MethodD,
         MethodE,
     ]
-    assert get_methods_for_mode(second_mode) == [
+    assert get_methods_for_mode(SECOND_MODE) == [
         MethodA,
         MethodF,
     ]
 
 
-def test_select_methods(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
-
-    class MethodB(Method):
-        name = "B"
-
-    class MethodD(Method):
-        name = "D"
-
-    class MethodE(Method):
-        name = "E"
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_select_methods():
+    (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
 
     methods = [MethodB, MethodD, MethodE]
 
@@ -358,19 +319,13 @@ def test_select_methods(monkeypatch):
         select_methods(methods, use_only=["foo", "bar"])
 
 
-def test_method_curation_opts_constructor(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_method_curation_opts_constructor():
+    MethodA, MethodF = get_methods(["A", "F"])
 
-    class Foo(Method):
-        name = "foo"
-
-    class MethodA(Method):
-        name = "A"
-
-    opts = MethodCurationOpts.from_names(skip=["A"], higher_priority=["foo"])
+    opts = MethodCurationOpts.from_names(skip=["A"], higher_priority=["F"])
     assert opts.skip == [MethodA]
-    assert opts.higher_priority == [Foo]
+    assert opts.higher_priority == [MethodF]
 
     # Should not be possible to define both: use_only and skip
     with pytest.raises(
@@ -379,7 +334,7 @@ def test_method_curation_opts_constructor(monkeypatch):
             "Can only define skip (blacklist) or use_only (whitelist), not both!"
         ),
     ):
-        MethodCurationOpts.from_names(skip=["A"], use_only=["foo"])
+        MethodCurationOpts.from_names(skip=["A"], use_only=["F"])
 
     # Should not be possible to define same method in lower and higher priority
     with pytest.raises(
