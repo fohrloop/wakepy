@@ -756,7 +756,11 @@ def get_prioritized_methods(
     priority_order: Optional[PriorityOrder] = None,
 ) -> List[MethodCls]:
     """Take an unordered list of Methods and sort them by priority using the
-    priority_order and automatic ordering.
+    priority_order and automatic ordering. The priority_order is used to define
+    groups of priority (sets of methods). The automatic ordering part is used
+    to order the methods *within* each priority group. In particular, all
+    methods supported by the current platform are placed first, and all
+    supported methods are then ordered alphabetically (ignoring case).
 
     Parameters
     ----------
@@ -774,18 +778,26 @@ def get_prioritized_methods(
 
     Example
     -------
-    Having following
+    Assuming: Current platform is Linux.
 
-        priority_order = [{'A', 'B'}, '*', {'E', 'F'}]
-        methods = [A, B, C, D, E, F]
+    >>> methods = [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA]
+    >>> get_prioritized_methods(
+    >>>    methods,
+    >>>    priority_order=[{"WinA", "LinuxB"}, "*"],
+    >>> )
+    [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
 
-    Could be first sorted with priority_order to get (an intermediate list)
+    Explanation:
 
-        [{A, B}, {C, D}, {E, F}]
+    WindowsA and LinuxB were given high priority, but since the current
+    platform is Linux, LinuxB was prioritized to be before WindowsA.
 
-    and then with automatic sorting (within the sets/method groups) to get
+    The asterisk ('*') is converted to a set of rest of the methods:
+    {"LinuxA", "LinuxC", "MultiPlatformA"}, and those are then
+    automatically ordered. As all of them support Linux, the result is
+    just the methods sorted alphabetically. The asterisk in the end is
+    optional; it is added to the end of `priority_order` if missing.
 
-        [B, A, C, D, F, E]
     """
     unordered_groups: List[Set[MethodCls]] = get_prioritized_methods_groups(
         methods, priority_order=priority_order
