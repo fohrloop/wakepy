@@ -6,10 +6,10 @@ from abc import ABC, ABCMeta
 from dataclasses import dataclass, field
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
+from . import CURRENT_SYSTEM
 from .calls import DbusMethodCall
 from .constants import ModeName, SystemName
 from .strenum import StrEnum, auto
-from . import CURRENT_SYSTEM
 
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
@@ -570,7 +570,8 @@ class MethodCurationOpts:
         skipped_with_priority = set(self.skip).intersection(methods_with_set_priority)
         if skipped_with_priority:
             raise ValueError(
-                f"Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+                f"Cannot have same methods in `skip` and `higher_priority` or "
+                "`lower_priority`!"
                 f" (See methods: {{{','.join(m.name for m in skipped_with_priority)}}})"
             )
 

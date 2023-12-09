@@ -12,18 +12,17 @@ from wakepy.core.method import (
     MethodCurationOpts,
     MethodDefinitionError,
     MethodError,
+    SystemName,
     check_priority_order,
     get_method,
     get_methods,
     get_methods_for_mode,
-    method_names_to_classes,
-    sort_methods_by_priority,
-    SystemName,
-    get_prioritized_methods_groups,
     get_prioritized_methods,
+    get_prioritized_methods_groups,
+    method_names_to_classes,
     select_methods,
+    sort_methods_by_priority,
 )
-
 
 # B, D, E
 FIRST_MODE = "first_mode"
