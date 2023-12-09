@@ -582,6 +582,13 @@ def test_get_prioritized_methods(monkeypatch):
         priority_order=[{"LinuxB"}, "*", {"LinuxA", "LinuxC"}],
     ) == [LinuxB, MultiPlatformA, LinuxA, LinuxC]
 
+    assert get_prioritized_methods(
+        [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA],
+        # Means "LinuxB & WinA" first, ordered with automatic ordering, and
+        # then all the rest, also automatically ordered
+        priority_order=[{"WinA", "LinuxB"}, "*"],
+    ) == [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
+
     # No user-defined order -> Just alphabetical, but current platform (linux) first.
     assert get_prioritized_methods(
         [
