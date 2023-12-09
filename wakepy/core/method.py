@@ -9,6 +9,7 @@ from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 from .calls import DbusMethodCall
 from .constants import ModeName, SystemName
 from .strenum import StrEnum, auto
+from . import CURRENT_SYSTEM
 
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
@@ -730,7 +731,22 @@ def get_prioritized_methods_groups(
 
 
 def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
-    return list(methods)
+    """Sorts Method classes by priority and returns a new sorted list with
+    Methods with highest priority first.
+
+    The logic is:
+    (1) Any Methods supporting the CURRENT_SYSTEM are placed before any other
+        Methods (the others are not expected to work at all)
+    (2) Sort alphabetically by Method name, ignoring the case
+    """
+    return sorted(
+        methods,
+        key=lambda m: (
+            # Prioritize methods supporting CURRENT_SYSTEM over any others
+            0 if CURRENT_SYSTEM in m.supported_systems else 1,
+            m.name.lower(),
+        ),
+    )
 
 
 def get_prioritized_methods(
