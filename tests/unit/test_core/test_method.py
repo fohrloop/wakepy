@@ -12,15 +12,17 @@ from wakepy.core.method import (
     MethodCurationOpts,
     MethodDefinitionError,
     MethodError,
+    SystemName,
     check_priority_order,
     get_method,
     get_methods,
     get_methods_for_mode,
-    method_names_to_classes,
+    get_prioritized_methods,
     get_prioritized_methods_groups,
+    method_names_to_classes,
     select_methods,
+    sort_methods_by_priority,
 )
-
 
 # B, D, E
 FIRST_MODE = "first_mode"
@@ -55,6 +57,40 @@ def provide_methods_a_f(monkeypatch):
     class MethodF(Method):
         name = "F"
         mode = SECOND_MODE
+
+
+@pytest.fixture(scope="function")
+def provide_methods_different_systems(monkeypatch):
+    # empty method registry
+    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+
+    class WindowsA(Method):
+        name = "WinA"
+        supported_systems = (SystemName.WINDOWS,)
+
+    class WindowsB(Method):
+        name = "WinB"
+        supported_systems = (SystemName.WINDOWS,)
+
+    class WindowsC(Method):
+        name = "WinC"
+        supported_systems = (SystemName.WINDOWS,)
+
+    class LinuxA(Method):
+        name = "LinuxA"
+        supported_systems = (SystemName.LINUX,)
+
+    class LinuxB(Method):
+        name = "LinuxB"
+        supported_systems = (SystemName.LINUX,)
+
+    class LinuxC(Method):
+        name = "LinuxC"
+        supported_systems = (SystemName.LINUX,)
+
+    class MultiPlatformA(Method):
+        name = "multiA"
+        supported_systems = (SystemName.LINUX, SystemName.WINDOWS, SystemName.DARWIN)
 
 
 def test_overridden_methods_autodiscovery():
@@ -483,3 +519,90 @@ def test_get_prioritized_methods_groups():
     assert get_prioritized_methods_groups(methods, priority_order=None) == [
         {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
     ]
+
+
+@pytest.mark.usefixtures("provide_methods_different_systems")
+def test_sort_methods_by_priority(monkeypatch):
+    WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA = get_methods(
+        ["WinA", "WinB", "WinC", "LinuxA", "LinuxB", "LinuxC", "multiA"]
+    )
+
+    monkeypatch.setattr("wakepy.core.method.CURRENT_SYSTEM", SystemName.LINUX)
+    # Expecting to see Linux methods prioritized, and then by method name
+    assert sort_methods_by_priority(
+        {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
+    ) == [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA, WindowsB, WindowsC]
+
+    monkeypatch.setattr("wakepy.core.method.CURRENT_SYSTEM", SystemName.WINDOWS)
+    # Expecting to see windows methods prioritized, and then by method name
+    assert sort_methods_by_priority(
+        {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
+    ) == [MultiPlatformA, WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC]
+
+
+@pytest.mark.usefixtures("provide_methods_different_systems")
+def test_get_prioritized_methods(monkeypatch):
+    WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA = get_methods(
+        ["WinA", "WinB", "WinC", "LinuxA", "LinuxB", "LinuxC", "multiA"]
+    )
+
+    monkeypatch.setattr("wakepy.core.method.CURRENT_SYSTEM", SystemName.LINUX)
+
+    assert get_prioritized_methods(
+        [
+            LinuxA,
+            LinuxB,
+            LinuxC,
+            MultiPlatformA,
+        ],
+        # Means: Prioritize LinuxC after everything else
+        priority_order=["*", {"LinuxC"}],
+    ) == [LinuxA, LinuxB, MultiPlatformA, LinuxC]
+
+    assert get_prioritized_methods(
+        [
+            LinuxA,
+            LinuxB,
+            LinuxC,
+            MultiPlatformA,
+        ],
+        # Means: prioritize LinuxC over anything else.
+        priority_order=[{"LinuxC"}],
+    ) == [LinuxC, LinuxA, LinuxB, MultiPlatformA]
+
+    assert get_prioritized_methods(
+        [
+            LinuxA,
+            LinuxB,
+            LinuxC,
+            MultiPlatformA,
+        ],
+        # Means, LinuxB first, then anything that is in between, and give
+        # lowest priority to LinuxA and LinuxC
+        priority_order=[{"LinuxB"}, "*", {"LinuxA", "LinuxC"}],
+    ) == [LinuxB, MultiPlatformA, LinuxA, LinuxC]
+
+    assert get_prioritized_methods(
+        [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA],
+        # Means "LinuxB & WinA" first, ordered with automatic ordering, and
+        # then all the rest, also automatically ordered
+        priority_order=[{"WinA", "LinuxB"}, "*"],
+    ) == [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
+
+    # No user-defined order -> Just alphabetical, but current platform (linux) first.
+    assert get_prioritized_methods(
+        [
+            LinuxA,
+            LinuxB,
+            WindowsA,
+            WindowsB,
+            LinuxC,
+            MultiPlatformA,
+        ],
+    ) == [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA, WindowsB]
+
+    monkeypatch.setattr("wakepy.core.method.CURRENT_SYSTEM", SystemName.WINDOWS)
+    # No user-defined order -> Just alphabetical, but current platform (Windows) first.
+    assert get_prioritized_methods(
+        [LinuxA, LinuxB, WindowsA, WindowsB, LinuxC, MultiPlatformA],
+    ) == [MultiPlatformA, WindowsA, WindowsB, LinuxA, LinuxB, LinuxC]

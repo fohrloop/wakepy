@@ -9,7 +9,7 @@ from .method import check_priority_order
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import List, Optional, Type
+    from typing import Optional, Type
 
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
     from .method import Method, PriorityOrder

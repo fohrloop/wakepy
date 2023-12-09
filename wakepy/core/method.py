@@ -6,6 +6,7 @@ from abc import ABC, ABCMeta
 from dataclasses import dataclass, field
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
+from . import CURRENT_SYSTEM
 from .calls import DbusMethodCall
 from .constants import ModeName, SystemName
 from .strenum import StrEnum, auto
@@ -41,7 +42,7 @@ def get_method(method_name: str) -> MethodCls:
     return METHOD_REGISTRY[method_name]
 
 
-def get_methods(method_names: List[str]) -> MethodCls:
+def get_methods(method_names: List[str]) -> List[MethodCls]:
     """Get Method classes based on their names."""
     return [get_method(name) for name in method_names]
 
@@ -569,7 +570,8 @@ class MethodCurationOpts:
         skipped_with_priority = set(self.skip).intersection(methods_with_set_priority)
         if skipped_with_priority:
             raise ValueError(
-                f"Cannot have same methods in `skip` and `higher_priority` or `lower_priority`!"
+                f"Cannot have same methods in `skip` and `higher_priority` or "
+                "`lower_priority`!"
                 f" (See methods: {{{','.join(m.name for m in skipped_with_priority)}}})"
             )
 
@@ -596,6 +598,9 @@ def iterate_priority_order(
     iterator are (method_name, in_set) 2-tuples, where the method_name is the
     method name (str) and the in_set is a boolean which is True if the returned
     method_name is part of a set and False otherwise."""
+
+    if not priority_order:
+        return
 
     for item in priority_order:
         if isinstance(item, set):
@@ -697,20 +702,18 @@ def get_prioritized_methods_groups(
 
     """
 
-    priority_order = priority_order or []
-
     # Make this a list of sets just to make things simpler
-    priority_order: List[Set[str]] = [
-        {item} if isinstance(item, str) else item for item in priority_order
+    priority_order_sets: List[Set[str]] = [
+        {item} if isinstance(item, str) else item for item in priority_order or []
     ]
 
     method_dct = {m.name: m for m in methods}
 
     asterisk = {"*"}
     asterisk_index = None
-    out = []
+    out: List[Set[MethodCls]] = []
 
-    for item in priority_order:
+    for item in priority_order_sets:
         if item == asterisk:
             # Save the location where to add the rest of the methods ('*')
             asterisk_index = len(out)
@@ -727,3 +730,81 @@ def get_prioritized_methods_groups(
             out.append(rest_of_the_methods)
 
     return out
+
+
+def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
+    """Sorts Method classes by priority and returns a new sorted list with
+    Methods with highest priority first.
+
+    The logic is:
+    (1) Any Methods supporting the CURRENT_SYSTEM are placed before any other
+        Methods (the others are not expected to work at all)
+    (2) Sort alphabetically by Method name, ignoring the case
+    """
+    return sorted(
+        methods,
+        key=lambda m: (
+            # Prioritize methods supporting CURRENT_SYSTEM over any others
+            0 if CURRENT_SYSTEM in m.supported_systems else 1,
+            m.name.lower() if m.name else "",
+        ),
+    )
+
+
+def get_prioritized_methods(
+    methods: List[MethodCls],
+    priority_order: Optional[PriorityOrder] = None,
+) -> List[MethodCls]:
+    """Take an unordered list of Methods and sort them by priority using the
+    priority_order and automatic ordering. The priority_order is used to define
+    groups of priority (sets of methods). The automatic ordering part is used
+    to order the methods *within* each priority group. In particular, all
+    methods supported by the current platform are placed first, and all
+    supported methods are then ordered alphabetically (ignoring case).
+
+    Parameters
+    ----------
+    methods:
+        The list of Methods to sort.
+    priority_order:
+        Optional priority order, which is a list of method names (strings) or
+        sets of method names (sets of strings). An asterisk ('*') may be used
+        for "all the rest methods". None is same as ['*'].
+
+    Returns
+    -------
+    sorted_methods:
+        The input `methods` sorted with priority, highest priority first.
+
+    Example
+    -------
+    Assuming: Current platform is Linux.
+
+    >>> methods = [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA]
+    >>> get_prioritized_methods(
+    >>>    methods,
+    >>>    priority_order=[{"WinA", "LinuxB"}, "*"],
+    >>> )
+    [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
+
+    Explanation:
+
+    WindowsA and LinuxB were given high priority, but since the current
+    platform is Linux, LinuxB was prioritized to be before WindowsA.
+
+    The asterisk ('*') is converted to a set of rest of the methods:
+    {"LinuxA", "LinuxC", "MultiPlatformA"}, and those are then
+    automatically ordered. As all of them support Linux, the result is
+    just the methods sorted alphabetically. The asterisk in the end is
+    optional; it is added to the end of `priority_order` if missing.
+
+    """
+    unordered_groups: List[Set[MethodCls]] = get_prioritized_methods_groups(
+        methods, priority_order=priority_order
+    )
+
+    ordered_groups: List[List[MethodCls]] = [
+        sort_methods_by_priority(group) for group in unordered_groups
+    ]
+
+    return [method for group in ordered_groups for method in group]
