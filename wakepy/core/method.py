@@ -42,7 +42,7 @@ def get_method(method_name: str) -> MethodCls:
     return METHOD_REGISTRY[method_name]
 
 
-def get_methods(method_names: List[str]) -> MethodCls:
+def get_methods(method_names: List[str]) -> List[MethodCls]:
     """Get Method classes based on their names."""
     return [get_method(name) for name in method_names]
 
@@ -599,6 +599,9 @@ def iterate_priority_order(
     method name (str) and the in_set is a boolean which is True if the returned
     method_name is part of a set and False otherwise."""
 
+    if not priority_order:
+        return
+
     for item in priority_order:
         if isinstance(item, set):
             for method_name in item:
@@ -699,20 +702,18 @@ def get_prioritized_methods_groups(
 
     """
 
-    priority_order = priority_order or []
-
     # Make this a list of sets just to make things simpler
-    priority_order: List[Set[str]] = [
-        {item} if isinstance(item, str) else item for item in priority_order
+    priority_order_sets: List[Set[str]] = [
+        {item} if isinstance(item, str) else item for item in priority_order or []
     ]
 
     method_dct = {m.name: m for m in methods}
 
     asterisk = {"*"}
     asterisk_index = None
-    out = []
+    out: List[Set[MethodCls]] = []
 
-    for item in priority_order:
+    for item in priority_order_sets:
         if item == asterisk:
             # Save the location where to add the rest of the methods ('*')
             asterisk_index = len(out)
@@ -745,7 +746,7 @@ def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
         key=lambda m: (
             # Prioritize methods supporting CURRENT_SYSTEM over any others
             0 if CURRENT_SYSTEM in m.supported_systems else 1,
-            m.name.lower(),
+            m.name.lower() if m.name else "",
         ),
     )
 
