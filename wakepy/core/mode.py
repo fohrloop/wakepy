@@ -5,14 +5,15 @@ from abc import ABC
 
 from .activationmanager import ModeActivationManager
 from .activationresult import ActivationResult
-from .method import check_priority_order
+from .method import check_priority_order, get_methods_for_mode, select_methods
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
     from typing import Optional, Type
 
+    from .constants import ModeName
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
-    from .method import Method, PriorityOrder
+    from .method import Method, PriorityOrder, StrCollection
 
 
 class ModeExit(Exception):
@@ -126,3 +127,37 @@ class Mode(ABC):
         # unreachable
 
         return False
+
+
+def create_mode(
+    modename: ModeName,
+    skip: Optional[StrCollection] = None,
+    use_only: Optional[StrCollection] = None,
+    dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+) -> Mode:
+    """
+    Creates and returns a Mode (a context manager).
+
+    Parameters
+    ----------
+    skip: list, tuple or set of str or None
+        The names of Methods to remove from the mode defined with `modename`;
+        a "blacklist" filter. Any Method in `skip` but not in the selected mode
+        will be silently ignored. Cannot be used same time with `use_only`.
+        Optional.
+    use_only: list, tuple or set of str
+        The names of Methods to select from the mode defined with `modename`;
+        a "whitelist" filter. Means "use these and only these Methods". Any
+        Methods in `use_only` but not in the selected mode will raise a
+        ValueError. Cannot be used same time with `skip`. Optional.
+    dbus_adapter:
+        Optional argument which can be used to define a customer DBus adapter.
+
+    Returns
+    -------
+    mode: Mode
+        The context manager for the selected mode.
+    """
+    methods_for_mode = get_methods_for_mode(modename)
+    selected_methods = select_methods(methods_for_mode, use_only=use_only, skip=skip)
+    return Mode(methods=selected_methods, dbus_adapter=dbus_adapter)
