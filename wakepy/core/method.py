@@ -727,3 +727,54 @@ def get_prioritized_methods_groups(
             out.append(rest_of_the_methods)
 
     return out
+
+
+def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
+    return list(methods)
+
+
+def get_prioritized_methods(
+    methods: List[MethodCls],
+    priority_order: Optional[PriorityOrder] = None,
+) -> List[MethodCls]:
+    """Take an unordered list of Methods and sort them by priority using the
+    priority_order and automatic ordering.
+
+    Parameters
+    ----------
+    methods:
+        The list of Methods to sort.
+    priority_order:
+        Optional priority order, which is a list of method names (strings) or
+        sets of method names (sets of strings). An asterisk ('*') may be used
+        for "all the rest methods". None is same as ['*'].
+
+    Returns
+    -------
+    sorted_methods:
+        The input `methods` sorted with priority, highest priority first.
+
+    Example
+    -------
+    Having following
+
+        priority_order = [{'A', 'B'}, '*', {'E', 'F'}]
+        methods = [A, B, C, D, E, F]
+
+    Could be first sorted with priority_order to get (an intermediate list)
+
+        [{A, B}, {C, D}, {E, F}]
+
+    and then with automatic sorting (within the sets/method groups) to get
+
+        [B, A, C, D, F, E]
+    """
+    unordered_groups: List[Set[MethodCls]] = get_prioritized_methods_groups(
+        methods, priority_order=priority_order
+    )
+
+    ordered_groups: List[List[MethodCls]] = [
+        sort_methods_by_priority(group) for group in unordered_groups
+    ]
+
+    return [method for group in ordered_groups for method in group]
