@@ -4,21 +4,13 @@ import typing
 
 from ..core.constants import ModeName
 from ..core.mode import create_mode
-from ..methods.gnome import GnomeSessionManagerNoIdle, GnomeSessionManagerNoSuspend
 
 if typing.TYPE_CHECKING:
-    from typing import List, Optional, Type
+    from typing import Optional, Type
 
     from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
-    from ..core.method import Method, MethodsPriorityOrder, StrCollection
+    from ..core.method import MethodsPriorityOrder, StrCollection
     from ..core.mode import Mode
-
-running_methods: List[Type[Method]] = [
-    GnomeSessionManagerNoSuspend,
-]
-presenting_methods: List[Type[Method]] = [
-    GnomeSessionManagerNoIdle,
-]
 
 
 def running(
