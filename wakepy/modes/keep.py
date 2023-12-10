@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from typing import List, Optional, Type
 
     from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
-    from ..core.method import Method, StrCollection, MethodsPriorityOrder
+    from ..core.method import Method, MethodsPriorityOrder, StrCollection
     from ..core.mode import Mode
 
 running_methods: List[Type[Method]] = [

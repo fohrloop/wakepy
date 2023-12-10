@@ -8,8 +8,8 @@ from wakepy.core import (
     DbusMethod,
     DbusMethodCall,
     Method,
-    SystemName,
     ModeName,
+    SystemName,
 )
 
 

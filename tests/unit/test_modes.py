@@ -1,7 +1,7 @@
 import pytest
 
+from wakepy.core import Method, ModeName
 from wakepy.modes import keep
-from wakepy.core import ModeName, Method
 
 
 def create_methods(monkeypatch, name_prefix: str, modename: ModeName):
