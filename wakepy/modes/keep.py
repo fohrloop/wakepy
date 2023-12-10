@@ -22,8 +22,8 @@ presenting_methods: List[Type[Method]] = [
 
 
 def running(
-    skip: Optional[StrCollection] = None,
     methods: Optional[StrCollection] = None,
+    omit: Optional[StrCollection] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
@@ -55,16 +55,16 @@ def running(
 
     Parameters
     ----------
-    skip: list, tuple or set of str or None
-        The names of Methods to remove from the keep.running mode; a
-        "blacklist" filter. Any Method in `skip` but not in the keep.running
-        mode will be silently ignored. Cannot be used same time with
-        `methods`. Optional.
     methods: list, tuple or set of str
         The names of Methods to select from the keep.running mode; a
         "whitelist" filter. Means "use these and only these Methods". Any
         Methods in `methods` but not in the keep.running mode will raise a
-        ValueError. Cannot be used same time with `skip`. Optional.
+        ValueError. Cannot be used same time with `omit`. Optional.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the keep.running mode; a
+        "blacklist" filter. Any Method in `omit` but not in the keep.running
+        mode will be silently ignored. Cannot be used same time with
+        `methods`. Optional.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -76,15 +76,15 @@ def running(
     """
     return create_mode(
         modename=ModeName.KEEP_RUNNING,
-        skip=skip,
+        omit=omit,
         methods=methods,
         dbus_adapter=dbus_adapter,
     )
 
 
 def presenting(
-    skip: Optional[StrCollection] = None,
     methods: Optional[StrCollection] = None,
+    omit: Optional[StrCollection] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping a system running
@@ -102,16 +102,16 @@ def presenting(
 
     Parameters
     ----------
-    skip: list, tuple or set of str or None
-        The names of Methods to remove from the keep.running mode; a
-        "blacklist" filter. Any Method in `skip` but not in the keep.running
-        mode will be silently ignored. Cannot be used same time with
-        `methods`. Optional.
     methods: list, tuple or set of str
         The names of Methods to select from the keep.running mode; a
         "whitelist" filter. Means "use these and only these Methods". Any
         Methods in `methods` but not in the keep.running mode will raise a
-        ValueError. Cannot be used same time with `skip`. Optional.
+        ValueError. Cannot be used same time with `omit`. Optional.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the keep.running mode; a
+        "blacklist" filter. Any Method in `omit` but not in the keep.running
+        mode will be silently ignored. Cannot be used same time with
+        `methods`. Optional.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -123,7 +123,7 @@ def presenting(
     """
     return create_mode(
         modename=ModeName.KEEP_PRESENTING,
-        skip=skip,
         methods=methods,
+        omit=omit,
         dbus_adapter=dbus_adapter,
     )

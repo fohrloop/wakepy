@@ -335,10 +335,10 @@ def test_select_methods():
     methods = [MethodB, MethodD, MethodE]
 
     # These can also be filtered with a blacklist
-    assert select_methods(methods, skip=["B"]) == [MethodD, MethodE]
-    assert select_methods(methods, skip=["B", "E"]) == [MethodD]
-    # Extra 'skip' methods do not matter
-    assert select_methods(methods, skip=["B", "E", "foo", "bar"]) == [
+    assert select_methods(methods, omit=["B"]) == [MethodD, MethodE]
+    assert select_methods(methods, omit=["B", "E"]) == [MethodD]
+    # Extra 'omit' methods do not matter
+    assert select_methods(methods, omit=["B", "E", "foo", "bar"]) == [
         MethodD,
     ]
 
