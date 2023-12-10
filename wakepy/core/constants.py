@@ -3,11 +3,10 @@ from .strenum import StrEnum, auto
 
 
 class PlatformName(StrEnum):
-    """The names of supported platforms"""
-
     WINDOWS = auto()
     LINUX = auto()
     MACOS = auto()
+    OTHER = auto()
 
 
 class ModeName(StrEnum):
