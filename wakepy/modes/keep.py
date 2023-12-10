@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from typing import List, Optional, Type
 
     from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
-    from ..core.method import Method, StrCollection, PriorityOrder
+    from ..core.method import Method, StrCollection, MethodsPriorityOrder
     from ..core.mode import Mode
 
 running_methods: List[Type[Method]] = [
@@ -24,7 +24,7 @@ presenting_methods: List[Type[Method]] = [
 def running(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
-    methods_priority: Optional[PriorityOrder] = None,
+    methods_priority: Optional[MethodsPriorityOrder] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
@@ -104,7 +104,7 @@ def running(
 def presenting(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
-    methods_priority: Optional[PriorityOrder] = None,
+    methods_priority: Optional[MethodsPriorityOrder] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping a system running

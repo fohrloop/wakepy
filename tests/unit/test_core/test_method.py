@@ -12,7 +12,7 @@ from wakepy.core.method import (
     MethodDefinitionError,
     MethodError,
     SystemName,
-    check_priority_order,
+    check_methods_priority,
     get_method,
     get_methods,
     get_methods_for_mode,
@@ -355,50 +355,52 @@ def test_select_methods():
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
-def test_check_priority_order():
+def test_check_methods_priority():
     methods = get_methods(["A", "B", "C", "D", "E", "F"])
     (MethodA, *_) = methods
 
     # These should be fine
-    check_priority_order(priority_order=None, methods=methods)
-    check_priority_order(priority_order=["*"], methods=methods)
+    check_methods_priority(methods_priority=None, methods=methods)
+    check_methods_priority(methods_priority=["*"], methods=methods)
     # Simple list of methods
-    check_priority_order(priority_order=["A", "B", "F"], methods=methods)
+    check_methods_priority(methods_priority=["A", "B", "F"], methods=methods)
     # Simple list of methods with asterisk
-    check_priority_order(priority_order=["A", "B", "*", "F"], methods=methods)
+    check_methods_priority(methods_priority=["A", "B", "*", "F"], methods=methods)
     # Simple set + strings
-    check_priority_order(priority_order=[{"A", "B"}, "*", "F"], methods=methods)
+    check_methods_priority(methods_priority=[{"A", "B"}, "*", "F"], methods=methods)
     # Simple set + strings
-    check_priority_order(priority_order=[{"A", "B"}, "*", "E", {"F"}], methods=methods)
+    check_methods_priority(
+        methods_priority=[{"A", "B"}, "*", "E", {"F"}], methods=methods
+    )
 
     # These are not fine
     # There is no Method with name "X" in methods
     with pytest.raises(
         ValueError,
-        match=re.escape('Method "X" in priority_order not in selected methods!'),
+        match=re.escape('Method "X" in methods_priority not in selected methods!'),
     ):
-        check_priority_order(priority_order=["X"], methods=methods)
+        check_methods_priority(methods_priority=["X"], methods=methods)
 
     # two asterisks
     with pytest.raises(
         ValueError,
-        match=re.escape("The asterisk (*) can only occur once in priority_order!"),
+        match=re.escape("The asterisk (*) can only occur once in methods_priority!"),
     ):
-        check_priority_order(priority_order=["A", "*", "B", "*"], methods=methods)
+        check_methods_priority(methods_priority=["A", "*", "B", "*"], methods=methods)
 
     # Asterisk inside a set
     with pytest.raises(
         ValueError,
-        match=re.escape("Asterisk (*) may not be a part of a set in priority_order!"),
+        match=re.escape("Asterisk (*) may not be a part of a set in methods_priority!"),
     ):
-        check_priority_order(priority_order=[{"*"}], methods=methods)
+        check_methods_priority(methods_priority=[{"*"}], methods=methods)
 
     # Unsupported type
     with pytest.raises(
         TypeError,
-        match=re.escape("priority_order must be a list[str | set[str]]!"),
+        match=re.escape("methods_priority must be a list[str | set[str]]!"),
     ):
-        check_priority_order(priority_order=[MethodA], methods=methods)
+        check_methods_priority(methods_priority=[MethodA], methods=methods)
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
@@ -406,17 +408,17 @@ def test_get_prioritized_methods_groups_does_not_edit_args():
     """Test that the prioriry_order argument is not modified by the function"""
     methods = get_methods(["A", "B", "C", "D", "E", "F"])
 
-    priority_order = ["A", "F"]
+    methods_priority = ["A", "F"]
 
     _ = get_prioritized_methods_groups(
         methods,
-        priority_order=priority_order,
+        methods_priority=methods_priority,
     )
 
-    assert priority_order == [
+    assert methods_priority == [
         "A",
         "F",
-    ], "The priority_order argument should not be modified by the function"
+    ], "The methods_priority argument should not be modified by the function"
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
@@ -425,7 +427,9 @@ def test_get_prioritized_methods_groups():
     (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
     # Case: Select some methods as more important, with '*'
-    assert get_prioritized_methods_groups(methods, priority_order=["A", "F", "*"]) == [
+    assert get_prioritized_methods_groups(
+        methods, methods_priority=["A", "F", "*"]
+    ) == [
         {MethodA},
         {MethodF},
         {MethodB, MethodC, MethodD, MethodE},
@@ -435,7 +439,7 @@ def test_get_prioritized_methods_groups():
     # The results should be exactly the same as with asterisk in the end
     assert get_prioritized_methods_groups(
         methods,
-        priority_order=["A", "F"],
+        methods_priority=["A", "F"],
     ) == [
         {MethodA},
         {MethodF},
@@ -443,14 +447,18 @@ def test_get_prioritized_methods_groups():
     ]
 
     # Case: asterisk in the middle
-    assert get_prioritized_methods_groups(methods, priority_order=["A", "*", "B"]) == [
+    assert get_prioritized_methods_groups(
+        methods, methods_priority=["A", "*", "B"]
+    ) == [
         {MethodA},
         {MethodC, MethodD, MethodE, MethodF},
         {MethodB},
     ]
 
     # Case: asterisk at the start
-    assert get_prioritized_methods_groups(methods, priority_order=["*", "A", "B"]) == [
+    assert get_prioritized_methods_groups(
+        methods, methods_priority=["*", "A", "B"]
+    ) == [
         {MethodC, MethodD, MethodE, MethodF},
         {MethodA},
         {MethodB},
@@ -458,7 +466,7 @@ def test_get_prioritized_methods_groups():
 
     # Case: Using sets
     assert get_prioritized_methods_groups(
-        methods, priority_order=[{"A", "B"}, "*", {"E", "F"}]
+        methods, methods_priority=[{"A", "B"}, "*", {"E", "F"}]
     ) == [
         {MethodA, MethodB},
         {MethodC, MethodD},
@@ -466,13 +474,13 @@ def test_get_prioritized_methods_groups():
     ]
 
     # Case: Using sets, no asterisk -> implicit asterisk at the end
-    assert get_prioritized_methods_groups(methods, priority_order=[{"A", "B"}]) == [
+    assert get_prioritized_methods_groups(methods, methods_priority=[{"A", "B"}]) == [
         {MethodA, MethodB},
         {MethodC, MethodD, MethodE, MethodF},
     ]
 
-    # Case: priority_order is None -> Should return all methods as one set
-    assert get_prioritized_methods_groups(methods, priority_order=None) == [
+    # Case: methods_priority is None -> Should return all methods as one set
+    assert get_prioritized_methods_groups(methods, methods_priority=None) == [
         {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
     ]
 
@@ -512,7 +520,7 @@ def test_get_prioritized_methods(monkeypatch):
             MultiPlatformA,
         ],
         # Means: Prioritize LinuxC after everything else
-        priority_order=["*", {"LinuxC"}],
+        methods_priority=["*", {"LinuxC"}],
     ) == [LinuxA, LinuxB, MultiPlatformA, LinuxC]
 
     assert get_prioritized_methods(
@@ -523,7 +531,7 @@ def test_get_prioritized_methods(monkeypatch):
             MultiPlatformA,
         ],
         # Means: prioritize LinuxC over anything else.
-        priority_order=[{"LinuxC"}],
+        methods_priority=[{"LinuxC"}],
     ) == [LinuxC, LinuxA, LinuxB, MultiPlatformA]
 
     assert get_prioritized_methods(
@@ -535,14 +543,14 @@ def test_get_prioritized_methods(monkeypatch):
         ],
         # Means, LinuxB first, then anything that is in between, and give
         # lowest priority to LinuxA and LinuxC
-        priority_order=[{"LinuxB"}, "*", {"LinuxA", "LinuxC"}],
+        methods_priority=[{"LinuxB"}, "*", {"LinuxA", "LinuxC"}],
     ) == [LinuxB, MultiPlatformA, LinuxA, LinuxC]
 
     assert get_prioritized_methods(
         [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA],
         # Means "LinuxB & WinA" first, ordered with automatic ordering, and
         # then all the rest, also automatically ordered
-        priority_order=[{"WinA", "LinuxB"}, "*"],
+        methods_priority=[{"WinA", "LinuxB"}, "*"],
     ) == [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
 
     # No user-defined order -> Just alphabetical, but current platform (linux) first.

@@ -21,8 +21,8 @@ T = TypeVar("T")
 Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
-# The strings in PriorityOrder are names of Methods or the asterisk ('*')
-PriorityOrder = List[Union[str, Set[str]]]
+# The strings in MethodsPriorityOrder are names of Methods or the asterisk ('*')
+MethodsPriorityOrder = List[Union[str, Set[str]]]
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
@@ -524,18 +524,18 @@ class Method(ABC, metaclass=MethodMeta):
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
 
 
-def iterate_priority_order(
-    priority_order: Optional[PriorityOrder],
+def iterate_methods_priority(
+    methods_priority: Optional[MethodsPriorityOrder],
 ) -> typing.Iterator[Tuple[str, bool]]:
-    """Provides an iterator over the items in priority_order. The items in the
+    """Provides an iterator over the items in methods_priority. The items in the
     iterator are (method_name, in_set) 2-tuples, where the method_name is the
     method name (str) and the in_set is a boolean which is True if the returned
     method_name is part of a set and False otherwise."""
 
-    if not priority_order:
+    if not methods_priority:
         return
 
-    for item in priority_order:
+    for item in methods_priority:
         if isinstance(item, set):
             for method_name in item:
                 yield method_name, True
@@ -543,70 +543,70 @@ def iterate_priority_order(
             yield item, False
 
 
-def check_priority_order(
-    priority_order: Optional[PriorityOrder], methods: List[MethodCls]
+def check_methods_priority(
+    methods_priority: Optional[MethodsPriorityOrder], methods: List[MethodCls]
 ) -> None:
-    """Checks against `methods` that the `priority_order` is valid.
+    """Checks against `methods` that the `methods_priority` is valid.
 
     Parameters
     ----------
-    priority_order: list[str | set[str]]
+    methods_priority: list[str | set[str]]
         The priority order, which is a list of where items are method names,
         sets of methods names or the asterisk ('*'). The asterisk means "all
         rest methods" and may occur only once in the priority order, and cannot
         be part of a set. All method names must be unique and must be part of
         the `methods`.
     methods: list[MethodCls]
-        The methods which the `priority_order` is validated against.
+        The methods which the `methods_priority` is validated against.
 
     Raises
     ------
-    ValueError or TypeError if the `priority_order` is not valid.
+    ValueError or TypeError if the `methods_priority` is not valid.
     """
-    if priority_order is None:
+    if methods_priority is None:
         return
 
     known_method_names = {m.name for m in methods}
     known_method_names.add("*")
     seen_method_names = set()
 
-    for method_name, in_set in iterate_priority_order(priority_order):
+    for method_name, in_set in iterate_methods_priority(methods_priority):
         if not isinstance(method_name, str):
-            raise TypeError("priority_order must be a list[str | set[str]]!")
+            raise TypeError("methods_priority must be a list[str | set[str]]!")
 
         if in_set and method_name == "*":
             raise ValueError(
-                "Asterisk (*) may not be a part of a set in priority_order!"
+                "Asterisk (*) may not be a part of a set in methods_priority!"
             )
         if method_name not in known_method_names:
             raise ValueError(
-                f'Method "{method_name}" in priority_order not in selected methods!'
+                f'Method "{method_name}" in methods_priority not in selected methods!'
             )
         if method_name in seen_method_names:
             if method_name != "*":
                 raise ValueError(
-                    f'Duplicate method name "{method_name}" in priority_order'
+                    f'Duplicate method name "{method_name}" in methods_priority'
                 )
             else:
                 raise ValueError(
-                    "The asterisk (*) can only occur once in priority_order!"
+                    "The asterisk (*) can only occur once in methods_priority!"
                 )
         seen_method_names.add(method_name)
 
 
 def get_prioritized_methods_groups(
-    methods: List[MethodCls], priority_order: Optional[PriorityOrder]
+    methods: List[MethodCls], methods_priority: Optional[MethodsPriorityOrder]
 ) -> List[Set[MethodCls]]:
     """Prioritizes Methods in `methods` based on priority order defined by
-    `priority_order`. This function does not validate the priority_order in
-    any way; use `check_priority_order` for validation of needed.
+    `methods_priority`. This function does not validate the methods_priority in
+    any way; use `check_methods_priority` for validation of needed.
 
     Parameters
     ----------
     methods: list[MethodCls]
         The source list of methods. These methods are returned as prioritized
         groups.
-    priority_order: list[str | set[str]]
+    methods_priority: list[str | set[str]]
         The names of the methods in `methods`. This specifies the priority
         order; the order of method classes in the returned list. An asterisk
         ('*') can be used to denote "all other methods".
@@ -626,7 +626,7 @@ def get_prioritized_methods_groups(
     with names "A", "B", "C", "D", "E", "F":
 
     >>> methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
-    >>> get_prioritized_methods_groups(methods, priority_order=["A", "F", "*"])
+    >>> get_prioritized_methods_groups(methods, methods_priority=["A", "F", "*"])
     [
         {MethodA},
         {MethodF},
@@ -636,8 +636,8 @@ def get_prioritized_methods_groups(
     """
 
     # Make this a list of sets just to make things simpler
-    priority_order_sets: List[Set[str]] = [
-        {item} if isinstance(item, str) else item for item in priority_order or []
+    methods_priority_sets: List[Set[str]] = [
+        {item} if isinstance(item, str) else item for item in methods_priority or []
     ]
 
     method_dct = {m.name: m for m in methods}
@@ -646,7 +646,7 @@ def get_prioritized_methods_groups(
     asterisk_index = None
     out: List[Set[MethodCls]] = []
 
-    for item in priority_order_sets:
+    for item in methods_priority_sets:
         if item == asterisk:
             # Save the location where to add the rest of the methods ('*')
             asterisk_index = len(out)
@@ -686,10 +686,10 @@ def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
 
 def get_prioritized_methods(
     methods: List[MethodCls],
-    priority_order: Optional[PriorityOrder] = None,
+    methods_priority: Optional[MethodsPriorityOrder] = None,
 ) -> List[MethodCls]:
     """Take an unordered list of Methods and sort them by priority using the
-    priority_order and automatic ordering. The priority_order is used to define
+    methods_priority and automatic ordering. The methods_priority is used to define
     groups of priority (sets of methods). The automatic ordering part is used
     to order the methods *within* each priority group. In particular, all
     methods supported by the current platform are placed first, and all
@@ -699,7 +699,7 @@ def get_prioritized_methods(
     ----------
     methods:
         The list of Methods to sort.
-    priority_order:
+    methods_priority:
         Optional priority order, which is a list of method names (strings) or
         sets of method names (sets of strings). An asterisk ('*') may be used
         for "all the rest methods". None is same as ['*'].
@@ -716,7 +716,7 @@ def get_prioritized_methods(
     >>> methods = [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA]
     >>> get_prioritized_methods(
     >>>    methods,
-    >>>    priority_order=[{"WinA", "LinuxB"}, "*"],
+    >>>    methods_priority=[{"WinA", "LinuxB"}, "*"],
     >>> )
     [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
 
@@ -729,11 +729,11 @@ def get_prioritized_methods(
     {"LinuxA", "LinuxC", "MultiPlatformA"}, and those are then
     automatically ordered. As all of them support Linux, the result is
     just the methods sorted alphabetically. The asterisk in the end is
-    optional; it is added to the end of `priority_order` if missing.
+    optional; it is added to the end of `methods_priority` if missing.
 
     """
     unordered_groups: List[Set[MethodCls]] = get_prioritized_methods_groups(
-        methods, priority_order=priority_order
+        methods, methods_priority=methods_priority
     )
 
     ordered_groups: List[List[MethodCls]] = [
