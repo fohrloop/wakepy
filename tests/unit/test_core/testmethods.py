@@ -1,7 +1,7 @@
 import enum
 import itertools
 
-from wakepy.core.configuration import CURRENT_PLATFORM
+from wakepy.core import CURRENT_PLATFORM
 from wakepy.core.method import Method
 
 

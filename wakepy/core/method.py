@@ -5,9 +5,9 @@ import warnings
 from abc import ABC, ABCMeta
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
-from . import CURRENT_PLATFORM
 from .calls import DbusMethodCall
 from .constants import ModeName, PlatformName
+from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
