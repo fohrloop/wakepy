@@ -131,8 +131,8 @@ class Mode(ABC):
 
 def create_mode(
     modename: ModeName,
+    methods: Optional[StrCollection] = None,
     skip: Optional[StrCollection] = None,
-    use_only: Optional[StrCollection] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """
@@ -140,16 +140,16 @@ def create_mode(
 
     Parameters
     ----------
+    methods: list, tuple or set of str
+        The names of Methods to select from the mode defined with `modename`;
+        a "whitelist" filter. Means "use these and only these Methods". Any
+        Methods in `methods` but not in the selected mode will raise a
+        ValueError. Cannot be used same time with `skip`. Optional.
     skip: list, tuple or set of str or None
         The names of Methods to remove from the mode defined with `modename`;
         a "blacklist" filter. Any Method in `skip` but not in the selected mode
-        will be silently ignored. Cannot be used same time with `use_only`.
+        will be silently ignored. Cannot be used same time with `methods`.
         Optional.
-    use_only: list, tuple or set of str
-        The names of Methods to select from the mode defined with `modename`;
-        a "whitelist" filter. Means "use these and only these Methods". Any
-        Methods in `use_only` but not in the selected mode will raise a
-        ValueError. Cannot be used same time with `skip`. Optional.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -159,5 +159,5 @@ def create_mode(
         The context manager for the selected mode.
     """
     methods_for_mode = get_methods_for_mode(modename)
-    selected_methods = select_methods(methods_for_mode, use_only=use_only, skip=skip)
+    selected_methods = select_methods(methods_for_mode, use_only=methods, skip=skip)
     return Mode(methods=selected_methods, dbus_adapter=dbus_adapter)
