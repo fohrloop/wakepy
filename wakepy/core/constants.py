@@ -2,12 +2,11 @@
 from .strenum import StrEnum, auto
 
 
-class SystemName(StrEnum):
-    """The names of supported systems"""
-
-    WINDOWS = "windows"
-    LINUX = "linux"
-    DARWIN = "darwin"
+class PlatformName(StrEnum):
+    WINDOWS = auto()
+    LINUX = auto()
+    MACOS = auto()
+    OTHER = auto()
 
 
 class ModeName(StrEnum):

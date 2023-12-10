@@ -4,7 +4,7 @@ import typing
 from queue import Empty, Queue
 from threading import Thread
 
-from . import CURRENT_SYSTEM, SystemName
+from . import CURRENT_PLATFORM, PlatformName
 from .constants import ControlMsg, WorkerThreadMsgType
 from .method import Suitability
 
@@ -63,13 +63,13 @@ class ModeWorkerThread(Thread):
         methods: List[Method],
         queue_in: Queue,
         queue_out: Queue,
-        system: SystemName = CURRENT_SYSTEM,
+        platform: PlatformName = CURRENT_PLATFORM,
         *args,
         **kwargs,
     ):
         super().__init__(*args, name="wakepy-mode-manager", **kwargs)
         self.methods = methods
-        self.system = system
+        self.platform = platform
         self.queue_in = queue_in
         self.queue_out = queue_out
 
@@ -89,7 +89,7 @@ class ModeWorkerThread(Thread):
         candidate_methods = []
         for method in methods:
             self.check_input_queue()
-            method.set_suitability(system=self.system)
+            method.set_suitability(platform=self.platform)
             if method.suitability == Suitability.UNSUITABLE:
                 continue
             candidate_methods.append(method)

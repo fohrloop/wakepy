@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from wakepy.core import Method, ModeName, DbusAdapter
+from wakepy.core import DbusAdapter, Method, ModeName
 from wakepy.modes import keep
 
 

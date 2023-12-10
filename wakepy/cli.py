@@ -11,7 +11,7 @@ import time
 import warnings
 from contextlib import ExitStack
 
-from wakepy.core.system import CURRENT_SYSTEM, SystemName
+from wakepy.core.system import CURRENT_PLATFORM, PlatformName
 from wakepy.modes import keep
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
@@ -105,7 +105,9 @@ def start(
 
         # A quick fix (Fix this better in next release)
         # On linux, D-Bus methods for keep_running use presentation_mode.
-        if CURRENT_SYSTEM == SystemName.LINUX and real_successes.get("keep_running"):
+        if CURRENT_PLATFORM == PlatformName.LINUX and real_successes.get(
+            "keep_running"
+        ):
             real_successes["presentation_mode"] = True
 
         print_on_start(**real_successes)

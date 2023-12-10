@@ -5,9 +5,9 @@ import warnings
 from abc import ABC, ABCMeta
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
-from . import CURRENT_SYSTEM
 from .calls import DbusMethodCall
-from .constants import ModeName, SystemName
+from .constants import ModeName, PlatformName
+from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
@@ -203,10 +203,10 @@ class SuitabilityCheckResult(StrEnum):
 class UnsuitabilityTag(StrEnum):
     """These are used to distiguish between different reasons for unsuitability
 
-    SYSTEM: Used when system is not supported by the method.
+    PLATFORM: Used when platform is not supported by the method.
     """
 
-    SYSTEM = auto()
+    PLATFORM = auto()
     OTHER = auto()
 
 
@@ -235,11 +235,10 @@ class Method(ABC, metaclass=MethodMeta):
     """The mode for the method. Each method may be connected to single mode.
     Use None for methods which do not implement any mode."""
 
-    supported_systems: Tuple[SystemName, ...] = tuple()
-    """All the supported systems. If a system is not listed here, this method
-    if not going to be used on the system (when used as part of a Mode)
-    
-    Modify this in the subclass"""
+    supported_platforms: Tuple[PlatformName, ...] = tuple()
+    """All the supported platforms. If a platform is not listed here, this
+    method is not going to be used on the platform (when used as part of a
+    Mode). Modify this in the subclass"""
 
     description: Optional[str] = None
     """Human-readable description for the method. Markdown allowed. Used to
@@ -295,8 +294,8 @@ class Method(ABC, metaclass=MethodMeta):
         is possible to give more information about why some Method is not
         supported.
 
-        NOTE: You do not have to test for (operating) system here as it is
-        automatically tested if Method has `supported_systems` attribute set!
+        NOTE: You do not have to test for the current platform here as it is
+        automatically tested if Method has `supported_platforms` attribute set!
 
         Examples
         --------
@@ -468,10 +467,10 @@ class Method(ABC, metaclass=MethodMeta):
 
     def get_suitability(
         self,
-        system: SystemName | str,
+        platform: PlatformName | str,
     ) -> Suitability:
         """This is a method used to check the suitability of a method when
-        running on a specific system with a set of software installed on it
+        running on a specific platform with a set of software installed on it
         (which wakepy does not know beforehand).
 
         This method is not meant to be overridden in a subclass; override the
@@ -479,18 +478,21 @@ class Method(ABC, metaclass=MethodMeta):
 
         Parameters
         ---------
-        system:
-            The system for which to check suitability. Usually, should be the
-            CURRENT_SYSTEM (if not testing). Can als be a lower-case string
+        platform:
+            The platform for which to check suitability. Usually, should be the
+            CURRENT_PLATFORM (if not testing). Can als be a lower-case string
             like "windows", "linux" or "darwin".
         """
 
-        if hasattr(self, "supported_systems") and system not in self.supported_systems:
+        if (
+            hasattr(self, "supported_platforms")
+            and platform not in self.supported_platforms
+        ):
             return Suitability(
                 SuitabilityCheckResult.UNSUITABLE,
-                UnsuitabilityTag.SYSTEM,
-                f"Supported systems are: {self.supported_systems}. "
-                f"(detected system: {system})",
+                UnsuitabilityTag.PLATFORM,
+                f"Supported platform are: {self.supported_platforms}. "
+                f"(detected platform: {platform})",
             )
 
         canuse = self.caniuse()
@@ -670,15 +672,15 @@ def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
     Methods with highest priority first.
 
     The logic is:
-    (1) Any Methods supporting the CURRENT_SYSTEM are placed before any other
+    (1) Any Methods supporting the CURRENT_PLATFORM are placed before any other
         Methods (the others are not expected to work at all)
     (2) Sort alphabetically by Method name, ignoring the case
     """
     return sorted(
         methods,
         key=lambda m: (
-            # Prioritize methods supporting CURRENT_SYSTEM over any others
-            0 if CURRENT_SYSTEM in m.supported_systems else 1,
+            # Prioritize methods supporting CURRENT_PLATFORM over any others
+            0 if CURRENT_PLATFORM in m.supported_platforms else 1,
             m.name.lower() if m.name else "",
         ),
     )

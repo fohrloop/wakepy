@@ -14,7 +14,7 @@ multiple dependencies of this type, use the name of the "most specific" or
 Examples
 (1) If a method needs D-Bus and GNOME, it is listed in gnome.py since GNOME is
     a desktop environment.
-(2) If a method needs a hypothetical (not well knwon) programX and systemd and
+(2) If a method needs a hypothetical (not well known) programX and systemd and
     D-Bus, it is listed under programx.py, because programX is the "most specific"
     or "least widespread" software.
 (3) If a method needs systemd and D-Bus, it is listed under systemd, as D-Bus
