@@ -13,5 +13,6 @@ from .constants import ModeName as ModeName
 from .constants import SystemName as SystemName
 from .dbus import DbusAddress as DbusAddress
 from .dbus import DbusMethod as DbusMethod
+from .dbus import DbusAdapter as DbusAdapter
 from .method import Method as Method
 from .strenum import StrEnum as StrEnum
