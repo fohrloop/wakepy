@@ -120,7 +120,7 @@ The systemd mask method will inhibit all forms of sleep (including hibernation a
 
 **How to check it?**:  For D-Bus  `org.freedesktop.ScreenSaver` based solution, there is no possibility to check it afterwards. You may monitor the call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html), though. For systemd mask based solution, you'll see that the Suspend option is removed from the menu altogether.
 
-**What systems are supported?** For D-Bus `org.freedesktop.ScreenSaver` method, you have to use a Freedesktop-compliant Desktop Environment, for example GNOME or KDE. The list of supported systems will be expanded in the future. For systemd solution, any Linux running systemd works, but you need sudo.
+**Which Desktop Environments are supported?** For D-Bus `org.freedesktop.ScreenSaver` method, you have to use a Freedesktop-compliant Desktop Environment, for example GNOME or KDE. The list of supported DEs will be expanded in the future. For systemd solution, any Linux running systemd works, but you need sudo.
 
 **Multiprocess safe?**: DBus: yes, systemd mask: no.
 

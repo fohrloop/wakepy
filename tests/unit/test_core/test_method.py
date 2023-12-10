@@ -65,31 +65,31 @@ def provide_methods_different_systems(monkeypatch):
 
     class WindowsA(Method):
         name = "WinA"
-        supported_systems = (SystemName.WINDOWS,)
+        supported_platforms = (SystemName.WINDOWS,)
 
     class WindowsB(Method):
         name = "WinB"
-        supported_systems = (SystemName.WINDOWS,)
+        supported_platforms = (SystemName.WINDOWS,)
 
     class WindowsC(Method):
         name = "WinC"
-        supported_systems = (SystemName.WINDOWS,)
+        supported_platforms = (SystemName.WINDOWS,)
 
     class LinuxA(Method):
         name = "LinuxA"
-        supported_systems = (SystemName.LINUX,)
+        supported_platforms = (SystemName.LINUX,)
 
     class LinuxB(Method):
         name = "LinuxB"
-        supported_systems = (SystemName.LINUX,)
+        supported_platforms = (SystemName.LINUX,)
 
     class LinuxC(Method):
         name = "LinuxC"
-        supported_systems = (SystemName.LINUX,)
+        supported_platforms = (SystemName.LINUX,)
 
     class MultiPlatformA(Method):
         name = "multiA"
-        supported_systems = (SystemName.LINUX, SystemName.WINDOWS, SystemName.DARWIN)
+        supported_platforms = (SystemName.LINUX, SystemName.WINDOWS, SystemName.DARWIN)
 
 
 def test_overridden_methods_autodiscovery():

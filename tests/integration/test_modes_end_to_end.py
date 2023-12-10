@@ -10,7 +10,7 @@ pytest.skip("These need to be fixed", allow_module_level=True)
 
 
 class MethodEnterExit(Method):
-    supported_systems = (CURRENT_SYSTEM,)
+    supported_platforms = (CURRENT_SYSTEM,)
 
     def enter_mode(self):
         ...
@@ -20,7 +20,7 @@ class MethodEnterExit(Method):
 
 
 class HeartBeatMethod(Method):
-    supported_systems = (CURRENT_SYSTEM,)
+    supported_platforms = (CURRENT_SYSTEM,)
 
     def heartbeat(self):
         ...

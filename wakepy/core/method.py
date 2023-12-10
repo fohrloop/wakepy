@@ -235,8 +235,8 @@ class Method(ABC, metaclass=MethodMeta):
     """The mode for the method. Each method may be connected to single mode.
     Use None for methods which do not implement any mode."""
 
-    supported_systems: Tuple[SystemName, ...] = tuple()
-    """All the supported systems. If a system is not listed here, this method
+    supported_platforms: Tuple[SystemName, ...] = tuple()
+    """All the supported platforms. If a system is not listed here, this method
     if not going to be used on the system (when used as part of a Mode)
     
     Modify this in the subclass"""
@@ -296,7 +296,7 @@ class Method(ABC, metaclass=MethodMeta):
         supported.
 
         NOTE: You do not have to test for (operating) system here as it is
-        automatically tested if Method has `supported_systems` attribute set!
+        automatically tested if Method has `supported_platforms` attribute set!
 
         Examples
         --------
@@ -485,11 +485,14 @@ class Method(ABC, metaclass=MethodMeta):
             like "windows", "linux" or "darwin".
         """
 
-        if hasattr(self, "supported_systems") and system not in self.supported_systems:
+        if (
+            hasattr(self, "supported_platforms")
+            and system not in self.supported_platforms
+        ):
             return Suitability(
                 SuitabilityCheckResult.UNSUITABLE,
                 UnsuitabilityTag.SYSTEM,
-                f"Supported systems are: {self.supported_systems}. "
+                f"Supported systems are: {self.supported_platforms}. "
                 f"(detected system: {system})",
             )
 
@@ -678,7 +681,7 @@ def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
         methods,
         key=lambda m: (
             # Prioritize methods supporting CURRENT_SYSTEM over any others
-            0 if CURRENT_SYSTEM in m.supported_systems else 1,
+            0 if CURRENT_SYSTEM in m.supported_platforms else 1,
             m.name.lower() if m.name else "",
         ),
     )
