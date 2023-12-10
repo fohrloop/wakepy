@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     from typing import List, Optional, Type
 
     from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
-    from ..core.method import Method, StrCollection
+    from ..core.method import Method, StrCollection, PriorityOrder
     from ..core.mode import Mode
 
 running_methods: List[Type[Method]] = [
@@ -24,6 +24,7 @@ presenting_methods: List[Type[Method]] = [
 def running(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
+    methods_priority: Optional[PriorityOrder] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
@@ -65,6 +66,23 @@ def running(
         "blacklist" filter. Any Method in `omit` but not in the keep.running
         mode will be silently ignored. Cannot be used same time with
         `methods`. Optional.
+    methods_priority: list[str | set[str]]
+        The priority order for the methods to be used when entering the
+        keep.running mode. You may use this parameter to force or suggest the
+        order in which Methods are used. Any methods not explicitly supported
+        by the current platform will automatically be unused (no need to add
+        them here). The format is a list[str | set[str]], where each
+        string is a Method name. Any method within a set will have equal
+        user-given priority, and they are prioritized with the automatic
+        prioritization rules. The first item in the list has the highest
+        priority. All method names must be unique and must be part of the
+        keep.running Mode.
+
+        The asterisk ('*') can be used to mean "all other methods"
+        and may occur only once in the priority order, and cannot be part of a
+        set. If asterisk is not part of the `methods_priority`, it will be
+        added as the last element automatically.
+
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -78,6 +96,7 @@ def running(
         modename=ModeName.KEEP_RUNNING,
         omit=omit,
         methods=methods,
+        methods_priority=methods_priority,
         dbus_adapter=dbus_adapter,
     )
 
@@ -85,6 +104,7 @@ def running(
 def presenting(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
+    methods_priority: Optional[PriorityOrder] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping a system running
@@ -103,15 +123,31 @@ def presenting(
     Parameters
     ----------
     methods: list, tuple or set of str
-        The names of Methods to select from the keep.running mode; a
+        The names of Methods to select from the keep.presenting mode; a
         "whitelist" filter. Means "use these and only these Methods". Any
-        Methods in `methods` but not in the keep.running mode will raise a
+        Methods in `methods` but not in the keep.presenting mode will raise a
         ValueError. Cannot be used same time with `omit`. Optional.
     omit: list, tuple or set of str or None
-        The names of Methods to remove from the keep.running mode; a
-        "blacklist" filter. Any Method in `omit` but not in the keep.running
+        The names of Methods to remove from the keep.presenting mode; a
+        "blacklist" filter. Any Method in `omit` but not in the keep.presenting
         mode will be silently ignored. Cannot be used same time with
         `methods`. Optional.
+    methods_priority: list[str | set[str]]
+        The priority order for the methods to be used when entering the
+        keep.presenting mode. You may use this parameter to force or suggest
+        the order in which Methods are used. Any methods not explicitly
+        supported by the current platform will automatically be unused (no need
+        to add them here). The format is a list[str | set[str]], where each
+        string is a Method name. Any method within a set will have equal
+        user-given priority, and they are prioritized with the automatic
+        prioritization rules. The first item in the list has the highest
+        priority. All method names must be unique and must be part of the
+        keep.presenting Mode.
+
+        The asterisk ('*') can be used to mean "all other methods"
+        and may occur only once in the priority order, and cannot be part of a
+        set. If asterisk is not part of the `methods_priority`, it will be
+        added as the last element automatically.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -125,5 +161,6 @@ def presenting(
         modename=ModeName.KEEP_PRESENTING,
         methods=methods,
         omit=omit,
+        methods_priority=methods_priority,
         dbus_adapter=dbus_adapter,
     )

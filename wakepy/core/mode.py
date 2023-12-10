@@ -133,6 +133,7 @@ def create_mode(
     modename: ModeName,
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
+    methods_priority: Optional[PriorityOrder] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """
@@ -150,6 +151,8 @@ def create_mode(
         a "blacklist" filter. Any Method in `omit` but not in the selected mode
         will be silently ignored. Cannot be used same time with `methods`.
         Optional.
+    methods_priority: list[str | set[str]]
+        The priority_order parameter for Mode. Used to prioritize methods.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -160,4 +163,8 @@ def create_mode(
     """
     methods_for_mode = get_methods_for_mode(modename)
     selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
-    return Mode(methods=selected_methods, dbus_adapter=dbus_adapter)
+    return Mode(
+        methods=selected_methods,
+        priority_order=methods_priority,
+        dbus_adapter=dbus_adapter,
+    )
