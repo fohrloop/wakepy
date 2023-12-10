@@ -2,26 +2,24 @@ from __future__ import annotations
 
 import typing
 
-from ..core.mode import Mode
-from ..methods.gnome import GnomeSessionManagerNoIdle, GnomeSessionManagerNoSuspend
+from ..core.constants import ModeName
+from ..core.mode import create_mode
 
 if typing.TYPE_CHECKING:
-    from typing import List, Type
+    from typing import Optional, Type
 
     from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
-    from ..core.method import Method
+    from ..core.method import MethodsPriorityOrder, StrCollection
+    from ..core.mode import Mode
 
 
-running_methods: List[Type[Method]] = [
-    GnomeSessionManagerNoSuspend,
-]
-presenting_methods: List[Type[Method]] = [
-    GnomeSessionManagerNoIdle,
-]
-
-
-def running(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None) -> Mode:
-    """A wakepy mode and context manager for keeping programs running.
+def running(
+    methods: Optional[StrCollection] = None,
+    omit: Optional[StrCollection] = None,
+    methods_priority: Optional[MethodsPriorityOrder] = None,
+    dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+) -> Mode:
+    """Create a wakepy mode (a context manager) for keeping programs running.
 
     Properties
     ----------
@@ -50,6 +48,33 @@ def running(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None) 
 
     Parameters
     ----------
+    methods: list, tuple or set of str
+        The names of Methods to select from the keep.running mode; a
+        "whitelist" filter. Means "use these and only these Methods". Any
+        Methods in `methods` but not in the keep.running mode will raise a
+        ValueError. Cannot be used same time with `omit`. Optional.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the keep.running mode; a
+        "blacklist" filter. Any Method in `omit` but not in the keep.running
+        mode will be silently ignored. Cannot be used same time with
+        `methods`. Optional.
+    methods_priority: list[str | set[str]]
+        The priority order for the methods to be used when entering the
+        keep.running mode. You may use this parameter to force or suggest the
+        order in which Methods are used. Any methods not explicitly supported
+        by the current platform will automatically be unused (no need to add
+        them here). The format is a list[str | set[str]], where each
+        string is a Method name. Any method within a set will have equal
+        user-given priority, and they are prioritized with the automatic
+        prioritization rules. The first item in the list has the highest
+        priority. All method names must be unique and must be part of the
+        keep.running Mode.
+
+        The asterisk ('*') can be used to mean "all other methods"
+        and may occur only once in the priority order, and cannot be part of a
+        set. If asterisk is not part of the `methods_priority`, it will be
+        added as the last element automatically.
+
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -59,13 +84,23 @@ def running(dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None) 
         The context manager for keeping a system running.
 
     """
-    return Mode(methods=running_methods, dbus_adapter=dbus_adapter)
+    return create_mode(
+        modename=ModeName.KEEP_RUNNING,
+        omit=omit,
+        methods=methods,
+        methods_priority=methods_priority,
+        dbus_adapter=dbus_adapter,
+    )
 
 
 def presenting(
+    methods: Optional[StrCollection] = None,
+    omit: Optional[StrCollection] = None,
+    methods_priority: Optional[MethodsPriorityOrder] = None,
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
-    """The keep.presenting mode context manager.
+    """Create a wakepy mode (a context manager) for keeping a system running
+    and showing content.
 
     Usage:
 
@@ -79,12 +114,45 @@ def presenting(
 
     Parameters
     ----------
+    methods: list, tuple or set of str
+        The names of Methods to select from the keep.presenting mode; a
+        "whitelist" filter. Means "use these and only these Methods". Any
+        Methods in `methods` but not in the keep.presenting mode will raise a
+        ValueError. Cannot be used same time with `omit`. Optional.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the keep.presenting mode; a
+        "blacklist" filter. Any Method in `omit` but not in the keep.presenting
+        mode will be silently ignored. Cannot be used same time with
+        `methods`. Optional.
+    methods_priority: list[str | set[str]]
+        The priority order for the methods to be used when entering the
+        keep.presenting mode. You may use this parameter to force or suggest
+        the order in which Methods are used. Any methods not explicitly
+        supported by the current platform will automatically be unused (no need
+        to add them here). The format is a list[str | set[str]], where each
+        string is a Method name. Any method within a set will have equal
+        user-given priority, and they are prioritized with the automatic
+        prioritization rules. The first item in the list has the highest
+        priority. All method names must be unique and must be part of the
+        keep.presenting Mode.
+
+        The asterisk ('*') can be used to mean "all other methods"
+        and may occur only once in the priority order, and cannot be part of a
+        set. If asterisk is not part of the `methods_priority`, it will be
+        added as the last element automatically.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
+
 
     Returns
     -------
     keep_presenting_mode: Mode
         The context manager for keeping a system presenting content.
     """
-    return Mode(methods=presenting_methods, dbus_adapter=dbus_adapter)
+    return create_mode(
+        modename=ModeName.KEEP_PRESENTING,
+        methods=methods,
+        omit=omit,
+        methods_priority=methods_priority,
+        dbus_adapter=dbus_adapter,
+    )
