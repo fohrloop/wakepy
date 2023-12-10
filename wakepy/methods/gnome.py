@@ -9,7 +9,7 @@ from wakepy.core import (
     DbusMethodCall,
     Method,
     ModeName,
-    SystemName,
+    PlatformName,
 )
 
 
@@ -59,7 +59,7 @@ class _GnomeSessionManager(Method, ABC):
         params=("inhibit_cookie",),
     ).of(session_manager)
 
-    supported_platforms = (SystemName.LINUX,)
+    supported_platforms = (PlatformName.LINUX,)
 
     @property
     @abstractmethod

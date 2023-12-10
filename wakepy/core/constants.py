@@ -2,8 +2,8 @@
 from .strenum import StrEnum, auto
 
 
-class SystemName(StrEnum):
-    """The names of supported systems"""
+class PlatformName(StrEnum):
+    """The names of supported platforms"""
 
     WINDOWS = "windows"
     LINUX = "linux"

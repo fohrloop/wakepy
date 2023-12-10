@@ -56,7 +56,7 @@ m = mode.__enter__()
 
 
 When entering into a Mode, a lot of things occur. One of the things is that wakepy needs to determine, from all the [***Methods***](#wakepy-methods) in `Mode.methods`, which ones can be used. There might be multiple reasons why a method could not be used
-- Wrong operating system
+- Wrong operating system or platform
 - Wrong Desktop Environment
 - Required software not found
 - Wrong version of Desktop Environment or software
@@ -95,5 +95,5 @@ When the context manager is exited, a `EXIT` command is automatically sent from 
 (wakepy-methods)=
 ## Wakepy Methods
 
-**Methods** are different ways of entering/keeping in a Mode. A Method may support one or more operating systems, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html) D-Bus service is one way of entering `keep.running` mode, and it required D-Bus and (a certain version of) GNOME. 
+**Methods** are different ways of entering/keeping in a Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html) D-Bus service is one way of entering `keep.running` mode, and it required D-Bus and (a certain version of) GNOME. 
 

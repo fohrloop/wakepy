@@ -1,7 +1,7 @@
 import enum
 import itertools
 
-from wakepy.core.configuration import CURRENT_SYSTEM
+from wakepy.core.configuration import CURRENT_PLATFORM
 from wakepy.core.method import Method
 
 
@@ -26,7 +26,7 @@ def create_test_method_classes():
 
     for enter_mode, heartbeat, exit_mode in itertools.product(MethodIs, repeat=3):
         clsname = f"M{enter_mode.value}{heartbeat.value}{exit_mode.value}"
-        clskwargs = {"supported_platforms": CURRENT_SYSTEM, "name": clsname}
+        clskwargs = {"supported_platforms": CURRENT_PLATFORM, "name": clsname}
         for mode, name in zip(
             (enter_mode, heartbeat, exit_mode), ("enter_mode", "heartbeat", "exit_mode")
         ):
