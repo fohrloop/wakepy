@@ -92,7 +92,7 @@ def provide_methods_different_platforms(monkeypatch):
         supported_platforms = (
             PlatformName.LINUX,
             PlatformName.WINDOWS,
-            PlatformName.DARWIN,
+            PlatformName.MACOS,
         )
 
 

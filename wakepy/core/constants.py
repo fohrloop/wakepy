@@ -5,9 +5,9 @@ from .strenum import StrEnum, auto
 class PlatformName(StrEnum):
     """The names of supported platforms"""
 
-    WINDOWS = "windows"
-    LINUX = "linux"
-    DARWIN = "darwin"
+    WINDOWS = auto()
+    LINUX = auto()
+    MACOS = auto()
 
 
 class ModeName(StrEnum):
