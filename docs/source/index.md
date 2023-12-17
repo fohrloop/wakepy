@@ -19,7 +19,7 @@
 :titlesonly:
 
 user-guide/index
-mode-activation
+technical-details/index
 cli-api
 ```
 

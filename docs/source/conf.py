@@ -55,6 +55,13 @@ myst_enable_extensions = [
 # See: https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#auto-generated-header-anchors
 myst_heading_anchors = 3
 
+# For numbered figures. Sphinx feature.
+# Ref: https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-numfig
+# Enables {numref} role in MyST.
+# Ref2: https://jupyterbook.org/en/stable/content/figures.html#numbered-references
+numfig = True
+
+
 # Add a border around Examples. Might or might not look good, depending on the
 # used theme.
 # See: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html#confval-napoleon_use_admonition_for_examples

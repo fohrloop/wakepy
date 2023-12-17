@@ -5,7 +5,6 @@
 
 modes
 tests-and-ci
-technical-details
 ```
 
 ## Requirements
