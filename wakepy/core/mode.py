@@ -54,7 +54,7 @@ class Mode(ABC):
         The list of methods associated for this mode.
     manager: ModeActivationManager
         The manager which lives in the main thread and talks to the
-        ModeActivator using queues. This is responsive for activating and
+        ModeActivator using queues. This is responsible for activating and
         deactivating a mode.
     """
 
