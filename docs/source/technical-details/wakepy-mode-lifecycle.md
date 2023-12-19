@@ -112,6 +112,19 @@ finally:
 
 ````
 
+The {numref}`fig-activate-mode-activity-diagram` presents an activity diagram from the "Activate Mode" step of {numref}`fig-mode-activity-diagram`. The steps are:
+- ***Prioritize Methods***: In this step, methods are prioritized first with `methods_priority` from the user, if given. Then, the methods are prioritized using platform support information from `Method.supported_platform`.
+- ***Try a Method***: Try to activate the Mode using the Method with highest priority. 
+- ***Start Heartbeat***: Starts a separate thread which runs a heartbeat process for the selected mode. Only applicable for Methods which rely on a heartbeat.
+
+
+:::{figure-md} fig-activate-mode-activity-diagram
+![activity diagram for the "Activate Mode" action](./img/activate-mode-activity-diagram.svg){width=430px}
+
+*The Activity Diagram for the "Activate Mode" action of the {numref}`fig-mode-activity-diagram`.*
+:::
+
+
 ## Staying in a Mode
 
 This part of the Mode lifecycle is where the user code ("USER_CODE" in {numref}`fig-mode-activity-diagram`) is ran. Sometimes this code could be just simple while loop with sleeps until `KeyboardInterrupt`, and sometimes it is some long-running task. During this activity, the Mode will be in *Active* or *Activation Failed* state ({numref}`state-diagram`).
