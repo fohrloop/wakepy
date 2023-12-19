@@ -114,7 +114,7 @@ finally:
 
 The {numref}`fig-activate-mode-activity-diagram` presents an activity diagram from the "Activate Mode" step of {numref}`fig-mode-activity-diagram`. The steps are:
 - ***Prioritize Methods***: In this step, methods are prioritized first with `methods_priority` from the user, if given. Then, the methods are prioritized using platform support information from `Method.supported_platform`.
-- ***Try a Method***: Try to activate the Mode using the Method with highest priority. 
+- ***Activate with a Method***: Try to activate the Mode using the Method with highest priority. This is explained in more detail in the [next section](#section-activating-with-a-method). Note that only *one* Method is ever used to activate a Mode; the first one which does not fail, in priority order.
 - ***Start Heartbeat***: Starts a separate thread which runs a heartbeat process for the selected mode. Only applicable for Methods which rely on a heartbeat.
 
 
@@ -122,6 +122,25 @@ The {numref}`fig-activate-mode-activity-diagram` presents an activity diagram fr
 ![activity diagram for the "Activate Mode" action](./img/activate-mode-activity-diagram.svg){width=430px}
 
 *The Activity Diagram for the "Activate Mode" action of the {numref}`fig-mode-activity-diagram`.*
+:::
+
+(section-activating-with-a-method)=
+### Activate with a Method
+
+The {numref}`fig-activate-with-a-method` presents the activity diagram for the "Activate with a Method" action from the {numref}`fig-activate-mode-activity-diagram`. This is what wakepy does with the Method:
+
+
+1. Checks platform support against the list in the `Method.supported_plaforms`. 
+2. Checks requirements using `Method.caniuse()`. 
+3. Tries to activate the Mode using the `Method.enter_mode()`, if defined
+4. Tries to start the heartbeat using the `Method.heartbeat()`, if defined
+
+If the first two steps do not fail, at least one of `Method.enter_mode()` and `Method.caniuse()` is defined and they do not raise Exceptions, the Mode activation is successful.
+
+:::{figure-md} fig-activate-with-a-method
+![activity diagram for the "Activate Mode" action](./img/activate-mode-using-method-activity-diagram.svg){width=430px}
+
+*The Activity Diagram for the "Activate with a Method" action of the {numref}`fig-activate-mode-activity-diagram`.*
 :::
 
 
