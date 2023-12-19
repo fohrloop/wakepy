@@ -131,7 +131,7 @@ The {numref}`fig-activate-with-a-method` presents the activity diagram for the "
 
 
 1. Checks platform support against the list in the `Method.supported_plaforms`. 
-2. Checks requirements using `Method.caniuse()`. 
+2. Checks requirements using `Method.caniuse()`. Some Methods could require a certain version of some specific Desktop Environment, a version of a 3rd party software, or some DBus service running. During this step, if some 3rd party SW has known bugs on certain versions, the Method may be dismissed.
 3. Tries to activate the Mode using the `Method.enter_mode()`, if defined
 4. Tries to start the heartbeat using the `Method.heartbeat()`, if defined
 
@@ -169,3 +169,9 @@ This is handled automatically by the context manager. What actually is called is
 ```{note}
 When using the `with` statement, the context manager takes care of calling `Mode.deactivate()` if the `USER_CORE` raises an Exception. It is also possible to use `Mode.deactivate()` directly, but that is not recommended, as explained in [this Note](activating-a-mode-note) in the Activating a Mode section.
 ```
+
+(wakepy-methods)=
+## Wakepy Methods
+
+**Methods** are different ways of entering/keeping in a Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html) D-Bus service is one way of entering `keep.running` mode, and it required D-Bus and (a certain version of) GNOME. 
+
