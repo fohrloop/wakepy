@@ -146,7 +146,7 @@ If the first two steps do not fail, at least one of `Method.enter_mode()` and `M
 
 ## Staying in a Mode
 
-This part of the Mode lifecycle is where the user code ("USER_CODE" in {numref}`fig-mode-activity-diagram`) is ran. Sometimes this code could be just simple while loop with sleeps until `KeyboardInterrupt`, and sometimes it is some long-running task. During this activity, the Mode will be in *Active* or *Activation Failed* state ({numref}`state-diagram`).
+This part of the Mode lifecycle is where the user code ("USER_CODE" in {numref}`fig-mode-activity-diagram`) is ran. Sometimes this code could be just simple while loop with sleeps until `KeyboardInterrupt`, and sometimes it is some long-running task. During this activity, the Mode will be in *Active* or *Activation Failed* state ({numref}`state-diagram`). If the used Method has a `heartbeat()` method, it will be called every `Method.heartbeat_period` seconds in a separate heartbeat thread.
 
 ## Deactivating a Mode
 
@@ -164,7 +164,7 @@ with mode:
 # Inactive
 ```
 
-This is handled automatically by the context manager. What actually is called is `Mode.__exit__()` which in turn calls `Mode.deactivate()`. 
+This is handled automatically by the context manager. What actually is called is `Mode.__exit__()` which in turn calls `Mode.deactivate()`, which triggers deactivating the used Method. Deactivating a Method means stopping the `Method.heartbeat()` calls (if heartbeat is used) and calling `Method.exit_mode()`.
 
 ```{note}
 When using the `with` statement, the context manager takes care of calling `Mode.deactivate()` if the `USER_CORE` raises an Exception. It is also possible to use `Mode.deactivate()` directly, but that is not recommended, as explained in [this Note](activating-a-mode-note) in the Activating a Mode section.
