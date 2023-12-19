@@ -7,6 +7,5 @@ This page contains more detailed explanation on how wakepy works.  You  *do not 
 
 technical-details
 wakepy-mode-lifecycle
-mode-activation
 ```
 
