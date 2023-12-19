@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.58261785"
-     inkscape:cx="206.82511"
-     inkscape:cy="351.86015"
+     inkscape:zoom="0.82394606"
+     inkscape:cx="98.914242"
+     inkscape:cy="415.07572"
      inkscape:window-width="1600"
      inkscape:window-height="836"
      inkscape:window-x="0"
@@ -244,14 +244,19 @@
     <text
        xml:space="preserve"
        style="font-size:5.0321px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
-       x="101.14248"
-       y="104.58321"
+       x="100.48346"
+       y="100.80473"
        id="text1-9-2-2-6-1-4-5-1"><tspan
          sodipodi:role="line"
-         id="tspan1-2-54-4-2-7-1-7-2"
          style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
-         x="101.14248"
-         y="104.58321">Try a Method</tspan></text>
+         x="100.48346"
+         y="100.80473"
+         id="tspan11">Activate with </tspan><tspan
+         sodipodi:role="line"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="100.48346"
+         y="107.09486"
+         id="tspan12">a Method</tspan></text>
     <rect
        style="fill:#1870d8;fill-opacity:1;stroke:#6c87e0;stroke-width:0.338631;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
        id="rect1-2-6-2-9-9-6-5-36-5"
