@@ -6,7 +6,7 @@ This page contains more detailed explanation on how wakepy works.  You  *do not 
 :maxdepth: 3
 
 technical-details
-wakepy-modes
+wakepy-mode-lifecycle
 mode-activation
 ```
 

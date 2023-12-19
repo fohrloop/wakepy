@@ -1,6 +1,6 @@
-# Wakepy Modes
+# Wakepy Mode Lifecycle
 
-## What Modes are?
+## Introduction to Modes
 **Modes** are what you enter in, stay for a while, and exit from. For example, `keep.running` is a Mode where automatic suspend is inhibited.  Modes are implemented as regular [context manager](https://peps.python.org/pep-0343) classes.  A simple example of using wakepy Modes is
 
 (simple-example-code-block)=
@@ -11,10 +11,7 @@ with keep.running():
     USER_CODE
 ```
 
-
-## States related to wakepy Modes
-
-There are five  different states related to activation and deactivation of wakepy Modes. Out of them, *three* are states of the Mode class: 
+Before we talk about the Mode lifecycle, let's introduce the different states a Mode can have. There are five different states related to any wakepy Mode lifecycle. Out of them, *three* are states of the Mode class: 
 - ***Inactive***: The initial state of Modes. Also the state after deactivation.
 - ***Active***: Where USER_CODE is meant to be run in.
 - ***Activation Failed***: Possible state if activation fails.
@@ -27,7 +24,7 @@ The two other — *Activation Started* and *Deactivation Started* — are interm
 *The five states related to wakepy Modes*
 :::
 
-## Wakepy Mode Lifecycle
+## Overview of the Mode Lifecycle
 
 In order to make it is easier to discuss about what is happening, we use the code from [this code block](simple-example-code-block) and  split the Mode initialization and activation in the [*context expression*](https://peps.python.org/pep-0343/#standard-terminology) into two statements and add comments and line numbers:
 
@@ -61,7 +58,7 @@ The wakepy.Mode Activity Diagram in {numref}`fig-mode-activity-diagram` shows th
 
 
 
-### Creating a Mode instance
+## Creating a Mode instance
 
 This corresponds to the action "Create Mode" in {numref}`fig-mode-activity-diagram`. When you create an instance of the wakepy Mode class with 
 
@@ -78,11 +75,10 @@ mode = keep.running()
 
 ```
 
-
 the instance will initially be in the *Inactive* state.
 
 
-### Activating a Mode
+## Activating a Mode
 
 In order to set your system into a Mode, you need to activate it ("Activate Mode" in {numref}`fig-mode-activity-diagram`). As Modes are [context managers](https://peps.python.org/pep-0343/) it is possible to simply use:
 
@@ -116,11 +112,24 @@ finally:
 
 ````
 
-### Running a long task (USER_CODE)
+The {numref}`fig-activate-mode-activity-diagram` presents an activity diagram from the "Activate Mode" step of {numref}`fig-mode-activity-diagram`. The steps are:
+- ***Prioritize Methods***: In this step, methods are prioritized first with `methods_priority` from the user, if given. Then, the methods are prioritized using platform support information from `Method.supported_platform`.
+- ***Try a Method***: Try to activate the Mode using the Method with highest priority. 
+- ***Start Heartbeat***: Starts a separate thread which runs a heartbeat process for the selected mode. Only applicable for Methods which rely on a heartbeat.
 
-The "USER_CODE" in {numref}`fig-mode-activity-diagram` is the place where user will run their code, for example some long-running task. During this activity, the Mode will be in Active state.
 
-### Deactivating a Mode
+:::{figure-md} fig-activate-mode-activity-diagram
+![activity diagram for the "Activate Mode" action](./img/activate-mode-activity-diagram.svg){width=430px}
+
+*The Activity Diagram for the "Activate Mode" action of the {numref}`fig-mode-activity-diagram`.*
+:::
+
+
+## Staying in a Mode
+
+This part of the Mode lifecycle is where the user code ("USER_CODE" in {numref}`fig-mode-activity-diagram`) is ran. Sometimes this code could be just simple while loop with sleeps until `KeyboardInterrupt`, and sometimes it is some long-running task. During this activity, the Mode will be in *Active* or *Activation Failed* state ({numref}`state-diagram`).
+
+## Deactivating a Mode
 
 The "Deactivate Mode" activity in {numref}`fig-mode-activity-diagram` occurs automatically when the `with` block is exited; between lines 10 and 11 in the code below:
 
