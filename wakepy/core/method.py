@@ -83,37 +83,6 @@ class MethodOutcome(StrEnum):
     SUCCESS = auto()
 
 
-class SuitabilityCheckResult(StrEnum):
-    # Uused when it is known for sure that a method is not suitable
-    UNSUITABLE = auto()
-    # Used when it can't be proben that a method is not suitable, but still it
-    # has not tested if the method is suitable or not. For example, if a
-    # subclass of Method does not implement `test_suitability()`
-    POTENTIALLY_SUITABLE = auto()
-    # Used when it has been tested, with `test_suitability`, that a method
-    # should be supported. For example, if a method needs executable called
-    # `foo`, version >=4.12, and an executable called `foo` was found in PATH
-    # and the version was 4.16. So, This is the best quess that the method
-    # should be suitable for the use case.
-    SUITABLE = auto()
-
-
-class UnsuitabilityTag(StrEnum):
-    """These are used to distiguish between different reasons for unsuitability
-
-    PLATFORM: Used when platform is not supported by the method.
-    """
-
-    PLATFORM = auto()
-    OTHER = auto()
-
-
-class Suitability(typing.NamedTuple):
-    result: SuitabilityCheckResult
-    tag: Optional[UnsuitabilityTag]
-    extrainfo: Optional[str]
-
-
 class Method(ABC, metaclass=MethodMeta):
     """Methods are objects that are used to switch modes. The phases for
     changing and being in a Mode is:
@@ -186,7 +155,7 @@ class Method(ABC, metaclass=MethodMeta):
 
     def caniuse(
         self,
-    ) -> Optional[bool] | UnsuitabilityTag | Tuple[UnsuitabilityTag, str]:
+    ) -> bool | None | str:
         """Tells if the Method is suitable or unsuitable. Implement this is a
         subclass. This is optional, but highly recommended. With `caniuse()` it
         is possible to give more information about why some Method is not
@@ -207,9 +176,9 @@ class Method(ABC, metaclass=MethodMeta):
         ------
         (a) If the Method is suitable, and can be used, return True.
         (b) If the result is uncertain, return None.
-        (c) If the Method is unsuitable, you may return False, UnsuitabilityTag
-        or tuple of (UnsuitabilityTag, str). The latter two options are
-        recommended, as they also explains *why* the Method is unsuitable.
+        (c) If the Method is unsuitable, you may return False or a string.
+            Returning a string is recommended, as it  also explains *why* the
+            Method is unsuitable.
         """
 
     def enter_mode(self):
@@ -365,7 +334,7 @@ class Method(ABC, metaclass=MethodMeta):
 
     def get_suitability(
         self,
-    ) -> Suitability:
+    ) -> [bool, str]:
         """This is a method used to check the suitability of a method when
         running on a specific platform with a set of software installed on it
         (which wakepy does not know beforehand).
@@ -375,34 +344,20 @@ class Method(ABC, metaclass=MethodMeta):
         """
 
         canuse = self.caniuse()
-        if canuse is True:
-            return Suitability(SuitabilityCheckResult.SUITABLE, None, None)
-        elif canuse is None:
-            return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
-        elif canuse is False:
-            return Suitability(
-                SuitabilityCheckResult.UNSUITABLE,
-                UnsuitabilityTag.OTHER,
-                None,
-            )
-        elif isinstance(canuse, UnsuitabilityTag):
-            return Suitability(SuitabilityCheckResult.UNSUITABLE, canuse, None)
 
-        if (
-            isinstance(canuse, tuple)
-            and len(canuse) == 2
-            and isinstance(canuse[0], (UnsuitabilityTag, str))
-            and isinstance(canuse[1], str)
-        ):
-            return Suitability(SuitabilityCheckResult.UNSUITABLE, canuse[0], canuse[1])
+        fail = False if canuse is True or canuse is None else True
 
-        warnings.warn(
-            (
-                f"""The caniuse() of {self} return value had an unexpected"""
-                """ format. Disregarding the output and trying the Method anyway."""
+        if canuse in {True, False, None}:
+            message = ""
+        elif isinstance(canuse, str):
+            message = canuse
+        else:
+            raise TypeError(
+                f"Method {self.__class__.__name__} returned: {canuse}, which is not of"
+                " type: 'bool | None | str'."
             )
-        )
-        return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
+
+        return fail, message
 
 
 def check_methods_priority(

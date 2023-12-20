@@ -6,7 +6,6 @@ from threading import Thread
 
 from . import CURRENT_PLATFORM, PlatformName
 from .constants import ControlMsg, WorkerThreadMsgType
-from .method import Suitability
 
 if typing.TYPE_CHECKING:
     from typing import List, Optional, Type
@@ -55,8 +54,7 @@ def sort_methods_by_priority(
     return sorted_methods
 
 
-# TODO: Convert ModeWorkerThread to ModeActivator
-# TODO: Check it this could be regular class, and not subclass of Thread
+# TODO: Remove / merge this to existing code.
 class ModeWorkerThread(Thread):
     def __init__(
         self,
@@ -90,8 +88,6 @@ class ModeWorkerThread(Thread):
         for method in methods:
             self.check_input_queue()
             method.set_suitability(platform=self.platform)
-            if method.suitability == Suitability.UNSUITABLE:
-                continue
             candidate_methods.append(method)
         return candidate_methods
 
