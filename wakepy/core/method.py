@@ -770,3 +770,21 @@ def _register_method(cls: Type[Method]):
         )
 
     _method_registry[cls.name] = cls
+
+
+def check_platform_support(method: Method, platform: PlatformName) -> bool:
+    """Checks if method is supported by the platform
+
+    Parameters
+    ----------
+    method: Method
+        The method which platform support to check.
+    platform:
+        The platform to check against.
+
+    Returns
+    -------
+    is_supported: bool
+        If True, the platform is supported. Otherwise, False.
+    """
+    return platform in method.supported_platforms
