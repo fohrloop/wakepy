@@ -14,15 +14,14 @@ if typing.TYPE_CHECKING:
     from wakepy.core import Call
     from wakepy.core.dbus import DbusAdapter
 
-
-# type annotation shorthands
 MethodCls = Type["Method"]
 T = TypeVar("T")
 Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
-# The strings in MethodsPriorityOrder are names of Methods or the asterisk ('*')
 MethodsPriorityOrder = List[Union[str, Set[str]]]
+"""The strings in MethodsPriorityOrder are names of Methods or the asterisk
+('*')"""
 
 METHOD_REGISTRY: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
