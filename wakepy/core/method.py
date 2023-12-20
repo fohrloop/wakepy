@@ -365,7 +365,6 @@ class Method(ABC, metaclass=MethodMeta):
 
     def get_suitability(
         self,
-        platform: PlatformName | str,
     ) -> Suitability:
         """This is a method used to check the suitability of a method when
         running on a specific platform with a set of software installed on it
@@ -373,24 +372,7 @@ class Method(ABC, metaclass=MethodMeta):
 
         This method is not meant to be overridden in a subclass; override the
         .caniuse(), instead.
-
-        Parameters
-        ---------
-        platform:
-            The platform for which to check suitability. Usually, should be the
-            CURRENT_PLATFORM (if not testing).
         """
-
-        if (
-            hasattr(self, "supported_platforms")
-            and platform not in self.supported_platforms
-        ):
-            return Suitability(
-                SuitabilityCheckResult.UNSUITABLE,
-                UnsuitabilityTag.PLATFORM,
-                f"Supported platform are: {self.supported_platforms}. "
-                f"(detected platform: {platform})",
-            )
 
         canuse = self.caniuse()
         if canuse is True:
