@@ -332,33 +332,6 @@ class Method(ABC, metaclass=MethodMeta):
         self.switch_success = True
         return self.switch_success
 
-    def get_suitability(
-        self,
-    ) -> [bool, str]:
-        """This is a method used to check the suitability of a method when
-        running on a specific platform with a set of software installed on it
-        (which wakepy does not know beforehand).
-
-        This method is not meant to be overridden in a subclass; override the
-        .caniuse(), instead.
-        """
-
-        canuse = self.caniuse()
-
-        fail = False if canuse is True or canuse is None else True
-
-        if canuse in {True, False, None}:
-            message = ""
-        elif isinstance(canuse, str):
-            message = canuse
-        else:
-            raise TypeError(
-                f"Method {self.__class__.__name__} returned: {canuse}, which is not of"
-                " type: 'bool | None | str'."
-            )
-
-        return fail, message
-
 
 def check_methods_priority(
     methods_priority: Optional[MethodsPriorityOrder], methods: List[MethodCls]
@@ -706,6 +679,41 @@ def _register_method(cls: Type[Method]):
         )
 
     _method_registry[cls.name] = cls
+
+
+def get_fails_caniuse(method: Method) -> tuple[bool, str]:
+    """Check if the requirements of a Method are met or not.
+
+    Returns
+    -------
+    (fail, message): (bool, str)
+        If Method.caniuse() return True or None, the requirements check does
+        not fail. In this case, return(False, '')
+
+        If Method.caniuse() return False, or a string, the requirements check
+        fails, and this function returns (True, message), where message is
+        either the string returned by .caniuse() or emptry string.
+
+    Raises
+    ------
+    TypeError, of method.caniuse() has wrong return type.
+    """
+
+    canuse = method.caniuse()
+
+    fail = False if canuse is True or canuse is None else True
+
+    if canuse in {True, False, None}:
+        message = ""
+    elif isinstance(canuse, str):
+        message = canuse
+    else:
+        raise TypeError(
+            f"Method {method.__class__.__name__} returned: {canuse}, which is not of"
+            " type: 'bool | None | str'."
+        )
+
+    return fail, message
 
 
 def get_platform_supported(method: Method, platform: PlatformName) -> bool:
