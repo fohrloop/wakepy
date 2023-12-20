@@ -32,7 +32,7 @@ SECOND_MODE = "second_mode"
 @pytest.fixture(scope="function")
 def provide_methods_a_f(monkeypatch):
     # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     class MethodA(Method):
         name = "A"
@@ -61,7 +61,7 @@ def provide_methods_a_f(monkeypatch):
 @pytest.fixture(scope="function")
 def provide_methods_different_platforms(monkeypatch):
     # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     class WindowsA(Method):
         name = "WinA"
@@ -182,7 +182,7 @@ def test_method_has_x_is_not_writeable():
 
 
 def test_get_method_which_is_not_yet_defined(monkeypatch):
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     # The method registry is empty so there is no Methods with the name
     with pytest.raises(
@@ -194,7 +194,7 @@ def test_get_method_which_is_not_yet_defined(monkeypatch):
 def test_get_method_working_example(monkeypatch):
     somename = "Some name"
     # Make the registry empty
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     # Create a method
     class SomeMethod(Method):
@@ -208,7 +208,7 @@ def test_get_method_working_example(monkeypatch):
 def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
     somename = "Some name"
     # Make the registry empty
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     class SomeMethod(Method):
         name = somename
@@ -222,7 +222,7 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
             name = somename
 
     # sanity check: The monkeypatching works as we expect
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     # Now as the registry is empty it is possible to define method with
     # the same name again

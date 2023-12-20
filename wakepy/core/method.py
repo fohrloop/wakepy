@@ -23,7 +23,7 @@ MethodsPriorityOrder = List[Union[str, Set[str]]]
 """The strings in MethodsPriorityOrder are names of Methods or the asterisk
 ('*')"""
 
-METHOD_REGISTRY: dict[str, MethodCls] = dict()
+_method_registry: dict[str, MethodCls] = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
 a module with a subclass of Method, the Method class is added to this registry.
 """
@@ -31,13 +31,13 @@ a module with a subclass of Method, the Method class is added to this registry.
 
 def get_method(method_name: str) -> MethodCls:
     """Get a Method class based on its name."""
-    if method_name not in METHOD_REGISTRY:
+    if method_name not in _method_registry:
         raise KeyError(
             f'No Method with name "{method_name}" found!'
             " Check that the name is correctly spelled and that the module containing"
             " the class is being imported."
         )
-    return METHOD_REGISTRY[method_name]
+    return _method_registry[method_name]
 
 
 def get_methods(method_names: List[str]) -> List[MethodCls]:
@@ -80,7 +80,7 @@ def get_methods_for_mode(
         The Method classes for the Mode.
     """
     methods = []
-    for method_cls in METHOD_REGISTRY.values():
+    for method_cls in _method_registry.values():
         if method_cls.mode != modename:
             continue
         methods.append(method_cls)
@@ -143,13 +143,13 @@ def _register_method(cls: Type[Method]):
         # Methods without a name will not be registered
         return
 
-    if cls.name in METHOD_REGISTRY:
+    if cls.name in _method_registry:
         raise MethodDefinitionError(
             f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
-            f"(already registered to {METHOD_REGISTRY[cls.name].__qualname__})"
+            f"(already registered to {_method_registry[cls.name].__qualname__})"
         )
 
-    METHOD_REGISTRY[cls.name] = cls
+    _method_registry[cls.name] = cls
 
 
 class MethodError(RuntimeError):
