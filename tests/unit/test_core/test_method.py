@@ -13,7 +13,7 @@ from wakepy.core.method import (
     MethodError,
     PlatformName,
     check_methods_priority,
-    check_platform_support,
+    get_platform_supported,
     get_method,
     get_methods,
     get_methods_for_mode,
@@ -578,20 +578,20 @@ def test_get_prioritized_methods(monkeypatch):
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
-def test_check_platform_support():
+def test_get_platform_supported():
     WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
 
     # The windows method is only supported on windows
-    assert check_platform_support(WindowsA(), PlatformName.WINDOWS)
-    assert not check_platform_support(WindowsA(), PlatformName.LINUX)
-    assert not check_platform_support(WindowsA(), PlatformName.MACOS)
+    assert get_platform_supported(WindowsA(), PlatformName.WINDOWS)
+    assert not get_platform_supported(WindowsA(), PlatformName.LINUX)
+    assert not get_platform_supported(WindowsA(), PlatformName.MACOS)
 
     # The linux method is only supported on linux
-    assert check_platform_support(LinuxA(), PlatformName.LINUX)
-    assert not check_platform_support(LinuxA(), PlatformName.WINDOWS)
-    assert not check_platform_support(LinuxA(), PlatformName.MACOS)
+    assert get_platform_supported(LinuxA(), PlatformName.LINUX)
+    assert not get_platform_supported(LinuxA(), PlatformName.WINDOWS)
+    assert not get_platform_supported(LinuxA(), PlatformName.MACOS)
 
     # Case: Method that supports linux, windows and macOS
-    assert check_platform_support(MultiPlatformA(), PlatformName.LINUX)
-    assert check_platform_support(MultiPlatformA(), PlatformName.WINDOWS)
-    assert check_platform_support(MultiPlatformA(), PlatformName.MACOS)
+    assert get_platform_supported(MultiPlatformA(), PlatformName.LINUX)
+    assert get_platform_supported(MultiPlatformA(), PlatformName.WINDOWS)
+    assert get_platform_supported(MultiPlatformA(), PlatformName.MACOS)
