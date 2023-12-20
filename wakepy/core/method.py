@@ -23,134 +23,6 @@ MethodsPriorityOrder = List[Union[str, Set[str]]]
 """The strings in MethodsPriorityOrder are names of Methods or the asterisk
 ('*')"""
 
-_method_registry: dict[str, MethodCls] = dict()
-"""A name -> Method class mapping. Updated automatically; when python loads
-a module with a subclass of Method, the Method class is added to this registry.
-"""
-
-
-def get_method(method_name: str) -> MethodCls:
-    """Get a Method class based on its name."""
-    if method_name not in _method_registry:
-        raise KeyError(
-            f'No Method with name "{method_name}" found!'
-            " Check that the name is correctly spelled and that the module containing"
-            " the class is being imported."
-        )
-    return _method_registry[method_name]
-
-
-def get_methods(method_names: List[str]) -> List[MethodCls]:
-    """Get Method classes based on their names."""
-    return [get_method(name) for name in method_names]
-
-
-def method_names_to_classes(
-    names: Collection[str] | None = None,
-) -> Collection[MethodCls] | None:
-    """Convert a collection (list, tuple or set) of method names to a
-    collection of method classes"""
-    if names is None:
-        return None
-
-    if isinstance(names, list):
-        return [get_method(name) for name in names]
-    elif isinstance(names, tuple):
-        return tuple(get_method(name) for name in names)
-    elif isinstance(names, set):
-        return set(get_method(name) for name in names)
-
-    raise TypeError("`names` must be a list, tuple or set")
-
-
-def get_methods_for_mode(
-    modename: ModeName,
-) -> List[MethodCls]:
-    """Get the Method classes belonging to a Mode; Methods with
-    Method.mode = `modename`.
-
-    Parameters
-    ----------
-    modename: str | ModeName
-        The name of the Mode from which to select the Methods.
-
-    Returns
-    -------
-    methods: list[MethodCls]
-        The Method classes for the Mode.
-    """
-    methods = []
-    for method_cls in _method_registry.values():
-        if method_cls.mode != modename:
-            continue
-        methods.append(method_cls)
-
-    return methods
-
-
-def select_methods(
-    methods: MethodClsCollection,
-    omit: Optional[StrCollection] = None,
-    use_only: Optional[StrCollection] = None,
-) -> List[MethodCls]:
-    """Selects Methods from from `methods` using a blacklist (omit) or
-    whitelist (use_only). If `omit` and `use_only` are both None, will return
-    all the original methods.
-
-    Parameters
-    ----------
-    methods: collection of Method classes
-        The collection of methods from which to make the selection.
-    omit: list, tuple or set of str or None
-        The names of Methods to remove from the `methods`; a "blacklist"
-        filter. Any Method in `omit` but not in `methods` will be silently
-        ignored. Cannot be used same time with `use_only`. Optional.
-    use_only: list, tuple or set of str
-        The names of Methods to select from the `methods`; a "whitelist"
-        filter. Means "use these and only these Methods". Any Methods in
-        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
-        be used same time with `omit`. Optional.
-
-    Returns
-    -------
-    methods: list[MethodCls]
-        The selected method classes.
-    """
-
-    if omit and use_only:
-        raise ValueError(
-            "Can only define omit (blacklist) or use_only (whitelist), not both!"
-        )
-
-    if omit is None and use_only is None:
-        selected_methods = list(methods)
-    elif omit:
-        selected_methods = [m for m in methods if m.name not in omit]
-    elif use_only:
-        selected_methods = [m for m in methods if m.name in use_only]
-        if not set(use_only).issubset(m.name for m in selected_methods):
-            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
-            raise ValueError(
-                f"Methods {missing} in `use_only` are not part of `methods`!"
-            )
-    return selected_methods
-
-
-def _register_method(cls: Type[Method]):
-    """Registers a subclass of Method to the method registry"""
-
-    if cls.name is None:
-        # Methods without a name will not be registered
-        return
-
-    if cls.name in _method_registry:
-        raise MethodDefinitionError(
-            f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
-            f"(already registered to {_method_registry[cls.name].__qualname__})"
-        )
-
-    _method_registry[cls.name] = cls
-
 
 class MethodError(RuntimeError):
     """Occurred inside wakepy.core.method.Method"""
@@ -525,25 +397,6 @@ class Method(ABC, metaclass=MethodMeta):
         return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
 
 
-def iterate_methods_priority(
-    methods_priority: Optional[MethodsPriorityOrder],
-) -> typing.Iterator[Tuple[str, bool]]:
-    """Provides an iterator over the items in methods_priority. The items in the
-    iterator are (method_name, in_set) 2-tuples, where the method_name is the
-    method name (str) and the in_set is a boolean which is True if the returned
-    method_name is part of a set and False otherwise."""
-
-    if not methods_priority:
-        return
-
-    for item in methods_priority:
-        if isinstance(item, set):
-            for method_name in item:
-                yield method_name, True
-        else:
-            yield item, False
-
-
 def check_methods_priority(
     methods_priority: Optional[MethodsPriorityOrder], methods: List[MethodCls]
 ) -> None:
@@ -571,7 +424,7 @@ def check_methods_priority(
     known_method_names.add("*")
     seen_method_names = set()
 
-    for method_name, in_set in iterate_methods_priority(methods_priority):
+    for method_name, in_set in _iterate_methods_priority(methods_priority):
         if not isinstance(method_name, str):
             raise TypeError("methods_priority must be a list[str | set[str]]!")
 
@@ -593,6 +446,25 @@ def check_methods_priority(
                     "The asterisk (*) can only occur once in methods_priority!"
                 )
         seen_method_names.add(method_name)
+
+
+def _iterate_methods_priority(
+    methods_priority: Optional[MethodsPriorityOrder],
+) -> typing.Iterator[Tuple[str, bool]]:
+    """Provides an iterator over the items in methods_priority. The items in the
+    iterator are (method_name, in_set) 2-tuples, where the method_name is the
+    method name (str) and the in_set is a boolean which is True if the returned
+    method_name is part of a set and False otherwise."""
+
+    if not methods_priority:
+        return
+
+    for item in methods_priority:
+        if isinstance(item, set):
+            for method_name in item:
+                yield method_name, True
+        else:
+            yield item, False
 
 
 def get_prioritized_methods_groups(
@@ -742,3 +614,132 @@ def get_prioritized_methods(
     ]
 
     return [method for group in ordered_groups for method in group]
+
+
+_method_registry: dict[str, MethodCls] = dict()
+"""A name -> Method class mapping. Updated automatically; when python loads
+a module with a subclass of Method, the Method class is added to this registry.
+"""
+
+
+def get_method(method_name: str) -> MethodCls:
+    """Get a Method class based on its name."""
+    if method_name not in _method_registry:
+        raise KeyError(
+            f'No Method with name "{method_name}" found!'
+            " Check that the name is correctly spelled and that the module containing"
+            " the class is being imported."
+        )
+    return _method_registry[method_name]
+
+
+def get_methods(method_names: List[str]) -> List[MethodCls]:
+    """Get Method classes based on their names."""
+    return [get_method(name) for name in method_names]
+
+
+def method_names_to_classes(
+    names: Collection[str] | None = None,
+) -> Collection[MethodCls] | None:
+    """Convert a collection (list, tuple or set) of method names to a
+    collection of method classes"""
+    if names is None:
+        return None
+
+    if isinstance(names, list):
+        return [get_method(name) for name in names]
+    elif isinstance(names, tuple):
+        return tuple(get_method(name) for name in names)
+    elif isinstance(names, set):
+        return set(get_method(name) for name in names)
+
+    raise TypeError("`names` must be a list, tuple or set")
+
+
+def get_methods_for_mode(
+    modename: ModeName,
+) -> List[MethodCls]:
+    """Get the Method classes belonging to a Mode; Methods with
+    Method.mode = `modename`.
+
+    Parameters
+    ----------
+    modename: str | ModeName
+        The name of the Mode from which to select the Methods.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The Method classes for the Mode.
+    """
+    methods = []
+    for method_cls in _method_registry.values():
+        if method_cls.mode != modename:
+            continue
+        methods.append(method_cls)
+
+    return methods
+
+
+def select_methods(
+    methods: MethodClsCollection,
+    omit: Optional[StrCollection] = None,
+    use_only: Optional[StrCollection] = None,
+) -> List[MethodCls]:
+    """Selects Methods from from `methods` using a blacklist (omit) or
+    whitelist (use_only). If `omit` and `use_only` are both None, will return
+    all the original methods.
+
+    Parameters
+    ----------
+    methods: collection of Method classes
+        The collection of methods from which to make the selection.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the `methods`; a "blacklist"
+        filter. Any Method in `omit` but not in `methods` will be silently
+        ignored. Cannot be used same time with `use_only`. Optional.
+    use_only: list, tuple or set of str
+        The names of Methods to select from the `methods`; a "whitelist"
+        filter. Means "use these and only these Methods". Any Methods in
+        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
+        be used same time with `omit`. Optional.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The selected method classes.
+    """
+
+    if omit and use_only:
+        raise ValueError(
+            "Can only define omit (blacklist) or use_only (whitelist), not both!"
+        )
+
+    if omit is None and use_only is None:
+        selected_methods = list(methods)
+    elif omit:
+        selected_methods = [m for m in methods if m.name not in omit]
+    elif use_only:
+        selected_methods = [m for m in methods if m.name in use_only]
+        if not set(use_only).issubset(m.name for m in selected_methods):
+            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
+            raise ValueError(
+                f"Methods {missing} in `use_only` are not part of `methods`!"
+            )
+    return selected_methods
+
+
+def _register_method(cls: Type[Method]):
+    """Registers a subclass of Method to the method registry"""
+
+    if cls.name is None:
+        # Methods without a name will not be registered
+        return
+
+    if cls.name in _method_registry:
+        raise MethodDefinitionError(
+            f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
+            f"(already registered to {_method_registry[cls.name].__qualname__})"
+        )
+
+    _method_registry[cls.name] = cls
