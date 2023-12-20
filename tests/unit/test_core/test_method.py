@@ -14,6 +14,7 @@ from wakepy.core.method import (
     PlatformName,
     check_methods_priority,
     get_platform_supported,
+    get_fails_caniuse,
     get_method,
     get_methods,
     get_methods_for_mode,
@@ -595,3 +596,37 @@ def test_get_platform_supported():
     assert get_platform_supported(MultiPlatformA(), PlatformName.LINUX)
     assert get_platform_supported(MultiPlatformA(), PlatformName.WINDOWS)
     assert get_platform_supported(MultiPlatformA(), PlatformName.MACOS)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        # True and None -> The check does not fail
+        dict(caniuse=True, expected=(False, "")),
+        dict(caniuse=None, expected=(False, "")),
+        # If returning False, the check fails
+        dict(caniuse=False, expected=(True, "")),
+        # If returning a string, the check fails with a reason
+        dict(caniuse="reason", expected=(True, "reason")),
+    ],
+)
+def test_get_fails_caniuse(params):
+    class SomeMethod(Method):
+        def caniuse(self):
+            return params["caniuse"]
+
+    assert get_fails_caniuse(SomeMethod()) == params["expected"]
+
+
+def test_get_fails_caniuse_return_bad_value():
+    class SomeMethod(Method):
+        def caniuse(self):
+            return 123
+
+    with pytest.raises(
+        TypeError,
+        match=re.escape(
+            "Method SomeMethod returned: 123, which is not of type: 'bool | None | str'."
+        ),
+    ):
+        get_fails_caniuse(SomeMethod())
