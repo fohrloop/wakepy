@@ -1,3 +1,30 @@
+"""This module defines the Method class and few functions for working with
+methods
+
+Method
+* A class which is intended to be subclassed
+* The Methods are ways of entering wakepy Modes.
+
+General functions
+-----------------
+select_methods
+    Select Methods from a collection based on a white- or blacklist.
+get_prioritized_methods
+    Prioritize of collection of Methods
+
+Functions for getting Methods
+-----------------------------
+get_method
+    Get a single method by name
+get_methods
+    Get multiple methods be name
+method_names_to_classes
+    Convert multiple method names to Method classes
+get_methods_for_mode
+    Get Methods based on a Mode name
+
+"""
+
 from __future__ import annotations
 
 import typing
