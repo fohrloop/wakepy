@@ -378,8 +378,7 @@ class Method(ABC, metaclass=MethodMeta):
         ---------
         platform:
             The platform for which to check suitability. Usually, should be the
-            CURRENT_PLATFORM (if not testing). Can als be a lower-case string
-            like "windows", "linux" or "darwin".
+            CURRENT_PLATFORM (if not testing).
         """
 
         if (
