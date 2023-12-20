@@ -693,25 +693,12 @@ def caniuse_fails(method: Method) -> tuple[bool, str]:
         If Method.caniuse() return False, or a string, the requirements check
         fails, and this function returns (True, message), where message is
         either the string returned by .caniuse() or emptry string.
-
-    Raises
-    ------
-    TypeError, of method.caniuse() has wrong return type.
     """
 
     canuse = method.caniuse()
 
-    fail = False if canuse is True or canuse is None else True
-
-    if canuse in {True, False, None}:
-        message = ""
-    elif isinstance(canuse, str):
-        message = canuse
-    else:
-        raise TypeError(
-            f"Method {method.__class__.__name__} returned: {canuse}, which is not of"
-            " type: 'bool | None | str'."
-        )
+    fail = False if (canuse is True or canuse is None) else True
+    message = "" if canuse in {True, False, None} else str(canuse)
 
     return fail, message
 

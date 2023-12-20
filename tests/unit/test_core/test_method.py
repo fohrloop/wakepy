@@ -608,6 +608,9 @@ def test_get_platform_supported():
         dict(caniuse=False, expected=(True, "")),
         # If returning a string, the check fails with a reason
         dict(caniuse="reason", expected=(True, "reason")),
+        # If .caniuse() returns anything else than a string, that is silently
+        # converted to a string, and the check fails.
+        dict(caniuse=123, expected=(True, "123")),
     ],
 )
 def test_caniuse_fails(params):
@@ -616,17 +619,3 @@ def test_caniuse_fails(params):
             return params["caniuse"]
 
     assert caniuse_fails(SomeMethod()) == params["expected"]
-
-
-def test_caniuse_fails_return_bad_value():
-    class SomeMethod(Method):
-        def caniuse(self):
-            return 123
-
-    with pytest.raises(
-        TypeError,
-        match=re.escape(
-            "Method SomeMethod returned: 123, which is not of type: 'bool | None | str'."
-        ),
-    ):
-        caniuse_fails(SomeMethod())
