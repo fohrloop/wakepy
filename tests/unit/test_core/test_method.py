@@ -14,7 +14,7 @@ from wakepy.core.method import (
     PlatformName,
     check_methods_priority,
     get_platform_supported,
-    get_fails_caniuse,
+    caniuse_fails,
     get_method,
     get_methods,
     get_methods_for_mode,
@@ -610,15 +610,15 @@ def test_get_platform_supported():
         dict(caniuse="reason", expected=(True, "reason")),
     ],
 )
-def test_get_fails_caniuse(params):
+def test_caniuse_fails(params):
     class SomeMethod(Method):
         def caniuse(self):
             return params["caniuse"]
 
-    assert get_fails_caniuse(SomeMethod()) == params["expected"]
+    assert caniuse_fails(SomeMethod()) == params["expected"]
 
 
-def test_get_fails_caniuse_return_bad_value():
+def test_caniuse_fails_return_bad_value():
     class SomeMethod(Method):
         def caniuse(self):
             return 123
@@ -629,4 +629,4 @@ def test_get_fails_caniuse_return_bad_value():
             "Method SomeMethod returned: 123, which is not of type: 'bool | None | str'."
         ),
     ):
-        get_fails_caniuse(SomeMethod())
+        caniuse_fails(SomeMethod())

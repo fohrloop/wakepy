@@ -681,7 +681,7 @@ def _register_method(cls: Type[Method]):
     _method_registry[cls.name] = cls
 
 
-def get_fails_caniuse(method: Method) -> tuple[bool, str]:
+def caniuse_fails(method: Method) -> tuple[bool, str]:
     """Check if the requirements of a Method are met or not.
 
     Returns
