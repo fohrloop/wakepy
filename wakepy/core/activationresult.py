@@ -61,7 +61,7 @@ class StageName(StrEnum):
     ACTIVATION = auto()
 
 
-@dataclass(frozen=True)
+@dataclass
 class MethodUsageResult:
     status: UsageStatus
 
