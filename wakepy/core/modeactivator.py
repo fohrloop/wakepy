@@ -25,35 +25,6 @@ def activate(
     TODO: Replace with real implementation"""
 
 
-def sort_methods_by_priority(
-    methods: List[Type[Method]],
-    prioritize: Optional[List[Type[Method]]] = None,
-) -> List[Type[Method]]:
-    """Sort `methods` based on `prioritize`.
-
-    Parameters
-    ----------
-    prioritize:
-        If given a list of Methods (classes), this list will be used to
-        order the returned Methods in the order given in `prioritize`. Any
-        Method in `prioritize` but not in the `methods` list will be
-        disregarded. Any method in `methods` but not in `prioritize`, will be
-        placed in the output list just after all prioritized methods, in same
-        order as in the original `methods`.
-    """
-
-    if not prioritize:
-        return methods
-
-    sorted_methods = sorted(
-        methods,
-        key=lambda method: prioritize.index(method)
-        if method in prioritize
-        else float("inf"),
-    )
-    return sorted_methods
-
-
 # TODO: Remove / merge this to existing code.
 class ModeWorkerThread(Thread):
     def __init__(
