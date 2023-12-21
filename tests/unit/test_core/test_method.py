@@ -12,12 +12,10 @@ from wakepy.core.method import (
     MethodDefinitionError,
     MethodError,
     PlatformName,
-    caniuse_fails,
     check_methods_priority,
     get_method,
     get_methods,
     get_methods_for_mode,
-    get_platform_supported,
     get_prioritized_methods,
     get_prioritized_methods_groups,
     method_names_to_classes,
@@ -58,44 +56,6 @@ def provide_methods_a_f(monkeypatch):
     class MethodF(Method):
         name = "F"
         mode = SECOND_MODE
-
-
-@pytest.fixture(scope="function")
-def provide_methods_different_platforms(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
-
-    class WindowsA(Method):
-        name = "WinA"
-        supported_platforms = (PlatformName.WINDOWS,)
-
-    class WindowsB(Method):
-        name = "WinB"
-        supported_platforms = (PlatformName.WINDOWS,)
-
-    class WindowsC(Method):
-        name = "WinC"
-        supported_platforms = (PlatformName.WINDOWS,)
-
-    class LinuxA(Method):
-        name = "LinuxA"
-        supported_platforms = (PlatformName.LINUX,)
-
-    class LinuxB(Method):
-        name = "LinuxB"
-        supported_platforms = (PlatformName.LINUX,)
-
-    class LinuxC(Method):
-        name = "LinuxC"
-        supported_platforms = (PlatformName.LINUX,)
-
-    class MultiPlatformA(Method):
-        name = "multiA"
-        supported_platforms = (
-            PlatformName.LINUX,
-            PlatformName.WINDOWS,
-            PlatformName.MACOS,
-        )
 
 
 def test_overridden_methods_autodiscovery():
@@ -576,46 +536,3 @@ def test_get_prioritized_methods(monkeypatch):
     assert get_prioritized_methods(
         [LinuxA, LinuxB, WindowsA, WindowsB, LinuxC, MultiPlatformA],
     ) == [MultiPlatformA, WindowsA, WindowsB, LinuxA, LinuxB, LinuxC]
-
-
-@pytest.mark.usefixtures("provide_methods_different_platforms")
-def test_get_platform_supported():
-    WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
-
-    # The windows method is only supported on windows
-    assert get_platform_supported(WindowsA(), PlatformName.WINDOWS)
-    assert not get_platform_supported(WindowsA(), PlatformName.LINUX)
-    assert not get_platform_supported(WindowsA(), PlatformName.MACOS)
-
-    # The linux method is only supported on linux
-    assert get_platform_supported(LinuxA(), PlatformName.LINUX)
-    assert not get_platform_supported(LinuxA(), PlatformName.WINDOWS)
-    assert not get_platform_supported(LinuxA(), PlatformName.MACOS)
-
-    # Case: Method that supports linux, windows and macOS
-    assert get_platform_supported(MultiPlatformA(), PlatformName.LINUX)
-    assert get_platform_supported(MultiPlatformA(), PlatformName.WINDOWS)
-    assert get_platform_supported(MultiPlatformA(), PlatformName.MACOS)
-
-
-@pytest.mark.parametrize(
-    "params",
-    [
-        # True and None -> The check does not fail
-        dict(caniuse=True, expected=(False, "")),
-        dict(caniuse=None, expected=(False, "")),
-        # If returning False, the check fails
-        dict(caniuse=False, expected=(True, "")),
-        # If returning a string, the check fails with a reason
-        dict(caniuse="reason", expected=(True, "reason")),
-        # If .caniuse() returns anything else than a string, that is silently
-        # converted to a string, and the check fails.
-        dict(caniuse=123, expected=(True, "123")),
-    ],
-)
-def test_caniuse_fails(params):
-    class SomeMethod(Method):
-        def caniuse(self):
-            return params["caniuse"]
-
-    assert caniuse_fails(SomeMethod()) == params["expected"]
