@@ -112,7 +112,7 @@ def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_failing():
 
 
 @freeze_time("2023-12-21 16:17:00")
-def test_try_enter_and_heartbeat_failing_enter_mode_with_error_message():
+def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_success():
     """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
 
     expected_time = dt.datetime.strptime(
@@ -126,6 +126,19 @@ def test_try_enter_and_heartbeat_failing_enter_mode_with_error_message():
         res = try_enter_and_heartbeat(method)
         # Expecting: Return Success + '' +  heartbeat time
         assert res == (True, "", expected_time)
+
+
+def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
+    """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
+
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.SUCCESSFUL],
+        heartbeat=[MethodIs.MISSING],
+        exit_mode=MethodIs,
+    ):
+        res = try_enter_and_heartbeat(method)
+        # Expecting: Return Success + '' + None (no heartbeat)
+        assert res == (True, "", None)
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
