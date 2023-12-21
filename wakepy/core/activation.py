@@ -15,7 +15,7 @@ import typing
 from typing import Optional, Tuple
 
 from .activationresult import MethodUsageResult, UsageStatus, StageName
-from .constants import ModeName, PlatformName
+from .constants import PlatformName
 from .method import MethodOutcome, MethodError
 
 if typing.TYPE_CHECKING:

@@ -1,16 +1,10 @@
-import itertools
 import re
 
 import pytest
-from testmethods import MethodIs, get_test_method_class
 
 from wakepy.core.method import (
-    EnterModeError,
-    ExitModeError,
-    HeartbeatCallError,
     Method,
     MethodDefinitionError,
-    MethodError,
     PlatformName,
     check_methods_priority,
     get_method,

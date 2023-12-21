@@ -74,7 +74,7 @@ def test_try_enter_and_heartbeat_failing_enter_mode():
         assert res == (False, "failure_reason", None)
 
 
-def test_try_enter_and_heartbeat_missing_enter_mode_and_heartbeat():
+def test_try_enter_and_heartbeat_missing_missing():
     """Tests 2) MM from TABLE 1; missing both enter_mode and heartbeat"""
     for method in iterate_test_methods(
         enter_mode=[MethodIs.MISSING],
@@ -91,7 +91,7 @@ def test_try_enter_and_heartbeat_missing_enter_mode_and_heartbeat():
             try_enter_and_heartbeat(method)
 
 
-def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_failing():
+def test_try_enter_and_heartbeat_missing_failing():
     """Tests 3) MF from TABLE 1; enter_mode missing and heartbeat failing"""
     for method in iterate_test_methods(
         enter_mode=[MethodIs.MISSING],
@@ -116,7 +116,7 @@ def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_failing():
 
 
 @freeze_time("2023-12-21 16:17:00")
-def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_success():
+def test_try_enter_and_heartbeat_missing_success():
     """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
 
     expected_time = dt.datetime.strptime(
@@ -132,7 +132,7 @@ def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_success():
         assert res == (True, "", expected_time)
 
 
-def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
+def test_try_enter_and_heartbeat_success_missing():
     """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
 
     for method in iterate_test_methods(
@@ -145,7 +145,7 @@ def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
         assert res == (True, "", None)
 
 
-def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
+def test_try_enter_and_heartbeat_success_failing():
     """Tests 6) SF from TABLE 1; enter_mode success, heartbeat failing
 
     This should, in general Return Fail + heartbeat error message + call exit_mode()
