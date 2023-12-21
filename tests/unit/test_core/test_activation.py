@@ -68,6 +68,23 @@ def test_try_enter_and_heartbeat_failing_enter_mode_with_error_message():
         assert res == (False, "failure_reason", None)
 
 
+def test_try_enter_and_heartbeat_missing_enter_mode_and_heartbeat():
+    """Tests 2) MM from TABLE 1; missing both enter_mode and heartbeat"""
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.MISSING],
+        heartbeat=[MethodIs.MISSING],
+        exit_mode=MethodIs,
+    ):
+        # Expecting an error as missing enter_mode and heartbeat
+        with pytest.raises(
+            RuntimeError,
+            match=re.escape(
+                f"Method {method.__class__.__name__} ({method.name}) is not properly defined! Missing implementation for both, enter_mode() and heartbeat()!"
+            ),
+        ):
+            try_enter_and_heartbeat(method)
+
+
 @pytest.mark.usefixtures("provide_methods_different_platforms")
 def test_get_platform_supported():
     WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
