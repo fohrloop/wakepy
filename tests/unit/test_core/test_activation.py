@@ -1,7 +1,7 @@
 import re
 
 import pytest
-from testmethods import MethodIs, get_test_method_class
+from testmethods import MethodIs, get_test_method_class, iterate_test_methods
 
 from wakepy.core.method import (
     Method,
@@ -9,7 +9,31 @@ from wakepy.core.method import (
     get_methods,
 )
 
-from wakepy.core.activation import caniuse_fails, get_platform_supported
+from wakepy.core.activation import (
+    caniuse_fails,
+    get_platform_supported,
+    try_enter_and_heartbeat,
+)
+
+
+def test_try_enter_and_heartbeat_failing_enter_mode():
+    """Test that each of following combinations:
+
+        {enter_mode} {heartbeat} {exit_mode}
+
+    where each of {enter_mode}, {heartbeat} and {exit_mode} is either
+    S: successful (implemented and returning True)
+    F: Failing (implemented as returning something else than True)
+    M: not implemented (missing method)
+
+    works as expected.
+    """
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.FAILING],
+        heartbeat=MethodIs,
+        exit_mode=MethodIs,
+    ):
+        res = try_enter_and_heartbeat(method)
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")

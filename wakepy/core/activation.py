@@ -82,7 +82,7 @@ def caniuse_fails(method: Method) -> tuple[bool, str]:
     return fail, message
 
 
-def _try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.datetime]]:
+def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.datetime]]:
     """Use a Method to first try to activate mode with Method.enter_mode()
     and then try the heartbeat with Method.heartbeat()
 
