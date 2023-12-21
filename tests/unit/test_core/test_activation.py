@@ -46,7 +46,9 @@ Methods   Expected result
 
 
 def test_try_enter_and_heartbeat_failing_enter_mode():
-    """Tests 1) F* from TABLE 1 when enter_mode returns False"""
+    """Tests 1) F* from TABLE 1; enter_mode failing"""
+
+    # Case: when enter_mode returns False
     for method in iterate_test_methods(
         enter_mode=[MethodIs.FAILING],
         heartbeat=MethodIs,
@@ -59,9 +61,7 @@ def test_try_enter_and_heartbeat_failing_enter_mode():
         # * No heartbeat_call_time (None)
         assert res == (False, "", None)
 
-
-def test_try_enter_and_heartbeat_failing_enter_mode_with_error_message():
-    """Tests 1) F* from TABLE 1 when enter_mode returns a string (error message)"""
+    # Case: enter_mode returns a string (error message)
     for method in iterate_test_methods(
         enter_mode=[MethodIs.FAILING_MESSAGE],
         heartbeat=MethodIs,
@@ -150,7 +150,8 @@ def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
     """Tests 6) SF from TABLE 1; enter_mode success, heartbeat failing
 
     This should, in general Return Fail + heartbeat error message + call exit_mode()
-    This call of exit_mode might be failing, so we test that separately"""
+    This call of exit_mode might be failing, so we test that separately
+    """
 
     # Case: empty error message ("") as heartbeat returns False
     for method in iterate_test_methods(
