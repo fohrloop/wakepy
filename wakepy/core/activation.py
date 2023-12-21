@@ -83,22 +83,27 @@ def caniuse_fails(method: Method) -> tuple[bool, str]:
 
 
 def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.datetime]]:
-    """Use a Method to first try to activate mode with Method.enter_mode()
-    and then try the heartbeat with Method.heartbeat()
+    """Try to use a Method to to activate a mode. First, with
+    method.enter_mode(), and then with the method.heartbeat()
 
     Returns
     -------
     success, err_message, heartbeat_call_time
         A three-tuple, where success is boolean and True if activating the mode
-        with the method was succesfull, otherwise False. The err_message is a
-        string which may be non-empty only when success is False -- otherwise,
-        it is ''. The heartbeat_call_time is the datetime (in UTC) just before
-        the method.hearbeat was called.
+        with the method was successful, otherwise False. The err_message is a
+        string which may be non-empty only when success is False. The
+        heartbeat_call_time is the datetime (in UTC) just before calling the
+        method.hearbeat().
 
     Raises
     ------
-    MethodError (RunTimeError), if the method is missing both, enter_mode() and
-    heartbeat() implementation.
+    RunTimeError  (a) if the `method` is missing both, enter_mode() and
+    heartbeat() implementation (Invalid Method definition) (b) the rare edge
+    case where the `method` has both, enter_mode() and heartbeat() defined, and
+    the enter_mode() succeeds but the heartbeat() fails, which causes
+    exit_mode() to be called, and if this exit_mode() also fails (as this
+    leaves system uncertain state).
+
 
     Detailed explanation
     --------------------
