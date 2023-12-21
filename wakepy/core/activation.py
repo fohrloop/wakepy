@@ -134,12 +134,12 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
      7)  SS    Return Success + heartbeat time
 
     """
-    enter_outcome, enter_errmessage = try_enter_mode(method)
+    enter_outcome, enter_errmessage = _try_enter_mode(method)
 
     if enter_outcome == MethodOutcome.FAILURE:  # 1) F*
         return False, enter_errmessage, None
 
-    hb_outcome, hb_errmessage, hb_calltime = try_heartbeat(method)
+    hb_outcome, hb_errmessage, hb_calltime = _try_heartbeat(method)
 
     method_name = f"Method {method.__class__.__name__} ({method.name})"
     if enter_outcome == MethodOutcome.NOT_IMPLEMENTED:
@@ -157,7 +157,7 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
         if hb_outcome == MethodOutcome.NOT_IMPLEMENTED:  # 5) SM
             return True, "", None
         if hb_outcome == MethodOutcome.FAILURE:  # 6) SF
-            rollback_with_exit(method)
+            _rollback_with_exit(method)
             return False, hb_errmessage, None
         elif hb_outcome == MethodOutcome.SUCCESS:  # 7) SS
             return True, "", hb_calltime
@@ -168,7 +168,7 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
     )
 
 
-def try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
+def _try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
     if not method.has_enter:
         return MethodOutcome.NOT_IMPLEMENTED, ""
 
@@ -185,7 +185,7 @@ def try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
     return outcome, message
 
 
-def try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.datetime]]:
+def _try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.datetime]]:
     """Calls the method.heartbeat()
 
     Returns
@@ -211,7 +211,7 @@ def try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.datet
     return outcome, message, heartbeat_call_time
 
 
-def rollback_with_exit(method):
+def _rollback_with_exit(method):
     """Roll back entering a mode by exiting it.
 
     Raises
