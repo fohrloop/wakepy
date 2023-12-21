@@ -32,10 +32,12 @@ import warnings
 from abc import ABC, ABCMeta
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
+from .activationresult import MethodUsageResult, UsageStatus, StageName
 from .calls import DbusMethodCall
 from .constants import ModeName, PlatformName
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
+
 
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
@@ -681,6 +683,47 @@ def _register_method(cls: Type[Method]):
     _method_registry[cls.name] = cls
 
 
+def activate_using(method: Method) -> MethodUsageResult:
+    result = MethodUsageResult(status=UsageStatus.FAIL, method_name=method.name)
+
+    if not get_platform_supported(method):
+        result.failure_stage = StageName.PLATFORM_SUPPORT
+        return result
+
+    requirements_fail, message = caniuse_fails(method)
+    if requirements_fail:
+        result.failure_stage = StageName.REQUIREMENTS
+        result.message = message
+        return result
+
+    activation_fail, message, heartbeat = try_activate_using(method)
+    if activation_fail:
+        result.failure_stage = StageName.ACTIVATION
+        result.message = message
+        return result
+
+    result.status = UsageStatus.SUCCESS
+    return result
+
+
+def get_platform_supported(method: Method, platform: PlatformName) -> bool:
+    """Checks if method is supported by the platform
+
+    Parameters
+    ----------
+    method: Method
+        The method which platform support to check.
+    platform:
+        The platform to check against.
+
+    Returns
+    -------
+    is_supported: bool
+        If True, the platform is supported. Otherwise, False.
+    """
+    return platform in method.supported_platforms
+
+
 def caniuse_fails(method: Method) -> tuple[bool, str]:
     """Check if the requirements of a Method are met or not.
 
@@ -701,21 +744,3 @@ def caniuse_fails(method: Method) -> tuple[bool, str]:
     message = "" if canuse in {True, False, None} else str(canuse)
 
     return fail, message
-
-
-def get_platform_supported(method: Method, platform: PlatformName) -> bool:
-    """Checks if method is supported by the platform
-
-    Parameters
-    ----------
-    method: Method
-        The method which platform support to check.
-    platform:
-        The platform to check against.
-
-    Returns
-    -------
-    is_supported: bool
-        If True, the platform is supported. Otherwise, False.
-    """
-    return platform in method.supported_platforms
