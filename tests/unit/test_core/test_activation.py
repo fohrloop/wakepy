@@ -15,25 +15,57 @@ from wakepy.core.activation import (
     try_enter_and_heartbeat,
 )
 
+"""
+TABLE 1
+Test table for try_enter_and_heartbeat. Methods are {enter_mode}{heartbeat}
+where {enter_mode} and {heartbeat} are
+
+M: Missing implementation
+F: Failed attempt (with or without message)
+S: Succesful attempt
+
+Methods   Expected result
+-------   ---------------------------------------------------------
+1)  F*    Return Fail + enter_mode error message
+
+2)  MM    Raise Exception -- the Method is faulty.
+3)  MF    Return Fail + heartbeat error message
+4)  MS    Return Success + heartbeat time
+
+5)  SM    Return Success
+6)  SF    Return Fail + heartbeat error message + call exit_mode()
+7)  SS    Return Success + heartbeat time
+"""
+
 
 def test_try_enter_and_heartbeat_failing_enter_mode():
-    """Test that each of following combinations:
-
-        {enter_mode} {heartbeat} {exit_mode}
-
-    where each of {enter_mode}, {heartbeat} and {exit_mode} is either
-    S: successful (implemented and returning True)
-    F: Failing (implemented as returning something else than True)
-    M: not implemented (missing method)
-
-    works as expected.
-    """
+    """Tests 1) F* from TABLE 1 when enter_mode returns False"""
     for method in iterate_test_methods(
         enter_mode=[MethodIs.FAILING],
         heartbeat=MethodIs,
         exit_mode=MethodIs,
     ):
         res = try_enter_and_heartbeat(method)
+        # Expecting
+        # * entering to FAIL (False)
+        # * empty error message (''), as not using FAILING_MESSAGE
+        # * No heartbeat_call_time (None)
+        assert res == (False, "", None)
+
+
+def test_try_enter_and_heartbeat_failing_enter_mode_with_error_message():
+    """Tests 1) F* from TABLE 1 when enter_mode returns a string (error message)"""
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.FAILING_MESSAGE],
+        heartbeat=MethodIs,
+        exit_mode=MethodIs,
+    ):
+        res = try_enter_and_heartbeat(method)
+        # Expecting
+        # * entering to FAIL (False)
+        # * error message ('failure_reason'), as using FAILING_MESSAGE
+        # * No heartbeat_call_time (None)
+        assert res == (False, "failure_reason", None)
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")

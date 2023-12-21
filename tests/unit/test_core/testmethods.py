@@ -2,13 +2,10 @@ from __future__ import annotations
 
 import enum
 import itertools
-import typing
+from typing import Type, Iterable
 
 from wakepy.core import CURRENT_PLATFORM
 from wakepy.core.method import Method
-
-if typing.TYPE_CHECKING:
-    from typing import Type, Iterable
 
 
 class MethodIs(enum.IntEnum):
