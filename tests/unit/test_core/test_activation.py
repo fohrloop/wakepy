@@ -85,6 +85,30 @@ def test_try_enter_and_heartbeat_missing_enter_mode_and_heartbeat():
             try_enter_and_heartbeat(method)
 
 
+def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_failing():
+    """Tests 3) MF from TABLE 1; enter_mode missing and heartbeat failing"""
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.MISSING],
+        heartbeat=[MethodIs.FAILING],
+        exit_mode=MethodIs,
+    ):
+        res = try_enter_and_heartbeat(method)
+        # Expecting
+        # * heartbeat to FAIL (-> False)
+        # * No error message (''), as using FAILING
+        # * No heartbeat_call_time (None)
+        assert res == (False, "", None)
+
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.MISSING],
+        heartbeat=[MethodIs.FAILING_MESSAGE],
+        exit_mode=MethodIs,
+    ):
+        res = try_enter_and_heartbeat(method)
+        # Expecting same as above, but with failing message
+        assert res == (False, "failure_reason", None)
+
+
 @pytest.mark.usefixtures("provide_methods_different_platforms")
 def test_get_platform_supported():
     WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
