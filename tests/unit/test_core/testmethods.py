@@ -105,3 +105,20 @@ def iterate_test_methods(
         yield get_test_method_class(
             enter_mode=enter_mode_, heartbeat=heartbeat_, exit_mode=exit_mode_
         )()
+
+
+# Just test that iterating the test methods works as expected
+_methods = list(
+    iterate_test_methods(
+        enter_mode=[MethodIs.MISSING],
+        heartbeat=[
+            MethodIs.MISSING,
+            MethodIs.FAILING,
+            MethodIs.FAILING_MESSAGE,
+        ],
+        exit_mode=MethodIs,
+    )
+)
+assert len(_methods) == 1 * 3 * 5
+assert all(isinstance(m, Method) for m in _methods)
+del _methods
