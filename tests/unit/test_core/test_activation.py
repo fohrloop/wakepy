@@ -1,25 +1,16 @@
-import re
 import datetime as dt
-import pytest
-from testmethods import (
-    MethodIs,
-    iterate_test_methods,
-    WakepyMethodTestError,
-)
-from freezegun import freeze_time
+import re
 
-from wakepy.core.method import (
-    Method,
-    PlatformName,
-    get_methods,
-)
+import pytest
+from freezegun import freeze_time
+from testmethods import MethodIs, WakepyMethodTestError, iterate_test_methods
 
 from wakepy.core.activation import (
     caniuse_fails,
     get_platform_supported,
     try_enter_and_heartbeat,
 )
-
+from wakepy.core.method import Method, PlatformName, get_methods
 
 """
 TABLE 1

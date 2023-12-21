@@ -14,9 +14,9 @@ import datetime as dt
 import typing
 from typing import Optional, Tuple
 
-from .activationresult import MethodUsageResult, UsageStatus, StageName
+from .activationresult import MethodUsageResult, StageName, UsageStatus
 from .constants import PlatformName
-from .method import MethodOutcome, MethodError
+from .method import MethodError, MethodOutcome
 
 if typing.TYPE_CHECKING:
     from .method import Method

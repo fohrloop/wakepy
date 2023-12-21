@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 import itertools
-from typing import Type, Iterable
+from typing import Iterable, Type
 
 from wakepy.core import CURRENT_PLATFORM
 from wakepy.core.method import Method

@@ -36,7 +36,6 @@ from .constants import ModeName, PlatformName
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
-
 if typing.TYPE_CHECKING:
     from wakepy.core import Call
     from wakepy.core.dbus import DbusAdapter

@@ -1,9 +1,6 @@
 import pytest
 
-from wakepy.core.method import (
-    Method,
-    PlatformName,
-)
+from wakepy.core.method import Method, PlatformName
 
 
 @pytest.fixture(scope="function")
