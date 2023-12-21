@@ -16,6 +16,10 @@ class MethodIs(enum.IntEnum):
     RAISING_EXCEPTION = 4
 
 
+class WakepyMethodTestError(Exception):
+    ...
+
+
 def create_test_method_classes():
     """Helper function for get_test_method_class. (See docs there)
     This basically creates a bunch of Method classes with the
@@ -24,9 +28,6 @@ def create_test_method_classes():
     possible. (5*5*5 = 125 combinations, if number of options in MethodIs is 5)
     """
     test_method_classes = dict()
-
-    class TestException(Exception):
-        ...
 
     # When enter_mode(), heartbear() or exit_mode() returns True, it is
     # considered as being successful
@@ -45,7 +46,7 @@ def create_test_method_classes():
     # like any other method or function ever made. Althought, if there's an
     # exception, it means the implementation has a bug.
     def raising_exception(self):
-        raise TestException("foo")
+        raise WakepyMethodTestError("foo")
 
     for enter_mode, heartbeat, exit_mode in itertools.product(MethodIs, repeat=3):
         clsname = f"M{enter_mode.value}{heartbeat.value}{exit_mode.value}"

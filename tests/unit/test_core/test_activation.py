@@ -1,7 +1,12 @@
 import re
 import datetime as dt
 import pytest
-from testmethods import MethodIs, get_test_method_class, iterate_test_methods
+from testmethods import (
+    MethodIs,
+    get_test_method_class,
+    iterate_test_methods,
+    WakepyMethodTestError,
+)
 from freezegun import freeze_time
 
 from wakepy.core.method import (
@@ -139,6 +144,61 @@ def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
         res = try_enter_and_heartbeat(method)
         # Expecting: Return Success + '' + None (no heartbeat)
         assert res == (True, "", None)
+
+
+def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
+    """Tests 6) SF from TABLE 1; enter_mode success, heartbeat failing
+
+    This should, in general Return Fail + heartbeat error message + call exit_mode()
+    This call of exit_mode might be failing, so we test that separately"""
+
+    # Case: empty error message ("") as heartbeat returns False
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.SUCCESSFUL],
+        heartbeat=[MethodIs.FAILING],
+        exit_mode=[MethodIs.SUCCESSFUL, MethodIs.MISSING],
+    ):
+        res = try_enter_and_heartbeat(method)
+        assert res == (False, "", None)
+
+    # Case: non-empty error message ("failure_reason") as heartbeat returns that message
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.SUCCESSFUL],
+        heartbeat=[MethodIs.FAILING_MESSAGE],
+        exit_mode=[MethodIs.SUCCESSFUL, MethodIs.MISSING],
+    ):
+        res = try_enter_and_heartbeat(method)
+        assert res == (False, "failure_reason", None)
+
+    # Case: The heartbeat fails, and because enter_mode() has succeed, wakepy
+    # tries to call exit_mode(). If that fails, the program must crash, as we
+    # are in an unknown state and this is clearly an error.
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.SUCCESSFUL],
+        heartbeat=[MethodIs.FAILING, MethodIs.FAILING_MESSAGE],
+        exit_mode=[MethodIs.FAILING, MethodIs.FAILING_MESSAGE],
+    ):
+        with pytest.raises(
+            RuntimeError,
+            match=re.escape(
+                f"Entered {method.__class__.__name__} ({method.name}) but could not exit!"
+            ),
+        ):
+            try_enter_and_heartbeat(method)
+
+    # Case: Same as the one above, but this time exit_mode() raises a
+    # WakepyMethodTestError. That is raised (and not catched), instead.
+    # If this happens, the Method.exit_mode() has a bug.
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.SUCCESSFUL],
+        heartbeat=[MethodIs.FAILING, MethodIs.FAILING_MESSAGE],
+        exit_mode=[MethodIs.RAISING_EXCEPTION],
+    ):
+        with pytest.raises(
+            WakepyMethodTestError,
+            match="foo",
+        ):
+            try_enter_and_heartbeat(method)
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
