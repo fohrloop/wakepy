@@ -178,7 +178,7 @@ def try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
     return outcome, message
 
 
-def try_heartbeat(method: Method) -> Tuple[MethodOutcome, str]:
+def try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.datetime]]:
     """Calls the method.heartbeat()
 
     Returns
@@ -187,7 +187,7 @@ def try_heartbeat(method: Method) -> Tuple[MethodOutcome, str]:
         The UTC time just before the method.heartbeat() was called.
     """
     if not method.has_heartbeat:
-        return MethodOutcome.NOT_IMPLEMENTED, ""
+        return MethodOutcome.NOT_IMPLEMENTED, "", None
 
     heartbeat_call_time = dt.datetime.now(dt.timezone.utc)
     retval = method.heartbeat()
