@@ -1,7 +1,8 @@
 import re
-
+import datetime as dt
 import pytest
 from testmethods import MethodIs, get_test_method_class, iterate_test_methods
+from freezegun import freeze_time
 
 from wakepy.core.method import (
     Method,
@@ -14,6 +15,7 @@ from wakepy.core.activation import (
     get_platform_supported,
     try_enter_and_heartbeat,
 )
+
 
 """
 TABLE 1
@@ -107,6 +109,23 @@ def test_try_enter_and_heartbeat_enter_mode_missing_heartbeat_failing():
         res = try_enter_and_heartbeat(method)
         # Expecting same as above, but with failing message
         assert res == (False, "failure_reason", None)
+
+
+@freeze_time("2023-12-21 16:17:00")
+def test_try_enter_and_heartbeat_failing_enter_mode_with_error_message():
+    """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
+
+    expected_time = dt.datetime.strptime(
+        "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
+    ).replace(tzinfo=dt.timezone.utc)
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.MISSING],
+        heartbeat=[MethodIs.SUCCESSFUL],
+        exit_mode=MethodIs,
+    ):
+        res = try_enter_and_heartbeat(method)
+        # Expecting: Return Success + '' +  heartbeat time
+        assert res == (True, "", expected_time)
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
