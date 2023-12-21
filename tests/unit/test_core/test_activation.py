@@ -76,7 +76,9 @@ def test_try_enter_and_heartbeat_missing_missing():
         with pytest.raises(
             RuntimeError,
             match=re.escape(
-                f"Method {method.__class__.__name__} ({method.name}) is not properly defined! Missing implementation for both, enter_mode() and heartbeat()!"
+                f"Method {method.__class__.__name__} ({method.name}) is not properly "
+                "defined! Missing implementation for both, enter_mode() "
+                "and heartbeat()!"
             ),
         ):
             try_enter_and_heartbeat(method)
@@ -172,7 +174,8 @@ def test_try_enter_and_heartbeat_success_failing():
         with pytest.raises(
             RuntimeError,
             match=re.escape(
-                f"Entered {method.__class__.__name__} ({method.name}) but could not exit!"
+                f"Entered {method.__class__.__name__} ({method.name}) but could not "
+                "exit!"
             ),
         ):
             try_enter_and_heartbeat(method)

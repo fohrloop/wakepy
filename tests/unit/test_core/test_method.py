@@ -174,7 +174,7 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
         MethodDefinitionError, match=re.escape('Duplicate Method name "Some name"')
     ):
 
-        class SomeMethod(Method):
+        class SomeMethod(Method):  # noqa:F811
             name = somename
 
     # sanity check: The monkeypatching works as we expect
@@ -182,7 +182,7 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
 
     # Now as the registry is empty it is possible to define method with
     # the same name again
-    class SomeMethod(Method):
+    class SomeMethod(Method):  # noqa:F811
         name = somename
 
 

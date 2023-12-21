@@ -145,7 +145,8 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
     if enter_outcome == MethodOutcome.NOT_IMPLEMENTED:
         if hb_outcome == MethodOutcome.NOT_IMPLEMENTED:  # 2) MM
             raise MethodError(
-                f"{method_name} is not properly defined! Missing implementation for both, enter_mode() and heartbeat()!"
+                f"{method_name} is not properly defined! Missing implementation for "
+                "both, enter_mode() and heartbeat()!"
             )
         elif hb_outcome == MethodOutcome.FAILURE:
             return False, hb_errmessage, None  # 3) MF
@@ -162,7 +163,8 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
             return True, "", hb_calltime
 
     raise RuntimeError(
-        f"Should never end up here. Check the return values for the enter_mode() and heartbeat() of the {method_name}"
+        "Should never end up here. Check the return values for the enter_mode() and "
+        f"heartbeat() of the {method_name}"
     )
 
 
