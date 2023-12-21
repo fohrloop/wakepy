@@ -3,7 +3,6 @@ import datetime as dt
 import pytest
 from testmethods import (
     MethodIs,
-    get_test_method_class,
     iterate_test_methods,
     WakepyMethodTestError,
 )
@@ -200,6 +199,23 @@ def test_try_enter_and_heartbeat_enter_mode_success_heartbeat_missing():
             match="foo",
         ):
             try_enter_and_heartbeat(method)
+
+
+@freeze_time("2023-12-21 16:17:00")
+def test_try_enter_and_heartbeat_success_success():
+    """Tests 7) SS from TABLE 1; enter_mode success & heartbeat success"""
+    expected_time = dt.datetime.strptime(
+        "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
+    ).replace(tzinfo=dt.timezone.utc)
+
+    for method in iterate_test_methods(
+        enter_mode=[MethodIs.SUCCESSFUL],
+        heartbeat=[MethodIs.SUCCESSFUL],
+        exit_mode=MethodIs,
+    ):
+        res = try_enter_and_heartbeat(method)
+        # Expecting Return Success + '' + heartbeat time
+        assert res == (True, "", expected_time)
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
