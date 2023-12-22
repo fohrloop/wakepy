@@ -306,6 +306,21 @@ def test_try_enter_and_heartbeat_success_success():
         assert res == (True, "", expected_time)
 
 
+def test_try_enter_and_heartbeat_special_cases():
+    # Case: returning bad value (only bool and str accepted)
+    for method_name in ("enter_mode", "heartbeat"):
+        method = get_test_method_class(**{method_name: 132})()
+        with pytest.raises(
+            RuntimeError,
+            match=re.escape(
+                f"The {method_name} of {method.__class__.__name__} ({method.name}) returned a "
+                "value of unsupported type. The supported types are: bool, str. "
+                "Returned value: 132"
+            ),
+        ):
+            try_enter_and_heartbeat(method)
+
+
 @pytest.mark.usefixtures("provide_methods_different_platforms")
 def test_get_platform_supported():
     WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
