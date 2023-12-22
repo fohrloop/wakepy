@@ -69,8 +69,8 @@ class ConstantEnumMeta(EnumMeta):
 
 
 class EnumMemberString(str):
-    """dummy string subclass to make it possible to add custome attributes
-    to it.
+    """dummy string subclass to make it possible to add custom attributes to
+    it.
     """
 
 
