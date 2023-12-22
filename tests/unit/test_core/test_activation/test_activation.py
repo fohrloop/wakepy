@@ -47,6 +47,23 @@ def test_activate_using_method_without_name():
         activate_using(method)
 
 
+@pytest.mark.usefixtures("provide_methods_different_platforms")
+def test_activate_using_method_without_platform_support(monkeypatch):
+    WindowsA, LinuxA = get_methods(["WinA", "LinuxA"])
+    winmethod = WindowsA()
+    linuxmethod = LinuxA()
+
+    monkeypatch.setattr("wakepy.core.activation.CURRENT_PLATFORM", PlatformName.LINUX)
+    res = activate_using(winmethod)
+    assert res.failure_stage == StageName.PLATFORM_SUPPORT
+    assert res.status == UsageStatus.FAIL
+
+    monkeypatch.setattr("wakepy.core.activation.CURRENT_PLATFORM", PlatformName.WINDOWS)
+    res = activate_using(linuxmethod)
+    assert res.failure_stage == StageName.PLATFORM_SUPPORT
+    assert res.status == UsageStatus.FAIL
+
+
 """
 TABLE 1
 Test table for try_enter_and_heartbeat. Methods are {enter_mode}{heartbeat}
