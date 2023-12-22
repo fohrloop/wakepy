@@ -24,6 +24,7 @@ from dataclasses import dataclass
 
 from .constants import PlatformName
 from .method import MethodError, MethodOutcome
+from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
@@ -253,7 +254,7 @@ def activate_using(method: Method) -> MethodUsageResult:
 
     result = MethodUsageResult(status=UsageStatus.FAIL, method_name=method.name)
 
-    if not get_platform_supported(method):
+    if not get_platform_supported(method, platform=CURRENT_PLATFORM):
         result.failure_stage = StageName.PLATFORM_SUPPORT
         return result
 
