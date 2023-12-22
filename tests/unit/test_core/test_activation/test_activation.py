@@ -10,7 +10,14 @@ from unittest.mock import Mock
 
 import pytest
 from freezegun import freeze_time
-from testmethods import MethodIs, WakepyMethodTestError, iterate_test_methods
+from testmethods import (
+    METHOD_OPTIONS,
+    WakepyMethodTestError,
+    iterate_test_methods,
+    get_test_method_class,
+    METHOD_MISSING,
+    FAILURE_REASON,
+)
 
 from wakepy.core import MethodUsageResult
 from wakepy.core.activation import (
@@ -55,37 +62,37 @@ def test_try_enter_and_heartbeat_failing_enter_mode():
 
     # Case: when enter_mode returns False
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.FAILING],
-        heartbeat=MethodIs,
-        exit_mode=MethodIs,
+        enter_mode=[False],
+        heartbeat=METHOD_OPTIONS,
+        exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
         # Expecting
         # * entering to FAIL (False)
-        # * empty error message (''), as not using FAILING_MESSAGE
+        # * empty error message (''), as returning False
         # * No heartbeat_call_time (None)
         assert res == (False, "", None)
 
     # Case: enter_mode returns a string (error message)
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.FAILING_MESSAGE],
-        heartbeat=MethodIs,
-        exit_mode=MethodIs,
+        enter_mode=[FAILURE_REASON],
+        heartbeat=METHOD_OPTIONS,
+        exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
         # Expecting
         # * entering to FAIL (False)
-        # * error message ('failure_reason'), as using FAILING_MESSAGE
+        # * error message (FAILURE_REASON)
         # * No heartbeat_call_time (None)
-        assert res == (False, "failure_reason", None)
+        assert res == (False, FAILURE_REASON, None)
 
 
 def test_try_enter_and_heartbeat_missing_missing():
     """Tests 2) MM from TABLE 1; missing both enter_mode and heartbeat"""
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.MISSING],
-        heartbeat=[MethodIs.MISSING],
-        exit_mode=MethodIs,
+        enter_mode=[METHOD_MISSING],
+        heartbeat=[METHOD_MISSING],
+        exit_mode=METHOD_OPTIONS,
     ):
         # Expecting an error as missing enter_mode and heartbeat
         with pytest.raises(
@@ -102,25 +109,25 @@ def test_try_enter_and_heartbeat_missing_missing():
 def test_try_enter_and_heartbeat_missing_failing():
     """Tests 3) MF from TABLE 1; enter_mode missing and heartbeat failing"""
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.MISSING],
-        heartbeat=[MethodIs.FAILING],
-        exit_mode=MethodIs,
+        enter_mode=[METHOD_MISSING],
+        heartbeat=[False],
+        exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
         # Expecting
         # * heartbeat to FAIL (-> False)
-        # * No error message (''), as using FAILING
+        # * No error message (''), as returing False
         # * No heartbeat_call_time (None)
         assert res == (False, "", None)
 
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.MISSING],
-        heartbeat=[MethodIs.FAILING_MESSAGE],
-        exit_mode=MethodIs,
+        enter_mode=[METHOD_MISSING],
+        heartbeat=[FAILURE_REASON],
+        exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
         # Expecting same as above, but with failing message
-        assert res == (False, "failure_reason", None)
+        assert res == (False, FAILURE_REASON, None)
 
 
 @freeze_time("2023-12-21 16:17:00")
@@ -131,9 +138,9 @@ def test_try_enter_and_heartbeat_missing_success():
         "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
     ).replace(tzinfo=dt.timezone.utc)
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.MISSING],
-        heartbeat=[MethodIs.SUCCESSFUL],
-        exit_mode=MethodIs,
+        enter_mode=[METHOD_MISSING],
+        heartbeat=[True],
+        exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
         # Expecting: Return Success + '' +  heartbeat time
@@ -144,9 +151,9 @@ def test_try_enter_and_heartbeat_success_missing():
     """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
 
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.SUCCESSFUL],
-        heartbeat=[MethodIs.MISSING],
-        exit_mode=MethodIs,
+        enter_mode=[True],
+        heartbeat=[METHOD_MISSING],
+        exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
         # Expecting: Return Success + '' + None (no heartbeat)
@@ -162,29 +169,30 @@ def test_try_enter_and_heartbeat_success_failing():
 
     # Case: empty error message ("") as heartbeat returns False
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.SUCCESSFUL],
-        heartbeat=[MethodIs.FAILING],
-        exit_mode=[MethodIs.SUCCESSFUL, MethodIs.MISSING],
+        enter_mode=[True],
+        heartbeat=[False],
+        exit_mode=[True, METHOD_MISSING],
     ):
         res = try_enter_and_heartbeat(method)
         assert res == (False, "", None)
 
-    # Case: non-empty error message ("failure_reason") as heartbeat returns that message
+    # Case: non-empty error message (FAILURE_REASON) as heartbeat returns that
+    # message
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.SUCCESSFUL],
-        heartbeat=[MethodIs.FAILING_MESSAGE],
-        exit_mode=[MethodIs.SUCCESSFUL, MethodIs.MISSING],
+        enter_mode=[True],
+        heartbeat=[FAILURE_REASON],
+        exit_mode=[True, METHOD_MISSING],
     ):
         res = try_enter_and_heartbeat(method)
-        assert res == (False, "failure_reason", None)
+        assert res == (False, FAILURE_REASON, None)
 
     # Case: The heartbeat fails, and because enter_mode() has succeed, wakepy
     # tries to call exit_mode(). If that fails, the program must crash, as we
     # are in an unknown state and this is clearly an error.
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.SUCCESSFUL],
-        heartbeat=[MethodIs.FAILING, MethodIs.FAILING_MESSAGE],
-        exit_mode=[MethodIs.FAILING, MethodIs.FAILING_MESSAGE],
+        enter_mode=[True],
+        heartbeat=[False, FAILURE_REASON],
+        exit_mode=[False, FAILURE_REASON],
     ):
         with pytest.raises(
             RuntimeError,
@@ -199,9 +207,9 @@ def test_try_enter_and_heartbeat_success_failing():
     # WakepyMethodTestError. That is raised (and not catched), instead.
     # If this happens, the Method.exit_mode() has a bug.
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.SUCCESSFUL],
-        heartbeat=[MethodIs.FAILING, MethodIs.FAILING_MESSAGE],
-        exit_mode=[MethodIs.RAISING_EXCEPTION],
+        enter_mode=[True],
+        heartbeat=[False, FAILURE_REASON],
+        exit_mode=[WakepyMethodTestError("foo")],
     ):
         with pytest.raises(
             WakepyMethodTestError,
@@ -218,9 +226,9 @@ def test_try_enter_and_heartbeat_success_success():
     ).replace(tzinfo=dt.timezone.utc)
 
     for method in iterate_test_methods(
-        enter_mode=[MethodIs.SUCCESSFUL],
-        heartbeat=[MethodIs.SUCCESSFUL],
-        exit_mode=MethodIs,
+        enter_mode=[True],
+        heartbeat=[True],
+        exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
         # Expecting Return Success + '' + heartbeat time
