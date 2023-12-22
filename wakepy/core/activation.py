@@ -272,6 +272,8 @@ def activate_using(method: Method) -> MethodUsageResult:
 
     result.status = UsageStatus.SUCCESS
 
+    # This is a placeholder for future. Heartbeat-based methods are not yet
+    # supported.
     if heartbeat_call_time:
         heartbeat = Heartbeat(method, heartbeat_call_time)
         heartbeat.start()
