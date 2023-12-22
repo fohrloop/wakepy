@@ -61,24 +61,6 @@ class StageName(StrEnum):
     ACTIVATION = auto()
 
 
-@dataclass
-class MethodUsageResult:
-    status: UsageStatus
-
-    method_name: str
-
-    # None if the method did not fail. Otherwise, the name of the stage where
-    # the method failed.
-    failure_stage: Optional[StageName] = None
-
-    message: str = ""
-
-    def __repr__(self):
-        error_at = " @" + self.failure_stage if self.failure_stage else ""
-        message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
-        return f"({self.status}{error_at}, {self.method_name}{message_part})"
-
-
 # TODO:_ Move functionality to ModeActivationManager?
 class ModeSwitcher:
     # The minimum and maximum waiting times for waiting data from Queue

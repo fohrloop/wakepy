@@ -10,11 +10,12 @@ activate_using(method:Method) -> MethodUsageResult
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 import datetime as dt
 import typing
 from typing import Optional, Tuple
 
-from .activationresult import MethodUsageResult, StageName, UsageStatus
+from .activationresult import StageName, UsageStatus
 from .constants import PlatformName
 from .method import MethodError, MethodOutcome
 
@@ -22,8 +23,33 @@ if typing.TYPE_CHECKING:
     from .method import Method
 
 
-class HeartBeat:
-    ...
+@dataclass
+class MethodUsageResult:
+    status: UsageStatus
+
+    method_name: str
+
+    # None if the method did not fail. Otherwise, the name of the stage where
+    # the method failed.
+    failure_stage: Optional[StageName] = None
+
+    message: str = ""
+
+    def __repr__(self):
+        error_at = " @" + self.failure_stage if self.failure_stage else ""
+        message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
+        return f"({self.status}{error_at}, {self.method_name}{message_part})"
+
+
+class Heartbeat:
+    def __init__(
+        self, method: Method, heartbeat_call_time: Optional[dt.datetime] = None
+    ):
+        self.method = method
+        self.prev_call = heartbeat_call_time
+
+    def start(self):
+        ...
 
 
 def activate_using(method: Method) -> MethodUsageResult:
@@ -33,11 +59,20 @@ def activate_using(method: Method) -> MethodUsageResult:
         result.failure_stage = StageName.PLATFORM_SUPPORT
         return result
 
-    requirements_fail, message = caniuse_fails(method)
+    requirements_fail, err_message = caniuse_fails(method)
     if requirements_fail:
         result.failure_stage = StageName.REQUIREMENTS
-        result.message = message
+        result.message = err_message
         return result
+
+    success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+    if not success:
+        result.failure_stage = StageName.ACTIVATION
+        result.message = err_message
+
+    if heartbeat_call_time:
+        heartbeat = Heartbeat(method, heartbeat_call_time)
+        heartbeat.start()
 
     return result
 
