@@ -74,7 +74,7 @@ class EnumMemberString(str):
     """
 
 
-class StrEnum(Enum, metaclass=ConstantEnumMeta):
+class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
     """A string constant / enumeration. For creating reusable, typed constants.
 
     Properties
@@ -121,7 +121,7 @@ class StrEnum(Enum, metaclass=ConstantEnumMeta):
         """
         return name
 
-    def __new__(cls, val=None, *args):
+    def __new__(cls, val=None, *_):
         """This is used to get rid of need for ".value" access:
 
         >>> StrEnum.FOO.value
