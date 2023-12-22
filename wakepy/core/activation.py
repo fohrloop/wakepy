@@ -2,11 +2,18 @@
 deactivation of Modes (using Methods).
 
 Most important functions
--------------------------
-
+------------------------
 activate_using(method:Method) -> MethodUsageResult
     Activate a mode using a single Method 
 
+Most important classes
+----------------------
+ActivationResult
+    This is something returned from mode activation task. Contains the summary
+    of all used methods, and whether the activation was successful or not.
+MethodUsageResult
+    One level lower than ActivationResult. This is result from activation task
+    using a single Method.
 """
 from __future__ import annotations
 
