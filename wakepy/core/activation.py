@@ -236,6 +236,7 @@ class MethodUsageResult:
 
 
 class Heartbeat:
+    # TODO: This is just temporary dummy implementation.
     def __init__(
         self, method: Method, heartbeat_call_time: Optional[dt.datetime] = None
     ):
