@@ -268,6 +268,9 @@ def activate_using(method: Method) -> MethodUsageResult:
     if not success:
         result.failure_stage = StageName.ACTIVATION
         result.message = err_message
+        return result
+
+    result.status = UsageStatus.SUCCESS
 
     if heartbeat_call_time:
         heartbeat = Heartbeat(method, heartbeat_call_time)
