@@ -394,7 +394,7 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
         elif hb_outcome == MethodOutcome.SUCCESS:  # 7) SS
             return True, "", hb_calltime
 
-    raise RuntimeError(
+    raise RuntimeError(  # pragma: no cover
         "Should never end up here. Check the return values for the enter_mode() and "
         f"heartbeat() of the {method_name}"
     )
