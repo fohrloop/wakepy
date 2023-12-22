@@ -518,15 +518,17 @@ def test_activation_result_get_detailed_results():
 
 
 def test_should_fake_success(monkeypatch):
-    for val in ("1", "yes", "True", "anystring"):
-        with monkeypatch.context() as mp:
-            mp.setenv("WAKEPY_FAKE_SUCCESS", val)
-            val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
-            assert val_from_env == str(val)
-            assert should_fake_success() is True
+    # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
     for val in ("0", "no", "NO", "False", "false", "FALSE"):
         with monkeypatch.context() as mp:
             mp.setenv("WAKEPY_FAKE_SUCCESS", val)
             val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
             assert val_from_env == str(val)
             assert should_fake_success() is False
+    # Anything else is considered truthy
+    for val in ("1", "yes", "True", "anystring"):
+        with monkeypatch.context() as mp:
+            mp.setenv("WAKEPY_FAKE_SUCCESS", val)
+            val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
+            assert val_from_env == str(val)
+            assert should_fake_success() is True
