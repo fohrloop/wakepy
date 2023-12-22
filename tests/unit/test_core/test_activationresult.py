@@ -1,17 +1,14 @@
 import os
-from unittest.mock import Mock
 
 import pytest
 
 from wakepy.core import ActivationResult, MethodUsageResult
 from wakepy.core.activationresult import (
-    ModeSwitcher,
     StageName,
     UsageStatus,
     should_fake_success,
 )
 
-switcher = Mock(spec_set=ModeSwitcher)
 
 PLATFORM_SUPPORT_FAIL = MethodUsageResult(
     status=UsageStatus.FAIL,
