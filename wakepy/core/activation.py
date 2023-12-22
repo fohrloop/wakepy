@@ -248,6 +248,9 @@ class Heartbeat:
 
 
 def activate_using(method: Method) -> MethodUsageResult:
+    if method.name is None:
+        raise ValueError("Methods without a name may not be used to activate modes!")
+
     result = MethodUsageResult(status=UsageStatus.FAIL, method_name=method.name)
 
     if not get_platform_supported(method):
