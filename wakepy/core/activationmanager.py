@@ -4,7 +4,7 @@ import typing
 from queue import Queue
 from threading import Thread
 
-from .activationresult import ActivationResult
+from .activation import ActivationResult
 
 if typing.TYPE_CHECKING:
     from typing import List, Optional, Type

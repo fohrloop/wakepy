@@ -4,8 +4,8 @@ as implementation details!
 See the public Python API at: https://wakepy.readthedocs.io/
 """
 
+from .activation import ActivationResult as ActivationResult
 from .activation import MethodUsageResult as MethodUsageResult
-from .activationresult import ActivationResult as ActivationResult
 from .calls import Call as Call
 from .calls import DbusMethodCall as DbusMethodCall
 from .constants import BusType as BusType

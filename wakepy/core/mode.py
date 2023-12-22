@@ -3,8 +3,8 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
+from .activation import ActivationResult
 from .activationmanager import ModeActivationManager
-from .activationresult import ActivationResult
 from .method import check_methods_priority, get_methods_for_mode, select_methods
 
 if typing.TYPE_CHECKING:
