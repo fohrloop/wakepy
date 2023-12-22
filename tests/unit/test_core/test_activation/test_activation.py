@@ -62,6 +62,24 @@ def test_activate_using_method_without_platform_support(monkeypatch):
     assert res.status == UsageStatus.FAIL
 
 
+def test_activate_using_method_caniuse_fails():
+    # Case 1: Fail by returning False from caniuse
+    method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
+    res = activate_using(method)
+    assert res.status == UsageStatus.FAIL
+    assert res.failure_stage == StageName.REQUIREMENTS
+    assert res.message == ""
+
+    # Case 2: Fail by returning some error reason from caniuse
+    method = get_test_method_class(
+        caniuse="SomeSW version <2.1.5 not supported", enter_mode=True, exit_mode=True
+    )()
+    res = activate_using(method)
+    assert res.status == UsageStatus.FAIL
+    assert res.failure_stage == StageName.REQUIREMENTS
+    assert res.message == "SomeSW version <2.1.5 not supported"
+
+
 """
 TABLE 1
 Test table for try_enter_and_heartbeat. Methods are {enter_mode}{heartbeat}
