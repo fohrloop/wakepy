@@ -41,8 +41,7 @@ class UsageStatus(StrEnum):
 
 class StageName(StrEnum):
     # These are stages which occur in order for each of the methods
-    # until the mode has been succesfully activated with "max number" of
-    # methods
+    # when using a Method for activation.
 
     NONE = auto()  # No stage at all.
 
