@@ -24,6 +24,7 @@ from wakepy.core.activation import (
     StageName,
     UsageStatus,
     caniuse_fails,
+    activate_using,
     get_platform_supported,
     should_fake_success,
     try_enter_and_heartbeat,
@@ -32,6 +33,18 @@ from wakepy.core.activationmanager import ModeActivationManager
 from wakepy.core.method import Method, PlatformName, get_methods
 
 mockmanager = Mock(spec_set=ModeActivationManager)
+
+
+def test_activate_using_method_without_name():
+    """Methods used for activation must have a name. If not, there should be
+    a ValueError raised"""
+
+    method = type("MyMethod", (Method,), {})()
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Methods without a name may not be used to activate modes!"),
+    ):
+        activate_using(method)
 
 
 """
