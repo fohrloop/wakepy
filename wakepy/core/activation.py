@@ -392,10 +392,10 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
         elif hb_outcome == MethodOutcome.SUCCESS:
             return True, "", hb_calltime  # 4) MS
 
-    if enter_outcome == MethodOutcome.SUCCESS:
+    elif enter_outcome == MethodOutcome.SUCCESS:
         if hb_outcome == MethodOutcome.NOT_IMPLEMENTED:  # 5) SM
             return True, "", None
-        if hb_outcome == MethodOutcome.FAILURE:  # 6) SF
+        elif hb_outcome == MethodOutcome.FAILURE:  # 6) SF
             _rollback_with_exit(method)
             return False, hb_errmessage, None
         elif hb_outcome == MethodOutcome.SUCCESS:  # 7) SS
