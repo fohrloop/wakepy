@@ -14,7 +14,6 @@ import datetime as dt
 import os
 import typing
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 from .constants import PlatformName
 from .method import MethodError, MethodOutcome

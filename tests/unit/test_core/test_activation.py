@@ -16,8 +16,8 @@ from wakepy.core.activation import (
     should_fake_success,
     try_enter_and_heartbeat,
 )
-from wakepy.core.method import Method, PlatformName, get_methods
 from wakepy.core.activationmanager import ModeActivationManager
+from wakepy.core.method import Method, PlatformName, get_methods
 
 mockmanager = Mock(spec_set=ModeActivationManager)
 
