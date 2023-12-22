@@ -11,20 +11,20 @@ from unittest.mock import Mock
 import pytest
 from freezegun import freeze_time
 from testmethods import (
+    FAILURE_REASON,
+    METHOD_MISSING,
     METHOD_OPTIONS,
     WakepyMethodTestError,
-    iterate_test_methods,
     get_test_method_class,
-    METHOD_MISSING,
-    FAILURE_REASON,
+    iterate_test_methods,
 )
 
 from wakepy.core import MethodUsageResult
 from wakepy.core.activation import (
     StageName,
     UsageStatus,
-    caniuse_fails,
     activate_using,
+    caniuse_fails,
     get_platform_supported,
     should_fake_success,
     try_enter_and_heartbeat,

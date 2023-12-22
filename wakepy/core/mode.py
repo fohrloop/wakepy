@@ -3,17 +3,18 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activation import ActivationResult
+from .activation import ActivationResult, check_methods_priority
 from .activationmanager import ModeActivationManager
-from .method import check_methods_priority, get_methods_for_mode, select_methods
+from .method import get_methods_for_mode, select_methods
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
     from typing import Optional, Type
 
+    from .activation import MethodsPriorityOrder
     from .constants import ModeName
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
-    from .method import Method, MethodsPriorityOrder, StrCollection
+    from .method import Method, StrCollection
 
 
 class ModeExit(Exception):
