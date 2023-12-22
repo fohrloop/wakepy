@@ -41,6 +41,7 @@ def get_test_method_class(
     enter_mode=METHOD_MISSING,
     heartbeat=METHOD_MISSING,
     exit_mode=METHOD_MISSING,
+    supported_platforms=(CURRENT_PLATFORM,),
 ) -> Type[Method]:
     """Get a test Method class with the .caniuse(), .enter_mode(), .heartbeat()
     and .exit_mode() methods defined as wanted. All methods can either be:
@@ -76,7 +77,7 @@ def get_test_method_class(
 
     def _create_class():
         clsname = get_new_classname()
-        clskwargs = {"supported_platforms": CURRENT_PLATFORM, "name": clsname}
+        clskwargs = {"supported_platforms": supported_platforms, "name": clsname}
         clsmethods = dict()
         clsmethods["caniuse"] = _create_function(caniuse)
         clsmethods["enter_mode"] = _create_function(enter_mode)
@@ -88,7 +89,7 @@ def get_test_method_class(
         }
         return type(clsname, (Method,), clskwargs)
 
-    key = (enter_mode, heartbeat, exit_mode)
+    key = (enter_mode, heartbeat, exit_mode, caniuse, supported_platforms)
     if key not in _test_method_classes:
         _test_method_classes[key] = _create_class()
 

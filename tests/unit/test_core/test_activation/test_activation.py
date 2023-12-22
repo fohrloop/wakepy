@@ -47,19 +47,17 @@ def test_activate_using_method_without_name():
         activate_using(method)
 
 
-@pytest.mark.usefixtures("provide_methods_different_platforms")
 def test_activate_using_method_without_platform_support(monkeypatch):
-    WindowsA, LinuxA = get_methods(["WinA", "LinuxA"])
-    winmethod = WindowsA()
-    linuxmethod = LinuxA()
+    WindowsMethod = get_test_method_class(
+        supported_platforms=(PlatformName.WINDOWS,),
+    )
 
+    winmethod = WindowsMethod()
     monkeypatch.setattr("wakepy.core.activation.CURRENT_PLATFORM", PlatformName.LINUX)
-    res = activate_using(winmethod)
-    assert res.failure_stage == StageName.PLATFORM_SUPPORT
-    assert res.status == UsageStatus.FAIL
 
-    monkeypatch.setattr("wakepy.core.activation.CURRENT_PLATFORM", PlatformName.WINDOWS)
-    res = activate_using(linuxmethod)
+    # The current platform is set to linux, so method supporting only linux
+    # should fail.
+    res = activate_using(winmethod)
     assert res.failure_stage == StageName.PLATFORM_SUPPORT
     assert res.status == UsageStatus.FAIL
 
