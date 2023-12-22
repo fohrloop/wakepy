@@ -80,6 +80,31 @@ def test_activate_using_method_caniuse_fails():
     assert res.message == "SomeSW version <2.1.5 not supported"
 
 
+def test_activate_using_method_enter_mode_fails():
+    # Case: Fail by returning False from enter_mode
+    method = get_test_method_class(caniuse=True, enter_mode=False)()
+    res = activate_using(method)
+    assert res.status == UsageStatus.FAIL
+    assert res.failure_stage == StageName.ACTIVATION
+    assert res.message == ""
+
+
+def test_activate_using_enter_mode_success():
+    method = get_test_method_class(caniuse=True, enter_mode=True)()
+    res = activate_using(method)
+    assert res.status == UsageStatus.SUCCESS
+    assert res.failure_stage is None
+    assert res.message == ""
+
+
+def test_activate_using_heartbeat_success():
+    method = get_test_method_class(heartbeat=True)()
+    res = activate_using(method)
+    assert res.status == UsageStatus.SUCCESS
+    assert res.failure_stage is None
+    assert res.message == ""
+
+
 """
 TABLE 1
 Test table for try_enter_and_heartbeat. Methods are {enter_mode}{heartbeat}
