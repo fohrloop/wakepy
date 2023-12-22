@@ -56,7 +56,7 @@ python -m pytest
 - To run tests with coverage, use
 
 ```
-coverage run -m pytest <test-target> && coverage html && python -m webbrowser -t htmlcov/index.html 
+python -m pytest --cov-branch --cov wakepy && coverage html && python -m webbrowser -t htmlcov/index.html 
 ```
 
 ## Running tests with multiple environments

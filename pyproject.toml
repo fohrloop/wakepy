@@ -41,10 +41,11 @@ doc = [
 ]
 dev = [
     "sphinx-autobuild",
+    "freezegun",
     "IPython",
     "black==23.3.0",
     "pytest",
-    "coverage",
+    "pytest-cov",
     "mypy==1.3.0",
     "tox==4.6.0",
     "isort==5.12.0",

@@ -1,16 +1,10 @@
-import itertools
 import re
 
 import pytest
-from testmethods import MethodIs, get_test_method_class
 
 from wakepy.core.method import (
-    EnterModeError,
-    ExitModeError,
-    HeartbeatCallError,
     Method,
     MethodDefinitionError,
-    MethodError,
     PlatformName,
     check_methods_priority,
     get_method,
@@ -32,7 +26,7 @@ SECOND_MODE = "second_mode"
 @pytest.fixture(scope="function")
 def provide_methods_a_f(monkeypatch):
     # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     class MethodA(Method):
         name = "A"
@@ -56,44 +50,6 @@ def provide_methods_a_f(monkeypatch):
     class MethodF(Method):
         name = "F"
         mode = SECOND_MODE
-
-
-@pytest.fixture(scope="function")
-def provide_methods_different_platforms(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
-
-    class WindowsA(Method):
-        name = "WinA"
-        supported_platforms = (PlatformName.WINDOWS,)
-
-    class WindowsB(Method):
-        name = "WinB"
-        supported_platforms = (PlatformName.WINDOWS,)
-
-    class WindowsC(Method):
-        name = "WinC"
-        supported_platforms = (PlatformName.WINDOWS,)
-
-    class LinuxA(Method):
-        name = "LinuxA"
-        supported_platforms = (PlatformName.LINUX,)
-
-    class LinuxB(Method):
-        name = "LinuxB"
-        supported_platforms = (PlatformName.LINUX,)
-
-    class LinuxC(Method):
-        name = "LinuxC"
-        supported_platforms = (PlatformName.LINUX,)
-
-    class MultiPlatformA(Method):
-        name = "multiA"
-        supported_platforms = (
-            PlatformName.LINUX,
-            PlatformName.WINDOWS,
-            PlatformName.MACOS,
-        )
 
 
 def test_overridden_methods_autodiscovery():
@@ -182,7 +138,7 @@ def test_method_has_x_is_not_writeable():
 
 
 def test_get_method_which_is_not_yet_defined(monkeypatch):
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     # The method registry is empty so there is no Methods with the name
     with pytest.raises(
@@ -194,7 +150,7 @@ def test_get_method_which_is_not_yet_defined(monkeypatch):
 def test_get_method_working_example(monkeypatch):
     somename = "Some name"
     # Make the registry empty
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     # Create a method
     class SomeMethod(Method):
@@ -208,7 +164,7 @@ def test_get_method_working_example(monkeypatch):
 def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
     somename = "Some name"
     # Make the registry empty
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     class SomeMethod(Method):
         name = somename
@@ -218,15 +174,15 @@ def test_not_possible_to_define_two_methods_with_same_name(monkeypatch):
         MethodDefinitionError, match=re.escape('Duplicate Method name "Some name"')
     ):
 
-        class SomeMethod(Method):
+        class SomeMethod(Method):  # noqa:F811
             name = somename
 
     # sanity check: The monkeypatching works as we expect
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     # Now as the registry is empty it is possible to define method with
     # the same name again
-    class SomeMethod(Method):
+    class SomeMethod(Method):  # noqa:F811
         name = somename
 
 
@@ -258,62 +214,6 @@ def test_method_names_to_classes():
     # Using unsupported type raises TypeError
     with pytest.raises(TypeError):
         method_names_to_classes(4123)
-
-
-def test_all_combinations_with_switch_to_the_mode():
-    """Test that each of following combinations:
-
-        {enter_mode} {heartbeat} {exit_mode}
-
-    where each of {enter_mode}, {heartbeat} and {exit_mode} is either
-    0: not implemented (missing method)
-    1: successful (implemented and not raising exception)
-    2: exception (implemented and raising exception)"
-
-    works as expected.
-    """
-
-    for enter_mode, heartbeat, exit_mode in itertools.product(
-        (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
-        (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
-        (MethodIs.MISSING, MethodIs.SUCCESSFUL, MethodIs.RAISING_EXCEPTION),
-    ):
-        method = get_test_method_class(
-            enter_mode=enter_mode, heartbeat=heartbeat, exit_mode=exit_mode
-        )()
-
-        if enter_mode == heartbeat == MethodIs.MISSING:
-            # enter_mode and heartbeat both missing -> not possible to switch
-            assert not method.activate_the_mode()
-            assert isinstance(method.mode_switch_exception, MethodError)
-            continue
-        elif MethodIs.RAISING_EXCEPTION not in (enter_mode, heartbeat):
-            # When neither enter_mode or heartbeat will cause exception,
-            # the switch should be successful
-            assert method.activate_the_mode()
-            assert method.mode_switch_exception is None
-        elif enter_mode == MethodIs.RAISING_EXCEPTION:
-            # If enter_mode has exception, switch is not successful
-            # .. and the exception type is EnterModeError
-            assert not method.activate_the_mode()
-            assert isinstance(method.mode_switch_exception, EnterModeError)
-        elif (heartbeat == MethodIs.RAISING_EXCEPTION) and (
-            exit_mode != MethodIs.RAISING_EXCEPTION
-        ):
-            # If heartbeat has exception, switch is not successful
-            # .. and the exception type is HeartbeatCallError
-            assert not method.activate_the_mode()
-            assert isinstance(method.mode_switch_exception, HeartbeatCallError)
-        elif (heartbeat == MethodIs.RAISING_EXCEPTION) and (
-            exit_mode == MethodIs.RAISING_EXCEPTION
-        ):
-            # If heartbeat has exception, we try to back off by calling
-            # exit_mode. If that fails, there should be exception raised.
-            with pytest.raises(ExitModeError):
-                method.activate_the_mode()
-        else:
-            # Test case missing? Should not happen ever.
-            raise Exception(method.__class__.__name__)
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

@@ -1,7 +1,33 @@
+"""This module defines the Method class and few functions for working with
+methods
+
+Method
+* A class which is intended to be subclassed
+* The Methods are ways of entering wakepy Modes.
+
+General functions
+-----------------
+select_methods
+    Select Methods from a collection based on a white- or blacklist.
+get_prioritized_methods
+    Prioritize of collection of Methods
+
+Functions for getting Methods
+-----------------------------
+get_method
+    Get a single method by name
+get_methods
+    Get multiple methods be name
+method_names_to_classes
+    Convert multiple method names to Method classes
+get_methods_for_mode
+    Get Methods based on a Mode name
+
+"""
+
 from __future__ import annotations
 
 import typing
-import warnings
 from abc import ABC, ABCMeta
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
@@ -14,143 +40,14 @@ if typing.TYPE_CHECKING:
     from wakepy.core import Call
     from wakepy.core.dbus import DbusAdapter
 
-
-# type annotation shorthands
 MethodCls = Type["Method"]
 T = TypeVar("T")
 Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
-# The strings in MethodsPriorityOrder are names of Methods or the asterisk ('*')
 MethodsPriorityOrder = List[Union[str, Set[str]]]
-
-METHOD_REGISTRY: dict[str, MethodCls] = dict()
-"""A name -> Method class mapping. Updated automatically; when python loads
-a module with a subclass of Method, the Method class is added to this registry.
-"""
-
-
-def get_method(method_name: str) -> MethodCls:
-    """Get a Method class based on its name."""
-    if method_name not in METHOD_REGISTRY:
-        raise KeyError(
-            f'No Method with name "{method_name}" found!'
-            " Check that the name is correctly spelled and that the module containing"
-            " the class is being imported."
-        )
-    return METHOD_REGISTRY[method_name]
-
-
-def get_methods(method_names: List[str]) -> List[MethodCls]:
-    """Get Method classes based on their names."""
-    return [get_method(name) for name in method_names]
-
-
-def method_names_to_classes(
-    names: Collection[str] | None = None,
-) -> Collection[MethodCls] | None:
-    """Convert a collection (list, tuple or set) of method names to a
-    collection of method classes"""
-    if names is None:
-        return None
-
-    if isinstance(names, list):
-        return [get_method(name) for name in names]
-    elif isinstance(names, tuple):
-        return tuple(get_method(name) for name in names)
-    elif isinstance(names, set):
-        return set(get_method(name) for name in names)
-
-    raise TypeError("`names` must be a list, tuple or set")
-
-
-def get_methods_for_mode(
-    modename: ModeName,
-) -> List[MethodCls]:
-    """Get the Method classes belonging to a Mode; Methods with
-    Method.mode = `modename`.
-
-    Parameters
-    ----------
-    modename: str | ModeName
-        The name of the Mode from which to select the Methods.
-
-    Returns
-    -------
-    methods: list[MethodCls]
-        The Method classes for the Mode.
-    """
-    methods = []
-    for method_cls in METHOD_REGISTRY.values():
-        if method_cls.mode != modename:
-            continue
-        methods.append(method_cls)
-
-    return methods
-
-
-def select_methods(
-    methods: MethodClsCollection,
-    omit: Optional[StrCollection] = None,
-    use_only: Optional[StrCollection] = None,
-) -> List[MethodCls]:
-    """Selects Methods from from `methods` using a blacklist (omit) or
-    whitelist (use_only). If `omit` and `use_only` are both None, will return
-    all the original methods.
-
-    Parameters
-    ----------
-    methods: collection of Method classes
-        The collection of methods from which to make the selection.
-    omit: list, tuple or set of str or None
-        The names of Methods to remove from the `methods`; a "blacklist"
-        filter. Any Method in `omit` but not in `methods` will be silently
-        ignored. Cannot be used same time with `use_only`. Optional.
-    use_only: list, tuple or set of str
-        The names of Methods to select from the `methods`; a "whitelist"
-        filter. Means "use these and only these Methods". Any Methods in
-        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
-        be used same time with `omit`. Optional.
-
-    Returns
-    -------
-    methods: list[MethodCls]
-        The selected method classes.
-    """
-
-    if omit and use_only:
-        raise ValueError(
-            "Can only define omit (blacklist) or use_only (whitelist), not both!"
-        )
-
-    if omit is None and use_only is None:
-        selected_methods = list(methods)
-    elif omit:
-        selected_methods = [m for m in methods if m.name not in omit]
-    elif use_only:
-        selected_methods = [m for m in methods if m.name in use_only]
-        if not set(use_only).issubset(m.name for m in selected_methods):
-            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
-            raise ValueError(
-                f"Methods {missing} in `use_only` are not part of `methods`!"
-            )
-    return selected_methods
-
-
-def _register_method(cls: Type[Method]):
-    """Registers a subclass of Method to the method registry"""
-
-    if cls.name is None:
-        # Methods without a name will not be registered
-        return
-
-    if cls.name in METHOD_REGISTRY:
-        raise MethodDefinitionError(
-            f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
-            f"(already registered to {METHOD_REGISTRY[cls.name].__qualname__})"
-        )
-
-    METHOD_REGISTRY[cls.name] = cls
+"""The strings in MethodsPriorityOrder are names of Methods or the asterisk
+('*')"""
 
 
 class MethodError(RuntimeError):
@@ -183,37 +80,7 @@ class MethodMeta(ABCMeta):
 class MethodOutcome(StrEnum):
     NOT_IMPLEMENTED = auto()
     SUCCESS = auto()
-
-
-class SuitabilityCheckResult(StrEnum):
-    # Uused when it is known for sure that a method is not suitable
-    UNSUITABLE = auto()
-    # Used when it can't be proben that a method is not suitable, but still it
-    # has not tested if the method is suitable or not. For example, if a
-    # subclass of Method does not implement `test_suitability()`
-    POTENTIALLY_SUITABLE = auto()
-    # Used when it has been tested, with `test_suitability`, that a method
-    # should be supported. For example, if a method needs executable called
-    # `foo`, version >=4.12, and an executable called `foo` was found in PATH
-    # and the version was 4.16. So, This is the best quess that the method
-    # should be suitable for the use case.
-    SUITABLE = auto()
-
-
-class UnsuitabilityTag(StrEnum):
-    """These are used to distiguish between different reasons for unsuitability
-
-    PLATFORM: Used when platform is not supported by the method.
-    """
-
-    PLATFORM = auto()
-    OTHER = auto()
-
-
-class Suitability(typing.NamedTuple):
-    result: SuitabilityCheckResult
-    tag: Optional[UnsuitabilityTag]
-    extrainfo: Optional[str]
+    FAILURE = auto()
 
 
 class Method(ABC, metaclass=MethodMeta):
@@ -288,7 +155,7 @@ class Method(ABC, metaclass=MethodMeta):
 
     def caniuse(
         self,
-    ) -> Optional[bool] | UnsuitabilityTag | Tuple[UnsuitabilityTag, str]:
+    ) -> bool | None | str:
         """Tells if the Method is suitable or unsuitable. Implement this is a
         subclass. This is optional, but highly recommended. With `caniuse()` it
         is possible to give more information about why some Method is not
@@ -309,24 +176,56 @@ class Method(ABC, metaclass=MethodMeta):
         ------
         (a) If the Method is suitable, and can be used, return True.
         (b) If the result is uncertain, return None.
-        (c) If the Method is unsuitable, you may return False, UnsuitabilityTag
-        or tuple of (UnsuitabilityTag, str). The latter two options are
-        recommended, as they also explains *why* the Method is unsuitable.
+        (c) If the Method is unsuitable, you may return False or a string.
+            Returning a string is recommended, as it  also explains *why* the
+            Method is unsuitable.
         """
 
-    def enter_mode(self):
+    def enter_mode(self) -> bool | str:
         """Enter to a Mode using this Method. Pair with a `exit_mode`.
 
+        Returns
+        -------
+        (a) If entering the mode was successful, return True
+        (b) If entering the mode was not successful, return a string
+        explaining the reason. You may also simply return False, but this is
+        discouraged.
+
+        Any other type of return value will raise an Exception.
+
+        Notes for subclassing
+        ---------------------
         The .enter_mode() should always leave anything in a clean in case of
         errors; When subclassing, make sure that in case of any exceptions,
         everything is cleaned (and .exit_mode() does not need to be called.)
         """
+        return True
 
-    def heartbeat(self):
-        """Called periodically, every `heartbeat_period` seconds."""
+    def heartbeat(self) -> bool | str:
+        """Called periodically, every `heartbeat_period` seconds.
 
-    def exit_mode(self):
+        Returns
+        -------
+        (a) If calling the heartbeatwas successful, return True
+        (b) If calling the heartbeat was not successful, return a string
+        explaining the reason. You may also simply return False, but this is
+        discouraged.
+
+        Any other type of return value will raise an Exception.
+        """
+        return True
+
+    def exit_mode(self) -> bool | str:
         """Exit from a Mode using this Method. Paired with `enter_mode`
+
+        Returns
+        -------
+        (a) If exiting the mode was successful, return True
+        (b) If exiting the mode was not successful, return a string
+        explaining the reason. You may also simply return False, but this is
+        discouraged.
+
+        Any other type of return value will raise an Exception.
 
         When subclassing, pay special attention to the fact that `enter_mode()`
         should never raise any exceptions, unless something really is broken.
@@ -337,6 +236,7 @@ class Method(ABC, metaclass=MethodMeta):
         "sorry, I'm not sure about this but you're possibly stuck in the mode
          until you reboot").
         """
+        return True
 
     def process_call(self, call: Optional[Call]):
         if call is None:
@@ -370,180 +270,6 @@ class Method(ABC, metaclass=MethodMeta):
     def has_heartbeat(self):
         return self._has_heartbeat
 
-    def try_enter_mode(self) -> MethodOutcome:
-        if not self.has_enter:
-            return MethodOutcome.NOT_IMPLEMENTED
-        try:
-            self.enter_mode()
-        except Exception as exc:
-            raise EnterModeError from exc
-        return MethodOutcome.SUCCESS
-
-    def try_heartbeat(self) -> MethodOutcome:
-        if not self.has_heartbeat:
-            return MethodOutcome.NOT_IMPLEMENTED
-        try:
-            self.heartbeat()
-        except Exception as exc:
-            raise HeartbeatCallError from exc
-        return MethodOutcome.SUCCESS
-
-    def try_exit_mode(self) -> MethodOutcome:
-        if not self.has_exit:
-            return MethodOutcome.NOT_IMPLEMENTED
-        try:
-            self.exit_mode()
-        except Exception as exc:
-            raise ExitModeError from exc
-        return MethodOutcome.SUCCESS
-
-    def activate_the_mode(self) -> bool:
-        """Try to use the Method to switch to a mode. Calls `enter_mode()` and
-        `heartbeat()` and at least one of them must be implemented in the used
-        Method subclass.
-
-        Returns
-        -------
-        success:
-            True, if switching to the mode succeeds (using enter_mode,
-            heartbeat, or both). False if switching fails, for example
-            because some 3rd party sw required by the method is missing (which
-            is typically more common that succeeding)
-
-        Side-effects
-        -------------
-        This sets the self.mode_switch_exception to an Exception if the mode
-        switch was unsuccessful and to None if it was successful.
-
-        Raises
-        ------
-        ExitModeError in the rare case where (1) enter_mode() and heartbeat()
-        and exit_more() are all implemented and (2) enter_mode() succeeds and
-        (3) heartbeat raises exception and (4) exit_mode() raises exception.
-
-        MethodError in the (erroreously implemented) case where (1)
-        enter_mode() and heartbeat() are both not implemented, and no successful
-        switch is possible.
-
-        """
-        try:
-            enter_outcome = self.try_enter_mode()
-        except EnterModeError as exc:
-            # In case of Exception during the enter, we don't try to do
-            # anything else with the method. Not even exit. The
-            # method.enter_mode() should always leave anything in a clean state
-            # (esp. if exceptions arise). That is because it is impossible to
-            # know how to clean anything from outside of the code inside of
-            # `enter_mode`.
-            self.mode_switch_exception = exc
-            self.switch_success = False
-            return self.switch_success
-
-        try:
-            heartbeat_outcome = self.try_heartbeat()
-        except HeartbeatCallError as exc:
-            # In the rare case where `enter_mode()` succeeds, *and* there
-            # is a `heartbeat()` implementation *which raises exception*,
-            # we mark it as failure, but we have to try to cancel the
-            # effect of `enter_mode()`.
-            self.try_exit_mode()
-            self.mode_switch_exception = exc
-            self.switch_success = False
-            return self.switch_success
-
-        # Here, no exceptions raised by `enter_mode()` or `heartbeat()`
-        # A final check: At least one success
-        if MethodOutcome.SUCCESS not in (enter_outcome, heartbeat_outcome):
-            self.mode_switch_exception = MethodError(
-                "There was no implementation for enter_mode() or heartbeat() in"
-                f" {self}."
-            )
-            self.switch_success = False
-            return self.switch_success
-
-        self.mode_switch_exception = None
-        self.switch_success = True
-        return self.switch_success
-
-    def get_suitability(
-        self,
-        platform: PlatformName | str,
-    ) -> Suitability:
-        """This is a method used to check the suitability of a method when
-        running on a specific platform with a set of software installed on it
-        (which wakepy does not know beforehand).
-
-        This method is not meant to be overridden in a subclass; override the
-        .caniuse(), instead.
-
-        Parameters
-        ---------
-        platform:
-            The platform for which to check suitability. Usually, should be the
-            CURRENT_PLATFORM (if not testing). Can als be a lower-case string
-            like "windows", "linux" or "darwin".
-        """
-
-        if (
-            hasattr(self, "supported_platforms")
-            and platform not in self.supported_platforms
-        ):
-            return Suitability(
-                SuitabilityCheckResult.UNSUITABLE,
-                UnsuitabilityTag.PLATFORM,
-                f"Supported platform are: {self.supported_platforms}. "
-                f"(detected platform: {platform})",
-            )
-
-        canuse = self.caniuse()
-        if canuse is True:
-            return Suitability(SuitabilityCheckResult.SUITABLE, None, None)
-        elif canuse is None:
-            return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
-        elif canuse is False:
-            return Suitability(
-                SuitabilityCheckResult.UNSUITABLE,
-                UnsuitabilityTag.OTHER,
-                None,
-            )
-        elif isinstance(canuse, UnsuitabilityTag):
-            return Suitability(SuitabilityCheckResult.UNSUITABLE, canuse, None)
-
-        if (
-            isinstance(canuse, tuple)
-            and len(canuse) == 2
-            and isinstance(canuse[0], (UnsuitabilityTag, str))
-            and isinstance(canuse[1], str)
-        ):
-            return Suitability(SuitabilityCheckResult.UNSUITABLE, canuse[0], canuse[1])
-
-        warnings.warn(
-            (
-                f"""The caniuse() of {self} return value had an unexpected"""
-                """ format. Disregarding the output and trying the Method anyway."""
-            )
-        )
-        return Suitability(SuitabilityCheckResult.POTENTIALLY_SUITABLE, None, None)
-
-
-def iterate_methods_priority(
-    methods_priority: Optional[MethodsPriorityOrder],
-) -> typing.Iterator[Tuple[str, bool]]:
-    """Provides an iterator over the items in methods_priority. The items in the
-    iterator are (method_name, in_set) 2-tuples, where the method_name is the
-    method name (str) and the in_set is a boolean which is True if the returned
-    method_name is part of a set and False otherwise."""
-
-    if not methods_priority:
-        return
-
-    for item in methods_priority:
-        if isinstance(item, set):
-            for method_name in item:
-                yield method_name, True
-        else:
-            yield item, False
-
 
 def check_methods_priority(
     methods_priority: Optional[MethodsPriorityOrder], methods: List[MethodCls]
@@ -572,7 +298,7 @@ def check_methods_priority(
     known_method_names.add("*")
     seen_method_names = set()
 
-    for method_name, in_set in iterate_methods_priority(methods_priority):
+    for method_name, in_set in _iterate_methods_priority(methods_priority):
         if not isinstance(method_name, str):
             raise TypeError("methods_priority must be a list[str | set[str]]!")
 
@@ -594,6 +320,25 @@ def check_methods_priority(
                     "The asterisk (*) can only occur once in methods_priority!"
                 )
         seen_method_names.add(method_name)
+
+
+def _iterate_methods_priority(
+    methods_priority: Optional[MethodsPriorityOrder],
+) -> typing.Iterator[Tuple[str, bool]]:
+    """Provides an iterator over the items in methods_priority. The items in the
+    iterator are (method_name, in_set) 2-tuples, where the method_name is the
+    method name (str) and the in_set is a boolean which is True if the returned
+    method_name is part of a set and False otherwise."""
+
+    if not methods_priority:
+        return
+
+    for item in methods_priority:
+        if isinstance(item, set):
+            for method_name in item:
+                yield method_name, True
+        else:
+            yield item, False
 
 
 def get_prioritized_methods_groups(
@@ -743,3 +488,132 @@ def get_prioritized_methods(
     ]
 
     return [method for group in ordered_groups for method in group]
+
+
+_method_registry: dict[str, MethodCls] = dict()
+"""A name -> Method class mapping. Updated automatically; when python loads
+a module with a subclass of Method, the Method class is added to this registry.
+"""
+
+
+def get_method(method_name: str) -> MethodCls:
+    """Get a Method class based on its name."""
+    if method_name not in _method_registry:
+        raise KeyError(
+            f'No Method with name "{method_name}" found!'
+            " Check that the name is correctly spelled and that the module containing"
+            " the class is being imported."
+        )
+    return _method_registry[method_name]
+
+
+def get_methods(method_names: List[str]) -> List[MethodCls]:
+    """Get Method classes based on their names."""
+    return [get_method(name) for name in method_names]
+
+
+def method_names_to_classes(
+    names: Collection[str] | None = None,
+) -> Collection[MethodCls] | None:
+    """Convert a collection (list, tuple or set) of method names to a
+    collection of method classes"""
+    if names is None:
+        return None
+
+    if isinstance(names, list):
+        return [get_method(name) for name in names]
+    elif isinstance(names, tuple):
+        return tuple(get_method(name) for name in names)
+    elif isinstance(names, set):
+        return set(get_method(name) for name in names)
+
+    raise TypeError("`names` must be a list, tuple or set")
+
+
+def get_methods_for_mode(
+    modename: ModeName,
+) -> List[MethodCls]:
+    """Get the Method classes belonging to a Mode; Methods with
+    Method.mode = `modename`.
+
+    Parameters
+    ----------
+    modename: str | ModeName
+        The name of the Mode from which to select the Methods.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The Method classes for the Mode.
+    """
+    methods = []
+    for method_cls in _method_registry.values():
+        if method_cls.mode != modename:
+            continue
+        methods.append(method_cls)
+
+    return methods
+
+
+def select_methods(
+    methods: MethodClsCollection,
+    omit: Optional[StrCollection] = None,
+    use_only: Optional[StrCollection] = None,
+) -> List[MethodCls]:
+    """Selects Methods from from `methods` using a blacklist (omit) or
+    whitelist (use_only). If `omit` and `use_only` are both None, will return
+    all the original methods.
+
+    Parameters
+    ----------
+    methods: collection of Method classes
+        The collection of methods from which to make the selection.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the `methods`; a "blacklist"
+        filter. Any Method in `omit` but not in `methods` will be silently
+        ignored. Cannot be used same time with `use_only`. Optional.
+    use_only: list, tuple or set of str
+        The names of Methods to select from the `methods`; a "whitelist"
+        filter. Means "use these and only these Methods". Any Methods in
+        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
+        be used same time with `omit`. Optional.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The selected method classes.
+    """
+
+    if omit and use_only:
+        raise ValueError(
+            "Can only define omit (blacklist) or use_only (whitelist), not both!"
+        )
+
+    if omit is None and use_only is None:
+        selected_methods = list(methods)
+    elif omit:
+        selected_methods = [m for m in methods if m.name not in omit]
+    elif use_only:
+        selected_methods = [m for m in methods if m.name in use_only]
+        if not set(use_only).issubset(m.name for m in selected_methods):
+            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
+            raise ValueError(
+                f"Methods {missing} in `use_only` are not part of `methods`!"
+            )
+    return selected_methods
+
+
+def _register_method(cls: Type[Method]):
+    """Registers a subclass of Method to the method registry"""
+
+    if cls.name is None:
+        # Methods without a name will not be registered
+        return
+
+    if cls.name in _method_registry:
+        raise MethodDefinitionError(
+            f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
+            f"(already registered to {_method_registry[cls.name].__qualname__})"
+        )
+
+    _method_registry[cls.name] = cls

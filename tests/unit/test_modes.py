@@ -8,7 +8,7 @@ from wakepy.modes import keep
 
 def create_methods(monkeypatch, name_prefix: str, modename: ModeName):
     # empty method registry
-    monkeypatch.setattr("wakepy.core.method.METHOD_REGISTRY", dict())
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
 
     class MethodA(Method):
         name = f"{name_prefix}A"
