@@ -448,3 +448,7 @@ def test_should_fake_success(monkeypatch):
             val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
             assert val_from_env == str(val)
             assert should_fake_success() is True
+
+    if "WAKEPY_FAKE_SUCCESS" in os.environ:
+        monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
+    assert should_fake_success() == False
