@@ -181,19 +181,49 @@ class Method(ABC, metaclass=MethodMeta):
             Method is unsuitable.
         """
 
-    def enter_mode(self):
+    def enter_mode(self) -> bool | str:
         """Enter to a Mode using this Method. Pair with a `exit_mode`.
 
+        Returns
+        -------
+        (a) If entering the mode was successful, return True
+        (b) If entering the mode was not successful, return a string
+        explaining the reason. You may also simply return False, but this is
+        discouraged.
+
+        Any other type of return value will raise an Exception.
+
+        Notes for subclassing
+        ---------------------
         The .enter_mode() should always leave anything in a clean in case of
         errors; When subclassing, make sure that in case of any exceptions,
         everything is cleaned (and .exit_mode() does not need to be called.)
         """
 
-    def heartbeat(self):
-        """Called periodically, every `heartbeat_period` seconds."""
+    def heartbeat(self) -> bool | str:
+        """Called periodically, every `heartbeat_period` seconds.
 
-    def exit_mode(self):
+        Returns
+        -------
+        (a) If calling the heartbeatwas successful, return True
+        (b) If calling the heartbeat was not successful, return a string
+        explaining the reason. You may also simply return False, but this is
+        discouraged.
+
+        Any other type of return value will raise an Exception.
+        """
+
+    def exit_mode(self) -> bool | str:
         """Exit from a Mode using this Method. Paired with `enter_mode`
+
+        Returns
+        -------
+        (a) If exiting the mode was successful, return True
+        (b) If exiting the mode was not successful, return a string
+        explaining the reason. You may also simply return False, but this is
+        discouraged.
+
+        Any other type of return value will raise an Exception.
 
         When subclassing, pay special attention to the fact that `enter_mode()`
         should never raise any exceptions, unless something really is broken.
