@@ -3,10 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from wakepy.core import ActivationResult, MethodUsageResult
-from wakepy.core.activation import (
-    StageName,
-    UsageStatus,
-)
+from wakepy.core.activation import StageName, UsageStatus
 from wakepy.core.activationmanager import ModeActivationManager
 
 mockmanager = Mock(spec_set=ModeActivationManager)
