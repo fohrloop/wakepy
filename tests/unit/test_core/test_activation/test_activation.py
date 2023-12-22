@@ -9,7 +9,7 @@ import re
 from unittest.mock import Mock
 
 import pytest
-from freezegun import freeze_time
+import time_machine
 from testmethods import (
     FAILURE_REASON,
     METHOD_MISSING,
@@ -201,7 +201,9 @@ def test_try_enter_and_heartbeat_missing_failing():
         assert res == (False, FAILURE_REASON, None)
 
 
-@freeze_time("2023-12-21 16:17:00")
+@time_machine.travel(
+    dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
+)
 def test_try_enter_and_heartbeat_missing_success():
     """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
 
@@ -289,7 +291,9 @@ def test_try_enter_and_heartbeat_success_failing():
             try_enter_and_heartbeat(method)
 
 
-@freeze_time("2023-12-21 16:17:00")
+@time_machine.travel(
+    dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
+)
 def test_try_enter_and_heartbeat_success_success():
     """Tests 7) SS from TABLE 1; enter_mode success & heartbeat success"""
     expected_time = dt.datetime.strptime(

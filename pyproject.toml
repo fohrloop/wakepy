@@ -41,7 +41,7 @@ doc = [
 ]
 dev = [
     "sphinx-autobuild",
-    "freezegun",
+    "time-machine",
     "IPython",
     "black==23.3.0",
     "pytest",
