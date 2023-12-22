@@ -199,6 +199,7 @@ class Method(ABC, metaclass=MethodMeta):
         errors; When subclassing, make sure that in case of any exceptions,
         everything is cleaned (and .exit_mode() does not need to be called.)
         """
+        return True
 
     def heartbeat(self) -> bool | str:
         """Called periodically, every `heartbeat_period` seconds.
@@ -212,6 +213,7 @@ class Method(ABC, metaclass=MethodMeta):
 
         Any other type of return value will raise an Exception.
         """
+        return True
 
     def exit_mode(self) -> bool | str:
         """Exit from a Mode using this Method. Paired with `enter_mode`
@@ -234,6 +236,7 @@ class Method(ABC, metaclass=MethodMeta):
         "sorry, I'm not sure about this but you're possibly stuck in the mode
          until you reboot").
         """
+        return True
 
     def process_call(self, call: Optional[Call]):
         if call is None:
