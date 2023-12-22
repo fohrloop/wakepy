@@ -41,14 +41,14 @@ UNUSED_RESULT = MethodUsageResult(
     status=UsageStatus.UNUSED,
     method_name="some-unused-method",
 )
-RESULTS_1 = [
+METHODUSAGERESULTS_1 = [
     PLATFORM_SUPPORT_FAIL,
     REQUIREMENTS_FAIL,
     SUCCESS_RESULT,
     UNUSED_RESULT,
 ]
 
-RESULTS_2 = [
+METHODUSAGERESULTS_2 = [
     MethodUsageResult(
         status=UsageStatus.SUCCESS,
         method_name="1st.successfull.method",
@@ -64,7 +64,7 @@ RESULTS_2 = [
     ),
 ]
 
-RESULTS_3_FAIL = [
+METHODUSAGERESULTS_3_FAIL = [
     MethodUsageResult(
         status=UsageStatus.FAIL,
         failure_stage=StageName.PLATFORM_SUPPORT,
@@ -326,10 +326,10 @@ def test_caniuse_fails(params):
 @pytest.mark.parametrize(
     "results, success_expected, real_success_expected, faking_success",
     [
-        (RESULTS_1, True, True, "0"),
-        (RESULTS_2, True, True, "0"),
-        (RESULTS_3_FAIL, False, False, "0"),
-        (RESULTS_3_FAIL, True, False, "1"),
+        (METHODUSAGERESULTS_1, True, True, "0"),
+        (METHODUSAGERESULTS_2, True, True, "0"),
+        (METHODUSAGERESULTS_3_FAIL, False, False, "0"),
+        (METHODUSAGERESULTS_3_FAIL, True, False, "1"),
     ],
 )
 def test_activation_result_success(
@@ -348,9 +348,9 @@ def test_activation_result_success(
 @pytest.mark.parametrize(
     "results, expected_active_methods, expected_active_methods_string",
     [
-        (RESULTS_1, ["a-successful-method"], "a-successful-method"),
+        (METHODUSAGERESULTS_1, ["a-successful-method"], "a-successful-method"),
         (
-            RESULTS_2,
+            METHODUSAGERESULTS_2,
             [
                 "1st.successfull.method",
                 "2nd-successful-method",
