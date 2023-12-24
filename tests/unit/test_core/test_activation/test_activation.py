@@ -53,17 +53,13 @@ def test_activate_function_success(monkeypatch):
     mocks = _arrange_for_test_activate(monkeypatch)
     methodcls_fail = get_test_method_class(enter_mode=False)
     methodcls_success = get_test_method_class(enter_mode=True)
-    methods = [
-        methodcls_success,
-        methodcls_fail,
-    ]
 
     # Act
     # Note: prioritize the failing first, so that the failing one will also be
     # used. This also tests at that the prioritization is used at least
     # somehow
     result, active_method, heartbeat = activate(
-        methods,
+        [methodcls_success, methodcls_fail],
         call_processor=mocks.call_processor,
         methods_priority=[
             methodcls_fail.name,
