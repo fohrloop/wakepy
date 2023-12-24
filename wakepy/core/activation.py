@@ -236,11 +236,6 @@ class MethodActivationResult:
 
     message: str = ""
 
-    heartbeart: Optional[Heartbeat] = None
-    """The heartbeat is an optional reference to a Heartbeat object. Only used
-    if the Method used has heartbeat() implemented.
-    """
-
     def __repr__(self):
         error_at = " @" + self.failure_stage if self.failure_stage else ""
         message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
@@ -515,7 +510,7 @@ def get_prioritized_methods(
     return [method for group in ordered_groups for method in group]
 
 
-def activate_using(method: Method) -> MethodActivationResult:
+def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
     if method.name is None:
         raise ValueError("Methods without a name may not be used to activate modes!")
 
@@ -523,29 +518,30 @@ def activate_using(method: Method) -> MethodActivationResult:
 
     if not get_platform_supported(method, platform=CURRENT_PLATFORM):
         result.failure_stage = StageName.PLATFORM_SUPPORT
-        return result
+        return result, None
 
     requirements_fail, err_message = caniuse_fails(method)
     if requirements_fail:
         result.failure_stage = StageName.REQUIREMENTS
         result.message = err_message
-        return result
+        return result, None
 
     success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
     if not success:
         result.failure_stage = StageName.ACTIVATION
         result.message = err_message
-        return result
+        return result, None
 
     result.status = UsageStatus.SUCCESS
 
-    # This is a placeholder for future. Heartbeat-based methods are not yet
-    # supported.
-    if heartbeat_call_time:
-        heartbeat = Heartbeat(method, heartbeat_call_time)
-        heartbeat.start()
+    if not heartbeat_call_time:
+        # Success, using just enter_mode(); no heartbeat()
+        return result, None
 
-    return result
+    heartbeat = Heartbeat(method, heartbeat_call_time)
+    heartbeat.start()
+
+    return result, heartbeat
 
 
 def get_platform_supported(method: Method, platform: PlatformName) -> bool:

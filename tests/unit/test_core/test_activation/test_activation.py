@@ -27,6 +27,7 @@ from wakepy.core.activation import (
     get_platform_supported,
     should_fake_success,
     try_enter_and_heartbeat,
+    Heartbeat,
 )
 from wakepy.core.method import Method, PlatformName, get_methods
 
@@ -53,52 +54,61 @@ def test_activate_using_method_without_platform_support(monkeypatch):
 
     # The current platform is set to linux, so method supporting only linux
     # should fail.
-    res = activate_using(winmethod)
+    res, heartbeat = activate_using(winmethod)
     assert res.failure_stage == StageName.PLATFORM_SUPPORT
     assert res.status == UsageStatus.FAIL
+    assert heartbeat is None
 
 
 def test_activate_using_method_caniuse_fails():
     # Case 1: Fail by returning False from caniuse
     method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
-    res = activate_using(method)
+    res, heartbeat = activate_using(method)
     assert res.status == UsageStatus.FAIL
     assert res.failure_stage == StageName.REQUIREMENTS
     assert res.message == ""
+    assert heartbeat is None
 
     # Case 2: Fail by returning some error reason from caniuse
     method = get_test_method_class(
         caniuse="SomeSW version <2.1.5 not supported", enter_mode=True, exit_mode=True
     )()
-    res = activate_using(method)
+    res, heartbeat = activate_using(method)
     assert res.status == UsageStatus.FAIL
     assert res.failure_stage == StageName.REQUIREMENTS
     assert res.message == "SomeSW version <2.1.5 not supported"
+    assert heartbeat is None
 
 
 def test_activate_using_method_enter_mode_fails():
     # Case: Fail by returning False from enter_mode
     method = get_test_method_class(caniuse=True, enter_mode=False)()
-    res = activate_using(method)
+    res, heartbeat = activate_using(method)
     assert res.status == UsageStatus.FAIL
     assert res.failure_stage == StageName.ACTIVATION
     assert res.message == ""
+    assert heartbeat is None
 
 
 def test_activate_using_enter_mode_success():
     method = get_test_method_class(caniuse=True, enter_mode=True)()
-    res = activate_using(method)
+    res, heartbeat = activate_using(method)
     assert res.status == UsageStatus.SUCCESS
     assert res.failure_stage is None
     assert res.message == ""
+    # No heartbeat on success, as the used Method does not have heartbeat()
+    assert heartbeat is None
 
 
 def test_activate_using_heartbeat_success():
     method = get_test_method_class(heartbeat=True)()
-    res = activate_using(method)
+    res, heartbeat = activate_using(method)
     assert res.status == UsageStatus.SUCCESS
     assert res.failure_stage is None
     assert res.message == ""
+    # We get a Heartbeat instance on success, as the used Method does has a
+    # heartbeat()
+    assert isinstance(heartbeat, Heartbeat)
 
 
 """
