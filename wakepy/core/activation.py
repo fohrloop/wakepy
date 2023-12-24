@@ -511,6 +511,16 @@ def get_prioritized_methods(
 
 
 def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
+    """Activates a mode defined by a Method.
+
+    Returns
+    -------
+    result:
+        The result of the activation process.
+    heartbeat:
+        If the `method` has method.heartbeat() implemented, and activation
+        succeeds, this is a Heartbeat object. Otherwise, this is None.
+    """
     if method.name is None:
         raise ValueError("Methods without a name may not be used to activate modes!")
 
