@@ -45,6 +45,15 @@ def test_check_methods_priority():
     ):
         check_methods_priority(methods_priority=["A", "*", "B", "*"], methods=methods)
 
+    # duplicate method names
+    with pytest.raises(
+        ValueError,
+        match=re.escape('Duplicate method name "A" in methods_priority'),
+    ):
+        check_methods_priority(
+            methods_priority=["A", "*", "B", {"A", "C"}], methods=methods
+        )
+
     # Asterisk inside a set
     with pytest.raises(
         ValueError,
