@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime as dt
 import typing
 
-
 if typing.TYPE_CHECKING:
     from typing import Optional
 
