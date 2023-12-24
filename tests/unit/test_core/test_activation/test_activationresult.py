@@ -1,64 +1,59 @@
-from unittest.mock import Mock
-
 import pytest
 
-from wakepy.core import ActivationResult, MethodUsageResult
+from wakepy.core import ActivationResult, MethodActivationResult
 from wakepy.core.activation import StageName, UsageStatus
-from wakepy.core.activationmanager import ModeActivationManager
 
-mockmanager = Mock(spec_set=ModeActivationManager)
-
-PLATFORM_SUPPORT_FAIL = MethodUsageResult(
+PLATFORM_SUPPORT_FAIL = MethodActivationResult(
     status=UsageStatus.FAIL,
     failure_stage=StageName.PLATFORM_SUPPORT,
     method_name="fail-platform",
     message="Platform XYZ not supported!",
 )
-REQUIREMENTS_FAIL = MethodUsageResult(
+REQUIREMENTS_FAIL = MethodActivationResult(
     status=UsageStatus.FAIL,
     failure_stage=StageName.REQUIREMENTS,
     method_name="fail-requirements",
     message="Missing requirement: Some SW v.1.2.3",
 )
-SUCCESS_RESULT = MethodUsageResult(
+SUCCESS_RESULT = MethodActivationResult(
     status=UsageStatus.SUCCESS,
     method_name="a-successful-method",
 )
-UNUSED_RESULT = MethodUsageResult(
+UNUSED_RESULT = MethodActivationResult(
     status=UsageStatus.UNUSED,
     method_name="some-unused-method",
 )
-METHODUSAGERESULTS_1 = [
+METHODACTIVATIONRESULTS_1 = [
     PLATFORM_SUPPORT_FAIL,
     REQUIREMENTS_FAIL,
     SUCCESS_RESULT,
     UNUSED_RESULT,
 ]
 
-METHODUSAGERESULTS_2 = [
-    MethodUsageResult(
+METHODACTIVATIONRESULTS_2 = [
+    MethodActivationResult(
         status=UsageStatus.SUCCESS,
         method_name="1st.successfull.method",
     ),
     REQUIREMENTS_FAIL,
-    MethodUsageResult(
+    MethodActivationResult(
         status=UsageStatus.SUCCESS,
         method_name="2nd-successful-method",
     ),
-    MethodUsageResult(
+    MethodActivationResult(
         status=UsageStatus.SUCCESS,
         method_name="last-successful-method",
     ),
 ]
 
-METHODUSAGERESULTS_3_FAIL = [
-    MethodUsageResult(
+METHODACTIVATIONRESULTS_3_FAIL = [
+    MethodActivationResult(
         status=UsageStatus.FAIL,
         failure_stage=StageName.PLATFORM_SUPPORT,
         method_name="fail-platform",
         message="Platform XYZ not supported!",
     ),
-    MethodUsageResult(
+    MethodActivationResult(
         status=UsageStatus.FAIL,
         failure_stage=StageName.REQUIREMENTS,
         method_name="fail-requirements",
@@ -68,7 +63,7 @@ METHODUSAGERESULTS_3_FAIL = [
 
 
 def test_activation_result_get_details():
-    ar = ActivationResult(mockmanager)
+    ar = ActivationResult()
     ar._results = [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
@@ -108,7 +103,7 @@ def test_activation_result_get_details():
 
 
 def test_activation_result_get_detailed_results():
-    ar = ActivationResult(mockmanager)
+    ar = ActivationResult()
     ar._results = [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
@@ -148,10 +143,10 @@ def test_activation_result_get_detailed_results():
 @pytest.mark.parametrize(
     "results, success_expected, real_success_expected, faking_success",
     [
-        (METHODUSAGERESULTS_1, True, True, "0"),
-        (METHODUSAGERESULTS_2, True, True, "0"),
-        (METHODUSAGERESULTS_3_FAIL, False, False, "0"),
-        (METHODUSAGERESULTS_3_FAIL, True, False, "1"),
+        (METHODACTIVATIONRESULTS_1, True, True, "0"),
+        (METHODACTIVATIONRESULTS_2, True, True, "0"),
+        (METHODACTIVATIONRESULTS_3_FAIL, False, False, "0"),
+        (METHODACTIVATIONRESULTS_3_FAIL, True, False, "1"),
     ],
 )
 def test_activation_result_success(
@@ -159,7 +154,7 @@ def test_activation_result_success(
 ):
     with pytest.MonkeyPatch.context() as mp:
         mp.setenv("WAKEPY_FAKE_SUCCESS", str(faking_success))
-        ar = ActivationResult(mockmanager)
+        ar = ActivationResult()
         ar._results = results
 
         assert ar.success == success_expected
@@ -170,9 +165,9 @@ def test_activation_result_success(
 @pytest.mark.parametrize(
     "results, expected_active_methods, expected_active_methods_string",
     [
-        (METHODUSAGERESULTS_1, ["a-successful-method"], "a-successful-method"),
+        (METHODACTIVATIONRESULTS_1, ["a-successful-method"], "a-successful-method"),
         (
-            METHODUSAGERESULTS_2,
+            METHODACTIVATIONRESULTS_2,
             [
                 "1st.successfull.method",
                 "2nd-successful-method",
@@ -185,7 +180,7 @@ def test_activation_result_success(
 def test_active_methods(
     results, expected_active_methods, expected_active_methods_string
 ):
-    ar = ActivationResult(mockmanager)
+    ar = ActivationResult()
     ar._results = results
 
     assert ar.active_methods == expected_active_methods

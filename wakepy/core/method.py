@@ -9,8 +9,6 @@ General functions
 -----------------
 select_methods
     Select Methods from a collection based on a white- or blacklist.
-get_prioritized_methods
-    Prioritize of collection of Methods
 
 Functions for getting Methods
 -----------------------------
@@ -31,13 +29,11 @@ import typing
 from abc import ABC, ABCMeta
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
-from .calls import DbusMethodCall
 from .constants import ModeName, PlatformName
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
-    from wakepy.core import Call
-    from wakepy.core.dbus import DbusAdapter
+    from wakepy.core import Call, CallProcessor
 
 MethodCls = Type["Method"]
 T = TypeVar("T")
@@ -124,16 +120,8 @@ class Method(ABC, metaclass=MethodMeta):
     _has_exit: bool
     _has_heartbeat: bool
 
-    def __init__(self, dbus_adapters: Optional[Tuple[DbusAdapter, ...]] = None):
-        self._dbus_adapters = dbus_adapters
-        self.mode_switch_exception: Exception | None = None
-        """Holds the possible exception caused by trying to switch to a mode
-        using this method.
-        """
-
-        self.switch_success: bool | None = None
-        """Tells if the switch to a Mode using the Method was successful or
-        not."""
+    def __init__(self, call_processor: Optional[CallProcessor] = None):
+        self._call_processor = call_processor
 
     def __init_subclass__(cls, **kwargs) -> None:
         """These are automatically added. They tell if the `enter_mode`,
@@ -146,11 +134,6 @@ class Method(ABC, metaclass=MethodMeta):
         _register_method(cls)
 
         return super().__init_subclass__(**kwargs)
-
-    heartbeat_period: int | float = 55
-    """This is the amount of time (in seconds) between two consecutive calls of
-    `heartbeat()`.
-    """
 
     def caniuse(
         self,
@@ -200,20 +183,6 @@ class Method(ABC, metaclass=MethodMeta):
         """
         return True
 
-    def heartbeat(self) -> bool | str:
-        """Called periodically, every `heartbeat_period` seconds.
-
-        Returns
-        -------
-        (a) If calling the heartbeatwas successful, return True
-        (b) If calling the heartbeat was not successful, return a string
-        explaining the reason. You may also simply return False, but this is
-        discouraged.
-
-        Any other type of return value will raise an Exception.
-        """
-        return True
-
     def exit_mode(self) -> bool | str:
         """Exit from a Mode using this Method. Paired with `enter_mode`
 
@@ -237,25 +206,32 @@ class Method(ABC, metaclass=MethodMeta):
         """
         return True
 
-    def process_call(self, call: Optional[Call]):
-        if call is None:
-            return
+    heartbeat_period: int | float = 55
+    """This is the amount of time (in seconds) between two consecutive calls of
+    `heartbeat()`.
+    """
 
-        if isinstance(call, DbusMethodCall) and self._dbus_adapters:
-            for dbus_adapter in self._dbus_adapters:
-                try:
-                    return dbus_adapter.process(call)
-                except MethodError:
-                    continue
+    def heartbeat(self) -> bool | str:
+        """Called periodically, every `heartbeat_period` seconds.
 
-        else:
-            raise NotImplementedError(f"Cannot process a call of type: {type(call)}")
+        Returns
+        -------
+        (a) If calling the heartbeatwas successful, return True
+        (b) If calling the heartbeat was not successful, return a string
+        explaining the reason. You may also simply return False, but this is
+        discouraged.
 
-    def __str__(self):
-        return f"<wakepy Method: {self.__class__.__name__}>"
+        Any other type of return value will raise an Exception.
+        """
+        return True
 
-    def __repr__(self):
-        return f"<wakepy Method: {self.__class__.__name__} at {hex(id(self))}>"
+    def process_call(self, call: Call) -> Any:
+        if self._call_processor is None:
+            raise RuntimeError(
+                f'{self.__class__.__name__ }cannot process call "{call}" as it does not'
+                " have CallProcessor."
+            )
+        return self._call_processor.process(call)
 
     @property
     def has_enter(self):
@@ -268,6 +244,12 @@ class Method(ABC, metaclass=MethodMeta):
     @property
     def has_heartbeat(self):
         return self._has_heartbeat
+
+    def __str__(self):
+        return f"<wakepy Method: {self.__class__.__name__}>"
+
+    def __repr__(self):
+        return f"<wakepy Method: {self.__class__.__name__} at {hex(id(self))}>"
 
 
 _method_registry: dict[str, MethodCls] = dict()

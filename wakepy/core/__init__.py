@@ -5,8 +5,9 @@ See the public Python API at: https://wakepy.readthedocs.io/
 """
 
 from .activation import ActivationResult as ActivationResult
-from .activation import MethodUsageResult as MethodUsageResult
+from .activation import MethodActivationResult as MethodActivationResult
 from .calls import Call as Call
+from .calls import CallProcessor as CallProcessor
 from .calls import DbusMethodCall as DbusMethodCall
 from .constants import BusType as BusType
 from .constants import ModeName as ModeName

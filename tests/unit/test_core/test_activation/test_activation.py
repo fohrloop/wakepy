@@ -6,7 +6,6 @@ Exception: ActivationResult is tested in it's own file
 import datetime as dt
 import os
 import re
-from unittest.mock import Mock
 
 import pytest
 import time_machine
@@ -19,7 +18,7 @@ from testmethods import (
     iterate_test_methods,
 )
 
-from wakepy.core import MethodUsageResult
+from wakepy.core import MethodActivationResult
 from wakepy.core.activation import (
     StageName,
     UsageStatus,
@@ -29,10 +28,7 @@ from wakepy.core.activation import (
     should_fake_success,
     try_enter_and_heartbeat,
 )
-from wakepy.core.activationmanager import ModeActivationManager
 from wakepy.core.method import Method, PlatformName, get_methods
-
-mockmanager = Mock(spec_set=ModeActivationManager)
 
 
 def test_activate_using_method_without_name():
@@ -317,9 +313,9 @@ def test_try_enter_and_heartbeat_special_cases():
         with pytest.raises(
             RuntimeError,
             match=re.escape(
-                f"The {method_name} of {method.__class__.__name__} ({method.name}) returned a "
-                "value of unsupported type. The supported types are: bool, str. "
-                "Returned value: 132"
+                f"The {method_name} of {method.__class__.__name__} ({method.name}) "
+                "returned a value of unsupported type. The supported types are: bool, "
+                "str. Returned value: 132"
             ),
         ):
             try_enter_and_heartbeat(method)
@@ -410,7 +406,7 @@ def test_method_usage_result(
     message,
     expected_string_representation,
 ):
-    mur = MethodUsageResult(
+    mur = MethodActivationResult(
         status=status,
         failure_stage=failure_stage,
         method_name=method_name,
@@ -455,4 +451,4 @@ def test_should_fake_success(monkeypatch):
 
     if "WAKEPY_FAKE_SUCCESS" in os.environ:
         monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
-    assert should_fake_success() == False
+    assert should_fake_success() is False

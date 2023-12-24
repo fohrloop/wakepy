@@ -3,15 +3,17 @@ deactivation of Modes (using Methods).
 
 Most important functions
 ------------------------
-activate_using(method:Method) -> MethodUsageResult
+activate_using(method:Method) -> MethodActivationResult
     Activate a mode using a single Method 
+get_prioritized_methods
+    Prioritize of collection of Methods
 
 Most important classes
 ----------------------
 ActivationResult
     This is something returned from mode activation task. Contains the summary
     of all used methods, and whether the activation was successful or not.
-MethodUsageResult
+MethodActivationResult
     One level lower than ActivationResult. This is result from activation task
     using a single Method.
 """
@@ -23,17 +25,16 @@ import typing
 from dataclasses import dataclass
 from typing import List, Set, Union
 
+from .calls import CallProcessor
 from .constants import PlatformName
 from .method import MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
-    from typing import Optional, Sequence, Tuple
+    from typing import Optional, Sequence, Tuple, Type
 
-    from .activationmanager import ModeActivationManager
     from .method import Method, MethodCls
-
 
 MethodsPriorityOrder = List[Union[str, Set[str]]]
 
@@ -94,16 +95,15 @@ class ActivationResult:
         If you want easier access, use .get_details().
     """
 
-    def __init__(self, manager: ModeActivationManager):
+    def __init__(self, results: Optional[List[MethodActivationResult]] = None):
         """
         Parameters
         ---------
-        manager:
-            The mode activation manager, which has methods for controlling and
-            getting information about the mode activation process.
+        results:
+            The MethodActivationResults to be used to fill the ActivationResult
+
         """
-        self._manager = manager
-        self._results: list[MethodUsageResult] = []
+        self._results: list[MethodActivationResult] = results or []
 
     @property
     def real_success(self) -> bool:
@@ -157,7 +157,7 @@ class ActivationResult:
         self,
         ignore_platform_fails: bool = True,
         ignore_unused: bool = False,
-    ) -> list[MethodUsageResult]:
+    ) -> list[MethodActivationResult]:
         """Get details of the activation results. This is the higher-level
         interface. If you want more control, use .get_detailed_results().
 
@@ -198,7 +198,7 @@ class ActivationResult:
             StageName.REQUIREMENTS,
             StageName.ACTIVATION,
         ),
-    ) -> list[MethodUsageResult]:
+    ) -> list[MethodActivationResult]:
         """Get details of the activation results. This is the lower-level
         interface. If you want easier access, use .get_details().
 
@@ -223,7 +223,9 @@ class ActivationResult:
 
 
 @dataclass
-class MethodUsageResult:
+class MethodActivationResult:
+    """This class is a result from using a single Method to activate a mode."""
+
     status: UsageStatus
 
     method_name: str
@@ -233,6 +235,11 @@ class MethodUsageResult:
     failure_stage: Optional[StageName] = None
 
     message: str = ""
+
+    heartbeart: Optional[Heartbeat] = None
+    """The heartbeat is an optional reference to a Heartbeat object. Only used
+    if the Method used has heartbeat() implemented.
+    """
 
     def __repr__(self):
         error_at = " @" + self.failure_stage if self.failure_stage else ""
@@ -250,6 +257,25 @@ class Heartbeat:
 
     def start(self):
         ...
+
+
+def activate(
+    methods: list[Type[Method]],
+    methods_priority: Optional[MethodsPriorityOrder] = None,
+    call_processor: CallProcessor | None = None,
+) -> ActivationResult:
+    call_processor = call_processor or CallProcessor()
+    prioritized_methods = get_prioritized_methods(methods, methods_priority)
+    results = []
+
+    for methodcls in prioritized_methods:
+        method = methodcls(call_processor=call_processor)
+        methodresult = activate_using(method)
+        results.append(methodresult)
+        if methodresult.status == UsageStatus.SUCCESS:
+            break
+
+    return ActivationResult(results)
 
 
 def check_methods_priority(
@@ -471,11 +497,11 @@ def get_prioritized_methods(
     return [method for group in ordered_groups for method in group]
 
 
-def activate_using(method: Method) -> MethodUsageResult:
+def activate_using(method: Method) -> MethodActivationResult:
     if method.name is None:
         raise ValueError("Methods without a name may not be used to activate modes!")
 
-    result = MethodUsageResult(status=UsageStatus.FAIL, method_name=method.name)
+    result = MethodActivationResult(status=UsageStatus.FAIL, method_name=method.name)
 
     if not get_platform_supported(method, platform=CURRENT_PLATFORM):
         result.failure_stage = StageName.PLATFORM_SUPPORT

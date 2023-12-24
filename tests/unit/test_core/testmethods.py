@@ -72,7 +72,10 @@ def get_test_method_class(
                 raise instructions
 
         else:
-            m = lambda self: instructions
+
+            def m(self):
+                return instructions
+
         return m
 
     def _create_class():

@@ -2,33 +2,26 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from wakepy.core.activationmanager import ModeActivationManager
-from wakepy.core.method import Method
-from wakepy.core.mode import ActivationResult, Mode, ModeExit
+from wakepy.core.calls import CallProcessor
+from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
 
 
 def mocks_for_test_mode():
     # Setup test
     mocks = Mock()
 
-    manager_cls = Mock(spec_set=type(ModeActivationManager))
-    manager = Mock(spec_set=ModeActivationManager)
+    mocks.call_processor_cls = Mock()
+    mocks.call_processor_cls.return_value = Mock(spec_set=CallProcessor)
+
+    mocks.mode_controller_cls = Mock()
+    mocks.mode_controller_cls.return_value = Mock(spec_set=ModeController)
+
     result = Mock(spec_set=ActivationResult)
-    methods = [Mock(spec_set=type(Method)) for _ in range(3)]
-    prioritize = methods[::-1]
-
-    dbus_adapter = Mock()
-
-    manager_cls.return_value = manager
-    manager.activate.return_value = result
+    methods = [Mock() for _ in range(3)]
 
     # Record calls in a "mock manager"
-    mocks.manager_cls = manager_cls
-    mocks.manager = manager
     mocks.result = result
     mocks.methods = methods
-    mocks.dbus_adapter = dbus_adapter
-    mocks.prioritize = prioritize
     return mocks
 
 
@@ -48,36 +41,43 @@ def test_mode_contextmanager_protocol():
     mocks = mocks_for_test_mode()
 
     class TestMode(Mode):
-        _manager_class = mocks.manager_cls
+        _call_processor_class = mocks.call_processor_class
+        _controller_class = mocks.controller_class
 
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
     mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter)
 
-    # Here we have one call. During init, the ModeActivationManager
-    # instance is created
-    assert len(mocks.mock_calls) == 1
-
-    # We have now created a new manager instance
-    assert mocks.mock_calls[0] == call.manager_cls(dbus_adapter=mocks.dbus_adapter)
+    # No calls during init
+    assert len(mocks.mock_calls) == 0
 
     # Test that the context manager protocol works
     with mode as m:
         # The second call
         # We have also called activate
-        assert len(mocks.mock_calls) == 2
-        assert mocks.mock_calls[1] == call.manager_cls().activate(
-            methods=mocks.methods,
+        assert len(mocks.mock_calls) == 3
+
+        # We have now created a new CallProcessor instance
+        assert mocks.mock_calls[0] == call.call_processor_class(
+            dbus_adapter=mocks.dbus_adapter
         )
-        # The __enter__ returns the value from the manager.activate()
+        # We have also created a ModeController instance
+        assert mocks.mock_calls[1] == call.controller_class(
+            call_processor=mocks.call_processor_class.return_value
+        )
+        # And called ModeController.activate
+        assert mocks.mock_calls[2] == call.controller_class().activate(
+            mocks.methods, methods_priority=None
+        )
+        # The __enter__ returns the value from the ModeController.activate()
         # call
-        assert m == mocks.result
+        assert m == mocks.controller_class.return_value.activate.return_value
 
     # If we get here, the __exit__ works without errors
-    # manager.deactivate() is called during __exit__
-    assert len(mocks.mock_calls) == 3
-    assert mocks.mock_calls[2] == call.manager_cls().deactivate()
+    # ModeController.deactivate() is called during __exit__
+    assert len(mocks.mock_calls) == 4
+    assert mocks.mock_calls[3] == call.controller_class().deactivate()
 
 
 def get_mocks_and_testmode():
@@ -85,7 +85,8 @@ def get_mocks_and_testmode():
     mocks = mocks_for_test_mode()
 
     class TestMode(Mode):
-        _manager_class = mocks.manager_cls
+        _call_processor_class = mocks.call_processor_class
+        _controller_class = mocks.controller_class
 
     return mocks, TestMode
 
@@ -100,10 +101,11 @@ def test_mode_exits():
     assert testval == 1
 
     # The deactivate is also called!
-    assert mocks.mock_calls == [
-        call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
-        call.manager_cls().deactivate(),
+    assert mocks.mock_calls.copy() == [
+        call.call_processor_class(dbus_adapter=None),
+        call.controller_class(call_processor=mocks.call_processor_class()),
+        call.controller_class().activate(mocks.methods, methods_priority=None),
+        call.controller_class().deactivate(),
     ]
 
 
@@ -119,10 +121,11 @@ def test_mode_exits_with_modeexit():
     assert testval == 2
 
     # The deactivate is also called!
-    assert mocks.mock_calls == [
-        call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
-        call.manager_cls().deactivate(),
+    assert mocks.mock_calls.copy() == [
+        call.call_processor_class(dbus_adapter=None),
+        call.controller_class(call_processor=mocks.call_processor_class()),
+        call.controller_class().activate(mocks.methods, methods_priority=None),
+        call.controller_class().deactivate(),
     ]
 
 
@@ -138,10 +141,11 @@ def test_mode_exits_with_modeexit_with_args():
     assert testval == 3
 
     # The deactivate is also called!
-    assert mocks.mock_calls == [
-        call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
-        call.manager_cls().deactivate(),
+    assert mocks.mock_calls.copy() == [
+        call.call_processor_class(dbus_adapter=None),
+        call.controller_class(call_processor=mocks.call_processor_class()),
+        call.controller_class().activate(mocks.methods, methods_priority=None),
+        call.controller_class().deactivate(),
     ]
 
 
@@ -161,8 +165,9 @@ def test_mode_exits_with_other_exception():
     assert testval == 4
 
     # The deactivate is also called!
-    assert mocks.mock_calls == [
-        call.manager_cls(dbus_adapter=None),
-        call.manager_cls().activate(methods=mocks.methods),
-        call.manager_cls().deactivate(),
+    assert mocks.mock_calls.copy() == [
+        call.call_processor_class(dbus_adapter=None),
+        call.controller_class(call_processor=mocks.call_processor_class()),
+        call.controller_class().activate(mocks.methods, methods_priority=None),
+        call.controller_class().deactivate(),
     ]

@@ -4,9 +4,9 @@ import typing
 from dataclasses import dataclass
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Tuple
+    from typing import Any, List, Optional, Tuple, Type
 
-    from .dbus import DbusAdapter, DbusAdapterSeq, DbusMethod
+    from .dbus import DbusAdapter, DbusAdapterTypeSeq, DbusMethod
 
 
 class Call:
@@ -33,30 +33,55 @@ class DbusMethodCall(Call):
             )
 
 
-# TODO: Define a Caller class
+class CallProcessor:
+    """A call processor. Determines *how* to process a call object and
+    processes it."""
+
+    def __init__(
+        self, dbus_adapter: Optional[Type[DbusAdapter] | DbusAdapterTypeSeq] = None
+    ):
+        """
+        dbus_adapter:
+            Determines, which Dbus library / implementation is to be used, if
+            Dbus-based methods are to be used with a mode. You may use this to
+            use a custom DBus implementation.
+        """
+        self.dbus_adapter = get_dbus_adapter(dbus_adapter)
+
+    def process(self, call: Call):
+        if isinstance(call, DbusMethodCall) and self.dbus_adapter:
+            return self.dbus_adapter.process(call)
+
+        else:
+            raise NotImplementedError(f"Cannot process a call of type: {type(call)}")
 
 
-def _to_tuple_of_dbus_adapter(
-    dbus_adapter: DbusAdapter | DbusAdapterSeq | None,
-) -> tuple[DbusAdapter, ...] | None:
-    """Makes sure that dbus_adapter is a tuple of DbusAdapter instances."""
-    if not dbus_adapter:
-        return None
+def get_dbus_adapter(
+    dbus_adapter: Optional[Type[DbusAdapter] | DbusAdapterTypeSeq] = None,
+) -> DbusAdapter | None:
+    """Creates a dbus adapter instance"""
 
-    elif isinstance(dbus_adapter, DbusAdapter):
-        return (dbus_adapter,)
+    if dbus_adapter is None:
+        return get_default_dbus_adapter()
 
-    if isinstance(dbus_adapter, (list, tuple)):
-        if not all(isinstance(a, DbusAdapter) for a in dbus_adapter):
-            raise ValueError("dbus_adapter can only consist of DbusAdapters!")
-        return tuple(dbus_adapter)
+    if isinstance(dbus_adapter, type):
+        return dbus_adapter()
 
-    raise ValueError("dbus_adapter type not understood")
+    # TODO: create some better logic which tests if the dbus adapter may be
+    # used. For now, just return first from the iterable which won't crash upon
+    # initialization
+    for adapter_cls in dbus_adapter:
+        try:
+            adapter = adapter_cls()
+            return adapter
+        except Exception:
+            continue
+    return None
 
 
-def get_default_dbus_adapter() -> tuple[DbusAdapter, ...]:
+def get_default_dbus_adapter() -> DbusAdapter | None:
     try:
         from wakepy.io.dbus.jeepney import JeepneyDbusAdapter
     except ImportError:
-        return tuple()
-    return (JeepneyDbusAdapter(),)
+        return None
+    return JeepneyDbusAdapter()

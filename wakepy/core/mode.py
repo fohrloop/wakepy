@@ -3,8 +3,8 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activation import ActivationResult, check_methods_priority
-from .activationmanager import ModeActivationManager
+from .activation import ActivationResult, activate, check_methods_priority
+from .calls import CallProcessor
 from .method import get_methods_for_mode, select_methods
 
 if typing.TYPE_CHECKING:
@@ -37,6 +37,27 @@ class ModeExit(Exception):
     """
 
 
+class ModeController:
+    def __init__(self, call_processor: CallProcessor):
+        self.call_processor = call_processor
+
+    def activate(
+        self,
+        method_classes: list[Type[Method]],
+        methods_priority: Optional[MethodsPriorityOrder] = None,
+    ) -> ActivationResult:
+        # TODO: result, actice_method as output
+        result = activate(
+            methods=method_classes,
+            methods_priority=methods_priority,
+            call_processor=self.call_processor,
+        )
+        return result
+
+    def deactivate(self):
+        ...
+
+
 class Mode(ABC):
     """A mode is something that is entered into, kept, and exited from. Modes
     are implemented as context managers, and user code (inside the with
@@ -51,15 +72,12 @@ class Mode(ABC):
 
     Attributes
     ----------
-    methods: list[Type[Method]]
+    method_classes: list[Type[Method]]
         The list of methods associated for this mode.
-    manager: ModeActivationManager
-        The manager which lives in the main thread and talks to the
-        ModeActivator using queues. This is responsible for activating and
-        deactivating a mode.
     """
 
-    _manager_class: Type[ModeActivationManager] = ModeActivationManager
+    _call_processor_class: Type[CallProcessor] = CallProcessor
+    _controller_class: Type[ModeController] = ModeController
 
     def __init__(
         self,
@@ -69,8 +87,8 @@ class Mode(ABC):
     ):
         """Initialize a Mode using Methods.
 
-        This is also where the ModeActivationManager settings, such as the dbus
-        adapter to be used, are defined.
+        This is also where the activation process related settings, such as the
+        dbus adapter to be used, are defined.
 
         Parameters
         ----------
@@ -86,15 +104,21 @@ class Mode(ABC):
         """
         check_methods_priority(methods_priority, methods)
 
-        self.methods = methods
+        self.methods_classes = methods
         self.methods_priority = methods_priority
-        self.manager: ModeActivationManager = self._manager_class(
-            dbus_adapter=dbus_adapter
-        )
+        self.controller: ModeController | None = None
+        self._dbus_adapter_cls = dbus_adapter
 
     def __enter__(self) -> ActivationResult:
-        # TODO: pass the methods_priority
-        return self.manager.activate(methods=self.methods)
+        if self.controller is None:
+            call_processor = self._call_processor_class(
+                dbus_adapter=self._dbus_adapter_cls
+            )
+            self.controller = self._controller_class(call_processor=call_processor)
+        return self.controller.activate(
+            self.methods_classes,
+            methods_priority=self.methods_priority,
+        )
 
     def __exit__(
         self,
@@ -117,7 +141,10 @@ class Mode(ABC):
         _ = exc_type
         _ = traceback
 
-        self.manager.deactivate()
+        if self.controller is None:
+            raise RuntimeError("Must __enter__ before __exit__!")
+
+        self.controller.deactivate()
 
         if exception is None or isinstance(exception, ModeExit):
             return True
