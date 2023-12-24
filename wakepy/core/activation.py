@@ -27,6 +27,7 @@ from typing import List, Set, Union
 
 from .calls import CallProcessor
 from .constants import PlatformName
+from .heartbeat import Heartbeat
 from .method import MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
@@ -240,18 +241,6 @@ class MethodActivationResult:
         error_at = " @" + self.failure_stage if self.failure_stage else ""
         message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
         return f"({self.status}{error_at}, {self.method_name}{message_part})"
-
-
-class Heartbeat:
-    # TODO: This is just temporary dummy implementation.
-    def __init__(
-        self, method: Method, heartbeat_call_time: Optional[dt.datetime] = None
-    ):
-        self.method = method
-        self.prev_call = heartbeat_call_time
-
-    def start(self):
-        ...
 
 
 def activate(
