@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activation import ActivationResult, activate, check_methods_priority
+from .activation import ActivationResult, activate
 from .calls import CallProcessor
 from .heartbeat import Heartbeat
 from .method import get_methods_for_mode, select_methods
@@ -108,7 +108,6 @@ class Mode(ABC):
         dbus_adapter:
             For using a custom dbus-adapter. Optional.
         """
-        check_methods_priority(methods_priority, methods)
 
         self.methods_classes = methods
         self.methods_priority = methods_priority

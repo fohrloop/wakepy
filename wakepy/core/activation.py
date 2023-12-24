@@ -266,6 +266,8 @@ def activate(
         .enter_mode(), .heartbeat() and .exit_mode() of the Method. Used for
         example for using a custom Dbus library adapter. Optional.
     """
+    check_methods_priority(methods_priority, methods)
+
     if not methods:
         # Cannot activate anything as there are no methods.
         return ActivationResult(), None, None
