@@ -35,7 +35,8 @@ from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import Method, PlatformName, get_methods
 
 
-def test_activate_without_methods():
+def test_activate_without_methods(monkeypatch):
+    _arrange_for_test_activate(monkeypatch)
     res, active_method, heartbeat = activate([], None)
     assert res.get_details() == []
     assert res.success is False
@@ -125,6 +126,7 @@ def _arrange_for_test_activate(monkeypatch):
     monkeypatch.setattr(
         "wakepy.core.activation.check_methods_priority", mocks.check_methods_priority
     )
+    monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
     return mocks
 
 
