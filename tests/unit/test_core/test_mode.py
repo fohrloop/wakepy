@@ -25,6 +25,17 @@ def mocks_for_test_mode():
     return mocks
 
 
+def get_mocks_and_testmode():
+    # Setup mocks
+    mocks = mocks_for_test_mode()
+
+    class TestMode(Mode):
+        _call_processor_class = mocks.call_processor_class
+        _controller_class = mocks.controller_class
+
+    return mocks, TestMode
+
+
 def test_mode_contextmanager_protocol():
     """Test that the Mode fulfills the context manager protocol; i.e. it is
     possible to use instances of Mode in a with statement like this:
@@ -38,11 +49,7 @@ def test_mode_contextmanager_protocol():
     """
 
     # Setup mocks
-    mocks = mocks_for_test_mode()
-
-    class TestMode(Mode):
-        _call_processor_class = mocks.call_processor_class
-        _controller_class = mocks.controller_class
+    mocks, TestMode = get_mocks_and_testmode()
 
     # starting point: No mock calls
     assert mocks.mock_calls == []
@@ -78,17 +85,6 @@ def test_mode_contextmanager_protocol():
     # ModeController.deactivate() is called during __exit__
     assert len(mocks.mock_calls) == 4
     assert mocks.mock_calls[3] == call.controller_class().deactivate()
-
-
-def get_mocks_and_testmode():
-    # Setup mocks
-    mocks = mocks_for_test_mode()
-
-    class TestMode(Mode):
-        _call_processor_class = mocks.call_processor_class
-        _controller_class = mocks.controller_class
-
-    return mocks, TestMode
 
 
 def test_mode_exits():
