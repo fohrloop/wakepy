@@ -25,6 +25,17 @@ def mocks_for_test_mode():
     return mocks
 
 
+def get_mocks_and_testmode():
+    # Setup mocks
+    mocks = mocks_for_test_mode()
+
+    class TestMode(Mode):
+        _call_processor_class = mocks.call_processor_class
+        _controller_class = mocks.controller_class
+
+    return mocks, TestMode
+
+
 def test_mode_contextmanager_protocol():
     """Test that the Mode fulfills the context manager protocol; i.e. it is
     possible to use instances of Mode in a with statement like this:
@@ -32,17 +43,13 @@ def test_mode_contextmanager_protocol():
     with Mode() as m:
         ...
 
-    Test also that the ModeActivationManager.activate() and .deactivate()
+    Test also that the ModeController.activate() and .deactivate()
     are called as expected. and that the `m` is the return value of the
     manager.activate()
     """
 
     # Setup mocks
-    mocks = mocks_for_test_mode()
-
-    class TestMode(Mode):
-        _call_processor_class = mocks.call_processor_class
-        _controller_class = mocks.controller_class
+    mocks, TestMode = get_mocks_and_testmode()
 
     # starting point: No mock calls
     assert mocks.mock_calls == []
@@ -80,17 +87,6 @@ def test_mode_contextmanager_protocol():
     assert mocks.mock_calls[3] == call.controller_class().deactivate()
 
 
-def get_mocks_and_testmode():
-    # Setup mocks
-    mocks = mocks_for_test_mode()
-
-    class TestMode(Mode):
-        _call_processor_class = mocks.call_processor_class
-        _controller_class = mocks.controller_class
-
-    return mocks, TestMode
-
-
 def test_mode_exits():
     mocks, TestMode = get_mocks_and_testmode()
 
@@ -100,13 +96,7 @@ def test_mode_exits():
 
     assert testval == 1
 
-    # The deactivate is also called!
-    assert mocks.mock_calls.copy() == [
-        call.call_processor_class(dbus_adapter=None),
-        call.controller_class(call_processor=mocks.call_processor_class()),
-        call.controller_class().activate(mocks.methods, methods_priority=None),
-        call.controller_class().deactivate(),
-    ]
+    _assert_context_manager_used_correctly(mocks)
 
 
 def test_mode_exits_with_modeexit():
@@ -120,13 +110,7 @@ def test_mode_exits_with_modeexit():
 
     assert testval == 2
 
-    # The deactivate is also called!
-    assert mocks.mock_calls.copy() == [
-        call.call_processor_class(dbus_adapter=None),
-        call.controller_class(call_processor=mocks.call_processor_class()),
-        call.controller_class().activate(mocks.methods, methods_priority=None),
-        call.controller_class().deactivate(),
-    ]
+    _assert_context_manager_used_correctly(mocks)
 
 
 def test_mode_exits_with_modeexit_with_args():
@@ -140,13 +124,7 @@ def test_mode_exits_with_modeexit_with_args():
 
     assert testval == 3
 
-    # The deactivate is also called!
-    assert mocks.mock_calls.copy() == [
-        call.call_processor_class(dbus_adapter=None),
-        call.controller_class(call_processor=mocks.call_processor_class()),
-        call.controller_class().activate(mocks.methods, methods_priority=None),
-        call.controller_class().deactivate(),
-    ]
+    _assert_context_manager_used_correctly(mocks)
 
 
 def test_mode_exits_with_other_exception():
@@ -164,7 +142,10 @@ def test_mode_exits_with_other_exception():
 
     assert testval == 4
 
-    # The deactivate is also called!
+    _assert_context_manager_used_correctly(mocks)
+
+
+def _assert_context_manager_used_correctly(mocks):
     assert mocks.mock_calls.copy() == [
         call.call_processor_class(dbus_adapter=None),
         call.controller_class(call_processor=mocks.call_processor_class()),
