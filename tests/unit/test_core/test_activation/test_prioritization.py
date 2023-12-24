@@ -18,6 +18,9 @@ def test_check_methods_priority():
 
     # These should be fine
     check_methods_priority(methods_priority=None, methods=methods)
+    # methods_priority is empty list. Does not crash.
+    check_methods_priority(methods_priority=[], methods=methods)
+    # Does not make sense but should not crash.
     check_methods_priority(methods_priority=["*"], methods=methods)
     # Simple list of methods
     check_methods_priority(methods_priority=["A", "B", "F"], methods=methods)
