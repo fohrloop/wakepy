@@ -245,8 +245,8 @@ class MethodActivationResult:
 
 def activate(
     methods: list[Type[Method]],
+    call_processor: CallProcessor,
     methods_priority: Optional[MethodsPriorityOrder] = None,
-    call_processor: CallProcessor | None = None,
 ) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
     """Activates a mode defined by a collection of Methods. Only the first
     Method which succeeds activation will be used, in order from highest
@@ -256,15 +256,15 @@ def activate(
     ----------
     methods:
         The list of Methods to be used for activating this Mode.
+    call_processor:
+        The call processor to use for processing Calls in the .caniuse(),
+        .enter_mode(), .heartbeat() and .exit_mode() of the Method. Used for
+        example for using a custom Dbus library adapter. Optional.
     methods_priority: list[str | set[str]]
         The priority order, which is a list of method names or asterisk
         ('*'). The asterisk means "all rest methods" and may occur only
         once in the priority order, and cannot be part of a set. All method
         names must be unique and must be part of the `methods`.
-    call_processor:
-        The call processor to use for processing Calls in the .caniuse(),
-        .enter_mode(), .heartbeat() and .exit_mode() of the Method. Used for
-        example for using a custom Dbus library adapter. Optional.
     """
     check_methods_priority(methods_priority, methods)
 
@@ -272,7 +272,6 @@ def activate(
         # Cannot activate anything as there are no methods.
         return ActivationResult(), None, None
 
-    call_processor = call_processor or CallProcessor()
     prioritized_methods = get_prioritized_methods(methods, methods_priority)
     results = []
 
