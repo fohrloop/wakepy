@@ -29,7 +29,6 @@ from wakepy.core.activation import (
     get_platform_supported,
     should_fake_success,
     try_enter_and_heartbeat,
-    Heartbeat,
 )
 from wakepy.core.calls import CallProcessor
 from wakepy.core.heartbeat import Heartbeat
@@ -39,7 +38,7 @@ from wakepy.core.method import Method, PlatformName, get_methods
 def test_activate_without_methods():
     res, active_method, heartbeat = activate([], None)
     assert res.get_details() == []
-    assert res.success == False
+    assert res.success is False
     assert active_method is None
     assert heartbeat is None
 
@@ -59,10 +58,13 @@ def test_activate_function_success(monkeypatch):
     ]
 
     # Act
+    # Note: prioritize the failing first, so that the failing one will also be
+    # used. This also tests at that the prioritization is used at least
+    # somehow
     result, active_method, heartbeat = activate(
         methods,
         call_processor=mocks.call_processor,
-        methods_priority=[  # prioritize the failing first, so that the failing one will also be used.
+        methods_priority=[
             methodcls_fail.name,
             methodcls_success.name,
         ],
