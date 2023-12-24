@@ -18,6 +18,9 @@ def test_check_methods_priority():
 
     # These should be fine
     check_methods_priority(methods_priority=None, methods=methods)
+    # methods_priority is empty list. Does not crash.
+    check_methods_priority(methods_priority=[], methods=methods)
+    # Does not make sense but should not crash.
     check_methods_priority(methods_priority=["*"], methods=methods)
     # Simple list of methods
     check_methods_priority(methods_priority=["A", "B", "F"], methods=methods)
@@ -44,6 +47,15 @@ def test_check_methods_priority():
         match=re.escape("The asterisk (*) can only occur once in methods_priority!"),
     ):
         check_methods_priority(methods_priority=["A", "*", "B", "*"], methods=methods)
+
+    # duplicate method names
+    with pytest.raises(
+        ValueError,
+        match=re.escape('Duplicate method name "A" in methods_priority'),
+    ):
+        check_methods_priority(
+            methods_priority=["A", "*", "B", {"A", "C"}], methods=methods
+        )
 
     # Asterisk inside a set
     with pytest.raises(
