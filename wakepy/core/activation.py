@@ -258,7 +258,7 @@ def activate(
     methods: list[Type[Method]],
     methods_priority: Optional[MethodsPriorityOrder] = None,
     call_processor: CallProcessor | None = None,
-) -> Tuple[ActivationResult, Method, Heartbeat]:
+) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
     """Activates a mode defined by a collection of Methods. Only the first
     Method which succeeds activation will be used, in order from highest
     priority to lowest priority.
@@ -277,18 +277,26 @@ def activate(
         .enter_mode(), .heartbeat() and .exit_mode() of the Method. Used for
         example for using a custom Dbus library adapter. Optional.
     """
+    if not methods:
+        # Cannot activate anything as there are no methods.
+        return ActivationResult(), None, None
+
     call_processor = call_processor or CallProcessor()
     prioritized_methods = get_prioritized_methods(methods, methods_priority)
     results = []
 
     for methodcls in prioritized_methods:
         method = methodcls(call_processor=call_processor)
-        methodresult = activate_using(method)
+        methodresult, heartbeat = activate_using(method)
         results.append(methodresult)
         if methodresult.status == UsageStatus.SUCCESS:
             break
+    else:
+        # Tried activate with all methods, but none of them succeed
+        return ActivationResult(results), None, None
 
-    return ActivationResult(results)
+    # Activation was succesful.
+    return ActivationResult(results), method, heartbeat
 
 
 def check_methods_priority(
