@@ -1,5 +1,3 @@
-from unittest.mock import Mock
-
 import pytest
 
 from wakepy.core import DbusAdapter, Method, ModeName
@@ -53,26 +51,28 @@ def test_keep_running_mode_creation(input_args, monkeypatch):
 
     mode = function_under_test()
     # All the methods for the mode are selected automatically
-    assert set(mode.methods) == {MethodA, MethodB, MethodC}
+    assert set(mode.methods_classes) == {MethodA, MethodB, MethodC}
 
     # Case: Test "omit" parameter
     mode = function_under_test(omit=[f"{name_prefix}A"])
-    assert set(mode.methods) == {MethodB, MethodC}
+    assert set(mode.methods_classes) == {MethodB, MethodC}
 
     # Case: Test "methods" parameter
     mode = function_under_test(methods=[f"{name_prefix}A", f"{name_prefix}B"])
-    assert set(mode.methods) == {MethodB, MethodA}
+    assert set(mode.methods_classes) == {MethodB, MethodA}
 
     # Case: Test "methods_priority" parameter
     methods_priority = [f"{name_prefix}A", f"{name_prefix}B"]
     mode = function_under_test(methods_priority=methods_priority)
     assert mode.methods_priority == methods_priority
-    assert set(mode.methods) == {MethodB, MethodA, MethodC}
+    assert set(mode.methods_classes) == {MethodB, MethodA, MethodC}
 
     # Case: Test "dbus_adapter" parameter
-    dbus_adapter = Mock(spec_set=DbusAdapter)
-    mode = function_under_test(dbus_adapter=dbus_adapter)
-    assert mode.manager._dbus_adapter == dbus_adapter
+    class MyDbusAdapter(DbusAdapter):
+        ...
+
+    mode = function_under_test(dbus_adapter=MyDbusAdapter)
+    assert mode._dbus_adapter_cls == MyDbusAdapter
 
 
 @pytest.mark.skip("This waits to be fixed")

@@ -1,6 +1,6 @@
 import pytest
 
-from wakepy.core import BusType, DbusAddress, DbusMethod
+from wakepy.core import BusType, CallProcessor, DbusAddress, DbusMethod
 from wakepy.core.dbus import DbusAdapter
 from wakepy.methods.gnome import (
     GnomeFlag,
@@ -31,18 +31,17 @@ method_uninhibit = DbusMethod(
 
 
 class DbusGnomeMockAdapter(DbusAdapter):
-    def __init__(self, flag, cookie):
+    def __init__(self):
         super().__init__()
-        self.__cookie = cookie
         self.__expected_inhibit_args = {
             "app_id": "wakepy",
             "toplevel_xid": 42,
             "reason": "wakelock active",
-            "flags": flag,
+            "flags": self._flag,
         }
 
         self.__expected_uninhibit_args = {
-            "inhibit_cookie": cookie,
+            "inhibit_cookie": self._cookie,
         }
 
     def process(self, call):
@@ -54,7 +53,7 @@ class DbusGnomeMockAdapter(DbusAdapter):
 
     def __process_inhibit(self, call):
         assert call.args == self.__expected_inhibit_args
-        return self.__cookie
+        return self._cookie
 
     def __process_uninhibit(self, call):
         assert call.args == self.__expected_uninhibit_args
@@ -73,12 +72,13 @@ def test_gnome(method_cls, flag):
 
     cookie = 75848243423
 
-    dbus_adapter = DbusGnomeMockAdapter(
-        flag=flag,
-        cookie=cookie,
-    )
+    class TestAdapter(DbusGnomeMockAdapter):
+        _flag = flag
+        _cookie = cookie
+
+    call_processor = CallProcessor(dbus_adapter=TestAdapter)
     # Test the method
-    method = method_cls(dbus_adapters=[dbus_adapter])
+    method = method_cls(call_processor)
 
     # Checks before tests
     # Nothing yet set
@@ -95,5 +95,5 @@ def test_gnome(method_cls, flag):
 
     # 2) Test exit_mode
     method.exit_mode()
-    assert dbus_adapter._process_inhibit_called
+    assert call_processor.dbus_adapter._process_inhibit_called
     assert method.inhibit_cookie is None
