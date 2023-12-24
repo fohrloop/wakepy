@@ -27,6 +27,7 @@ from typing import List, Set, Union
 
 from .calls import CallProcessor
 from .constants import PlatformName
+from .heartbeat import Heartbeat
 from .method import MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
@@ -236,46 +237,56 @@ class MethodActivationResult:
 
     message: str = ""
 
-    heartbeart: Optional[Heartbeat] = None
-    """The heartbeat is an optional reference to a Heartbeat object. Only used
-    if the Method used has heartbeat() implemented.
-    """
-
     def __repr__(self):
         error_at = " @" + self.failure_stage if self.failure_stage else ""
         message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
         return f"({self.status}{error_at}, {self.method_name}{message_part})"
 
 
-class Heartbeat:
-    # TODO: This is just temporary dummy implementation.
-    def __init__(
-        self, method: Method, heartbeat_call_time: Optional[dt.datetime] = None
-    ):
-        self.method = method
-        self.prev_call = heartbeat_call_time
-
-    def start(self):
-        ...
-
-
 def activate(
     methods: list[Type[Method]],
+    call_processor: CallProcessor,
     methods_priority: Optional[MethodsPriorityOrder] = None,
-    call_processor: CallProcessor | None = None,
-) -> ActivationResult:
-    call_processor = call_processor or CallProcessor()
+) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
+    """Activates a mode defined by a collection of Methods. Only the first
+    Method which succeeds activation will be used, in order from highest
+    priority to lowest priority.
+
+    Parameters
+    ----------
+    methods:
+        The list of Methods to be used for activating this Mode.
+    call_processor:
+        The call processor to use for processing Calls in the .caniuse(),
+        .enter_mode(), .heartbeat() and .exit_mode() of the Method. Used for
+        example for using a custom Dbus library adapter. Optional.
+    methods_priority: list[str | set[str]]
+        The priority order, which is a list of method names or asterisk
+        ('*'). The asterisk means "all rest methods" and may occur only
+        once in the priority order, and cannot be part of a set. All method
+        names must be unique and must be part of the `methods`.
+    """
+    check_methods_priority(methods_priority, methods)
+
+    if not methods:
+        # Cannot activate anything as there are no methods.
+        return ActivationResult(), None, None
+
     prioritized_methods = get_prioritized_methods(methods, methods_priority)
     results = []
 
     for methodcls in prioritized_methods:
         method = methodcls(call_processor=call_processor)
-        methodresult = activate_using(method)
+        methodresult, heartbeat = activate_using(method)
         results.append(methodresult)
         if methodresult.status == UsageStatus.SUCCESS:
             break
+    else:
+        # Tried activate with all methods, but none of them succeed
+        return ActivationResult(results), None, None
 
-    return ActivationResult(results)
+    # Activation was succesful.
+    return ActivationResult(results), method, heartbeat
 
 
 def check_methods_priority(
@@ -497,7 +508,17 @@ def get_prioritized_methods(
     return [method for group in ordered_groups for method in group]
 
 
-def activate_using(method: Method) -> MethodActivationResult:
+def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
+    """Activates a mode defined by a Method.
+
+    Returns
+    -------
+    result:
+        The result of the activation process.
+    heartbeat:
+        If the `method` has method.heartbeat() implemented, and activation
+        succeeds, this is a Heartbeat object. Otherwise, this is None.
+    """
     if method.name is None:
         raise ValueError("Methods without a name may not be used to activate modes!")
 
@@ -505,29 +526,30 @@ def activate_using(method: Method) -> MethodActivationResult:
 
     if not get_platform_supported(method, platform=CURRENT_PLATFORM):
         result.failure_stage = StageName.PLATFORM_SUPPORT
-        return result
+        return result, None
 
     requirements_fail, err_message = caniuse_fails(method)
     if requirements_fail:
         result.failure_stage = StageName.REQUIREMENTS
         result.message = err_message
-        return result
+        return result, None
 
     success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
     if not success:
         result.failure_stage = StageName.ACTIVATION
         result.message = err_message
-        return result
+        return result, None
 
     result.status = UsageStatus.SUCCESS
 
-    # This is a placeholder for future. Heartbeat-based methods are not yet
-    # supported.
-    if heartbeat_call_time:
-        heartbeat = Heartbeat(method, heartbeat_call_time)
-        heartbeat.start()
+    if not heartbeat_call_time:
+        # Success, using just enter_mode(); no heartbeat()
+        return result, None
 
-    return result
+    heartbeat = Heartbeat(method, heartbeat_call_time)
+    heartbeat.start()
+
+    return result, heartbeat
 
 
 def get_platform_supported(method: Method, platform: PlatformName) -> bool:

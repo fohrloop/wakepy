@@ -3,8 +3,9 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activation import ActivationResult, activate, check_methods_priority
+from .activation import ActivationResult, activate
 from .calls import CallProcessor
+from .heartbeat import Heartbeat
 from .method import get_methods_for_mode, select_methods
 
 if typing.TYPE_CHECKING:
@@ -40,22 +41,27 @@ class ModeExit(Exception):
 class ModeController:
     def __init__(self, call_processor: CallProcessor):
         self.call_processor = call_processor
+        self.active_method: Method | None = None
+        self.heartbeat: Heartbeat | None = None
 
     def activate(
         self,
         method_classes: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
     ) -> ActivationResult:
-        # TODO: result, actice_method as output
-        result = activate(
+        result, active_method, heartbeat = activate(
             methods=method_classes,
             methods_priority=methods_priority,
             call_processor=self.call_processor,
         )
+        self.active_method = active_method
+        self.heartbeat = heartbeat
         return result
 
     def deactivate(self):
-        ...
+        # TODO: Call some deactivation function and stop heartbeat
+        self.active_method = None
+        self.heartbeat = None
 
 
 class Mode(ABC):
@@ -102,7 +108,6 @@ class Mode(ABC):
         dbus_adapter:
             For using a custom dbus-adapter. Optional.
         """
-        check_methods_priority(methods_priority, methods)
 
         self.methods_classes = methods
         self.methods_priority = methods_priority
