@@ -415,7 +415,7 @@ def get_prioritized_methods_groups(
         if item == asterisk:
             # Save the location where to add the rest of the methods ('*')
             asterisk_index = len(out)
-        elif isinstance(item, set):
+        else:  # Item is a set but not `asterisk`
             out.append({method_dct[name] for name in item})
 
     out_flattened = {m for group in out for m in group}
