@@ -32,7 +32,7 @@ def test_mode_contextmanager_protocol():
     with Mode() as m:
         ...
 
-    Test also that the ModeActivationManager.activate() and .deactivate()
+    Test also that the ModeController.activate() and .deactivate()
     are called as expected. and that the `m` is the return value of the
     manager.activate()
     """
