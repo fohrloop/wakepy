@@ -1,9 +1,14 @@
 from unittest.mock import Mock, call
 
 import pytest
+from testmethods import (
+    get_test_method_class,
+)
 
 from wakepy.core.calls import CallProcessor
 from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
+from wakepy.core.method import Method
+from wakepy.core.heartbeat import Heartbeat
 
 
 def mocks_for_test_mode():
@@ -152,3 +157,24 @@ def _assert_context_manager_used_correctly(mocks):
         call.controller_class().activate(mocks.methods, methods_priority=None),
         call.controller_class().deactivate(),
     ]
+
+
+def test_modecontroller():
+    method_cls = get_test_method_class(enter_mode=True, heartbeat=True, exit_mode=True)
+    controller = ModeController(Mock(spec_set=CallProcessor))
+
+    # When controller was created, it has not active method or heartbeat
+    assert controller.active_method is None
+    assert controller.heartbeat is None
+
+    controller.activate([method_cls])
+    assert isinstance(controller.active_method, method_cls)
+    assert isinstance(controller.heartbeat, Heartbeat)
+
+    retval = controller.deactivate()
+    assert retval is True
+    assert controller.active_method is None
+    assert controller.heartbeat is None
+
+    # Calling a deactivate for mode which is not activated will return False
+    assert controller.deactivate() is False
