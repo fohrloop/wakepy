@@ -6,5 +6,6 @@ This page contains more detailed explanation on how wakepy works.  You  *do not 
 :maxdepth: 3
 
 wakepy-mode-lifecycle
+test-manually
 ```
 
