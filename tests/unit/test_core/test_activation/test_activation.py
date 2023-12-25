@@ -23,21 +23,22 @@ from wakepy.core import MethodActivationResult
 from wakepy.core.activation import (
     StageName,
     UsageStatus,
-    activate,
-    activate_using,
+    activate_one_of_multiple,
+    activate_method,
     caniuse_fails,
+    deactivate_method,
     get_platform_supported,
     should_fake_success,
     try_enter_and_heartbeat,
 )
 from wakepy.core.calls import CallProcessor
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.method import Method, PlatformName, get_methods
+from wakepy.core.method import Method, MethodError, PlatformName, get_methods
 
 
 def test_activate_without_methods(monkeypatch):
     _arrange_for_test_activate(monkeypatch)
-    res, active_method, heartbeat = activate([], None)
+    res, active_method, heartbeat = activate_one_of_multiple([], None)
     assert res.get_details() == []
     assert res.success is False
     assert active_method is None
@@ -45,9 +46,9 @@ def test_activate_without_methods(monkeypatch):
 
 
 def test_activate_function_success(monkeypatch):
-    """Here we test the activate() function. It calls some other functions
-    which we do not care about as they're tested elsewhere. That is we why
-    monkeypatch those functions with fakes"""
+    """Here we test the activate_one_of_multiple() function. It calls some
+    other functions which we do not care about as they're tested elsewhere.
+    That is we why monkeypatch those functions with fakes"""
 
     # Arrange
     mocks = _arrange_for_test_activate(monkeypatch)
@@ -58,7 +59,7 @@ def test_activate_function_success(monkeypatch):
     # Note: prioritize the failing first, so that the failing one will also be
     # used. This also tests at that the prioritization is used at least
     # somehow
-    result, active_method, heartbeat = activate(
+    result, active_method, heartbeat = activate_one_of_multiple(
         [methodcls_success, methodcls_fail],
         call_processor=mocks.call_processor,
         methods_priority=[
@@ -89,7 +90,7 @@ def test_activate_function_failure(monkeypatch):
     methodcls_fail = get_test_method_class(enter_mode=False)
 
     # Act
-    result, active_method, heartbeat = activate(
+    result, active_method, heartbeat = activate_one_of_multiple(
         [methodcls_fail],
         call_processor=mocks.call_processor,
     )
@@ -102,12 +103,14 @@ def test_activate_function_failure(monkeypatch):
 
 
 def _arrange_for_test_activate(monkeypatch):
-    """This is the test arrangement step for tests for the `activate` function"""
+    """This is the test arrangement step for tests for the
+    `activate_one_of_multiple` function"""
+
     mocks = Mock()
     mocks.heartbeat = Mock(spec_set=Heartbeat)
     mocks.call_processor = Mock(spec_set=CallProcessor)
 
-    def fake_activate_using(method):
+    def fake_activate_method(method):
         success = method.enter_mode()
         return (
             MethodActivationResult(
@@ -118,7 +121,7 @@ def _arrange_for_test_activate(monkeypatch):
             mocks.heartbeat,
         )
 
-    monkeypatch.setattr("wakepy.core.activation.activate_using", fake_activate_using)
+    monkeypatch.setattr("wakepy.core.activation.activate_method", fake_activate_method)
     monkeypatch.setattr(
         "wakepy.core.activation.check_methods_priority", mocks.check_methods_priority
     )
@@ -126,7 +129,7 @@ def _arrange_for_test_activate(monkeypatch):
     return mocks
 
 
-def test_activate_using_method_without_name():
+def test_activate_method_method_without_name():
     """Methods used for activation must have a name. If not, there should be
     a ValueError raised"""
 
@@ -135,10 +138,10 @@ def test_activate_using_method_without_name():
         ValueError,
         match=re.escape("Methods without a name may not be used to activate modes!"),
     ):
-        activate_using(method)
+        activate_method(method)
 
 
-def test_activate_using_method_without_platform_support(monkeypatch):
+def test_activate_method_method_without_platform_support(monkeypatch):
     WindowsMethod = get_test_method_class(
         supported_platforms=(PlatformName.WINDOWS,),
     )
@@ -148,16 +151,16 @@ def test_activate_using_method_without_platform_support(monkeypatch):
 
     # The current platform is set to linux, so method supporting only linux
     # should fail.
-    res, heartbeat = activate_using(winmethod)
+    res, heartbeat = activate_method(winmethod)
     assert res.failure_stage == StageName.PLATFORM_SUPPORT
     assert res.status == UsageStatus.FAIL
     assert heartbeat is None
 
 
-def test_activate_using_method_caniuse_fails():
+def test_activate_method_method_caniuse_fails():
     # Case 1: Fail by returning False from caniuse
     method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
-    res, heartbeat = activate_using(method)
+    res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.FAIL
     assert res.failure_stage == StageName.REQUIREMENTS
     assert res.message == ""
@@ -167,26 +170,26 @@ def test_activate_using_method_caniuse_fails():
     method = get_test_method_class(
         caniuse="SomeSW version <2.1.5 not supported", enter_mode=True, exit_mode=True
     )()
-    res, heartbeat = activate_using(method)
+    res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.FAIL
     assert res.failure_stage == StageName.REQUIREMENTS
     assert res.message == "SomeSW version <2.1.5 not supported"
     assert heartbeat is None
 
 
-def test_activate_using_method_enter_mode_fails():
+def test_activate_method_method_enter_mode_fails():
     # Case: Fail by returning False from enter_mode
     method = get_test_method_class(caniuse=True, enter_mode=False)()
-    res, heartbeat = activate_using(method)
+    res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.FAIL
     assert res.failure_stage == StageName.ACTIVATION
     assert res.message == ""
     assert heartbeat is None
 
 
-def test_activate_using_enter_mode_success():
+def test_activate_method_enter_mode_success():
     method = get_test_method_class(caniuse=True, enter_mode=True)()
-    res, heartbeat = activate_using(method)
+    res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.SUCCESS
     assert res.failure_stage is None
     assert res.message == ""
@@ -194,9 +197,9 @@ def test_activate_using_enter_mode_success():
     assert heartbeat is None
 
 
-def test_activate_using_heartbeat_success():
+def test_activate_method_heartbeat_success():
     method = get_test_method_class(heartbeat=True)()
-    res, heartbeat = activate_using(method)
+    res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.SUCCESS
     assert res.failure_stage is None
     assert res.message == ""
@@ -523,6 +526,67 @@ def test_method_usage_result(
     assert mur.message == message
 
     assert str(mur) == expected_string_representation
+
+
+def test_deactivate_success_no_heartbeat():
+    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    deactivate_method(method)
+
+
+def test_deactivate_success_with_heartbeat():
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = True
+    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    deactivate_method(method, heartbeat=heartbeat)
+
+
+def test_deactivate_success_with_heartbeat_and_no_exit():
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = True
+    method = get_test_method_class(enter_mode=True)()
+    deactivate_method(method, heartbeat=heartbeat)
+
+
+def test_deactivate_fail_exit_mode_returning_bad_value():
+    method = get_test_method_class(enter_mode=True, exit_mode=123)()
+    with pytest.raises(
+        MethodError,
+        match=re.escape(
+            f"The exit_mode of {method.__class__.__name__} ({method.name}) returned a "
+            "value of unsupported type. The supported types are: bool, str. "
+            "Returned value: 123"
+        ),
+    ):
+        deactivate_method(method)
+
+
+def test_deactivate_fail_exit_mode_returning_string():
+    method = get_test_method_class(enter_mode=True, exit_mode="oh no")()
+    with pytest.raises(
+        MethodError,
+        match=re.escape(
+            f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+            "unsuccessful"
+        )
+        + ".*"
+        + re.escape("Returned value: oh no"),
+    ):
+        deactivate_method(method)
+
+
+def test_deactivate_fail_heartbeat_not_stopping():
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = "Bad value"
+    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    with pytest.raises(
+        MethodError,
+        match=re.escape(
+            f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
+            "be stopped! Suggesting submitting a bug report and rebooting for clearing "
+            "the mode."
+        ),
+    ):
+        deactivate_method(method, heartbeat)
 
 
 def test_stagename():

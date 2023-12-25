@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activation import ActivationResult, activate
+from .activation import ActivationResult, activate_one_of_multiple
 from .calls import CallProcessor
 from .heartbeat import Heartbeat
 from .method import get_methods_for_mode, select_methods
@@ -49,7 +49,7 @@ class ModeController:
         method_classes: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
     ) -> ActivationResult:
-        result, active_method, heartbeat = activate(
+        result, active_method, heartbeat = activate_one_of_multiple(
             methods=method_classes,
             methods_priority=methods_priority,
             call_processor=self.call_processor,

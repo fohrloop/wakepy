@@ -3,7 +3,7 @@ deactivation of Modes (using Methods).
 
 Most important functions
 ------------------------
-activate_using(method:Method) -> MethodActivationResult
+activate_method(method:Method) -> MethodActivationResult
     Activate a mode using a single Method 
 get_prioritized_methods
     Prioritize of collection of Methods
@@ -243,7 +243,7 @@ class MethodActivationResult:
         return f"({self.status}{error_at}, {self.method_name}{message_part})"
 
 
-def activate(
+def activate_one_of_multiple(
     methods: list[Type[Method]],
     call_processor: CallProcessor,
     methods_priority: Optional[MethodsPriorityOrder] = None,
@@ -277,7 +277,7 @@ def activate(
 
     for methodcls in prioritized_methods:
         method = methodcls(call_processor=call_processor)
-        methodresult, heartbeat = activate_using(method)
+        methodresult, heartbeat = activate_method(method)
         results.append(methodresult)
         if methodresult.status == UsageStatus.SUCCESS:
             break
@@ -508,8 +508,8 @@ def get_prioritized_methods(
     return [method for group in ordered_groups for method in group]
 
 
-def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
-    """Activates a mode defined by a Method.
+def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
+    """Activates a mode defined by a single Method.
 
     Returns
     -------
@@ -550,6 +550,43 @@ def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | 
     heartbeat.start()
 
     return result, heartbeat
+
+
+def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> None:
+    """Deactivates a mode defined by the `method`.
+
+    Raises
+    ------
+    MethodError (RuntimeError), if the deactivation was not successful.
+    """
+
+    heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
+
+    if method.has_exit:
+        retval = method.exit_mode()
+        if not isinstance(retval, (bool, str)):
+            raise MethodError(
+                f"The exit_mode of {method.__class__.__name__} ({method.name}) "
+                "returned a value of unsupported type. The supported types are: "
+                f"bool, str. Returned value: {retval}"
+            )
+        if isinstance(retval, str) or retval is False:
+            raise MethodError(
+                f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+                "unsuccessful! This should never happen, and could mean that the "
+                "implementation has a bug. Entering the mode has been successful, and "
+                "since exiting was not, your system might stil be in the mode defined "
+                f"by the '{method.__class__.__name__}', or not.  Suggesting submitting "
+                f"a bug report and rebooting for clearing the mode. "
+                f"Returned value: {retval}"
+            )
+
+    if heartbeat_stopped is not True:
+        raise MethodError(
+            f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
+            "be stopped! Suggesting submitting a bug report and rebooting for "
+            "clearing the mode. "
+        )
 
 
 def get_platform_supported(method: Method, platform: PlatformName) -> bool:
