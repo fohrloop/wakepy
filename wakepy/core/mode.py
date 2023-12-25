@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activation import ActivationResult, activate_one_of_multiple
+from .activation import ActivationResult, activate_one_of_multiple, deactivate_method
 from .calls import CallProcessor
 from .heartbeat import Heartbeat
 from .method import get_methods_for_mode, select_methods
@@ -49,6 +49,10 @@ class ModeController:
         method_classes: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
     ) -> ActivationResult:
+        """Activates the mode with one of the methods in the input method
+        classes. The methods are used with descending priority; highest
+        priority first.
+        """
         result, active_method, heartbeat = activate_one_of_multiple(
             methods=method_classes,
             methods_priority=methods_priority,
@@ -58,10 +62,28 @@ class ModeController:
         self.heartbeat = heartbeat
         return result
 
-    def deactivate(self):
-        # TODO: Call some deactivation function and stop heartbeat
+    def deactivate(self) -> bool:
+        """Deactivates the active mode, defined by the active Method, if any.
+        If there was no active method, does nothing.
+
+        Returns
+        -------
+        deactivated:
+            If there was no active method, returns False (nothing was done).
+            If there was an active method, and it was deactivated, returns True
+
+        Raises
+        ------
+        MethodError (RuntimeError) if there was active method but an error
+        occurred when trying to deactivate it."""
+
+        if not self.active_method:
+            return False
+
+        deactivate_method(self.active_method, self.heartbeat)
         self.active_method = None
         self.heartbeat = None
+        return True
 
 
 class Mode(ABC):
