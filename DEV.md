@@ -5,10 +5,10 @@ This document serves as documentation for the package developers.
 ## Branches and tags
 
 
-- `main` branch: for development. All PRs should be against it. 
-- `latest-release` branch: The latest wakepy release. This is used to select the where [wakepy.readthedocs.io](https://wakepy.readthedocs.io/) redirects to (the "latest" version). 
+- **`dev`** branch: for development. All PRs should be against it.
+- **`latest-release`** branch: The latest wakepy release. This is used to select the where [wakepy.readthedocs.io](https://wakepy.readthedocs.io/) redirects to (the "latest" version). 
 - Use a local short-lived feature branch for development.
-- Release versions use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the main branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
+- Release versions use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the dev branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
 
 
 ## Installing for development
