@@ -24,16 +24,16 @@ from wakepy.core.activation import (
     StageName,
     UsageStatus,
     activate,
-    deactivate,
     activate_using,
     caniuse_fails,
+    deactivate,
     get_platform_supported,
     should_fake_success,
     try_enter_and_heartbeat,
 )
 from wakepy.core.calls import CallProcessor
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.method import Method, PlatformName, get_methods
+from wakepy.core.method import Method, MethodError, PlatformName, get_methods
 
 
 def test_activate_without_methods(monkeypatch):
@@ -536,6 +536,55 @@ def test_deactivate_success_with_heartbeat():
     heartbeat.stop.return_value = True
     method = get_test_method_class(enter_mode=True, exit_mode=True)()
     deactivate(method, heartbeat=heartbeat)
+
+
+def test_deactivate_success_with_heartbeat_and_no_exit():
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = True
+    method = get_test_method_class(enter_mode=True)()
+    deactivate(method, heartbeat=heartbeat)
+
+
+def test_deactivate_fail_exit_mode_returning_bad_value():
+    method = get_test_method_class(enter_mode=True, exit_mode=123)()
+    with pytest.raises(
+        MethodError,
+        match=re.escape(
+            f"The exit_mode of {method.__class__.__name__} ({method.name}) returned a "
+            "value of unsupported type. The supported types are: bool, str. "
+            "Returned value: 123"
+        ),
+    ):
+        deactivate(method)
+
+
+def test_deactivate_fail_exit_mode_returning_string():
+    method = get_test_method_class(enter_mode=True, exit_mode="oh no")()
+    with pytest.raises(
+        MethodError,
+        match=re.escape(
+            f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+            "unsuccessful"
+        )
+        + ".*"
+        + re.escape("Returned value: oh no"),
+    ):
+        deactivate(method)
+
+
+def test_deactivate_fail_heartbeat_not_stopping():
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = "Bad value"
+    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    with pytest.raises(
+        MethodError,
+        match=re.escape(
+            f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
+            "be stopped! Suggesting submitting a bug report and rebooting for clearing "
+            "the mode."
+        ),
+    ):
+        deactivate(method, heartbeat)
 
 
 def test_stagename():

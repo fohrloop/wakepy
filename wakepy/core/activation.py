@@ -566,25 +566,25 @@ def deactivate(method: Method, heartbeat: Optional[Heartbeat] = None) -> None:
         retval = method.exit_mode()
         if not isinstance(retval, (bool, str)):
             raise MethodError(
-                f"The exit_mode of {method.__class__.__name__} ({method.name}) returned a"
-                " value of unsupported type. The supported types are: bool, str."
-                f" Returned value: {retval}"
+                f"The exit_mode of {method.__class__.__name__} ({method.name}) "
+                "returned a value of unsupported type. The supported types are: "
+                f"bool, str. Returned value: {retval}"
             )
-        if isinstance(retval, str) or retval == False:
+        if isinstance(retval, str) or retval is False:
             raise MethodError(
                 f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
                 "unsuccessful! This should never happen, and could mean that the "
                 "implementation has a bug. Entering the mode has been successful, and "
-                "since exiting was not, your system might stil be in the mode defined by "
-                f"the '{method.__class__.__name__}', or not.  Suggesting submitting "
+                "since exiting was not, your system might stil be in the mode defined "
+                f"by the '{method.__class__.__name__}', or not.  Suggesting submitting "
                 f"a bug report and rebooting for clearing the mode. "
                 f"Returned value: {retval}"
             )
 
-    if not heartbeat_stopped:
+    if heartbeat_stopped is not True:
         raise MethodError(
             f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
-            " be stopped! Suggesting submitting a bug report and rebooting for "
+            "be stopped! Suggesting submitting a bug report and rebooting for "
             "clearing the mode. "
         )
 
