@@ -3,7 +3,7 @@ deactivation of Modes (using Methods).
 
 Most important functions
 ------------------------
-activate_using(method:Method) -> MethodActivationResult
+activate_method(method:Method) -> MethodActivationResult
     Activate a mode using a single Method 
 get_prioritized_methods
     Prioritize of collection of Methods
@@ -243,7 +243,7 @@ class MethodActivationResult:
         return f"({self.status}{error_at}, {self.method_name}{message_part})"
 
 
-def activate(
+def activate_one_of_multiple(
     methods: list[Type[Method]],
     call_processor: CallProcessor,
     methods_priority: Optional[MethodsPriorityOrder] = None,
@@ -277,7 +277,7 @@ def activate(
 
     for methodcls in prioritized_methods:
         method = methodcls(call_processor=call_processor)
-        methodresult, heartbeat = activate_using(method)
+        methodresult, heartbeat = activate_method(method)
         results.append(methodresult)
         if methodresult.status == UsageStatus.SUCCESS:
             break
@@ -508,8 +508,8 @@ def get_prioritized_methods(
     return [method for group in ordered_groups for method in group]
 
 
-def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
-    """Activates a mode defined by a Method.
+def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
+    """Activates a mode defined by a single Method.
 
     Returns
     -------
@@ -552,7 +552,7 @@ def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | 
     return result, heartbeat
 
 
-def deactivate(method: Method, heartbeat: Optional[Heartbeat] = None) -> None:
+def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> None:
     """Deactivates a mode defined by the `method`.
 
     Raises
