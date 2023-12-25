@@ -24,6 +24,7 @@ from wakepy.core.activation import (
     StageName,
     UsageStatus,
     activate,
+    deactivate,
     activate_using,
     caniuse_fails,
     get_platform_supported,
@@ -523,6 +524,18 @@ def test_method_usage_result(
     assert mur.message == message
 
     assert str(mur) == expected_string_representation
+
+
+def test_deactivate_success_no_heartbeat():
+    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    deactivate(method)
+
+
+def test_deactivate_success_with_heartbeat():
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = True
+    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    deactivate(method, heartbeat=heartbeat)
 
 
 def test_stagename():

@@ -17,5 +17,8 @@ class Heartbeat:
         self.method = method
         self.prev_call = heartbeat_call_time
 
-    def start(self):
+    def start(self) -> bool:
+        ...
+
+    def stop(self) -> bool:
         ...

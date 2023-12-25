@@ -552,6 +552,43 @@ def activate_using(method: Method) -> Tuple[MethodActivationResult, Heartbeat | 
     return result, heartbeat
 
 
+def deactivate(method: Method, heartbeat: Optional[Heartbeat] = None) -> None:
+    """Deactivates a mode defined by the `method`.
+
+    Raises
+    ------
+    MethodError (RuntimeError), if the deactivation was not successful.
+    """
+
+    heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
+
+    if method.has_exit:
+        retval = method.exit_mode()
+        if not isinstance(retval, (bool, str)):
+            raise MethodError(
+                f"The exit_mode of {method.__class__.__name__} ({method.name}) returned a"
+                " value of unsupported type. The supported types are: bool, str."
+                f" Returned value: {retval}"
+            )
+        if isinstance(retval, str) or retval == False:
+            raise MethodError(
+                f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+                "unsuccessful! This should never happen, and could mean that the "
+                "implementation has a bug. Entering the mode has been successful, and "
+                "since exiting was not, your system might stil be in the mode defined by "
+                f"the '{method.__class__.__name__}', or not.  Suggesting submitting "
+                f"a bug report and rebooting for clearing the mode. "
+                f"Returned value: {retval}"
+            )
+
+    if not heartbeat_stopped:
+        raise MethodError(
+            f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
+            " be stopped! Suggesting submitting a bug report and rebooting for "
+            "clearing the mode. "
+        )
+
+
 def get_platform_supported(method: Method, platform: PlatformName) -> bool:
     """Checks if method is supported by the platform
 
