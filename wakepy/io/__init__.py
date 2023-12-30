@@ -1,6 +1,7 @@
-"""This sub-package contains the parts of wakepy which do I/O;
+"""This sub-package contains most[1] of the parts of wakepy which do I/O;
 
 * Implementation of dbus adapters
 
-Everything else is wakepy is IO-free (sans I/O).
+[1] There are some environment variable checks and reading of the platform
+version in the core. 
 """

@@ -84,7 +84,7 @@ def test_gnome(method_cls, flag):
     # Nothing yet set
     assert method.inhibit_cookie is None
 
-    # cannot exit yet as have not entereds
+    # cannot exit yet as have not entered
     with pytest.raises(ValueError):
         method.exit_mode()
 
