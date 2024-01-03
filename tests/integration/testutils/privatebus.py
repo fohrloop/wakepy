@@ -9,6 +9,8 @@ class PrivateSessionBus:
 
     It is listed as `PrivateSessionBus._start_cmd`  (e.g. "dbus-daemon
     --session --print-address")
+
+    See: https://dbus.freedesktop.org/doc/dbus-daemon.1.html
     """
 
     _start_cmd = "dbus-daemon --session --print-address"
@@ -17,13 +19,15 @@ class PrivateSessionBus:
         self.p: subprocess.Popen | None = None
         self.bus_address: str | None = None
 
-    def start(self):
+    def start(self) -> str:
         if self.p:
             raise Exception("dbus-daemon already running!")
-        cmd_args = self._start_cmd.split()
 
         self.p = subprocess.Popen(
-            cmd_args, stdout=subprocess.PIPE, shell=False, env={"DBUS_VERBOSE": "1"}
+            self._start_cmd.split(),
+            stdout=subprocess.PIPE,
+            shell=False,
+            env={"DBUS_VERBOSE": "1"},
         )
 
         self.bus_address = self.p.stdout.readline().decode("utf-8").strip()
