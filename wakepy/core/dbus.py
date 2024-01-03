@@ -159,11 +159,6 @@ class DbusMethod(NamedTuple):
         )
 
 
-class DbusPythonProxyCreationError(Exception):
-    """Raised when trying to create a python callable from DBusMethodSpec, but
-    that fails completely."""
-
-
 class DbusAdapter:
     def process(self, call: DbusMethodCall):
         ...
