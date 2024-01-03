@@ -1,6 +1,3 @@
-"""The tests in this folder test the D-Bus functionality. A real message bus 
-is created with dbus-daemon in a subprocess."""
-
 import logging
 import multiprocessing as mp
 
