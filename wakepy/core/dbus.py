@@ -174,5 +174,5 @@ class DbusAdapter:
     Exception will be omitted if using the high-level API of wakepy.
     """
 
-    def create_connection(self):
+    def process(self, call: DbusMethodCall):
         ...
