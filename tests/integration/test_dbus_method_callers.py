@@ -2,6 +2,8 @@ from jeepney import DBusAddress, MessageType, new_method_call
 from jeepney.io.blocking import open_dbus_connection
 
 
+# TODO: Replace this with tests for DbusAdapter. The only reason to use
+# a fake Dbus service on a private session bus is to test DbusAdapters.
 def test_session_manager(private_bus):
     addr = DBusAddress(
         object_path="/org/github/wakepy/TestManager",
