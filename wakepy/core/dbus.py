@@ -11,6 +11,12 @@ if typing.TYPE_CHECKING:
     from .calls import DbusMethodCall
 
 
+DbusAdapterSeq = typing.Union[List["DbusAdapter"], Tuple["DbusAdapter", ...]]
+DbusAdapterTypeSeq = typing.Union[
+    List[Type["DbusAdapter"]], Tuple[Type["DbusAdapter"], ...]
+]
+
+
 class DbusAddress(NamedTuple):
     """The dbus object and interface specification. This uniquelly defines the
     interface to connect with."""
@@ -164,9 +170,3 @@ class DbusAdapter:
 
     def create_connection(self):
         ...
-
-
-DbusAdapterSeq = typing.Union[List[DbusAdapter], Tuple[DbusAdapter, ...]]
-DbusAdapterTypeSeq = typing.Union[
-    List[Type[DbusAdapter]], Tuple[Type[DbusAdapter], ...]
-]
