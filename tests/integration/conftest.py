@@ -32,18 +32,7 @@ def private_bus() -> str:
     bus.stop()
 
 
-class SessionManager(DbusService):
-    ...
-
-
-def start_service(service_cls, bus_address, server_name, object_path, queue):
-    service = service_cls(bus_address, queue)
-    service.start(
-        server_name=server_name,
-        object_path=object_path,
-    )
-
-
+# TODO: Make this better somehow?
 @pytest.fixture(scope="package", autouse=True)
 def dbus_service(private_bus):
     """The DBus adapters are tested against a real DBus service using a private
@@ -52,11 +41,18 @@ def dbus_service(private_bus):
     """
     logger.info("Initializing dbus_services")
 
+    def start_service(service_cls, bus_address, server_name, object_path, queue):
+        service = service_cls(bus_address, queue)
+        service.start(
+            server_name=server_name,
+            object_path=object_path,
+        )
+
     queue = mp.Queue()
     proc = mp.Process(
         target=start_service,
         kwargs=dict(
-            service_cls=SessionManager,
+            service_cls=DbusService,
             bus_address=private_bus,
             server_name="org.github.wakepy.TestManager",
             object_path="/org/github/wakepy/TestManager",
