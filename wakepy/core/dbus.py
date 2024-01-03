@@ -160,8 +160,19 @@ class DbusMethod(NamedTuple):
 
 
 class DbusAdapter:
-    def process(self, call: DbusMethodCall):
-        ...
+    """Defines the DbusAdapter interface. This is to be subclassed, and each
+    subclass is usually an implementation for a DbusAdapter using single
+    python (dbus-)library.
+
+    When subclassing, implement the .process(call) method. The call
+    (DbusMethodCall) tells which bus to use (session/system/custom addr), and
+    therefore the connection must be created within the .process() call (this
+    can of course be cached).
+
+    The __init__() should not take any arguments, and it may raise any subtype
+    of Exception, which simply means that the DbusAdapter may not be used. The
+    Exception will be omitted if using the high-level API of wakepy.
+    """
 
     def create_connection(self):
         ...
