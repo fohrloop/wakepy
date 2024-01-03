@@ -9,8 +9,19 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session", autouse=True)
-def private_bus():
-    """This is something that runs before any tests"""
+def private_bus() -> str:
+    """Creates a real, private session dbus message bus (dbus-daemon) instance
+    which can be used to test dbus adapters, instead of the default session
+    bus. Because it is an isolated throw-away bus (sandbox), commands in tests
+    may not change real system settings.
+
+    The created bus is visible and available for use globally in the system
+    (not just within the python process). You may see it for example with
+
+    ps -x | grep dbus-daemon | grep -v grep | grep dbus-daemon
+
+    As this is a pytest fixture, this runs before any tests."""
+
     bus = PrivateSessionBus()
     bus_address = bus.start()
     logger.info("Initiated private bus: %s", bus_address)
