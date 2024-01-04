@@ -15,19 +15,6 @@ session_manager = DbusAddress(
     interface="org.gnome.SessionManager",
 )
 
-method_inhibit = DbusMethod(
-    name="Inhibit",
-    signature="susu",
-    params=("app_id", "toplevel_xid", "reason", "flags"),
-    output_signature="u",
-    output_params=("inhibit_cookie",),
-).of(session_manager)
-
-method_uninhibit = DbusMethod(
-    name="UnInhibit",
-    signature="u",
-    params=("inhibit_cookie",),
-).of(session_manager)
 
 fake_cookie = 75848243423
 
@@ -40,6 +27,15 @@ fake_cookie = 75848243423
     ],
 )
 def test_gnome_enter_mode(method_cls, flag):
+    # Arrange
+    method_inhibit = DbusMethod(
+        name="Inhibit",
+        signature="susu",
+        params=("app_id", "toplevel_xid", "reason", "flags"),
+        output_signature="u",
+        output_params=("inhibit_cookie",),
+    ).of(session_manager)
+
     class TestAdapter(DbusAdapter):
         def process(self, call):
             assert call.method == method_inhibit
@@ -51,38 +47,51 @@ def test_gnome_enter_mode(method_cls, flag):
             }
             return fake_cookie
 
-    # Test the method
     method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
-
-    # Checks before tests: Nothing yet set
     assert method.inhibit_cookie is None
 
-    # cannot exit yet as have not entered
-    with pytest.raises(RuntimeError, match="Cannot exit before entering"):
-        method.exit_mode()
-
-    # This sets a inhibit_cookie to value returned by the DbusAdapter
+    # Act
     method.enter_mode()
+
+    # Assert
+    # Entering mode sets a inhibit_cookie to value returned by the DbusAdapter
     assert method.inhibit_cookie == fake_cookie
 
 
 @pytest.mark.parametrize(
-    "method_cls, flag",
-    [
-        (GnomeSessionManagerNoSuspend, GnomeFlag.INHIBIT_SUSPEND),
-        (GnomeSessionManagerNoIdle, GnomeFlag.INHIBIT_IDLE),
-    ],
+    "method_cls",
+    [GnomeSessionManagerNoSuspend, GnomeSessionManagerNoIdle],
 )
-def test_gnome_exit_mode(method_cls, flag):
+def test_gnome_exit_mode(method_cls):
+    # Arrange
+    method_uninhibit = DbusMethod(
+        name="UnInhibit",
+        signature="u",
+        params=("inhibit_cookie",),
+    ).of(session_manager)
+
     class TestAdapter(DbusAdapter):
         def process(self, call):
             assert call.method == method_uninhibit
             assert call.args == {"inhibit_cookie": fake_cookie}
 
-    # Test the method
     method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
     method.inhibit_cookie = fake_cookie
 
-    # exiting mode unsets the inhibit_cookie
+    # Act
     method.exit_mode()
+
+    # Assert
+    # exiting mode unsets the inhibit_cookie
     assert method.inhibit_cookie is None
+
+
+@pytest.mark.parametrize(
+    "method_cls",
+    [GnomeSessionManagerNoSuspend, GnomeSessionManagerNoIdle],
+)
+def test_gnome_exit_before_enter(method_cls):
+    method = method_cls(CallProcessor(dbus_adapter=DbusAdapter))
+    assert method.inhibit_cookie is None
+    with pytest.raises(RuntimeError, match="Cannot exit before entering"):
+        method.exit_mode()
