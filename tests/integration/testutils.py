@@ -1,15 +1,18 @@
-import multiprocessing as mp
+from __future__ import annotations
 
-from typing import Optional
+import time
+import typing
+from typing import Optional, Tuple
+
 from jeepney import HeaderFields, MessageType, new_error, new_method_return
 from jeepney.bus_messages import message_bus
 from jeepney.io.blocking import open_dbus_connection
 
+if typing.TYPE_CHECKING:
+    from wakepy.core import DbusAddress
+    import queue
+
 DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER = 1
-
-
-def test_simple_method_add(x: int, y: int):
-    return x + y
 
 
 class DbusService:
@@ -25,7 +28,9 @@ class DbusService:
         "org.gnome.SessionManager"
     """
 
-    def __init__(self, bus_address: str, queue: Optional[mp.Queue] = None):
+    addr: DbusAddress
+
+    def __init__(self, bus_address: str, queue_: queue.Queue, stop: typing.Callable):
         """
         Parameters
         ----------
@@ -38,7 +43,8 @@ class DbusService:
         self.bus_name: None | str = None
         self.object_path: None | str = None
         self._unique_name: None | str = None
-        self._queue = queue
+        self._queue = queue_
+        self._stop = stop
 
     def start(self, server_name: str, object_path: str):
         """
@@ -54,7 +60,8 @@ class DbusService:
         with open_dbus_connection(self.bus_address) as connection:
             self._unique_name = connection.unique_name
             self.reserve_bus_name(connection, bus_name=server_name)
-            while True:
+            while not self._stop():
+                time.sleep(0.01)
                 self.run_loop(connection)
 
     def reserve_bus_name(self, connection, bus_name):
@@ -87,18 +94,34 @@ class DbusService:
         )
 
     def run_loop(self, connection):
-        msg = connection.receive()
+        try:
+            msg = connection.receive(timeout=0)
+        except TimeoutError:
+            return
 
         if msg.header.message_type != MessageType.method_call:
             raise ValueError("Received non-method call message:", msg)
 
         method = msg.header.fields[HeaderFields.member]
 
-        # Dispatch to different methods
-        if method == "SimpleNumberAdd":
-            res = test_simple_method_add(msg.body[0], msg.body[1])
-            rep = new_method_return(msg, "i", (res,))
-        else:
+        out = self.handle_method(method, args=msg.body)
+
+        if out is None:
             rep = new_error(msg, self.bus_name + ".Error.NoMethod")
 
+        else:
+            output_signature, output = out
+            if not isinstance(output_signature, str) or not isinstance(output, tuple):
+                raise ValueError(
+                    "The output of handle_method must be Tuple[str, Tuple]!"
+                )
+
+            rep = new_method_return(msg, output_signature, output)
+
         connection.send_message(rep)
+
+    def handle_method(self, method: str, args: Tuple) -> Optional[Tuple[str, Tuple]]:
+        """Should return either None (when method does not exist), or tuple of
+        output signature (like "ii" or "sus", etc.), and output values which
+        are of the type defined by the output signature
+        """
