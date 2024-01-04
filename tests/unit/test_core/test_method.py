@@ -245,3 +245,19 @@ def test_register_method(monkeypatch):
     register_method(MethodA)
 
     assert get_method("A") is MethodA
+
+
+def test_method_defaults():
+    """tests the Method enter_mode, exit_mode and heartbeat defaults"""
+    m = Method()
+    assert m.enter_mode() is True
+    assert m.heartbeat() is True
+    assert m.exit_mode() is True
+
+
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_method_string_representations():
+    MethodB = get_method("B")
+    method = MethodB()
+    assert method.__str__() == "<wakepy Method: MethodB>"
+    assert method.__repr__() == f"<wakepy Method: MethodB at {hex(id(method))}>"
