@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 calculator_service_addr = DbusAddress(
     bus=BusType.SESSION,
-    service="org.github.wakepy.CalculatorService",
-    path="/org/github/wakepy/CalculatorService",
-    interface="org.github.wakepy.CalculatorService",  # TODO: simplify
+    service="org.github.wakepy.TestCalculatorService",
+    path="/org/github/wakepy/TestCalculatorService",
+    interface="org.github.wakepy.TestCalculatorService",  # TODO: simplify
 )
 
 _numberadd_method = DbusMethod(
@@ -38,7 +38,7 @@ _numbermultiply_method = DbusMethod(
 ).of(calculator_service_addr)
 
 
-class CalculatorService(DbusService):
+class TestCalculatorService(DbusService):
     addr = calculator_service_addr
 
     def handle_method(self, method: str, args):
@@ -52,9 +52,9 @@ class CalculatorService(DbusService):
 
 string_operation_service_addr = DbusAddress(
     bus=BusType.SESSION,
-    service="org.github.wakepy.StringOperationService",
-    path="/org/github/wakepy/StringOperationService",
-    interface="org.github.wakepy.StringOperationService",  # TODO: simplify
+    service="org.github.wakepy.TestStringOperationService",
+    path="/org/github/wakepy/TestStringOperationService",
+    interface="org.github.wakepy.TestStringOperationService",  # TODO: simplify
 )
 
 _string_shorten_method = DbusMethod(
@@ -66,7 +66,7 @@ _string_shorten_method = DbusMethod(
 ).of(string_operation_service_addr)
 
 
-class StringOperationService(DbusService):
+class TestStringOperationService(DbusService):
     addr = string_operation_service_addr
 
     def handle_method(self, method: str, args):
@@ -100,16 +100,16 @@ def string_shorten_method():
 
 @pytest.fixture(scope="session")
 def dbus_calculator_service():
-    """Provides a Dbus service called org.github.wakepy.CalculatorService
+    """Provides a Dbus service called org.github.wakepy.TestCalculatorService
     in the session bus"""
-    yield from _dbus_service(CalculatorService)
+    yield from _dbus_service(TestCalculatorService)
 
 
 @pytest.fixture(scope="session")
 def dbus_string_operation_service():
-    """Provides a Dbus service called org.github.wakepy.StringOperationService
+    """Provides a Dbus service called org.github.wakepy.TestStringOperationService
     in the session bus"""
-    yield from _dbus_service(StringOperationService)
+    yield from _dbus_service(TestStringOperationService)
 
 
 def _dbus_service(service_cls: Type[DbusService]):
