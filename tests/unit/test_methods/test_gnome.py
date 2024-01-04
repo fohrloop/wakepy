@@ -1,3 +1,9 @@
+"""This module tests the GNOME specific methods. 
+
+These tests do *not* use IO / real or fake Dbus calls. Instead, a special dbus
+adapter is used which simply asserts the Call objects and returns what we
+would expect from a dbus service."""
+
 import pytest
 
 from wakepy.core import BusType, CallProcessor, DbusAddress, DbusMethod
