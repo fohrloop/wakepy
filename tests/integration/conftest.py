@@ -30,8 +30,8 @@ def dbus_service():
         target=start_service,
         kwargs=dict(
             service_cls=DbusService,
-            server_name="org.github.wakepy.TestManager",
-            object_path="/org/github/wakepy/TestManager",
+            server_name="org.github.wakepy.CalculatorService",
+            object_path="/org/github/wakepy/CalculatorService",
             queue=queue,
         ),
     )

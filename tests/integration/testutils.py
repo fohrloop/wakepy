@@ -95,7 +95,7 @@ class DbusService:
         method = msg.header.fields[HeaderFields.member]
 
         # Dispatch to different methods
-        if method == "TestSimpleNumberAdd":
+        if method == "SimpleNumberAdd":
             res = test_simple_method_add(msg.body[0], msg.body[1])
             rep = new_method_return(msg, "i", (res,))
         else:

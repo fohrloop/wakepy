@@ -20,4 +20,4 @@ numberadd_method = DbusMethod(
 def test_jeepney_dbus_adapter():
     adapter = JeepneyDbusAdapter()
     call = DbusMethodCall(numberadd_method, (2, 3))
-    assert adapter.process(call) == 5
+    assert adapter.process(call) == (5,)
