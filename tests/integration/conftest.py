@@ -52,6 +52,39 @@ class CalculatorService(DbusService):
             return _numbermultiply_method.output_signature, (res,)
 
 
+string_operation_service_addr = DbusAddress(
+    bus=BusType.SESSION,
+    service="org.github.wakepy.StringOperationService",
+    path="/org/github/wakepy/StringOperationService",
+    interface="org.github.wakepy.StringOperationService",  # TODO: simplify
+)
+
+_string_shorten_method = DbusMethod(
+    name="ShortenToNChars",
+    signature="su",
+    params=("the_string", "max_chars"),
+    output_signature="su",
+    output_params=("shortened_string", "n_removed_chars"),
+).of(string_operation_service_addr)
+
+
+class StringOperationService(DbusService):
+    addr = string_operation_service_addr
+
+    def handle_method(self, method: str, args):
+        if method == _string_shorten_method.name:
+            string, max_chars = args[0], args[1]
+            shortened_string = string[:max_chars]
+            if len(shortened_string) < len(string):
+                n_removed = len(string) - len(shortened_string)
+            else:
+                n_removed = 0
+            return _string_shorten_method.output_signature, (
+                shortened_string,
+                n_removed,
+            )
+
+
 @pytest.fixture(scope="session")
 def numberadd_method():
     return _numberadd_method
@@ -63,7 +96,24 @@ def numbermultiply_method():
 
 
 @pytest.fixture(scope="session")
+def string_shorten_method():
+    return _string_shorten_method
+
+
+@pytest.fixture(scope="session")
 def dbus_calculator_service():
+    yield from _dbus_service(CalculatorService)
+
+
+@pytest.fixture(scope="session")
+def dbus_string_operation_service():
+    yield from _dbus_service(StringOperationService)
+
+
+def _dbus_service(service_cls: Type[DbusService]):
+    queue_ = queue.Queue()
+    should_stop = False
+
     def start_service(
         service: Type[DbusService], queue_: queue.Queue, should_stop: Callable
     ):
@@ -75,12 +125,10 @@ def dbus_calculator_service():
             object_path=service.addr.path,
         )
 
-    queue_ = queue.Queue()
-    should_stop = False
     th = threading.Thread(
         target=start_service,
         kwargs=dict(
-            service=CalculatorService, queue_=queue_, should_stop=lambda: should_stop
+            service=service_cls, queue_=queue_, should_stop=lambda: should_stop
         ),
         daemon=True,
     )
@@ -91,13 +139,13 @@ def dbus_calculator_service():
     # service, which will make the test fail randomly (but rarely) for no
     # apparent reason
     assert queue_.get(timeout=2) == "ready"
-    logger.info("Initialization of dbus_services ready")
+    logger.info(f"Initialization of {service_cls.addr.service} ready")
 
     yield
 
     should_stop = True
-    logger.info("Stopping dbus_services")
+    logger.info(f"Stopping {service_cls.addr.service}")
     th.join(1)
     if th.is_alive():
-        raise Exception("Service did not stop!")
-    logger.info("Stopped dbus_services")
+        raise Exception(f"Service {service_cls.addr.service} did not stop!")
+    logger.info(f"Stopped {service_cls.addr.service}")

@@ -73,8 +73,7 @@ class DbusService:
         RunTimeError if could not become the primary owner
         """
         reply = connection.send_and_get_reply(message_bus.RequestName(bus_name))
-        if self._queue:
-            self._queue.put("ready")
+        self._queue.put("ready")
 
         if reply.body[0] == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER:
             # The name had no existing owner, and the caller is now
@@ -108,15 +107,16 @@ class DbusService:
 
         if out is None:
             rep = new_error(msg, self.bus_name + ".Error.NoMethod")
-
-        else:
+        elif (
+            isinstance(out, tuple)
+            and len(out) == 2
+            and isinstance(out[0], str)
+            and isinstance(out[1], tuple)
+        ):
             output_signature, output = out
-            if not isinstance(output_signature, str) or not isinstance(output, tuple):
-                raise ValueError(
-                    "The output of handle_method must be Tuple[str, Tuple]!"
-                )
-
             rep = new_method_return(msg, output_signature, output)
+        else:
+            raise ValueError("The output of handle_method must be Tuple[str, Tuple]!")
 
         connection.send_message(rep)
 
