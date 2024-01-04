@@ -100,15 +100,21 @@ def string_shorten_method():
 
 @pytest.fixture(scope="session")
 def dbus_calculator_service():
+    """Provides a Dbus service called org.github.wakepy.CalculatorService
+    in the session bus"""
     yield from _dbus_service(CalculatorService)
 
 
 @pytest.fixture(scope="session")
 def dbus_string_operation_service():
+    """Provides a Dbus service called org.github.wakepy.StringOperationService
+    in the session bus"""
     yield from _dbus_service(StringOperationService)
 
 
 def _dbus_service(service_cls: Type[DbusService]):
+    """Start a Dbus Service in a separate thread."""
+
     queue_ = queue.Queue()
     should_stop = False
 
