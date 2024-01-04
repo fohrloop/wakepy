@@ -1,14 +1,11 @@
 from unittest.mock import Mock, call
 
 import pytest
-from testmethods import (
-    get_test_method_class,
-)
+from testmethods import get_test_method_class
 
 from wakepy.core.calls import CallProcessor
-from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
-from wakepy.core.method import Method
 from wakepy.core.heartbeat import Heartbeat
+from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
 
 
 def mocks_for_test_mode():
