@@ -1,3 +1,9 @@
+"""This module tests the GNOME specific methods. 
+
+These tests do *not* use IO / real or fake Dbus calls. Instead, a special dbus
+adapter is used which simply asserts the Call objects and returns what we
+would expect from a dbus service."""
+
 import pytest
 
 from wakepy.core import BusType, CallProcessor, DbusAddress, DbusMethod
@@ -15,49 +21,8 @@ session_manager = DbusAddress(
     interface="org.gnome.SessionManager",
 )
 
-method_inhibit = DbusMethod(
-    name="Inhibit",
-    signature="susu",
-    params=("app_id", "toplevel_xid", "reason", "flags"),
-    output_signature="u",
-    output_params=("inhibit_cookie",),
-).of(session_manager)
 
-method_uninhibit = DbusMethod(
-    name="UnInhibit",
-    signature="u",
-    params=("inhibit_cookie",),
-).of(session_manager)
-
-
-class DbusGnomeMockAdapter(DbusAdapter):
-    def __init__(self):
-        super().__init__()
-        self.__expected_inhibit_args = {
-            "app_id": "wakepy",
-            "toplevel_xid": 42,
-            "reason": "wakelock active",
-            "flags": self._flag,
-        }
-
-        self.__expected_uninhibit_args = {
-            "inhibit_cookie": self._cookie,
-        }
-
-    def process(self, call):
-        if call.method == method_inhibit:
-            return self.__process_inhibit(call)
-        elif call.method == method_uninhibit:
-            return self.__process_uninhibit(call)
-        raise Exception("should never happen")
-
-    def __process_inhibit(self, call):
-        assert call.args == self.__expected_inhibit_args
-        return self._cookie
-
-    def __process_uninhibit(self, call):
-        assert call.args == self.__expected_uninhibit_args
-        self._process_inhibit_called = True
+fake_cookie = 75848243423
 
 
 @pytest.mark.parametrize(
@@ -67,33 +32,72 @@ class DbusGnomeMockAdapter(DbusAdapter):
         (GnomeSessionManagerNoIdle, GnomeFlag.INHIBIT_IDLE),
     ],
 )
-def test_gnome(method_cls, flag):
-    # Setup a mock adapter
+def test_gnome_enter_mode(method_cls, flag):
+    # Arrange
+    method_inhibit = DbusMethod(
+        name="Inhibit",
+        signature="susu",
+        params=("app_id", "toplevel_xid", "reason", "flags"),
+        output_signature="u",
+        output_params=("inhibit_cookie",),
+    ).of(session_manager)
 
-    cookie = 75848243423
+    class TestAdapter(DbusAdapter):
+        def process(self, call):
+            assert call.method == method_inhibit
+            assert call.args == {
+                "app_id": "wakepy",
+                "toplevel_xid": 42,
+                "reason": "wakelock active",
+                "flags": flag,
+            }
+            return fake_cookie
 
-    class TestAdapter(DbusGnomeMockAdapter):
-        _flag = flag
-        _cookie = cookie
-
-    call_processor = CallProcessor(dbus_adapter=TestAdapter)
-    # Test the method
-    method = method_cls(call_processor)
-
-    # Checks before tests
-    # Nothing yet set
+    method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
     assert method.inhibit_cookie is None
 
-    # cannot exit yet as have not entered
-    with pytest.raises(ValueError):
-        method.exit_mode()
-
-    # 1) Test enter_mode
-    # This sets a inhibit_cookie
+    # Act
     method.enter_mode()
-    assert method.inhibit_cookie == cookie
 
-    # 2) Test exit_mode
+    # Assert
+    # Entering mode sets a inhibit_cookie to value returned by the DbusAdapter
+    assert method.inhibit_cookie == fake_cookie
+
+
+@pytest.mark.parametrize(
+    "method_cls",
+    [GnomeSessionManagerNoSuspend, GnomeSessionManagerNoIdle],
+)
+def test_gnome_exit_mode(method_cls):
+    # Arrange
+    method_uninhibit = DbusMethod(
+        name="UnInhibit",
+        signature="u",
+        params=("inhibit_cookie",),
+    ).of(session_manager)
+
+    class TestAdapter(DbusAdapter):
+        def process(self, call):
+            assert call.method == method_uninhibit
+            assert call.args == {"inhibit_cookie": fake_cookie}
+
+    method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
+    method.inhibit_cookie = fake_cookie
+
+    # Act
     method.exit_mode()
-    assert call_processor.dbus_adapter._process_inhibit_called
+
+    # Assert
+    # exiting mode unsets the inhibit_cookie
     assert method.inhibit_cookie is None
+
+
+@pytest.mark.parametrize(
+    "method_cls",
+    [GnomeSessionManagerNoSuspend, GnomeSessionManagerNoIdle],
+)
+def test_gnome_exit_before_enter(method_cls):
+    method = method_cls(CallProcessor(dbus_adapter=DbusAdapter))
+    assert method.inhibit_cookie is None
+    with pytest.raises(RuntimeError, match="Cannot exit before entering"):
+        method.exit_mode()

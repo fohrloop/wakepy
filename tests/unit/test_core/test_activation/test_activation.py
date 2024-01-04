@@ -23,8 +23,8 @@ from wakepy.core import MethodActivationResult
 from wakepy.core.activation import (
     StageName,
     UsageStatus,
-    activate_one_of_multiple,
     activate_method,
+    activate_one_of_multiple,
     caniuse_fails,
     deactivate_method,
     get_platform_supported,

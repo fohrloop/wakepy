@@ -1,18 +1,31 @@
-import multiprocessing as mp
+from __future__ import annotations
+
+import time
+import typing
+from typing import Optional, Tuple
 
 from jeepney import HeaderFields, MessageType, new_error, new_method_return
 from jeepney.bus_messages import message_bus
 from jeepney.io.blocking import open_dbus_connection
 
+if typing.TYPE_CHECKING:
+    import queue
+
+    from wakepy.core import DbusAddress
+
 DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER = 1
 
 
-def test_simple_method_add(x: int, y: int):
-    return x + y
-
-
 class DbusService:
-    """
+    """A class for defining Dbus services, which can be made available in a
+    bus. To define a dbus service, create a subclass and provide
+
+    (1) addr: DbusAddress
+        Where the dbus service is located at.
+    (2) handle_method
+        A function which handles dbus method calls. Use if statements for
+        defining what to do if the service provides multiple methods.
+
     Attributes
     ----------
     bus_address
@@ -24,7 +37,9 @@ class DbusService:
         "org.gnome.SessionManager"
     """
 
-    def __init__(self, bus_address: str, queue: "mp.Queue | None" = None):
+    addr: DbusAddress
+
+    def __init__(self, bus_address: str, queue_: queue.Queue, stop: typing.Callable):
         """
         Parameters
         ----------
@@ -37,7 +52,8 @@ class DbusService:
         self.bus_name: None | str = None
         self.object_path: None | str = None
         self._unique_name: None | str = None
-        self._queue = queue
+        self._queue = queue_
+        self._stop = stop
 
     def start(self, server_name: str, object_path: str):
         """
@@ -53,7 +69,8 @@ class DbusService:
         with open_dbus_connection(self.bus_address) as connection:
             self._unique_name = connection.unique_name
             self.reserve_bus_name(connection, bus_name=server_name)
-            while True:
+            while not self._stop():
+                time.sleep(0.01)
                 self.run_loop(connection)
 
     def reserve_bus_name(self, connection, bus_name):
@@ -65,8 +82,7 @@ class DbusService:
         RunTimeError if could not become the primary owner
         """
         reply = connection.send_and_get_reply(message_bus.RequestName(bus_name))
-        if self._queue:
-            self._queue.put("ready")
+        self._queue.put("ready")
 
         if reply.body[0] == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER:
             # The name had no existing owner, and the caller is now
@@ -86,18 +102,35 @@ class DbusService:
         )
 
     def run_loop(self, connection):
-        msg = connection.receive()
+        try:
+            msg = connection.receive(timeout=0)
+        except TimeoutError:
+            return
 
         if msg.header.message_type != MessageType.method_call:
             raise ValueError("Received non-method call message:", msg)
 
         method = msg.header.fields[HeaderFields.member]
 
-        # Dispatch to different methods
-        if method == "TestSimpleNumberAdd":
-            res = test_simple_method_add(msg.body[0], msg.body[1])
-            rep = new_method_return(msg, "i", (res,))
-        else:
+        out = self.handle_method(method, args=msg.body)
+
+        if out is None:
             rep = new_error(msg, self.bus_name + ".Error.NoMethod")
+        elif (
+            isinstance(out, tuple)
+            and len(out) == 2
+            and isinstance(out[0], str)
+            and isinstance(out[1], tuple)
+        ):
+            output_signature, output = out
+            rep = new_method_return(msg, output_signature, output)
+        else:
+            raise ValueError("The output of handle_method must be Tuple[str, Tuple]!")
 
         connection.send_message(rep)
+
+    def handle_method(self, method: str, args: Tuple) -> Optional[Tuple[str, Tuple]]:
+        """Should return either None (when method does not exist), or tuple of
+        output signature (like "ii" or "sus", etc.), and output values which
+        are of the type defined by the output signature
+        """

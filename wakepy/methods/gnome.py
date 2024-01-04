@@ -84,7 +84,7 @@ class _GnomeSessionManager(Method, ABC):
 
     def exit_mode(self):
         if self.inhibit_cookie is None:
-            raise ValueError("Cannot exit before entering")
+            raise RuntimeError("Cannot exit before entering")
 
         call = DbusMethodCall(
             method=self.method_uninhibit,
