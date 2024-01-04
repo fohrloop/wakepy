@@ -4,13 +4,13 @@ from jeepney.io.blocking import open_dbus_connection
 
 # TODO: Replace this with tests for DbusAdapter. The only reason to use
 # a fake Dbus service on a private session bus is to test DbusAdapters.
-def test_session_manager(private_bus):
+def test_session_manager():
     addr = DBusAddress(
         object_path="/org/github/wakepy/TestManager",
         bus_name="org.github.wakepy.TestManager",
         # interface="org.github.wakepy.TestManager.Numbers",
     )
-    with open_dbus_connection(private_bus) as connection:
+    with open_dbus_connection("SESSION") as connection:
         first_number, second_number = 5, 6
 
         for first_number, second_number in ((5, 6), (7, 8), (10, 11)):

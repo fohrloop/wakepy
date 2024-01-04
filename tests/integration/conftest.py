@@ -2,46 +2,23 @@ import logging
 import multiprocessing as mp
 
 import pytest
-from testutils.dbus_service import DbusService
-from testutils.privatebus import PrivateSessionBus
+from testutils import DbusService
 
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="session", autouse=True)
-def private_bus() -> str:
-    """Creates a real, private session dbus message bus (dbus-daemon) instance
-    which can be used to test dbus adapters, instead of the default session
-    bus. Because it is an isolated throw-away bus (sandbox), commands in tests
-    may not change real system settings.
-
-    The created bus is visible and available for use globally in the system
-    (not just within the python process). You may see it for example with
-
-    ps -x | grep dbus-daemon | grep -v grep | grep dbus-daemon
-
-    As this is a pytest fixture, this runs before any tests."""
-
-    bus = PrivateSessionBus()
-    bus_address = bus.start()
-    logger.info("Initiated private bus: %s", bus_address)
-
-    yield bus_address
-
-    logger.info("Terminating private bus")
-    bus.stop()
-
-
 # TODO: Make this better somehow?
 @pytest.fixture(scope="package", autouse=True)
-def dbus_service(private_bus):
+def dbus_service():
     """The DBus adapters are tested against a real DBus service using a private
     dbus-daemon. This fixture makes sure that a test service is available on
     the bus for tests.
     """
     logger.info("Initializing dbus_services")
 
-    def start_service(service_cls, bus_address, server_name, object_path, queue):
+    def start_service(
+        service_cls, server_name, object_path, queue, bus_address="SESSION"
+    ):
         service = service_cls(bus_address, queue)
         service.start(
             server_name=server_name,
@@ -53,7 +30,6 @@ def dbus_service(private_bus):
         target=start_service,
         kwargs=dict(
             service_cls=DbusService,
-            bus_address=private_bus,
             server_name="org.github.wakepy.TestManager",
             object_path="/org/github/wakepy/TestManager",
             queue=queue,

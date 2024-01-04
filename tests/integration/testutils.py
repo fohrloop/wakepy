@@ -1,5 +1,6 @@
 import multiprocessing as mp
 
+from typing import Optional
 from jeepney import HeaderFields, MessageType, new_error, new_method_return
 from jeepney.bus_messages import message_bus
 from jeepney.io.blocking import open_dbus_connection
@@ -24,7 +25,7 @@ class DbusService:
         "org.gnome.SessionManager"
     """
 
-    def __init__(self, bus_address: str, queue: "mp.Queue | None" = None):
+    def __init__(self, bus_address: str, queue: Optional[mp.Queue] = None):
         """
         Parameters
         ----------
