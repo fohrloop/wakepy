@@ -210,6 +210,7 @@ def test_select_methods():
 
     # These can be filtered with a whitelist
     assert select_methods(methods, use_only=["B", "E"]) == [MethodB, MethodE]
+
     # If a whitelist contains extra methods, raise exception
     with pytest.raises(
         ValueError,
@@ -218,6 +219,15 @@ def test_select_methods():
         ),
     ):
         select_methods(methods, use_only=["foo", "bar"])
+
+    # Cannot provide both: omit and use_only
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Can only define omit (blacklist) or use_only (whitelist), not both!"
+        ),
+    ):
+        select_methods(methods, use_only=["B"], omit=["E"])
 
 
 def test_register_method(monkeypatch):
