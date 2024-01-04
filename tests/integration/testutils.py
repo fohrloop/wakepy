@@ -17,7 +17,15 @@ DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER = 1
 
 
 class DbusService:
-    """
+    """A class for defining Dbus services, which can be made available in a
+    bus. To define a dbus service, create a subclass and provide
+
+    (1) addr: DbusAddress
+        Where the dbus service is located at.
+    (2) handle_method
+        A function which handles dbus method calls. Use if statements for
+        defining what to do if the service provides multiple methods.
+
     Attributes
     ----------
     bus_address
