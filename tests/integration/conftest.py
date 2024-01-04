@@ -3,16 +3,14 @@ provides the services as fixtures. The services run in separate threads.
 """
 
 import logging
-import threading
-from typing import Type, Callable
 import queue
+import threading
+from typing import Callable, Type
 
 import pytest
 from testutils import DbusService
 
-
 from wakepy.core import BusType, DbusAddress, DbusMethod
-
 
 logger = logging.getLogger(__name__)
 

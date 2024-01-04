@@ -9,8 +9,9 @@ from jeepney.bus_messages import message_bus
 from jeepney.io.blocking import open_dbus_connection
 
 if typing.TYPE_CHECKING:
-    from wakepy.core import DbusAddress
     import queue
+
+    from wakepy.core import DbusAddress
 
 DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER = 1
 

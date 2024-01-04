@@ -1,7 +1,6 @@
-from jeepney import new_method_call, DBusAddress
+from jeepney import DBusAddress, new_method_call
 from jeepney.io.blocking import open_dbus_connection
 from jeepney.wrappers import unwrap_msg
-
 
 from wakepy.core.calls import DbusMethodCall
 from wakepy.core.dbus import DbusAdapter
