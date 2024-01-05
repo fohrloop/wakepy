@@ -344,24 +344,29 @@ def select_methods(
     -------
     methods: list[MethodCls]
         The selected method classes.
+
+    Raises
+    ------
+    ValueError if the input arguments (omit or use_only) are invalid.
     """
 
     if omit and use_only:
         raise ValueError(
             "Can only define omit (blacklist) or use_only (whitelist), not both!"
         )
-
-    if omit is None and use_only is None:
+    elif omit is None and use_only is None:
         selected_methods = list(methods)
     elif omit is not None:
         selected_methods = [m for m in methods if m.name not in omit]
-    else:  # use_only is not None
+    elif use_only is not None:
         selected_methods = [m for m in methods if m.name in use_only]
         if not set(use_only).issubset(m.name for m in selected_methods):
             missing = sorted(set(use_only) - set(m.name for m in selected_methods))
             raise ValueError(
                 f"Methods {missing} in `use_only` are not part of `methods`!"
             )
+    else:  # pragma: no cover
+        raise ValueError("Invalid `omit` and/or `use_only`!")
     return selected_methods
 
 
