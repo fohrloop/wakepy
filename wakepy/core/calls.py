@@ -61,19 +61,17 @@ class DbusMethodCall(Call):
     ) -> Tuple[Any, ...]:
         if isinstance(args, tuple) or isinstance(args, list):
             args = tuple(args)
-            self.__check_tuple_args(args, method)
+            self.__check_args_length(args, method)
             return args
 
         assert isinstance(args, dict), "args may only be tuple, list or dict"
         return self.__dict_args_as_tuple(args, method)
 
-    def __check_tuple_args(self, args: Tuple[Any, ...], method: DbusMethod) -> None:
+    def __check_args_length(self, args: Tuple[Any, ...], method: DbusMethod):
         if method.params is None:
+            # not possible to check.
             return
 
-        self.__check_args_length(args, method)
-
-    def __check_args_length(self, args: Tuple[Any, ...], method: DbusMethod):
         if len(method.params) != len(args):
             raise ValueError(
                 f"Expected args to have {len(method.params)} items! (has: {len(args)})"
