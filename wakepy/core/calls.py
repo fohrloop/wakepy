@@ -22,7 +22,9 @@ class DbusMethodCall(Call):
     method: DbusMethod
     """The method which is the target of the call. Must be completely defined.
     """
+
     args: Tuple[Any, ...]
+    """The method args (positional). This is used"""
 
     def __init__(
         self, method: DbusMethod, args: dict[str, Any] | Tuple[Any, ...] | List[Any]
@@ -68,6 +70,16 @@ class DbusMethodCall(Call):
                 f" Expected: {method.params}. Got: {tuple(args)}"
             )
         return tuple(args[p] for p in method.params)
+
+    def get_kwargs(self) -> dict[str, Any] | None:
+        """Get a keyword-argument representation (dict) of the self.args. If
+        the DbusMethod (self.method) does not have params defined, returns
+        None."""
+        if self.method.params is None:
+            return None
+        assert isinstance(self.method.params, tuple)
+
+        return {p: arg for p, arg in zip(self.method.params, self.args)}
 
 
 class CallProcessor:

@@ -92,3 +92,15 @@ def test_dbusmethod_args_dict_different_order(method: DbusMethod):
     args = dict(third=3, first=1, second="2")
     call = DbusMethodCall(method, args=args)
     assert call.args == (1, "2", 3)
+
+
+def test_dbusmethod_get_kwargs(method: DbusMethod):
+    args = (1, "2", 3)
+    call = DbusMethodCall(method, args=args)
+    assert call.get_kwargs() == dict(first=1, second="2", third=3)
+
+
+def test_dbusmethod_get_kwargs(method_without_params: DbusMethod):
+    args = (1, "2", 3)
+    call = DbusMethodCall(method_without_params, args=args)
+    assert call.get_kwargs() == None
