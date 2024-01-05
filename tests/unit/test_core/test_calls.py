@@ -24,19 +24,19 @@ def method_without_params(service):
     ).of(service)
 
 
-def test_dbusmethod_args_as_tuple_using_tuple(method: DbusMethod):
+def test_dbusmethod_args_tuple(method: DbusMethod):
     args = (1, "2", 3)
     call = DbusMethodCall(method, args=args)
-    assert call._args_as_tuple(args, method) == args
+    assert call.args == args
 
 
-def test_dbusmethod_args_as_tuple_using_list(method: DbusMethod):
+def test_dbusmethod_args_list(method: DbusMethod):
     args = [1, "2", 3]
     call = DbusMethodCall(method, args=args)
-    assert call._args_as_tuple(args, method) == (1, "2", 3)
+    assert call.args == (1, "2", 3)
 
 
-def test_dbusmethod_args_as_tuple_using_dict_method_without_params(
+def test_dbusmethod_args_dict_method_without_params(
     method_without_params: DbusMethod,
 ):
     args = dict(first=1, second="2", third=3)
@@ -82,13 +82,13 @@ def test_dbusmethod_args_dict_wrong_keys(method: DbusMethod):
         DbusMethodCall(method, args=args)
 
 
-def test_dbusmethod_args_as_tuple_using_dict(method: DbusMethod):
+def test_dbusmethod_args_dict(method: DbusMethod):
     args = dict(first=1, second="2", third=3)
     call = DbusMethodCall(method, args=args)
-    assert call._args_as_tuple(args, method) == (1, "2", 3)
+    assert call.args == (1, "2", 3)
 
 
-def test_dbusmethod_args_as_tuple_using_dict_different_order(method: DbusMethod):
+def test_dbusmethod_args_dict_different_order(method: DbusMethod):
     args = dict(third=3, first=1, second="2")
     call = DbusMethodCall(method, args=args)
-    assert call._args_as_tuple(args, method) == (1, "2", 3)
+    assert call.args == (1, "2", 3)
