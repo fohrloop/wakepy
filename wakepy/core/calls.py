@@ -44,7 +44,11 @@ class DbusMethodCall(Call):
             return tuple(args)
 
         assert isinstance(args, dict), "args may only be tuple, list or dict"
+        return self.__dict_args_as_tuple(args, method)
 
+    def __dict_args_as_tuple(
+        self, args: dict[str, Any], method: DbusMethod
+    ) -> Tuple[Any, ...]:
         if method.params is None:
             raise ValueError(
                 "args cannot be a dictionary if method does not have the params "
