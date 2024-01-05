@@ -23,7 +23,7 @@ class DbusMethodCall(Call):
     """The method which is the target of the call. Must be completely defined.
     """
     method: DbusMethod
-    args: dict[str, Any] | Tuple[Any, ...] | List[Any]
+    args: Tuple[Any, ...]
 
     def __init__(
         self, method: DbusMethod, args: dict[str, Any] | Tuple[Any, ...] | List[Any]
