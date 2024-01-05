@@ -67,3 +67,16 @@ def test_dbusmethod_args_dict_too_few_keys(method: DbusMethod):
         match=re.escape("Expected args to have 3 keys! (has: 2)"),
     ):
         DbusMethodCall(method, args=args)
+
+
+def test_dbusmethod_args_dict_wrong_keys(method: DbusMethod):
+    args = dict(first=1, second="2", fifth="2")
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "The keys in `args` do not match the keys in the DbusMethod params! "
+            "Expected: ('first', 'second', 'third'). Got: ('first', 'second', 'fifth')"
+        ),
+    ):
+        DbusMethodCall(method, args=args)

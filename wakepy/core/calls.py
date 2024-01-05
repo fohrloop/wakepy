@@ -61,6 +61,11 @@ class DbusMethodCall(Call):
                 f"Expected args to have {len(method.params)} keys! (has: {len(args)})"
             )
 
+        if set(method.params) != set(args):
+            raise ValueError(
+                "The keys in `args` do not match the keys in the DbusMethod params!"
+                f" Expected: {method.params}. Got: {tuple(args)}"
+            )
         raise NotImplementedError()
 
 
