@@ -37,16 +37,38 @@ class DbusMethodCall(Call):
         self.method = method
         self.args = self._args_as_tuple(args, method)
 
+    def get_kwargs(self) -> dict[str, Any] | None:
+        """Get a keyword-argument representation (dict) of the self.args. If
+        the DbusMethod (self.method) does not have params defined, returns
+        None."""
+        if self.method.params is None:
+            return None
+        assert isinstance(self.method.params, tuple)
+
+        return {p: arg for p, arg in zip(self.method.params, self.args)}
+
     def _args_as_tuple(
         self, args: dict[str, Any] | Tuple[Any, ...] | List[Any], method: DbusMethod
     ) -> Tuple[Any, ...]:
-        if isinstance(args, tuple):
+        if isinstance(args, tuple) or isinstance(args, list):
+            args = tuple(args)
+            self.__check_tuple_args(args, method)
             return args
-        elif isinstance(args, list):
-            return tuple(args)
 
         assert isinstance(args, dict), "args may only be tuple, list or dict"
         return self.__dict_args_as_tuple(args, method)
+
+    def __check_tuple_args(self, args: Tuple[Any, ...], method: DbusMethod) -> None:
+        if method.params is None:
+            return
+
+        self.__check_args_length(args, method)
+
+    def __check_args_length(self, args: Tuple[Any, ...], method: DbusMethod):
+        if len(method.params) != len(args):
+            raise ValueError(
+                f"Expected args to have {len(method.params)} items! (has: {len(args)})"
+            )
 
     def __dict_args_as_tuple(
         self, args: dict[str, Any], method: DbusMethod
@@ -58,10 +80,7 @@ class DbusMethodCall(Call):
                 "args as a tuple or a list."
             )
 
-        if len(method.params) != len(args):
-            raise ValueError(
-                f"Expected args to have {len(method.params)} keys! (has: {len(args)})"
-            )
+        self.__check_args_length(tuple(args), method)
 
         if set(method.params) != set(args):
             raise ValueError(
@@ -69,16 +88,6 @@ class DbusMethodCall(Call):
                 f" Expected: {method.params}. Got: {tuple(args)}"
             )
         return tuple(args[p] for p in method.params)
-
-    def get_kwargs(self) -> dict[str, Any] | None:
-        """Get a keyword-argument representation (dict) of the self.args. If
-        the DbusMethod (self.method) does not have params defined, returns
-        None."""
-        if self.method.params is None:
-            return None
-        assert isinstance(self.method.params, tuple)
-
-        return {p: arg for p, arg in zip(self.method.params, self.args)}
 
 
 class CallProcessor:

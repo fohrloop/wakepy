@@ -32,6 +32,24 @@ def test_dbusmethod_args_tuple(method: DbusMethod):
     assert call.args == args
 
 
+def test_dbusmethod_args_tuple_too_long(method: DbusMethod):
+    args = (1, "2", 3, 4)
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Expected args to have 3 items! (has: 4)"),
+    ):
+        DbusMethodCall(method, args=args)
+
+
+def test_dbusmethod_args_tuple_too_short(method: DbusMethod):
+    args = (1, "2")
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Expected args to have 3 items! (has: 2)"),
+    ):
+        DbusMethodCall(method, args=args)
+
+
 def test_dbusmethod_args_list(method: DbusMethod):
     args = [1, "2", 3]
     call = DbusMethodCall(method, args=args)
@@ -58,7 +76,7 @@ def test_dbusmethod_args_dict_too_many_keys(method: DbusMethod):
 
     with pytest.raises(
         ValueError,
-        match=re.escape("Expected args to have 3 keys! (has: 4)"),
+        match=re.escape("Expected args to have 3 items! (has: 4)"),
     ):
         DbusMethodCall(method, args=args)
 
@@ -68,7 +86,7 @@ def test_dbusmethod_args_dict_too_few_keys(method: DbusMethod):
 
     with pytest.raises(
         ValueError,
-        match=re.escape("Expected args to have 3 keys! (has: 2)"),
+        match=re.escape("Expected args to have 3 items! (has: 2)"),
     ):
         DbusMethodCall(method, args=args)
 
