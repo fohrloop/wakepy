@@ -14,3 +14,9 @@ def test_dbusmethod_args_as_tuple_using_tuple(method: DbusMethod):
     args = (1, "2", 3)
     call = DbusMethodCall(method, args=args)
     assert call._args_as_tuple(args, method) == args
+
+
+def test_dbusmethod_args_as_tuple_using_list(method: DbusMethod):
+    args = [1, "2", 3]
+    call = DbusMethodCall(method, args=args)
+    assert call._args_as_tuple(args, method) == (1, "2", 3)

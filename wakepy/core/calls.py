@@ -38,7 +38,11 @@ class DbusMethodCall(Call):
     def _args_as_tuple(
         self, args: dict[str, Any] | Tuple[Any, ...] | List[Any], method: DbusMethod
     ) -> Tuple[Any, ...]:
-        return args
+        if isinstance(args, tuple):
+            return args
+        elif isinstance(args, list):
+            return tuple(args)
+        raise NotImplementedError()
 
 
 class CallProcessor:
