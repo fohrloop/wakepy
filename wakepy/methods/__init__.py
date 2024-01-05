@@ -21,3 +21,9 @@ Examples
     is more widespread than systemd, and you may have D-Bus without systemd
     but not vice versa. 
 """
+
+# NOTE: All modules containing wakepy.Methods must be imported here! The reason
+# is that the Methods are registered into the method registry only if the class
+# definition is executed (if the module containing the Method class definition
+# is imported)
+from . import gnome as gnome
