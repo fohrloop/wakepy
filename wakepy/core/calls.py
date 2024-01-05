@@ -27,6 +27,8 @@ class DbusMethodCall(Call):
     def __init__(
         self, method: DbusMethod, args: dict[str, Any] | Tuple[Any, ...] | List[Any]
     ):
+        """Converts the `args` argument is converted into a tuple and makes it
+        available at DbusMethodCall.args."""
         if not method.completely_defined():
             raise ValueError(
                 f"{self.__class__.__name__} requires completely defined DBusMethod!"
