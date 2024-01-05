@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-from dataclasses import dataclass
 
 if typing.TYPE_CHECKING:
     from typing import Any, List, Optional, Tuple, Type
@@ -18,19 +17,84 @@ class Call:
     """
 
 
-@dataclass
 class DbusMethodCall(Call):
+    """Represents a Dbus method call with its arguments. Has basic validation
+    for the number of arguments (compare args agains the DbusMethod.params, if
+    the DbusMethod.params are defined).
+
+    Note: Does not check for validity of args against the input parameter
+    signature. This is done only by the underlying Dbus library when doing the
+    dbus method calls.
+    """
+
     method: DbusMethod
     """The method which is the target of the call. Must be completely defined.
     """
 
-    args: dict[str, Any] | Tuple[Any, ...] | List[Any]
+    args: Tuple[Any, ...]
+    """The method args (positional). This is used"""
 
-    def __post_init__(self):
-        if not self.method.completely_defined():
+    def __init__(
+        self, method: DbusMethod, args: dict[str, Any] | Tuple[Any, ...] | List[Any]
+    ):
+        """Converts the `args` argument is converted into a tuple and makes it
+        available at DbusMethodCall.args."""
+        if not method.completely_defined():
             raise ValueError(
                 f"{self.__class__.__name__} requires completely defined DBusMethod!"
             )
+        self.method = method
+        self.args = self._args_as_tuple(args, method)
+
+    def get_kwargs(self) -> dict[str, Any] | None:
+        """Get a keyword-argument representation (dict) of the self.args. If
+        the DbusMethod (self.method) does not have params defined, returns
+        None."""
+        if self.method.params is None:
+            return None
+        assert isinstance(self.method.params, tuple)
+
+        return {p: arg for p, arg in zip(self.method.params, self.args)}
+
+    def _args_as_tuple(
+        self, args: dict[str, Any] | Tuple[Any, ...] | List[Any], method: DbusMethod
+    ) -> Tuple[Any, ...]:
+        if isinstance(args, tuple) or isinstance(args, list):
+            args = tuple(args)
+            self.__check_args_length(args, method)
+            return args
+
+        assert isinstance(args, dict), "args may only be tuple, list or dict"
+        return self.__dict_args_as_tuple(args, method)
+
+    def __check_args_length(self, args: Tuple[Any, ...], method: DbusMethod):
+        if method.params is None:
+            # not possible to check.
+            return
+
+        if len(method.params) != len(args):
+            raise ValueError(
+                f"Expected args to have {len(method.params)} items! (has: {len(args)})"
+            )
+
+    def __dict_args_as_tuple(
+        self, args: dict[str, Any], method: DbusMethod
+    ) -> Tuple[Any, ...]:
+        if not isinstance(method.params, tuple):
+            raise ValueError(
+                "args cannot be a dictionary if method does not have the params "
+                f"defined! Either add params to the DbusMethod '{method.name}' or give "
+                "args as a tuple or a list."
+            )
+
+        self.__check_args_length(tuple(args), method)
+
+        if set(method.params) != set(args):
+            raise ValueError(
+                "The keys in `args` do not match the keys in the DbusMethod params!"
+                f" Expected: {method.params}. Got: {tuple(args)}"
+            )
+        return tuple(args[p] for p in method.params)
 
 
 class CallProcessor:
