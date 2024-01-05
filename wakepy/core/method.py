@@ -131,7 +131,7 @@ class Method(ABC, metaclass=MethodMeta):
         cls._has_enter = cls.enter_mode is not Method.enter_mode
         cls._has_exit = cls.exit_mode is not Method.exit_mode
         cls._has_heartbeat = cls.heartbeat is not Method.heartbeat
-        _register_method(cls)
+        register_method(cls)
 
         return super().__init_subclass__(**kwargs)
 
@@ -365,7 +365,7 @@ def select_methods(
     return selected_methods
 
 
-def _register_method(cls: Type[Method]):
+def register_method(cls: Type[Method]):
     """Registers a subclass of Method to the method registry"""
 
     if cls.name is None:
@@ -373,9 +373,12 @@ def _register_method(cls: Type[Method]):
         return
 
     if cls.name in _method_registry:
-        raise MethodDefinitionError(
-            f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
-            f"(already registered to {_method_registry[cls.name].__qualname__})"
-        )
+        if _method_registry[cls.name] is not cls:
+            raise MethodDefinitionError(
+                f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
+                f"(already registered to {_method_registry[cls.name].__qualname__})"
+            )
+        else:
+            return
 
     _method_registry[cls.name] = cls

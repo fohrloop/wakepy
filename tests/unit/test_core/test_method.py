@@ -10,6 +10,7 @@ from wakepy.core.method import (
     get_methods_for_mode,
     method_names_to_classes,
     select_methods,
+    register_method,
 )
 
 
@@ -217,3 +218,20 @@ def test_select_methods():
         ),
     ):
         select_methods(methods, use_only=["foo", "bar"])
+
+
+def test_register_method(monkeypatch):
+    # Make the registry empty
+    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
+
+    class MethodA(Method):
+        name = "A"
+
+    assert get_method("A") is MethodA
+
+    # It is possible to register the same method many times without issues.
+    register_method(MethodA)
+    register_method(MethodA)
+    register_method(MethodA)
+
+    assert get_method("A") is MethodA
