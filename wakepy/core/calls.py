@@ -22,7 +22,6 @@ class DbusMethodCall(Call):
     method: DbusMethod
     """The method which is the target of the call. Must be completely defined.
     """
-    method: DbusMethod
     args: Tuple[Any, ...]
 
     def __init__(
