@@ -353,9 +353,9 @@ def select_methods(
 
     if omit is None and use_only is None:
         selected_methods = list(methods)
-    elif omit:
+    elif omit is not None:
         selected_methods = [m for m in methods if m.name not in omit]
-    elif use_only:
+    else:  # use_only is not None
         selected_methods = [m for m in methods if m.name in use_only]
         if not set(use_only).issubset(m.name for m in selected_methods):
             missing = sorted(set(use_only) - set(m.name for m in selected_methods))
