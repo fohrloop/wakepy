@@ -45,12 +45,13 @@ def test_gnome_enter_mode(method_cls, flag):
     class TestAdapter(DbusAdapter):
         def process(self, call):
             assert call.method == method_inhibit
-            assert call.args == {
+            assert call.get_kwargs() == {
                 "app_id": "wakepy",
                 "toplevel_xid": 42,
                 "reason": "wakelock active",
                 "flags": flag,
             }
+
             return fake_cookie
 
     method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
@@ -79,7 +80,7 @@ def test_gnome_exit_mode(method_cls):
     class TestAdapter(DbusAdapter):
         def process(self, call):
             assert call.method == method_uninhibit
-            assert call.args == {"inhibit_cookie": fake_cookie}
+            assert call.get_kwargs() == {"inhibit_cookie": fake_cookie}
 
     method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
     method.inhibit_cookie = fake_cookie
