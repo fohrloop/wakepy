@@ -67,7 +67,7 @@ class DbusMethodCall(Call):
                 "The keys in `args` do not match the keys in the DbusMethod params!"
                 f" Expected: {method.params}. Got: {tuple(args)}"
             )
-        raise NotImplementedError()
+        return tuple(args[p] for p in method.params)
 
 
 class CallProcessor:
