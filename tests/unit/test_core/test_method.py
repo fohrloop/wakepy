@@ -9,8 +9,8 @@ from wakepy.core.method import (
     get_methods,
     get_methods_for_mode,
     method_names_to_classes,
-    select_methods,
     register_method,
+    select_methods,
 )
 
 
