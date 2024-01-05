@@ -86,3 +86,9 @@ def test_dbusmethod_args_as_tuple_using_dict(method: DbusMethod):
     args = dict(first=1, second="2", third=3)
     call = DbusMethodCall(method, args=args)
     assert call._args_as_tuple(args, method) == (1, "2", 3)
+
+
+def test_dbusmethod_args_as_tuple_using_dict_different_order(method: DbusMethod):
+    args = dict(third=3, first=1, second="2")
+    call = DbusMethodCall(method, args=args)
+    assert call._args_as_tuple(args, method) == (1, "2", 3)
