@@ -42,6 +42,15 @@ class DbusMethodCall(Call):
             return args
         elif isinstance(args, list):
             return tuple(args)
+
+        assert isinstance(args, dict), "args may only be tuple, list or dict"
+
+        if method.params is None:
+            raise ValueError(
+                "args cannot be a dictionary if method does not have the params "
+                f"defined! Either add params to the DbusMethod '{method.name}' or give "
+                "args as a tuple or a list."
+            )
         raise NotImplementedError()
 
 
