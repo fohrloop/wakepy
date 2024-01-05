@@ -51,6 +51,16 @@ class DbusMethodCall(Call):
                 f"defined! Either add params to the DbusMethod '{method.name}' or give "
                 "args as a tuple or a list."
             )
+
+        assert isinstance(
+            method.params, tuple
+        ), "method.params must be a tuple if not None."
+
+        if len(method.params) != len(args):
+            raise ValueError(
+                f"Expected args to have {len(method.params)} keys! (has: {len(args)})"
+            )
+
         raise NotImplementedError()
 
 

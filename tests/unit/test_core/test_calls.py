@@ -47,3 +47,23 @@ def test_dbusmethod_args_as_tuple_using_dict_method_without_params(
         ),
     ):
         DbusMethodCall(method_without_params, args=args)
+
+
+def test_dbusmethod_args_dict_too_many_keys(method: DbusMethod):
+    args = dict(first=1, second="2", third=3, fourth=4)
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Expected args to have 3 keys! (has: 4)"),
+    ):
+        DbusMethodCall(method, args=args)
+
+
+def test_dbusmethod_args_dict_too_few_keys(method: DbusMethod):
+    args = dict(first=1, second="2")
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Expected args to have 3 keys! (has: 2)"),
+    ):
+        DbusMethodCall(method, args=args)
