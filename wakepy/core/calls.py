@@ -18,6 +18,15 @@ class Call:
 
 
 class DbusMethodCall(Call):
+    """Represents a Dbus method call with its arguments. Has basic validation
+    for the number of arguments (compare args agains the DbusMethod.params, if
+    the DbusMethod.params are defined).
+
+    Note: Does not check for validity of args against the input parameter
+    signature. This is done only by the underlying Dbus library when doing the
+    dbus method calls.
+    """
+
     method: DbusMethod
     """The method which is the target of the call. Must be completely defined.
     """
