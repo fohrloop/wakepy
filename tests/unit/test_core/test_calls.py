@@ -1,6 +1,8 @@
-from wakepy.core import DbusMethod, DbusMethodCall, DbusAddress
-import pytest
 import re
+
+import pytest
+
+from wakepy.core import DbusAddress, DbusMethod, DbusMethodCall
 
 
 @pytest.fixture
@@ -43,7 +45,9 @@ def test_dbusmethod_args_dict_method_without_params(
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "args cannot be a dictionary if method does not have the params defined! Either add params to the DbusMethod 'test-method' or give args as a tuple or a list."
+            "args cannot be a dictionary if method does not have the params defined! "
+            "Either add params to the DbusMethod 'test-method' or give args as a tuple "
+            "or a list."
         ),
     ):
         DbusMethodCall(method_without_params, args=args)
@@ -100,7 +104,8 @@ def test_dbusmethod_get_kwargs(method: DbusMethod):
     assert call.get_kwargs() == dict(first=1, second="2", third=3)
 
 
-def test_dbusmethod_get_kwargs(method_without_params: DbusMethod):
+def test_dbusmethod_get_kwargs_noparams(method_without_params: DbusMethod):
     args = (1, "2", 3)
     call = DbusMethodCall(method_without_params, args=args)
-    assert call.get_kwargs() == None
+    # Not possible to convert to args to dict as the params are not named.
+    assert call.get_kwargs() is None
