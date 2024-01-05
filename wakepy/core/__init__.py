@@ -16,5 +16,6 @@ from .dbus import DbusAdapter as DbusAdapter
 from .dbus import DbusAddress as DbusAddress
 from .dbus import DbusMethod as DbusMethod
 from .method import Method as Method
+from .mode import Mode as Mode
 from .platform import CURRENT_PLATFORM as CURRENT_PLATFORM
 from .strenum import StrEnum as StrEnum
