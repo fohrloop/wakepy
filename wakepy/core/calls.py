@@ -18,19 +18,27 @@ class Call:
     """
 
 
-@dataclass
 class DbusMethodCall(Call):
     method: DbusMethod
     """The method which is the target of the call. Must be completely defined.
     """
-
+    method: DbusMethod
     args: dict[str, Any] | Tuple[Any, ...] | List[Any]
 
-    def __post_init__(self):
-        if not self.method.completely_defined():
+    def __init__(
+        self, method: DbusMethod, args: dict[str, Any] | Tuple[Any, ...] | List[Any]
+    ):
+        if not method.completely_defined():
             raise ValueError(
                 f"{self.__class__.__name__} requires completely defined DBusMethod!"
             )
+        self.method = method
+        self.args = self._args_as_tuple(args, method)
+
+    def _args_as_tuple(
+        self, args: dict[str, Any] | Tuple[Any, ...] | List[Any], method: DbusMethod
+    ) -> Tuple[Any, ...]:
+        return args
 
 
 class CallProcessor:
