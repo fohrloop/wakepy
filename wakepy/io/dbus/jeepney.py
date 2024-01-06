@@ -7,6 +7,9 @@ from wakepy.core.dbus import DbusAdapter
 
 
 class JeepneyDbusAdapter(DbusAdapter):
+    """An implementation of DbusAdapter using jeepney. Can be used to process
+    DbusMethodCalls (communication with Dbus services over a dbus-daemon)."""
+
     # timeout for dbus calls, in seconds
     timeout = 2
 
