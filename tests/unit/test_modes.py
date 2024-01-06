@@ -75,14 +75,12 @@ def test_keep_running_mode_creation(input_args, monkeypatch):
     assert mode._dbus_adapter_cls == MyDbusAdapter
 
 
-@pytest.mark.skip("This waits to be fixed")
 def test_keep_running():
     with keep.running() as k:
         assert k.success
         assert not k.failure
 
 
-@pytest.mark.skip("This waits to be fixed")
 def test_keep_presenting():
     with keep.presenting() as k:
         assert k.success
