@@ -96,6 +96,9 @@ class DbusMethodCall(Call):
             )
         return tuple(args[p] for p in method.params)
 
+    def __repr__(self) -> str:
+        return f"<{self.method.service} {self.args} | bus: {self.method.bus}>"
+
 
 class CallProcessor:
     """A call processor. Determines *how* to process a call object and

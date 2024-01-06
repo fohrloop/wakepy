@@ -127,3 +127,9 @@ def test_dbusmethod_get_kwargs_noparams(method_without_params: DbusMethod):
     call = DbusMethodCall(method_without_params, args=args)
     # Not possible to convert to args to dict as the params are not named.
     assert call.get_kwargs() is None
+
+
+def test_dbusmethod_string_representation(method: DbusMethod):
+    args = (1, "2", 3)
+    call = DbusMethodCall(method, args=args)
+    assert call.__repr__() == "<wakepy.foo (1, '2', 3) | bus: SESSION>"
