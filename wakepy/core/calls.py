@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import typing
 
 if typing.TYPE_CHECKING:
@@ -114,8 +115,10 @@ class CallProcessor:
             use a custom DBus implementation.
         """
         self.dbus_adapter = get_dbus_adapter(dbus_adapter)
+        self.logger = logging.getLogger(__name__)
 
     def process(self, call: Call):
+        self.logger.debug("Processing: %s", call)
         if isinstance(call, DbusMethodCall) and self.dbus_adapter:
             return self.dbus_adapter.process(call)
 
