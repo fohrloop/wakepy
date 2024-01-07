@@ -520,7 +520,6 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
         succeeds, this is a Heartbeat object. Otherwise, this is None.
     """
     if method.name is None:
-        # TODO: Should not raise exceptions.
         raise ValueError("Methods without a name may not be used to activate modes!")
 
     result = MethodActivationResult(status=UsageStatus.FAIL, method_name=method.name)
