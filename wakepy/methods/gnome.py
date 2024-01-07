@@ -33,7 +33,7 @@ class _GnomeSessionManager(Method, ABC):
     session_manager = DbusAddress(
         bus=BusType.SESSION,
         service="org.gnome.SessionManager",
-        path="org/gnome/SessionManager",
+        path="/org/gnome/SessionManager",
         interface="org.gnome.SessionManager",
     )
 
@@ -54,7 +54,7 @@ class _GnomeSessionManager(Method, ABC):
     ).of(session_manager)
 
     method_uninhibit = DbusMethod(
-        name="UnInhibit",
+        name="Uninhibit",
         signature="u",
         params=("inhibit_cookie",),
     ).of(session_manager)
@@ -77,17 +77,16 @@ class _GnomeSessionManager(Method, ABC):
                 app_id="wakepy",
                 toplevel_xid=42,  # The value does not seem to matter.
                 reason="wakelock active",
-                flags=self.flags,
+                flags=int(self.flags),
             ),
         )
 
-        self.inhibit_cookie = self.process_call(call)
-        if self.inhibit_cookie is None:
+        retval = self.process_call(call)
+        if retval is None:
             raise RuntimeError(
                 "Could not get inhibit cookie from org.gnome.SessionManager"
             )
-
-        return
+        self.inhibit_cookie = retval[0]
 
     def exit_mode(self):
         if self.inhibit_cookie is None:
@@ -100,7 +99,6 @@ class _GnomeSessionManager(Method, ABC):
         )
         self.process_call(call)
         self.inhibit_cookie = None
-        return
 
 
 class GnomeSessionManagerNoSuspend(_GnomeSessionManager):
