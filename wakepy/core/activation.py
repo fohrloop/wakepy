@@ -651,6 +651,7 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
     exit_mode() to be called, and if this exit_mode() also fails (as this
     leaves system uncertain state).
 
+    TODO: Update this ^
 
     Detailed explanation
     --------------------
@@ -719,6 +720,7 @@ def _try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
     if not method.has_enter:
         return MethodOutcome.NOT_IMPLEMENTED, ""
 
+    # TODO: Only accept True as return value
     retval = method.enter_mode()
     if not isinstance(retval, (bool, str)):
         raise MethodError(
@@ -746,6 +748,7 @@ def _try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.date
     heartbeat_call_time = dt.datetime.now(dt.timezone.utc)
     retval = method.heartbeat()
 
+    # TODO: Only accept True as return value
     if not isinstance(retval, (bool, str)):
         raise MethodError(
             f"The heartbeat of {method.__class__.__name__} ({method.name}) returned a"
@@ -758,6 +761,7 @@ def _try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.date
     return outcome, message, heartbeat_call_time
 
 
+# TODO: Rename similarly with the enter_mode call function?
 def _rollback_with_exit(method):
     """Roll back entering a mode by exiting it.
 
@@ -774,6 +778,7 @@ def _rollback_with_exit(method):
         # Nothing to exit from.
         return
 
+    # TODO: Add try..except
     exit_outcome = method.exit_mode()
     if exit_outcome is not True:
         raise RuntimeError(
