@@ -167,12 +167,12 @@ class Method(ABC, metaclass=MethodMeta):
         # - If a Method depends on availability of certain software on PATH,
         #   could test that it exist on PATH. (and that the version is suitable)
 
-    def enter_mode(self) -> bool:
+    def enter_mode(self):
         """Enter to a Mode using this Method. Pair with a `exit_mode`.
 
         Returns
         -------
-        If entering the mode was successful, returns True. Otherwise, raises
+        If entering the mode was successful, returns None. Otherwise, raises
         an Exception.
 
         Raises
@@ -182,8 +182,8 @@ class Method(ABC, metaclass=MethodMeta):
 
         # Notes for subclassing
         # =====================
-        # The only acceptable return value from this method is True. Any other
-        # return value (also None) is considered as an error.
+        # The only acceptable return value from this method is None. Any other
+        # return value is considered as an error.
         #
         # Errors
         # -------
@@ -195,23 +195,21 @@ class Method(ABC, metaclass=MethodMeta):
         # exceptions, everything is cleaned; everything should be left in
         # a state which does not require .exit_mode() to be called.
         #
-        return True
+        return
 
-    def exit_mode(self) -> bool:
+    def exit_mode(self):
         """Exit from a Mode using this Method. Paired with `enter_mode`
 
         Returns
         -------
         If exiting the mode was successful, or if there was no need to exit
-        from the mode, returns True. Otherwise, raises an Exception.
-
-        Any other type of return value will raise an Exception.
+        from the mode, returns None. Otherwise, raises an Exception.
         """
 
         # Notes for subclassing
         # =====================
-        # The only acceptable return value from this method is True. Any other
-        # return value (also None) is considered as an error.
+        # The only acceptable return value from this method is None. Any other
+        # return value is considered as an error.
         #
         # Pay special attention to the fact that `exit_mode()`
         # should never raise any exceptions, unless something really is broken.
@@ -222,23 +220,22 @@ class Method(ABC, metaclass=MethodMeta):
         # "sorry, I'm not sure about this but you're possibly stuck in the mode
         #  until you reboot").
 
-        return True
+        return
 
     heartbeat_period: int | float = 55
     """This is the amount of time (in seconds) between two consecutive calls of
     `heartbeat()`.
     """
 
-    def heartbeat(self) -> bool:
+    def heartbeat(self):
         """Called periodically, every `heartbeat_period` seconds.
 
         Returns
         -------
-        If calling the heartbeat was successful, returns True. Otherwise,
+        If calling the heartbeat was successful, returns None. Otherwise,
         raises an Exception.
         """
-
-        return True
+        return
 
     def process_call(self, call: Call) -> Any:
         if self._call_processor is None:
