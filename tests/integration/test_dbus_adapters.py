@@ -104,13 +104,6 @@ def test_jeepney_dbus_adapter_wrong_service_definition():
         adapter.process(DbusMethodCall(wrong_method, (-5, 2)))
 
 
-@pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_number_multiply_tmp(numbermultiply_method):
-    adapter = JeepneyDbusAdapter()
-    call = DbusMethodCall(numbermultiply_method, (-5, 3))
-    assert adapter.process(call) == (-15,)
-
-
 @pytest.mark.usefixtures("dbus_string_operation_service")
 def test_jeepney_dbus_adapter_string_shorten(string_shorten_method):
     # The service shortens a string to a given number of characters and tells
