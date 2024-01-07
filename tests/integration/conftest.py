@@ -14,7 +14,7 @@ from wakepy.core import BusType, DbusAddress, DbusMethod
 
 logger = logging.getLogger(__name__)
 
-calculator_service_addr = DbusAddress(
+_calculator_service_addr = DbusAddress(
     bus=BusType.SESSION,
     service="org.github.wakepy.TestCalculatorService",
     path="/org/github/wakepy/TestCalculatorService",
@@ -27,7 +27,7 @@ _numberadd_method = DbusMethod(
     params=("first_number", "second_number"),
     output_signature="u",
     output_params=("result",),
-).of(calculator_service_addr)
+).of(_calculator_service_addr)
 
 _numbermultiply_method = DbusMethod(
     name="SimpleNumberMultiply",
@@ -35,11 +35,11 @@ _numbermultiply_method = DbusMethod(
     params=("first_number", "second_number"),
     output_signature="i",
     output_params=("result",),
-).of(calculator_service_addr)
+).of(_calculator_service_addr)
 
 
 class TestCalculatorService(DbusService):
-    addr = calculator_service_addr
+    addr = _calculator_service_addr
 
     def handle_method(self, method: str, args):
         if method == _numberadd_method.name:
@@ -81,6 +81,11 @@ class TestStringOperationService(DbusService):
                 shortened_string,
                 n_removed,
             )
+
+
+@pytest.fixture(scope="session")
+def calculator_service_addr():
+    return _calculator_service_addr
 
 
 @pytest.fixture(scope="session")
