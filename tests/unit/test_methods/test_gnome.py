@@ -63,7 +63,7 @@ def test_gnome_enter_mode(method_cls, flag):
     enter_retval = method.enter_mode()
 
     # Assert
-    assert enter_retval is True
+    assert enter_retval is None
     # Entering mode sets a inhibit_cookie to value returned by the DbusAdapter
     assert method.inhibit_cookie == fake_cookie
 

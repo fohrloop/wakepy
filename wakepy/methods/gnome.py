@@ -87,7 +87,7 @@ class _GnomeSessionManager(Method, ABC):
                 "Could not get inhibit cookie from org.gnome.SessionManager"
             )
 
-        return True
+        return
 
     def exit_mode(self):
         if self.inhibit_cookie is None:
