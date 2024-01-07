@@ -250,9 +250,9 @@ def test_register_method(monkeypatch):
 def test_method_defaults():
     """tests the Method enter_mode, exit_mode and heartbeat defaults"""
     m = Method()
-    assert m.enter_mode() is True
-    assert m.heartbeat() is True
-    assert m.exit_mode() is True
+    assert m.enter_mode() is None
+    assert m.heartbeat() is None
+    assert m.exit_mode() is None
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

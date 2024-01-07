@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 import typing
 from typing import Optional, Tuple
@@ -115,7 +116,7 @@ class DbusService:
         out = self.handle_method(method, args=msg.body)
 
         if out is None:
-            rep = new_error(msg, self.bus_name + ".Error.NoMethod")
+            rep = self._get_error_message(msg)
         elif (
             isinstance(out, tuple)
             and len(out) == 2
@@ -127,7 +128,15 @@ class DbusService:
         else:
             raise ValueError("The output of handle_method must be Tuple[str, Tuple]!")
 
-        connection.send_message(rep)
+        try:
+            connection.send_message(rep)
+        except Exception as e:
+            logging.info("Error occured:" + str(e))
+            connection.send_message(self._get_error_message(msg, ".Error.OtherError"))
+
+    def _get_error_message(self, msg, method=".Error.NoMethod"):
+        """Create an error message for replying to a message"""
+        return new_error(msg, self.bus_name + method)
 
     def handle_method(self, method: str, args: Tuple) -> Optional[Tuple[str, Tuple]]:
         """Should return either None (when method does not exist), or tuple of

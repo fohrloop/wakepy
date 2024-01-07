@@ -563,23 +563,20 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
     heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
 
     if method.has_exit:
-        retval = method.exit_mode()
-        if not isinstance(retval, (bool, str)):
-            raise MethodError(
-                f"The exit_mode of {method.__class__.__name__} ({method.name}) "
-                "returned a value of unsupported type. The supported types are: "
-                f"bool, str. Returned value: {retval}"
-            )
-        if isinstance(retval, str) or retval is False:
-            raise MethodError(
-                f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
-                "unsuccessful! This should never happen, and could mean that the "
-                "implementation has a bug. Entering the mode has been successful, and "
-                "since exiting was not, your system might stil be in the mode defined "
-                f"by the '{method.__class__.__name__}', or not.  Suggesting submitting "
-                f"a bug report and rebooting for clearing the mode. "
-                f"Returned value: {retval}"
-            )
+        errortxt = (
+            f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+            "unsuccessful! This should never happen, and could mean that the "
+            "implementation has a bug. Entering the mode has been successful, and "
+            "since exiting was not, your system might still be in the mode defined "
+            f"by the '{method.__class__.__name__}', or not.  Suggesting submitting "
+            f"a bug report and rebooting for clearing the mode. "
+        )
+        try:
+            retval = method.exit_mode()
+            if retval is not None:
+                raise ValueError("exit_mode returned a value other than None!")
+        except Exception as e:
+            raise MethodError(errortxt + "Original error: " + str(e))
 
     if heartbeat_stopped is not True:
         raise MethodError(
@@ -621,7 +618,10 @@ def caniuse_fails(method: Method) -> tuple[bool, str]:
         either the string returned by .caniuse() or emptry string.
     """
 
-    canuse = method.caniuse()
+    try:
+        canuse = method.caniuse()
+    except Exception as exc:
+        return True, str(exc)
 
     fail = False if (canuse is True or canuse is None) else True
     message = "" if canuse in {True, False, None} else str(canuse)
@@ -644,13 +644,11 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
 
     Raises
     ------
-    RunTimeError  (a) if the `method` is missing both, enter_mode() and
-    heartbeat() implementation (Invalid Method definition) (b) the rare edge
-    case where the `method` has both, enter_mode() and heartbeat() defined, and
-    the enter_mode() succeeds but the heartbeat() fails, which causes
-    exit_mode() to be called, and if this exit_mode() also fails (as this
-    leaves system uncertain state).
-
+    RunTimeError: In the rare edge case where the `method` has both,
+    enter_mode() and heartbeat() defined, and the enter_mode() succeeds but the
+    heartbeat() fails, which causes exit_mode() to be called, and if this
+    exit_mode() also fails (as this leaves system uncertain state). All other
+    Exceptions are handled (returning success=False).
 
     Detailed explanation
     --------------------
@@ -690,11 +688,12 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
 
     method_name = f"Method {method.__class__.__name__} ({method.name})"
     if enter_outcome == MethodOutcome.NOT_IMPLEMENTED:
-        if hb_outcome == MethodOutcome.NOT_IMPLEMENTED:  # 2) MM
-            raise MethodError(
+        if hb_outcome == MethodOutcome.NOT_IMPLEMENTED:
+            errmsg = (
                 f"{method_name} is not properly defined! Missing implementation for "
                 "both, enter_mode() and heartbeat()!"
             )
+            return False, errmsg, None  # 2) MM
         elif hb_outcome == MethodOutcome.FAILURE:
             return False, hb_errmessage, None  # 3) MF
         elif hb_outcome == MethodOutcome.SUCCESS:
@@ -716,24 +715,20 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
 
 
 def _try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
+    """Calls the method.enter_mode(). This function catches any possible
+    Exceptions during the call."""
+
     if not method.has_enter:
         return MethodOutcome.NOT_IMPLEMENTED, ""
 
-    retval = method.enter_mode()
-    if not isinstance(retval, (bool, str)):
-        raise MethodError(
-            f"The enter_mode of {method.__class__.__name__} ({method.name}) returned a"
-            " value of unsupported type. The supported types are: bool, str."
-            f" Returned value: {retval}"
-        )
-    outcome = MethodOutcome.SUCCESS if retval is True else MethodOutcome.FAILURE
-    message = retval if isinstance(retval, str) else ""
+    outcome, err_message = _try_method_call(method, "enter_mode")
 
-    return outcome, message
+    return outcome, err_message
 
 
 def _try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.datetime]]:
-    """Calls the method.heartbeat()
+    """Calls the method.heartbeat(). This function catches any possible
+    Exceptions during the call.
 
     Returns
     -------
@@ -744,18 +739,30 @@ def _try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.date
         return MethodOutcome.NOT_IMPLEMENTED, "", None
 
     heartbeat_call_time = dt.datetime.now(dt.timezone.utc)
-    retval = method.heartbeat()
+    outcome, err_message = _try_method_call(method, "heartbeat")
 
-    if not isinstance(retval, (bool, str)):
-        raise MethodError(
-            f"The heartbeat of {method.__class__.__name__} ({method.name}) returned a"
-            " value of unsupported type. The supported types are: bool, str."
-            f" Returned value: {retval}"
+    return outcome, err_message, heartbeat_call_time
+
+
+def _try_method_call(method: Method, mthdname: str) -> Tuple[MethodOutcome, str]:
+    try:
+        method_to_call = getattr(method, mthdname)
+        retval = method_to_call()
+        if retval is not None:
+            raise ValueError(
+                f"The {mthdname} of {method.__class__.__name__} ({method.name}) "
+                f"returned an unsupported value {retval}. The only accepted return "
+                "value is None"
+            )
+        outcome = MethodOutcome.SUCCESS
+        err_message = ""
+    except Exception as exc:
+        err_message = (
+            f"Error in the {mthdname} of {method.__class__.__name__} "
+            f"({method.name})! Original error: {str(exc)}"
         )
-    outcome = MethodOutcome.SUCCESS if retval is True else MethodOutcome.FAILURE
-    message = retval if isinstance(retval, str) else ""
-
-    return outcome, message, heartbeat_call_time
+        outcome = MethodOutcome.FAILURE
+    return outcome, err_message
 
 
 def _rollback_with_exit(method):
@@ -763,7 +770,7 @@ def _rollback_with_exit(method):
 
     Raises
     ------
-    RuntimeError, if exit_mode fails (returns something else than True)
+    RuntimeError, if exit_mode fails (returns something else than None)
 
     Notes
     -----
@@ -774,11 +781,15 @@ def _rollback_with_exit(method):
         # Nothing to exit from.
         return
 
-    exit_outcome = method.exit_mode()
-    if exit_outcome is not True:
+    try:
+        exit_outcome = method.exit_mode()
+        if exit_outcome is not None:
+            raise ValueError("exit_method did not return None")
+    except Exception as exc:
         raise RuntimeError(
             f"Entered {method.__class__.__name__} ({method.name}) but could not exit!"
-        )
+            + f" Original error: {str(exc)}"
+        ) from exc
 
 
 def should_fake_success() -> bool:

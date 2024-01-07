@@ -157,7 +157,7 @@ def _assert_context_manager_used_correctly(mocks):
 
 
 def test_modecontroller():
-    method_cls = get_test_method_class(enter_mode=True, heartbeat=True, exit_mode=True)
+    method_cls = get_test_method_class(enter_mode=None, heartbeat=None, exit_mode=None)
     controller = ModeController(Mock(spec_set=CallProcessor))
 
     # When controller was created, it has not active method or heartbeat

@@ -138,21 +138,7 @@ class Method(ABC, metaclass=MethodMeta):
     def caniuse(
         self,
     ) -> bool | None | str:
-        """Tells if the Method is suitable or unsuitable. Implement this is a
-        subclass. This is optional, but highly recommended. With `caniuse()` it
-        is possible to give more information about why some Method is not
-        supported.
-
-        NOTE: You do not have to test for the current platform here as it is
-        automatically tested if Method has `supported_platforms` attribute set!
-
-        Examples
-        --------
-        - Test that system is running KDE using DbusMethodCalls to some service
-          that should be running on KDE. Could also test that the version of
-          KDE is something that is needed.
-        - If a Method depends on availability of certain software on PATH,
-          could test that it exist on PATH. (and that the version is suitable)
+        """Tells if the Method is suitable or unsuitable.
 
         Returns
         ------
@@ -163,67 +149,93 @@ class Method(ABC, metaclass=MethodMeta):
             Method is unsuitable.
         """
 
-    def enter_mode(self) -> bool | str:
+        # Notes for subclassing
+        # =====================
+        # This is optional, but highly recommended. With `caniuse()` it
+        # is possible to give more information about why some Method is not
+        # supported.
+
+        # NOTE: You do not have to test for the current platform here as it is
+        # automatically tested if Method has `supported_platforms` attribute
+        # set!
+
+        # Examples
+        # --------
+        # - Test that system is running KDE using DbusMethodCalls to some service
+        #   that should be running on KDE. Could also test that the version of
+        #   KDE is something that is needed.
+        # - If a Method depends on availability of certain software on PATH,
+        #   could test that it exist on PATH. (and that the version is suitable)
+
+    def enter_mode(self):
         """Enter to a Mode using this Method. Pair with a `exit_mode`.
 
         Returns
         -------
-        (a) If entering the mode was successful, return True
-        (b) If entering the mode was not successful, return a string
-        explaining the reason. You may also simply return False, but this is
-        discouraged.
+        If entering the mode was successful, returns None. Otherwise, raises
+        an Exception.
 
-        Any other type of return value will raise an Exception.
-
-        Notes for subclassing
-        ---------------------
-        The .enter_mode() should always leave anything in a clean in case of
-        errors; When subclassing, make sure that in case of any exceptions,
-        everything is cleaned (and .exit_mode() does not need to be called.)
+        Raises
+        -------
+        Could raise an Exception of any type.
         """
-        return True
 
-    def exit_mode(self) -> bool | str:
+        # Notes for subclassing
+        # =====================
+        # The only acceptable return value from this method is None. Any other
+        # return value is considered as an error.
+        #
+        # Errors
+        # -------
+        # If the mode enter was not succesful, raise an Exception of any type.
+        # This is catched by the mode activation process and handled.
+        #
+        # Note: The .enter_mode() should always leave anything in a clean in
+        # case of errors; When subclassing, make sure that in case of any
+        # exceptions, everything is cleaned; everything should be left in
+        # a state which does not require .exit_mode() to be called.
+        #
+        return
+
+    def exit_mode(self):
         """Exit from a Mode using this Method. Paired with `enter_mode`
 
         Returns
         -------
-        (a) If exiting the mode was successful, return True
-        (b) If exiting the mode was not successful, return a string
-        explaining the reason. You may also simply return False, but this is
-        discouraged.
-
-        Any other type of return value will raise an Exception.
-
-        When subclassing, pay special attention to the fact that `enter_mode()`
-        should never raise any exceptions, unless something really is broken.
-        This is because if any exceptions are raised in `method.enter_mode()`
-        or `method.heartbeat()`, that method will simply not be used. But, if
-        exceptions are risen in `method.exit_mode()`, there is no way to
-        "correct" the situation (cannot just disregard the method and say:
-        "sorry, I'm not sure about this but you're possibly stuck in the mode
-         until you reboot").
+        If exiting the mode was successful, or if there was no need to exit
+        from the mode, returns None. Otherwise, raises an Exception.
         """
-        return True
+
+        # Notes for subclassing
+        # =====================
+        # The only acceptable return value from this method is None. Any other
+        # return value is considered as an error.
+        #
+        # Pay special attention to the fact that `exit_mode()`
+        # should never raise any exceptions, unless something really is broken.
+        # This is because if any exceptions are raised in `method.enter_mode()`
+        # or `method.heartbeat()`, that method will simply not be used. But, if
+        # exceptions are risen in `method.exit_mode()`, there is no way to
+        # "correct" the situation (cannot just disregard the method and say:
+        # "sorry, I'm not sure about this but you're possibly stuck in the mode
+        #  until you reboot").
+
+        return
 
     heartbeat_period: int | float = 55
     """This is the amount of time (in seconds) between two consecutive calls of
     `heartbeat()`.
     """
 
-    def heartbeat(self) -> bool | str:
+    def heartbeat(self):
         """Called periodically, every `heartbeat_period` seconds.
 
         Returns
         -------
-        (a) If calling the heartbeatwas successful, return True
-        (b) If calling the heartbeat was not successful, return a string
-        explaining the reason. You may also simply return False, but this is
-        discouraged.
-
-        Any other type of return value will raise an Exception.
+        If calling the heartbeat was successful, returns None. Otherwise,
+        raises an Exception.
         """
-        return True
+        return
 
     def process_call(self, call: Call) -> Any:
         if self._call_processor is None:

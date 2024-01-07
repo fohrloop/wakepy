@@ -179,16 +179,16 @@ def test_activate_method_method_caniuse_fails():
 
 def test_activate_method_method_enter_mode_fails():
     # Case: Fail by returning False from enter_mode
-    method = get_test_method_class(caniuse=True, enter_mode=False)()
+    method = get_test_method_class(caniuse=True, enter_mode=RuntimeError("failed"))()
     res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.FAIL
     assert res.failure_stage == StageName.ACTIVATION
-    assert res.message == ""
+    assert "Original error: failed" in res.message
     assert heartbeat is None
 
 
 def test_activate_method_enter_mode_success():
-    method = get_test_method_class(caniuse=True, enter_mode=True)()
+    method = get_test_method_class(caniuse=True, enter_mode=None)()
     res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.SUCCESS
     assert res.failure_stage is None
@@ -198,7 +198,7 @@ def test_activate_method_enter_mode_success():
 
 
 def test_activate_method_heartbeat_success():
-    method = get_test_method_class(heartbeat=True)()
+    method = get_test_method_class(heartbeat=None)()
     res, heartbeat = activate_method(method)
     assert res.status == UsageStatus.SUCCESS
     assert res.failure_stage is None
@@ -234,31 +234,20 @@ Methods   Expected result
 def test_try_enter_and_heartbeat_failing_enter_mode():
     """Tests 1) F* from TABLE 1; enter_mode failing"""
 
-    # Case: when enter_mode returns False
+    # Case: enter_mode raises exception
     for method in iterate_test_methods(
-        enter_mode=[False],
+        enter_mode=[RuntimeError(FAILURE_REASON)],
         heartbeat=METHOD_OPTIONS,
         exit_mode=METHOD_OPTIONS,
     ):
-        res = try_enter_and_heartbeat(method)
+        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
         # Expecting
-        # * entering to FAIL (False)
-        # * empty error message (''), as returning False
-        # * No heartbeat_call_time (None)
-        assert res == (False, "", None)
-
-    # Case: enter_mode returns a string (error message)
-    for method in iterate_test_methods(
-        enter_mode=[FAILURE_REASON],
-        heartbeat=METHOD_OPTIONS,
-        exit_mode=METHOD_OPTIONS,
-    ):
-        res = try_enter_and_heartbeat(method)
-        # Expecting
-        # * entering to FAIL (False)
+        # * entering to FAIL
         # * error message (FAILURE_REASON)
         # * No heartbeat_call_time (None)
-        assert res == (False, FAILURE_REASON, None)
+        assert success is False
+        assert FAILURE_REASON in err_message
+        assert heartbeat_call_time is None
 
 
 def test_try_enter_and_heartbeat_missing_missing():
@@ -268,16 +257,18 @@ def test_try_enter_and_heartbeat_missing_missing():
         heartbeat=[METHOD_MISSING],
         exit_mode=METHOD_OPTIONS,
     ):
+        expected_errmsg = (
+            f"Method {method.__class__.__name__} ({method.name}) is not properly "
+            "defined! Missing implementation for both, enter_mode() "
+            "and heartbeat()!"
+        )
+
+        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+
         # Expecting an error as missing enter_mode and heartbeat
-        with pytest.raises(
-            RuntimeError,
-            match=re.escape(
-                f"Method {method.__class__.__name__} ({method.name}) is not properly "
-                "defined! Missing implementation for both, enter_mode() "
-                "and heartbeat()!"
-            ),
-        ):
-            try_enter_and_heartbeat(method)
+        assert success is False
+        assert err_message == expected_errmsg
+        assert heartbeat_call_time is None
 
 
 def test_try_enter_and_heartbeat_missing_failing():
@@ -287,21 +278,27 @@ def test_try_enter_and_heartbeat_missing_failing():
         heartbeat=[False],
         exit_mode=METHOD_OPTIONS,
     ):
-        res = try_enter_and_heartbeat(method)
+        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
         # Expecting
-        # * heartbeat to FAIL (-> False)
-        # * No error message (''), as returing False
+        # * heartbeat to FAIL (-> success is False)
+        # * Error message saying that can only return None
         # * No heartbeat_call_time (None)
-        assert res == (False, "", None)
+        assert success is False
+        assert "returned an unsupported value False." in err_message
+        assert "The only accepted return value is None" in err_message
+        assert heartbeat_call_time is None
 
     for method in iterate_test_methods(
         enter_mode=[METHOD_MISSING],
         heartbeat=[FAILURE_REASON],
         exit_mode=METHOD_OPTIONS,
     ):
-        res = try_enter_and_heartbeat(method)
+        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
         # Expecting same as above, but with failing message
-        assert res == (False, FAILURE_REASON, None)
+        assert success is False
+        assert f"returned an unsupported value {FAILURE_REASON}." in err_message
+        assert "The only accepted return value is None" in err_message
+        assert heartbeat_call_time is None
 
 
 @time_machine.travel(
@@ -315,7 +312,7 @@ def test_try_enter_and_heartbeat_missing_success():
     ).replace(tzinfo=dt.timezone.utc)
     for method in iterate_test_methods(
         enter_mode=[METHOD_MISSING],
-        heartbeat=[True],
+        heartbeat=[None],
         exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
@@ -327,7 +324,7 @@ def test_try_enter_and_heartbeat_success_missing():
     """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
 
     for method in iterate_test_methods(
-        enter_mode=[True],
+        enter_mode=[None],
         heartbeat=[METHOD_MISSING],
         exit_mode=METHOD_OPTIONS,
     ):
@@ -343,30 +340,22 @@ def test_try_enter_and_heartbeat_success_failing():
     This call of exit_mode might be failing, so we test that separately
     """
 
-    # Case: empty error message ("") as heartbeat returns False
+    # Case: Heartbeate fails by raising RuntimeError
     for method in iterate_test_methods(
-        enter_mode=[True],
-        heartbeat=[False],
-        exit_mode=[True, METHOD_MISSING],
+        enter_mode=[None],
+        heartbeat=[RuntimeError(FAILURE_REASON)],
+        exit_mode=[None, METHOD_MISSING],
     ):
-        res = try_enter_and_heartbeat(method)
-        assert res == (False, "", None)
-
-    # Case: non-empty error message (FAILURE_REASON) as heartbeat returns that
-    # message
-    for method in iterate_test_methods(
-        enter_mode=[True],
-        heartbeat=[FAILURE_REASON],
-        exit_mode=[True, METHOD_MISSING],
-    ):
-        res = try_enter_and_heartbeat(method)
-        assert res == (False, FAILURE_REASON, None)
+        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+        assert success is False
+        assert f"Original error: {FAILURE_REASON}" in err_message
+        assert heartbeat_call_time is None
 
     # Case: The heartbeat fails, and because enter_mode() has succeed, wakepy
     # tries to call exit_mode(). If that fails, the program must crash, as we
     # are in an unknown state and this is clearly an error.
     for method in iterate_test_methods(
-        enter_mode=[True],
+        enter_mode=[None],
         heartbeat=[False, FAILURE_REASON],
         exit_mode=[False, FAILURE_REASON],
     ):
@@ -380,15 +369,15 @@ def test_try_enter_and_heartbeat_success_failing():
             try_enter_and_heartbeat(method)
 
     # Case: Same as the one above, but this time exit_mode() raises a
-    # WakepyMethodTestError. That is raised (and not catched), instead.
+    # WakepyMethodTestError. That is re-raised as RuntimeError, instead.
     # If this happens, the Method.exit_mode() has a bug.
     for method in iterate_test_methods(
-        enter_mode=[True],
+        enter_mode=[None],
         heartbeat=[False, FAILURE_REASON],
         exit_mode=[WakepyMethodTestError("foo")],
     ):
         with pytest.raises(
-            WakepyMethodTestError,
+            RuntimeError,
             match="foo",
         ):
             try_enter_and_heartbeat(method)
@@ -404,8 +393,8 @@ def test_try_enter_and_heartbeat_success_success():
     ).replace(tzinfo=dt.timezone.utc)
 
     for method in iterate_test_methods(
-        enter_mode=[True],
-        heartbeat=[True],
+        enter_mode=[None],
+        heartbeat=[None],
         exit_mode=METHOD_OPTIONS,
     ):
         res = try_enter_and_heartbeat(method)
@@ -417,15 +406,11 @@ def test_try_enter_and_heartbeat_special_cases():
     # Case: returning bad value (only bool and str accepted)
     for method_name in ("enter_mode", "heartbeat"):
         method = get_test_method_class(**{method_name: 132})()
-        with pytest.raises(
-            RuntimeError,
-            match=re.escape(
-                f"The {method_name} of {method.__class__.__name__} ({method.name}) "
-                "returned a value of unsupported type. The supported types are: bool, "
-                "str. Returned value: 132"
-            ),
-        ):
-            try_enter_and_heartbeat(method)
+        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+
+        assert success is False
+        assert "The only accepted return value is None" in err_message
+        assert heartbeat_call_time is None
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
@@ -529,39 +514,40 @@ def test_method_usage_result(
 
 
 def test_deactivate_success_no_heartbeat():
-    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    method = get_test_method_class(enter_mode=None, exit_mode=None)()
     deactivate_method(method)
 
 
 def test_deactivate_success_with_heartbeat():
     heartbeat = Mock(spec_set=Heartbeat)
     heartbeat.stop.return_value = True
-    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    method = get_test_method_class(enter_mode=None, exit_mode=None)()
     deactivate_method(method, heartbeat=heartbeat)
 
 
 def test_deactivate_success_with_heartbeat_and_no_exit():
     heartbeat = Mock(spec_set=Heartbeat)
     heartbeat.stop.return_value = True
-    method = get_test_method_class(enter_mode=True)()
+    method = get_test_method_class(enter_mode=None)()
     deactivate_method(method, heartbeat=heartbeat)
 
 
 def test_deactivate_fail_exit_mode_returning_bad_value():
-    method = get_test_method_class(enter_mode=True, exit_mode=123)()
+    method = get_test_method_class(enter_mode=None, exit_mode=123)()
     with pytest.raises(
         MethodError,
         match=re.escape(
-            f"The exit_mode of {method.__class__.__name__} ({method.name}) returned a "
-            "value of unsupported type. The supported types are: bool, str. "
-            "Returned value: 123"
-        ),
+            f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+            "unsuccessful!"
+        )
+        + " .* "
+        + re.escape("Original error: exit_mode returned a value other than None!"),
     ):
         deactivate_method(method)
 
 
-def test_deactivate_fail_exit_mode_returning_string():
-    method = get_test_method_class(enter_mode=True, exit_mode="oh no")()
+def test_deactivate_failing_exit_mode():
+    method = get_test_method_class(enter_mode=None, exit_mode=Exception("oh no"))()
     with pytest.raises(
         MethodError,
         match=re.escape(
@@ -569,7 +555,7 @@ def test_deactivate_fail_exit_mode_returning_string():
             "unsuccessful"
         )
         + ".*"
-        + re.escape("Returned value: oh no"),
+        + re.escape("Original error: oh no"),
     ):
         deactivate_method(method)
 
@@ -577,7 +563,7 @@ def test_deactivate_fail_exit_mode_returning_string():
 def test_deactivate_fail_heartbeat_not_stopping():
     heartbeat = Mock(spec_set=Heartbeat)
     heartbeat.stop.return_value = "Bad value"
-    method = get_test_method_class(enter_mode=True, exit_mode=True)()
+    method = get_test_method_class(enter_mode=None, exit_mode=None)()
     with pytest.raises(
         MethodError,
         match=re.escape(
