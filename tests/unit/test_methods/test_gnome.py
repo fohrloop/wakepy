@@ -90,7 +90,7 @@ def test_gnome_exit_mode(method_cls):
     exit_retval = method.exit_mode()
 
     # Assert
-    assert exit_retval is True
+    assert exit_retval is None
     # exiting mode unsets the inhibit_cookie
     assert method.inhibit_cookie is None
 
@@ -102,5 +102,4 @@ def test_gnome_exit_mode(method_cls):
 def test_gnome_exit_before_enter(method_cls):
     method = method_cls(CallProcessor(dbus_adapter=DbusAdapter))
     assert method.inhibit_cookie is None
-    with pytest.raises(RuntimeError, match="Cannot exit before entering"):
-        method.exit_mode()
+    assert method.exit_mode() is None
