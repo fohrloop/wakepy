@@ -560,8 +560,8 @@ def test_deactivate_fail_exit_mode_returning_bad_value():
         deactivate_method(method)
 
 
-def test_deactivate_fail_exit_mode_returning_string():
-    method = get_test_method_class(enter_mode=True, exit_mode="oh no")()
+def test_deactivate_failing_exit_mode():
+    method = get_test_method_class(enter_mode=None, exit_mode=Exception("oh no"))()
     with pytest.raises(
         MethodError,
         match=re.escape(
@@ -569,7 +569,7 @@ def test_deactivate_fail_exit_mode_returning_string():
             "unsuccessful"
         )
         + ".*"
-        + re.escape("Returned value: oh no"),
+        + re.escape("Original error: oh no"),
     ):
         deactivate_method(method)
 

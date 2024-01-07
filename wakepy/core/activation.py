@@ -563,7 +563,7 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
     heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
 
     if method.has_exit:
-        error = MethodError(
+        errortxt = (
             f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
             "unsuccessful! This should never happen, and could mean that the "
             "implementation has a bug. Entering the mode has been successful, and "
@@ -574,7 +574,7 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
         try:
             method.exit_mode()
         except Exception as e:
-            raise error from e
+            raise MethodError(errortxt + "Original error: " + str(e))
 
     if heartbeat_stopped is not True:
         raise MethodError(
