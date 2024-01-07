@@ -33,7 +33,7 @@ class _GnomeSessionManager(Method, ABC):
     session_manager = DbusAddress(
         bus=BusType.SESSION,
         service="org.gnome.SessionManager",
-        path="org/gnome/SessionManager",
+        path="/org/gnome/SessionManager",
         interface="org.gnome.SessionManager",
     )
 
@@ -77,7 +77,7 @@ class _GnomeSessionManager(Method, ABC):
                 app_id="wakepy",
                 toplevel_xid=42,  # The value does not seem to matter.
                 reason="wakelock active",
-                flags=self.flags,
+                flags=int(self.flags),
             ),
         )
 

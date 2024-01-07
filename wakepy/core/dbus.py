@@ -34,7 +34,7 @@ class DbusAddress(NamedTuple):
     """The path of the object to connect with. One object, defined by the
     bus, service and path, might have multiple interfaces.
 
-    Example: "org/spam/Manager"
+    Example: "/org/spam/Manager"
     """
 
     interface: str
