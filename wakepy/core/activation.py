@@ -761,12 +761,14 @@ def _try_method_call(method: Method, mthdname: str) -> Tuple[MethodOutcome, str]
         outcome = MethodOutcome.SUCCESS
         err_message = ""
     except Exception as exc:
-        err_message = f"Error in the {mthdname} of {method.__class__.__name__} ({method.name})! Original error: {str(exc)}"
+        err_message = (
+            f"Error in the {mthdname} of {method.__class__.__name__} "
+            f"({method.name})! Original error: {str(exc)}"
+        )
         outcome = MethodOutcome.FAILURE
     return outcome, err_message
 
 
-# TODO: Rename similarly with the enter_mode call function?
 def _rollback_with_exit(method):
     """Roll back entering a mode by exiting it.
 
@@ -783,7 +785,6 @@ def _rollback_with_exit(method):
         # Nothing to exit from.
         return
 
-    # TODO: Add try..except
     exit_outcome = method.exit_mode()
     if exit_outcome is not None:
         raise RuntimeError(
