@@ -4,6 +4,8 @@ These tests do *not* use IO / real or fake Dbus calls. Instead, a special dbus
 adapter is used which simply asserts the Call objects and returns what we
 would expect from a dbus service."""
 
+import re
+
 import pytest
 
 from wakepy.core import BusType, CallProcessor, DbusAddress, DbusMethod
@@ -103,3 +105,21 @@ def test_gnome_exit_before_enter(method_cls):
     method = method_cls(CallProcessor(dbus_adapter=DbusAdapter))
     assert method.inhibit_cookie is None
     assert method.exit_mode() is None
+
+
+@pytest.mark.parametrize(
+    "method_cls",
+    [GnomeSessionManagerNoSuspend, GnomeSessionManagerNoIdle],
+)
+def test_with_dbus_adapter_which_returns_none(method_cls):
+    class BadAdapterReturnNone(DbusAdapter):
+        def process(self, _):
+            return None
+
+    method = method_cls(CallProcessor(dbus_adapter=BadAdapterReturnNone))
+
+    with pytest.raises(
+        RuntimeError,
+        match=re.escape("Could not get inhibit cookie from org.gnome.SessionManager"),
+    ):
+        assert method.enter_mode() is False

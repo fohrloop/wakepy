@@ -70,7 +70,7 @@ class _GnomeSessionManager(Method, ABC):
         super().__init__(*args, **kwargs)
         self.inhibit_cookie: Optional[int] = None
 
-    def enter_mode(self) -> bool | str:
+    def enter_mode(self):
         call = DbusMethodCall(
             method=self.method_inhibit,
             args=dict(
@@ -82,11 +82,17 @@ class _GnomeSessionManager(Method, ABC):
         )
 
         self.inhibit_cookie = self.process_call(call)
+        if self.inhibit_cookie is None:
+            raise RuntimeError(
+                "Could not get inhibit cookie from org.gnome.SessionManager"
+            )
+
         return True
 
-    def exit_mode(self) -> bool | str:
+    def exit_mode(self):
         if self.inhibit_cookie is None:
-            raise RuntimeError("Cannot exit before entering")
+            # Nothing to exit from.
+            return
 
         call = DbusMethodCall(
             method=self.method_uninhibit,
@@ -94,7 +100,7 @@ class _GnomeSessionManager(Method, ABC):
         )
         self.process_call(call)
         self.inhibit_cookie = None
-        return True
+        return
 
 
 class GnomeSessionManagerNoSuspend(_GnomeSessionManager):
