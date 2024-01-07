@@ -62,7 +62,8 @@ or in python
 import time
 from wakepy import keep
 with keep.running():
-    time.sleep(99999)
+    while True:
+      time.sleep(1)
 ```
 
 (enter-keep-presenting-script)=
@@ -81,7 +82,8 @@ or in python
 import time
 from wakepy import keep
 with keep.presenting():
-    time.sleep(99999)
+    while True:
+      time.sleep(1)
 ```
 
 
