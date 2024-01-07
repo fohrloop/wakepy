@@ -369,7 +369,7 @@ def test_try_enter_and_heartbeat_success_failing():
             try_enter_and_heartbeat(method)
 
     # Case: Same as the one above, but this time exit_mode() raises a
-    # WakepyMethodTestError. That is raised (and not catched), instead.
+    # WakepyMethodTestError. That is re-raised as RuntimeError, instead.
     # If this happens, the Method.exit_mode() has a bug.
     for method in iterate_test_methods(
         enter_mode=[None],
@@ -377,7 +377,7 @@ def test_try_enter_and_heartbeat_success_failing():
         exit_mode=[WakepyMethodTestError("foo")],
     ):
         with pytest.raises(
-            WakepyMethodTestError,
+            RuntimeError,
             match="foo",
         ):
             try_enter_and_heartbeat(method)

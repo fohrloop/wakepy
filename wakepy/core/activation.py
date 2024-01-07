@@ -644,15 +644,12 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
         method.hearbeat().
 
     Raises
-    RunTimeError  (a) if the `method` is missing both, enter_mode() and
     ------
-    heartbeat() implementation (Invalid Method definition) (b) the rare edge
-    case where the `method` has both, enter_mode() and heartbeat() defined, and
-    the enter_mode() succeeds but the heartbeat() fails, which causes
-    exit_mode() to be called, and if this exit_mode() also fails (as this
-    leaves system uncertain state).
-
-    TODO: Update this ^
+    RunTimeError: In the rare edge case where the `method` has both,
+    enter_mode() and heartbeat() defined, and the enter_mode() succeeds but the
+    heartbeat() fails, which causes exit_mode() to be called, and if this
+    exit_mode() also fails (as this leaves system uncertain state). All other
+    Exceptions are handled (returning success=False).
 
     Detailed explanation
     --------------------
@@ -774,7 +771,7 @@ def _rollback_with_exit(method):
 
     Raises
     ------
-    RuntimeError, if exit_mode fails (returns something else than True)
+    RuntimeError, if exit_mode fails (returns something else than None)
 
     Notes
     -----
@@ -785,11 +782,15 @@ def _rollback_with_exit(method):
         # Nothing to exit from.
         return
 
-    exit_outcome = method.exit_mode()
-    if exit_outcome is not None:
+    try:
+        exit_outcome = method.exit_mode()
+        if exit_outcome is not None:
+            raise ValueError("exit_method did not return None")
+    except Exception as exc:
         raise RuntimeError(
             f"Entered {method.__class__.__name__} ({method.name}) but could not exit!"
-        )
+            + f" Original error: {str(exc)}"
+        ) from exc
 
 
 def should_fake_success() -> bool:
