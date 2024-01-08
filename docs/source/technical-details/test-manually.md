@@ -2,6 +2,18 @@
 
 All wakepy Modes rely somehow on external software, library or dbus service. This is why it cannot be 100% guaranteed beforehand that a wakepy Mode can be activated on some specific platform and Desktop Environment, even if a particular Mode would have multiple alternative Methods. This page lists ways to check manually if wakepy mode works on a system.
 
+
+
+```{admonition} Notes for manual testing
+:class: warning
+###### Before testing
+- Close browser tabs which might prevent your system from going to sleep (e.g.  YouTube) 
+- Close applications which might prevent your system from going to sleep (e.g. video players apps) 
+
+###### When ending the test
+- Avoid pressing the power button as it might force the computer to sleep.
+```
+
 ## wakepy test script
 
 This is a test script for helping to determine if the wakepy modes work correctly on your system:
@@ -62,7 +74,8 @@ or in python
 import time
 from wakepy import keep
 with keep.running():
-    time.sleep(99999)
+    while True:
+      time.sleep(1)
 ```
 
 (enter-keep-presenting-script)=
@@ -81,7 +94,8 @@ or in python
 import time
 from wakepy import keep
 with keep.presenting():
-    time.sleep(99999)
+    while True:
+      time.sleep(1)
 ```
 
 
@@ -91,30 +105,8 @@ with keep.presenting():
 
 - Homepage: [gnome.org](https://www.gnome.org/)
 
-### GNOME: keep.running
-
-Before you start. Check the current timeout values (seconds), and write the number down somewhere. These are timeouts for automatic sleep.
-```
-gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout
-gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout
-```
-
-Then, set a low value to the timeouts (here, 15 seconds):
-
-```
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 15
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 15
-```
-
-Test that your system sleeps automatically after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running mode](#enter-keep-running-script) in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
-
-```
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800
-```
-
-
-### GNOME: keep.presenting
+(gnome-keep-running-manual-test)=
+### keep.running (GNOME)
 
 Before you start. Check the current timeout values (seconds), and write the number down somewhere. The first one (org.gnome.desktop.session idle-delay) is time until "screen blank", and the rest are timeouts for automatic sleep.
 
@@ -132,10 +124,14 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 15
 ```
 
-Test that your system sleeps automatically and blanks the screen after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.presenting mode](#enter-keep-presenting-script) in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
+Test that your system sleeps automatically and blanks the screen after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script)  or in the in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
 
 ```
 gsettings set org.gnome.desktop.session idle-delay 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800
 ```
+
+### keep.presenting (GNOME)
+
+Follow the [same steps as in with keep.running](#gnome-keep-running-manual-test), but enter the [keep.presenting](#enter-keep-presenting-script) mode

@@ -19,6 +19,7 @@
 :titlesonly:
 
 user-guide/index
+methods-reference
 technical-details/index
 cli-api
 ```
