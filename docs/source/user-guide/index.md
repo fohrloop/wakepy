@@ -65,9 +65,7 @@ with keep.presenting() as k:
 | Screenlock is prevented  | No*          | Yes             |
 | Screensaver is prevented | No*          | Yes             |
 
-```{warning}
-*On Linux, on wakepy <= 0.7.0 the default behavior with keep.running is to also prevent automatic screenlock! This is because `org.freedesktop.ScreenSaver.Inhibit` method is used. This will be changed in a future release.
-```
+
 
 ```{note}
 The table above only considers the *automatic* actions (go to sleep, start screenlock, start screensaver), which are based on the *idle timer*; It is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually lock the session/screen or start screensaver.
