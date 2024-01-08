@@ -1,8 +1,0 @@
-# Wakepy Methods
-
-*(This is WIP. TODO: Make some way to collect documentation automatically)*
-
-## _GnomeSessionManager
-
-D-Bus, GNOME Desktop Environment with gnome-session running. The exact version of GNOME is unknown, but this should work from GNOME 2.24 ([2008-09-23](https://gitlab.gnome.org/GNOME/gnome-session/-/tags/GNOME_SESSION_2_24_0)) onwards. See [version history of org.gnome.SessionManager.xml](https://gitlab.gnome.org/GNOME/gnome-session/-/commits/main/gnome-session/org.gnome.SessionManager.xml). At least [this](https://fedoraproject.org/wiki/Desktop/Whiteboards/InhibitApis) and [this](https://bugzilla.redhat.com/show_bug.cgi?id=529287#c3) mention GNOME 2.24.
-
