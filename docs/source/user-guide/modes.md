@@ -147,6 +147,6 @@ The systemd mask method will inhibit all forms of sleep (including hibernation a
 
 
 ## General questions
-**What if the process holding the lock dies?**: The lock is automatically removed. With one exception: Using systemd mask method on Linux, since it alters global system settings. That will not be used unless other methods fail and you're running the process with sudo.
+**What if the process holding the lock dies?**: The lock is automatically removed. 
 
 **How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a successful inhibit lock in tests, you may set an environment variable: `WAKEPY_FAKE_SUCCESS` to `yes`.
