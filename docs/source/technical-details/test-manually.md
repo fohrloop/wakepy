@@ -2,6 +2,18 @@
 
 All wakepy Modes rely somehow on external software, library or dbus service. This is why it cannot be 100% guaranteed beforehand that a wakepy Mode can be activated on some specific platform and Desktop Environment, even if a particular Mode would have multiple alternative Methods. This page lists ways to check manually if wakepy mode works on a system.
 
+
+
+```{admonition} Notes for manual testing
+:class: warning
+###### Before testing
+- Close browser tabs which might prevent your system from going to sleep (e.g.  YouTube) 
+- Close applications which might prevent your system from going to sleep (e.g. video players apps) 
+
+###### When ending the test
+- Avoid pressing the power button as it might force the computer to sleep.
+```
+
 ## wakepy test script
 
 This is a test script for helping to determine if the wakepy modes work correctly on your system:
