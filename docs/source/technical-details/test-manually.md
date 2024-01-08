@@ -105,30 +105,8 @@ with keep.presenting():
 
 - Homepage: [gnome.org](https://www.gnome.org/)
 
-### GNOME: keep.running
-
-Before you start. Check the current timeout values (seconds), and write the number down somewhere. These are timeouts for automatic sleep.
-```
-gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout
-gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout
-```
-
-Then, set a low value to the timeouts (here, 15 seconds):
-
-```
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 15
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 15
-```
-
-Test that your system sleeps automatically after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running mode](#enter-keep-running-script) in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
-
-```
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800
-```
-
-
-### GNOME: keep.presenting
+(gnome-keep-running-manual-test)=
+### keep.running (GNOME)
 
 Before you start. Check the current timeout values (seconds), and write the number down somewhere. The first one (org.gnome.desktop.session idle-delay) is time until "screen blank", and the rest are timeouts for automatic sleep.
 
@@ -146,10 +124,14 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 15
 ```
 
-Test that your system sleeps automatically and blanks the screen after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.presenting mode](#enter-keep-presenting-script) in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
+Test that your system sleeps automatically and blanks the screen after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script)  or in the in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
 
 ```
 gsettings set org.gnome.desktop.session idle-delay 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800
 ```
+
+### keep.presenting (GNOME)
+
+Follow the [same steps as in with keep.running](#gnome-keep-running-manual-test), but enter the [keep.presenting](#enter-keep-presenting-script) mode
