@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 import typing
+from typing import Any, List, Optional, Tuple, Type
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Optional, Tuple, Type
-
     from .dbus import DbusAdapter, DbusAdapterTypeSeq, DbusMethod
+
+
+CallArguments = Optional[dict[str, Any] | Tuple[Any, ...] | List[Any]]
 
 
 class Call:
@@ -35,9 +37,7 @@ class DbusMethodCall(Call):
     args: Tuple[Any, ...]
     """The method args (positional). This is used"""
 
-    def __init__(
-        self, method: DbusMethod, args: dict[str, Any] | Tuple[Any, ...] | List[Any]
-    ):
+    def __init__(self, method: DbusMethod, args: CallArguments = None):
         """Converts the `args` argument is converted into a tuple and makes it
         available at DbusMethodCall.args."""
         if not method.completely_defined():
@@ -58,8 +58,11 @@ class DbusMethodCall(Call):
         return {p: arg for p, arg in zip(self.method.params, self.args)}
 
     def _args_as_tuple(
-        self, args: dict[str, Any] | Tuple[Any, ...] | List[Any], method: DbusMethod
+        self, args: CallArguments, method: DbusMethod
     ) -> Tuple[Any, ...]:
+        if args is None:
+            return tuple()
+
         if isinstance(args, tuple) or isinstance(args, list):
             args = tuple(args)
             self.__check_args_length(args, method)
