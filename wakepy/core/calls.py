@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 import typing
-from typing import Any, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 if typing.TYPE_CHECKING:
     from .dbus import DbusAdapter, DbusAdapterTypeSeq, DbusMethod
 
 
-CallArguments = Optional[dict[str, Any] | Tuple[Any, ...] | List[Any]]
+CallArguments = Optional[Union[Dict[str, Any], Tuple[Any, ...], List[Any]]]
 
 
 class Call:
