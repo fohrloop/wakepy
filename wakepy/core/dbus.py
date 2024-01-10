@@ -8,6 +8,7 @@ from .calls import DbusMethodCall
 
 if typing.TYPE_CHECKING:
     from typing import Optional
+
     from .calls import CallArguments
 
 
