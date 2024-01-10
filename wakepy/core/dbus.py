@@ -4,11 +4,10 @@ import typing
 from typing import List, NamedTuple, Tuple, Type, Union
 
 from . import BusType
+from .calls import DbusMethodCall
 
 if typing.TYPE_CHECKING:
-    from typing import Optional
-
-    from .calls import DbusMethodCall
+    from typing import Any, Optional
 
 
 DbusAdapterSeq = typing.Union[List["DbusAdapter"], Tuple["DbusAdapter", ...]]
@@ -157,6 +156,11 @@ class DbusMethod(NamedTuple):
         return all(
             x is not None for x in (self.service, self.path, self.interface, self.bus)
         )
+
+    def to_call(
+        self, args: dict[str, Any] | Tuple[Any, ...] | List[Any]
+    ) -> DbusMethodCall:
+        return DbusMethodCall(self, args)
 
 
 class DbusAdapter:
