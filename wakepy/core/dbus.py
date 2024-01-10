@@ -158,7 +158,7 @@ class DbusMethod(NamedTuple):
             x is not None for x in (self.service, self.path, self.interface, self.bus)
         )
 
-    def to_call(self, args: CallArguments) -> DbusMethodCall:
+    def to_call(self, args: CallArguments = None) -> DbusMethodCall:
         return DbusMethodCall(self, args)
 
 

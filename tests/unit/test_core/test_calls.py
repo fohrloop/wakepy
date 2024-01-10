@@ -26,6 +26,16 @@ def method_without_params(service):
     ).of(service)
 
 
+def test_dbusmethod_args_none(method: DbusMethod):
+    call = DbusMethodCall(method, args=None)
+    assert call.args == tuple()
+
+
+def test_dbusmethod_args_missing(method: DbusMethod):
+    call = DbusMethodCall(method)
+    assert call.args == tuple()
+
+
 def test_dbusmethod_args_tuple(method: DbusMethod):
     args = (1, "2", 3)
     call = DbusMethodCall(method, args=args)

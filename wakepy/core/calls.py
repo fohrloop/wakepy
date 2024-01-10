@@ -37,7 +37,7 @@ class DbusMethodCall(Call):
     args: Tuple[Any, ...]
     """The method args (positional). This is used"""
 
-    def __init__(self, method: DbusMethod, args: CallArguments):
+    def __init__(self, method: DbusMethod, args: CallArguments = None):
         """Converts the `args` argument is converted into a tuple and makes it
         available at DbusMethodCall.args."""
         if not method.completely_defined():
@@ -60,6 +60,9 @@ class DbusMethodCall(Call):
     def _args_as_tuple(
         self, args: CallArguments, method: DbusMethod
     ) -> Tuple[Any, ...]:
+        if args is None:
+            return tuple()
+
         if isinstance(args, tuple) or isinstance(args, list):
             args = tuple(args)
             self.__check_args_length(args, method)
