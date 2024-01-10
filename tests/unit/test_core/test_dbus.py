@@ -1,6 +1,6 @@
-from wakepy.core.dbus import DbusMethod, DbusMethodCall, DbusAddress, BusType
 import pytest
 
+from wakepy.core.dbus import BusType, DbusAddress, DbusMethod, DbusMethodCall
 
 session_manager = DbusAddress(
     bus=BusType.SESSION,
