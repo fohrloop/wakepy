@@ -79,9 +79,12 @@ def test_mode_contextmanager_protocol():
         assert mocks.mock_calls[2] == call.controller_class().activate(
             mocks.methods, methods_priority=None
         )
-        # The __enter__ returns the value from the ModeController.activate()
+        # The __enter__ returns the Mode
+        assert m is mode
+
+        # The m.result contains the value from the ModeController.activate()
         # call
-        assert m == mocks.controller_class.return_value.activate.return_value
+        assert m.result == mocks.controller_class.return_value.activate.return_value
 
     # If we get here, the __exit__ works without errors
     # ModeController.deactivate() is called during __exit__

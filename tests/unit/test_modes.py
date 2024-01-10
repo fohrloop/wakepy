@@ -1,6 +1,6 @@
 import pytest
 
-from wakepy.core import DbusAdapter, Method, ModeName
+from wakepy.core import ActivationResult, DbusAdapter, Method, Mode, ModeName
 from wakepy.modes import keep
 
 
@@ -77,11 +77,14 @@ def test_keep_running_mode_creation(input_args, monkeypatch):
 
 def test_keep_running(fake_dbus_adapter):
     """Simple smoke test for keep.running()"""
-    with keep.running(dbus_adapter=fake_dbus_adapter) as k:
-        assert isinstance(k.success, bool)
+    with keep.running(dbus_adapter=fake_dbus_adapter) as m:
+        assert isinstance(m, Mode)
+        assert isinstance(m.result.success, bool)
+    assert isinstance(m.result, ActivationResult)
 
 
 def test_keep_presenting(fake_dbus_adapter):
     """Simple smoke test for keep.presenting()"""
-    with keep.presenting(dbus_adapter=fake_dbus_adapter) as k:
-        assert isinstance(k.success, bool)
+    with keep.presenting(dbus_adapter=fake_dbus_adapter) as m:
+        assert isinstance(m, Mode)
+        assert isinstance(m.result.success, bool)

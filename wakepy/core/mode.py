@@ -134,18 +134,20 @@ class Mode(ABC):
         self.methods_classes = methods
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
+        self.result: ActivationResult | None = None
         self._dbus_adapter_cls = dbus_adapter
 
-    def __enter__(self) -> ActivationResult:
+    def __enter__(self) -> Mode:
         if self.controller is None:
             call_processor = self._call_processor_class(
                 dbus_adapter=self._dbus_adapter_cls
             )
             self.controller = self._controller_class(call_processor=call_processor)
-        return self.controller.activate(
+        self.result = self.controller.activate(
             self.methods_classes,
             methods_priority=self.methods_priority,
         )
+        return self
 
     def __exit__(
         self,
