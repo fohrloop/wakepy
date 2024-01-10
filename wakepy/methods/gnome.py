@@ -37,14 +37,6 @@ class _GnomeSessionManager(Method, ABC):
         interface="org.gnome.SessionManager",
     )
 
-    method_isinhibited = DbusMethod(
-        name="IsInhibited",
-        signature="u",
-        params=("flags",),
-        output_signature="b",
-        output_params=("is_inhibited",),
-    ).of(session_manager)
-
     method_inhibit = DbusMethod(
         name="Inhibit",
         signature="susu",
