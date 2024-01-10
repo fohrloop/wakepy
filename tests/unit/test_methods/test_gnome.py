@@ -19,7 +19,7 @@ from wakepy.methods.gnome import (
 session_manager = DbusAddress(
     bus=BusType.SESSION,
     service="org.gnome.SessionManager",
-    path="org/gnome/SessionManager",
+    path="/org/gnome/SessionManager",
     interface="org.gnome.SessionManager",
 )
 
@@ -54,7 +54,7 @@ def test_gnome_enter_mode(method_cls, flag):
                 "flags": flag,
             }
 
-            return fake_cookie
+            return (fake_cookie,)
 
     method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
     assert method.inhibit_cookie is None
@@ -75,7 +75,7 @@ def test_gnome_enter_mode(method_cls, flag):
 def test_gnome_exit_mode(method_cls):
     # Arrange
     method_uninhibit = DbusMethod(
-        name="UnInhibit",
+        name="Uninhibit",
         signature="u",
         params=("inhibit_cookie",),
     ).of(session_manager)
