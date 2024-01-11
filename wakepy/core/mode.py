@@ -105,6 +105,9 @@ class Mode(ABC):
         The list of methods associated for this mode.
     active: bool
         True if the mode is active. Otherwise, False.
+    result: ActivationResult | None
+        The activation result which tells more about the activation process
+        outcome. None if Mode has not yet been activated.
     """
 
     _call_processor_class: Type[CallProcessor] = CallProcessor
