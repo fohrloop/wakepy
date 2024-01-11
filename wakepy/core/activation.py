@@ -221,15 +221,15 @@ class MethodActivationResult:
     # the method failed.
     failure_stage: Optional[StageName] = None
 
-    message: str = ""
+    failure_reason: str = ""
 
     def __repr__(self):
         error_at = " @" + self.failure_stage if self.failure_stage else ""
-        message_part = f', "{self.message}"' if self.success is False else ""
+        failure_reason = f', "{self.failure_reason}"' if self.success is False else ""
         success_str = (
             "SUCCESS" if self.success else "FAIL" if self.success is False else "UNUSED"
         )
-        return f"({success_str}{error_at}, {self.method_name}{message_part})"
+        return f"({success_str}{error_at}, {self.method_name}{failure_reason})"
 
 
 def activate_one_of_multiple(
@@ -520,13 +520,13 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     requirements_fail, err_message = caniuse_fails(method)
     if requirements_fail:
         result.failure_stage = StageName.REQUIREMENTS
-        result.message = err_message
+        result.failure_reason = err_message
         return result, None
 
     success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
     if not success:
         result.failure_stage = StageName.ACTIVATION
-        result.message = err_message
+        result.failure_reason = err_message
         return result, None
 
     result.success = True

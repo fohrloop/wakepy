@@ -162,7 +162,7 @@ def test_activate_method_method_caniuse_fails():
     res, heartbeat = activate_method(method)
     assert res.success == False
     assert res.failure_stage == StageName.REQUIREMENTS
-    assert res.message == ""
+    assert res.failure_reason == ""
     assert heartbeat is None
 
     # Case 2: Fail by returning some error reason from caniuse
@@ -172,7 +172,7 @@ def test_activate_method_method_caniuse_fails():
     res, heartbeat = activate_method(method)
     assert res.success == False
     assert res.failure_stage == StageName.REQUIREMENTS
-    assert res.message == "SomeSW version <2.1.5 not supported"
+    assert res.failure_reason == "SomeSW version <2.1.5 not supported"
     assert heartbeat is None
 
 
@@ -182,7 +182,7 @@ def test_activate_method_method_enter_mode_fails():
     res, heartbeat = activate_method(method)
     assert res.success == False
     assert res.failure_stage == StageName.ACTIVATION
-    assert "Original error: failed" in res.message
+    assert "Original error: failed" in res.failure_reason
     assert heartbeat is None
 
 
@@ -191,7 +191,7 @@ def test_activate_method_enter_mode_success():
     res, heartbeat = activate_method(method)
     assert res.success == True
     assert res.failure_stage is None
-    assert res.message == ""
+    assert res.failure_reason == ""
     # No heartbeat on success, as the used Method does not have heartbeat()
     assert heartbeat is None
 
@@ -201,7 +201,7 @@ def test_activate_method_heartbeat_success():
     res, heartbeat = activate_method(method)
     assert res.success == True
     assert res.failure_stage is None
-    assert res.message == ""
+    assert res.failure_reason == ""
     # We get a Heartbeat instance on success, as the used Method does has a
     # heartbeat()
     assert isinstance(heartbeat, Heartbeat)
@@ -491,7 +491,7 @@ def test_caniuse_fails(params):
     ],
 )
 def test_method_usage_result(
-    status,
+    status,  # TODO: rename
     failure_stage,
     method_name,
     message,
@@ -501,13 +501,13 @@ def test_method_usage_result(
         success=status,
         failure_stage=failure_stage,
         method_name=method_name,
-        message=message,
+        failure_reason=message,
     )
     # These attributes are available
+    assert mur.method_name == method_name
     assert mur.success == status
     assert mur.failure_stage == failure_stage
-    assert mur.method_name == method_name
-    assert mur.message == message
+    assert mur.failure_reason == message
 
     assert str(mur) == expected_string_representation
 

@@ -7,13 +7,13 @@ PLATFORM_SUPPORT_FAIL = MethodActivationResult(
     success=False,
     failure_stage=StageName.PLATFORM_SUPPORT,
     method_name="fail-platform",
-    message="Platform XYZ not supported!",
+    failure_reason="Platform XYZ not supported!",
 )
 REQUIREMENTS_FAIL = MethodActivationResult(
     success=False,
     failure_stage=StageName.REQUIREMENTS,
     method_name="fail-requirements",
-    message="Missing requirement: Some SW v.1.2.3",
+    failure_reason="Missing requirement: Some SW v.1.2.3",
 )
 SUCCESS_RESULT = MethodActivationResult(
     success=True,
@@ -51,13 +51,13 @@ METHODACTIVATIONRESULTS_3_FAIL = [
         success=False,
         failure_stage=StageName.PLATFORM_SUPPORT,
         method_name="fail-platform",
-        message="Platform XYZ not supported!",
+        failure_reason="Platform XYZ not supported!",
     ),
     MethodActivationResult(
         success=False,
         failure_stage=StageName.REQUIREMENTS,
         method_name="fail-requirements",
-        message="Missing requirement: Some SW v.1.2.3",
+        failure_reason="Missing requirement: Some SW v.1.2.3",
     ),
 ]
 
