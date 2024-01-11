@@ -456,7 +456,7 @@ def test_caniuse_fails(params):
 
 
 @pytest.mark.parametrize(
-    "status, failure_stage, method_name, message, expected_string_representation",
+    "success, failure_stage, method_name, message, expected_string_representation",
     [
         (
             False,
@@ -491,21 +491,21 @@ def test_caniuse_fails(params):
     ],
 )
 def test_method_usage_result(
-    status,  # TODO: rename
+    success,
     failure_stage,
     method_name,
     message,
     expected_string_representation,
 ):
     mur = MethodActivationResult(
-        success=status,
+        success=success,
         failure_stage=failure_stage,
         method_name=method_name,
         failure_reason=message,
     )
     # These attributes are available
     assert mur.method_name == method_name
-    assert mur.success == status
+    assert mur.success == success
     assert mur.failure_stage == failure_stage
     assert mur.failure_reason == message
 
