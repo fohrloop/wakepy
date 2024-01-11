@@ -1,3 +1,4 @@
+import re
 import pytest
 
 from wakepy.core import ActivationResult, MethodActivationResult
@@ -62,7 +63,7 @@ METHODACTIVATIONRESULTS_3_FAIL = [
 ]
 
 
-def test_activation_result_get_details():
+def test_activation_result_list_methods():
     ar = ActivationResult()
     ar._results = [
         PLATFORM_SUPPORT_FAIL,
@@ -71,23 +72,23 @@ def test_activation_result_get_details():
         UNUSED_RESULT,
     ]
 
-    # By default, the get_details drops out failures occuring in the
+    # By default, the list_methods drops out failures occuring in the
     # platform stage
-    assert ar.get_details() == [
+    assert ar.list_methods() == [
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
         UNUSED_RESULT,
     ]
 
     # The same as above but with explicit arguments.
-    assert ar.get_details(ignore_platform_fails=True) == [
+    assert ar.list_methods(ignore_platform_fails=True) == [
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
         UNUSED_RESULT,
     ]
 
     # Do not ignore platform fails
-    assert ar.get_details(ignore_platform_fails=False) == [
+    assert ar.list_methods(ignore_platform_fails=False) == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
@@ -95,14 +96,14 @@ def test_activation_result_get_details():
     ]
 
     # ignore unused
-    assert ar.get_details(ignore_platform_fails=False, ignore_unused=True) == [
+    assert ar.list_methods(ignore_platform_fails=False, ignore_unused=True) == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
     ]
 
 
-def test_activation_result_get_detailed_results():
+def test_activation_result_query():
     ar = ActivationResult()
     ar._results = [
         PLATFORM_SUPPORT_FAIL,
@@ -112,7 +113,7 @@ def test_activation_result_get_detailed_results():
     ]
 
     # When no arguments given, return everything
-    assert ar.get_detailed_results() == [
+    assert ar.query() == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
@@ -120,20 +121,20 @@ def test_activation_result_get_detailed_results():
     ]
 
     # Possible to filter with status
-    assert ar.get_detailed_results(success=(False,)) == [
+    assert ar.query(success=(False,)) == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
     ]
 
     # Possible to filter with fail_stage
-    assert ar.get_detailed_results(fail_stages=("REQUIREMENTS",)) == [
+    assert ar.query(fail_stages=("REQUIREMENTS",)) == [
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
         UNUSED_RESULT,
     ]
 
     # or with both
-    assert ar.get_detailed_results(success=(False,), fail_stages=("REQUIREMENTS",)) == [
+    assert ar.query(success=(False,), fail_stages=("REQUIREMENTS",)) == [
         REQUIREMENTS_FAIL,
     ]
 
@@ -160,26 +161,22 @@ def test_activation_result_success(
         assert ar.failure == (not success_expected)
 
 
-@pytest.mark.parametrize(
-    "results, expected_active_methods, expected_active_methods_string",
-    [
-        (METHODACTIVATIONRESULTS_1, ["a-successful-method"], "a-successful-method"),
-        (
-            METHODACTIVATIONRESULTS_2,
-            [
-                "1st.successfull.method",
-                "2nd-successful-method",
-                "last-successful-method",
-            ],
-            "1st.successfull.method, 2nd-successful-method & last-successful-method",
-        ),
-    ],
-)
-def test_active_methods(
-    results, expected_active_methods, expected_active_methods_string
-):
-    ar = ActivationResult()
-    ar._results = results
+def test_active_method():
+    ar = ActivationResult(METHODACTIVATIONRESULTS_1)
+    assert ar.active_method == "a-successful-method"
 
-    assert ar.active_methods == expected_active_methods
-    assert ar.active_methods_string == expected_active_methods_string
+
+def test_active_method_with_fails():
+    ar = ActivationResult([PLATFORM_SUPPORT_FAIL, REQUIREMENTS_FAIL])
+    assert ar.active_method is None
+
+
+def test_active_method_with_multiple_success():
+    ar = ActivationResult(METHODACTIVATIONRESULTS_2)
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "The ActivationResult cannot have more than one active methods! Active methods: ['1st.successfull.method', '2nd-successful-method', 'last-successful-method']"
+        ),
+    ):
+        ar.active_method

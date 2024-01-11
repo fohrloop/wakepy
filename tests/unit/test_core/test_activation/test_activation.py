@@ -38,7 +38,7 @@ from wakepy.core.method import Method, MethodError, PlatformName, get_methods
 def test_activate_without_methods(monkeypatch):
     _arrange_for_test_activate(monkeypatch)
     res, active_method, heartbeat = activate_one_of_multiple([], None)
-    assert res.get_details() == []
+    assert res.list_methods() == []
     assert res.success is False
     assert active_method is None
     assert heartbeat is None
@@ -74,7 +74,7 @@ def test_activate_function_success(monkeypatch):
 
     # The failing method is tried first because there is prioritization step
     # which honors the `methods_priority``
-    assert [x.method_name for x in result.get_details()] == [
+    assert [x.method_name for x in result.list_methods()] == [
         methodcls_fail.name,
         methodcls_success.name,
     ]

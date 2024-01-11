@@ -53,14 +53,9 @@ class StageName(StrEnum):
 
 
 class ActivationResult:
-    """The result returned by activating a mode, i.e. the `x` in
-    `with mode as x: ...`.
-
-    The ActivationResult is responsible of keeping track on successful and
-    failed methods and providing different views on the results of the
-    activation process. All results are lazily loaded; if you access any of the
-    ActivationResult attributes, you will have to wait until the results
-    are ready.
+    """The ActivationResult is responsible of keeping track on the possibly
+    successful (max 1), failed and unused methods and providing different views
+    on the results of the activation process.
 
     Attributes
     ----------
@@ -73,21 +68,20 @@ class ActivationResult:
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
     failure: bool
         Always opposite of `success`. Included for convenience.
-    active_methods: list[str]
-        List of the names of all the successful (active) methods.
-    active_methods_string: str
-        A single string containing the names of all the successful (active)
-        methods.
+    active_method: str | None
+        The name of the the active (successful) method, if any.
 
 
     Methods
     -------
-    get_details:
-        Get details of the activation results. This is the higher-level
-        interface. If you want more control, use .get_detailed_results().
-    get_detailed_results:
-        Lower-level interface for getting details of the activation results.
-        If you want easier access, use .get_details().
+    list_methods:
+        Get a list of the methods present in the activation process, and their
+        activation results. This is the higher-level interface. If you want
+        more control, use .query().
+    query:
+        Lower level interface for getting the list of the methods present in
+        the activation process, and their activation results. If you want
+        easier access, use .list_methods().
     """
 
     def __init__(self, results: Optional[List[MethodActivationResult]] = None):
@@ -126,31 +120,28 @@ class ActivationResult:
         return not self.success
 
     @property
-    def active_methods(self) -> list[str]:
-        """List of the names of all the successful (active) methods"""
-        return [res.method_name for res in self._results if res.success]
+    def active_method(self) -> str | None:
+        """The name of the active (successful) method. If no methods are
+        active, this is None."""
+        methods = [res.method_name for res in self._results if res.success]
+        if not methods:
+            return None
+        elif len(methods) == 1:
+            return methods[0]
+        else:
+            raise ValueError(
+                "The ActivationResult cannot have more than one active methods! "
+                f"Active methods: {methods}"
+            )
 
-    @property
-    def active_methods_string(self) -> str:
-        """A single string containing the names of all the successful (active)
-        methods. For example:
-
-        if `active_methods` is ['fist-method', 'SecondMethod',
-        'some.third.Method'], the `active_methods_string` will be:
-        'fist-method, SecondMethod & some.third.Method'
-        """
-        active_methods = self.active_methods
-        if len(active_methods) == 1:
-            return active_methods[0]
-        return ", ".join(active_methods[:-1]) + f" & {active_methods[-1]}"
-
-    def get_details(
+    def list_methods(
         self,
         ignore_platform_fails: bool = True,
         ignore_unused: bool = False,
     ) -> list[MethodActivationResult]:
-        """Get details of the activation results. This is the higher-level
-        interface. If you want more control, use .get_detailed_results().
+        """Get a list of the methods present in the activation process, and
+        their activation results. This is the higher-level interface. If you
+        want more control, use .query().
 
         Parameters
         ----------
@@ -168,11 +159,9 @@ class ActivationResult:
         if not ignore_platform_fails:
             fail_stages.insert(0, StageName.PLATFORM_SUPPORT)
 
-        return self.get_detailed_results(
-            success=success_values, fail_stages=fail_stages
-        )
+        return self.query(success=success_values, fail_stages=fail_stages)
 
-    def get_detailed_results(
+    def query(
         self,
         success: Sequence[bool | None] = (True, False, None),
         fail_stages: Sequence[StageName] = (
@@ -181,8 +170,9 @@ class ActivationResult:
             StageName.ACTIVATION,
         ),
     ) -> list[MethodActivationResult]:
-        """Get details of the activation results. This is the lower-level
-        interface. If you want easier access, use .get_details().
+        """Get a list of the methods present in the activation process, and
+        their activation results. This is the lower-level interface. If you
+        want easier access, use .list_methods().
 
         Parameters
         ----------
