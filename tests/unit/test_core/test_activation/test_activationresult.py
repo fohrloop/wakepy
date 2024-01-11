@@ -103,7 +103,7 @@ def test_activation_result_get_details():
     ]
 
 
-def test_activation_result_get_detailed_results():
+def test_activation_result_query():
     ar = ActivationResult()
     ar._results = [
         PLATFORM_SUPPORT_FAIL,
@@ -113,7 +113,7 @@ def test_activation_result_get_detailed_results():
     ]
 
     # When no arguments given, return everything
-    assert ar.get_detailed_results() == [
+    assert ar.query() == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
@@ -121,20 +121,20 @@ def test_activation_result_get_detailed_results():
     ]
 
     # Possible to filter with status
-    assert ar.get_detailed_results(success=(False,)) == [
+    assert ar.query(success=(False,)) == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
     ]
 
     # Possible to filter with fail_stage
-    assert ar.get_detailed_results(fail_stages=("REQUIREMENTS",)) == [
+    assert ar.query(fail_stages=("REQUIREMENTS",)) == [
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
         UNUSED_RESULT,
     ]
 
     # or with both
-    assert ar.get_detailed_results(success=(False,), fail_stages=("REQUIREMENTS",)) == [
+    assert ar.query(success=(False,), fail_stages=("REQUIREMENTS",)) == [
         REQUIREMENTS_FAIL,
     ]
 

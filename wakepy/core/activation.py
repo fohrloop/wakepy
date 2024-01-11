@@ -76,8 +76,8 @@ class ActivationResult:
     -------
     get_details:
         Get details of the activation results. This is the higher-level
-        interface. If you want more control, use .get_detailed_results().
-    get_detailed_results:
+        interface. If you want more control, use .query().
+    query:
         Lower-level interface for getting details of the activation results.
         If you want easier access, use .get_details().
     """
@@ -138,7 +138,7 @@ class ActivationResult:
         ignore_unused: bool = False,
     ) -> list[MethodActivationResult]:
         """Get details of the activation results. This is the higher-level
-        interface. If you want more control, use .get_detailed_results().
+        interface. If you want more control, use .query().
 
         Parameters
         ----------
@@ -156,11 +156,9 @@ class ActivationResult:
         if not ignore_platform_fails:
             fail_stages.insert(0, StageName.PLATFORM_SUPPORT)
 
-        return self.get_detailed_results(
-            success=success_values, fail_stages=fail_stages
-        )
+        return self.query(success=success_values, fail_stages=fail_stages)
 
-    def get_detailed_results(
+    def query(
         self,
         success: Sequence[bool | None] = (True, False, None),
         fail_stages: Sequence[StageName] = (
