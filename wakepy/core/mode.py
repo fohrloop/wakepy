@@ -103,6 +103,8 @@ class Mode(ABC):
     ----------
     method_classes: list[Type[Method]]
         The list of methods associated for this mode.
+    active: bool
+        True if the mode is active. Otherwise, False.
     """
 
     _call_processor_class: Type[CallProcessor] = CallProcessor
@@ -136,6 +138,7 @@ class Mode(ABC):
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
         self.result: ActivationResult | None = None
+        self.active: bool = False
         self._dbus_adapter_cls = dbus_adapter
 
     def __enter__(self) -> Mode:
@@ -148,6 +151,7 @@ class Mode(ABC):
             self.methods_classes,
             methods_priority=self.methods_priority,
         )
+        self.active = self.result.success
         return self
 
     def __exit__(
@@ -175,6 +179,7 @@ class Mode(ABC):
             raise RuntimeError("Must __enter__ before __exit__!")
 
         self.controller.deactivate()
+        self.active = False
 
         if exception is None or isinstance(exception, ModeExit):
             return True
