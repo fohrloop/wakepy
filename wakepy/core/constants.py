@@ -19,19 +19,6 @@ class ModeName(StrEnum):
     KEEP_PRESENTING = "keep.presenting"
 
 
-class ControlMsg(StrEnum):
-    """Send to worker threads"""
-
-    TERMINATE = auto()
-
-
-class WorkerThreadMsgType(StrEnum):
-    """Send from worker threads"""
-
-    OK = auto()
-    EXCEPTION = auto()
-
-
 class BusType(StrEnum):
     """Type of D-Bus bus."""
 
