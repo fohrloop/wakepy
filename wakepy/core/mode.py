@@ -26,8 +26,9 @@ class ModeExit(Exception):
     Example
     -------
     ```
-    with keep.running() as k:
-        if not k.success:
+    with keep.running():
+        # do something
+        if some_condition:
             print('failure')
             raise ModeExit
         print('success')
@@ -102,6 +103,11 @@ class Mode(ABC):
     ----------
     method_classes: list[Type[Method]]
         The list of methods associated for this mode.
+    active: bool
+        True if the mode is active. Otherwise, False.
+    activation_result: ActivationResult | None
+        The activation result which tells more about the activation process
+        outcome. None if Mode has not yet been activated.
     """
 
     _call_processor_class: Type[CallProcessor] = CallProcessor
@@ -134,18 +140,22 @@ class Mode(ABC):
         self.methods_classes = methods
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
+        self.activation_result: ActivationResult | None = None
+        self.active: bool = False
         self._dbus_adapter_cls = dbus_adapter
 
-    def __enter__(self) -> ActivationResult:
+    def __enter__(self) -> Mode:
         if self.controller is None:
             call_processor = self._call_processor_class(
                 dbus_adapter=self._dbus_adapter_cls
             )
             self.controller = self._controller_class(call_processor=call_processor)
-        return self.controller.activate(
+        self.activation_result = self.controller.activate(
             self.methods_classes,
             methods_priority=self.methods_priority,
         )
+        self.active = self.activation_result.success
+        return self
 
     def __exit__(
         self,
@@ -172,6 +182,7 @@ class Mode(ABC):
             raise RuntimeError("Must __enter__ before __exit__!")
 
         self.controller.deactivate()
+        self.active = False
 
         if exception is None or isinstance(exception, ModeExit):
             return True

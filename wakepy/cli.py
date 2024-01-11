@@ -99,10 +99,14 @@ def start(
     with ExitStack() as stack:
         if keep_running:
             m = stack.enter_context(keep.running())
-            real_successes["keep_running"] = m.real_success
+            real_successes["keep_running"] = (
+                m.activation_result.real_success if m.activation_result else False
+            )
         if presentation_mode:
             m = stack.enter_context(keep.presenting())
-            real_successes["presentation_mode"] = m.real_success
+            real_successes["presentation_mode"] = (
+                m.activation_result.real_success if m.activation_result else False
+            )
 
         # A quick fix (Fix this better in next release)
         # On linux, D-Bus methods for keep_running use presentation_mode.
