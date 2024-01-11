@@ -26,8 +26,9 @@ class ModeExit(Exception):
     Example
     -------
     ```
-    with keep.running() as k:
-        if not k.success:
+    with keep.running():
+        # do something
+        if some_condition:
             print('failure')
             raise ModeExit
         print('success')
