@@ -1,3 +1,4 @@
+import re
 import pytest
 
 from wakepy.core import ActivationResult, MethodActivationResult
@@ -160,26 +161,22 @@ def test_activation_result_success(
         assert ar.failure == (not success_expected)
 
 
-@pytest.mark.parametrize(
-    "results, expected_active_methods, expected_active_methods_string",
-    [
-        (METHODACTIVATIONRESULTS_1, ["a-successful-method"], "a-successful-method"),
-        (
-            METHODACTIVATIONRESULTS_2,
-            [
-                "1st.successfull.method",
-                "2nd-successful-method",
-                "last-successful-method",
-            ],
-            "1st.successfull.method, 2nd-successful-method & last-successful-method",
-        ),
-    ],
-)
-def test_active_methods(
-    results, expected_active_methods, expected_active_methods_string
-):
-    ar = ActivationResult()
-    ar._results = results
+def test_active_method():
+    ar = ActivationResult(METHODACTIVATIONRESULTS_1)
+    assert ar.active_method == "a-successful-method"
 
-    assert ar.active_methods == expected_active_methods
-    assert ar.active_methods_string == expected_active_methods_string
+
+def test_active_method_with_fails():
+    ar = ActivationResult([PLATFORM_SUPPORT_FAIL, REQUIREMENTS_FAIL])
+    assert ar.active_method is None
+
+
+def test_active_method_with_multiple_success():
+    ar = ActivationResult(METHODACTIVATIONRESULTS_2)
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "The ActivationResult cannot have more than one active methods! Active methods: ['1st.successfull.method', '2nd-successful-method', 'last-successful-method']"
+        ),
+    ):
+        ar.active_method

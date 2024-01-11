@@ -53,14 +53,9 @@ class StageName(StrEnum):
 
 
 class ActivationResult:
-    """The result returned by activating a mode, i.e. the `x` in
-    `with mode as x: ...`.
-
-    The ActivationResult is responsible of keeping track on successful and
-    failed methods and providing different views on the results of the
-    activation process. All results are lazily loaded; if you access any of the
-    ActivationResult attributes, you will have to wait until the results
-    are ready.
+    """The ActivationResult is responsible of keeping track on the possibly
+    successful (max 1), failed and unused methods and providing different views
+    on the results of the activation process.
 
     Attributes
     ----------
@@ -73,11 +68,8 @@ class ActivationResult:
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
     failure: bool
         Always opposite of `success`. Included for convenience.
-    active_methods: list[str]
-        List of the names of all the successful (active) methods.
-    active_methods_string: str
-        A single string containing the names of all the successful (active)
-        methods.
+    active_method: str | None
+        The name of the the active (successful) method, if any.
 
 
     Methods
@@ -126,23 +118,19 @@ class ActivationResult:
         return not self.success
 
     @property
-    def active_methods(self) -> list[str]:
-        """List of the names of all the successful (active) methods"""
-        return [res.method_name for res in self._results if res.success]
-
-    @property
-    def active_methods_string(self) -> str:
-        """A single string containing the names of all the successful (active)
-        methods. For example:
-
-        if `active_methods` is ['fist-method', 'SecondMethod',
-        'some.third.Method'], the `active_methods_string` will be:
-        'fist-method, SecondMethod & some.third.Method'
-        """
-        active_methods = self.active_methods
-        if len(active_methods) == 1:
-            return active_methods[0]
-        return ", ".join(active_methods[:-1]) + f" & {active_methods[-1]}"
+    def active_method(self) -> str | None:
+        """The name of the active (successful) method. If no methods are
+        active, this is None."""
+        methods = [res.method_name for res in self._results if res.success]
+        if not methods:
+            return None
+        elif len(methods) == 1:
+            return methods[0]
+        else:
+            raise ValueError(
+                "The ActivationResult cannot have more than one active methods! "
+                f"Active methods: {methods}"
+            )
 
     def get_details(
         self,
