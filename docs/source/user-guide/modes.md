@@ -10,21 +10,17 @@ The available modes are
 
 ## Entering a mode
 
-The wakepy modes are implemented as context managers. When entering the context, a object is returned, which has following attributes:
+The wakepy modes are implemented as context managers of type `wakepy.Mode`. When entering the context, the `wakepy.Mode` instance (`m`) is returned, which has following attributes:
 
-- `k.success`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
-- `k.failure`: Always opposite of `success`.
-
-```{note}
-The new wakepy python API is under development, and once ready, the returned object will have some proper class name and documentation. On version 0.7.0, these are the only attributes available that are guaranteed to be there also in later releases.
-```  
+- `m.active`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
+- `m.result`: An ActivationResult instance which gives more detailed information about the activation process.
 
 ````{tip} 
 You may want to inform user about failure in activating a mode. For example:
 
 ```{code-block} python
-with keep.running() as k:
-    if not k.success:
+with keep.running() as m:
+    if not m.active:
         print('Failed to inhibit system sleep.')
 
     do_something_that_takes_long_time()

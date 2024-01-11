@@ -35,7 +35,7 @@ If you want to keep a long task running, but do not want to prevent screen from 
 ```{code-block} python
 from wakepy import keep
 
-with keep.running() as k:
+with keep.running():
     # Do something that takes a long time
 ```
 
@@ -46,7 +46,7 @@ with keep.running() as k:
 ```{code-block} python
 from wakepy import keep
 
-with keep.presenting() as k:
+with keep.presenting():
     # Do something that takes a long time
 ```
 
