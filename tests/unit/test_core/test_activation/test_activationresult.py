@@ -63,7 +63,7 @@ METHODACTIVATIONRESULTS_3_FAIL = [
 ]
 
 
-def test_activation_result_get_details():
+def test_activation_result_list_methods():
     ar = ActivationResult()
     ar._results = [
         PLATFORM_SUPPORT_FAIL,
@@ -72,23 +72,23 @@ def test_activation_result_get_details():
         UNUSED_RESULT,
     ]
 
-    # By default, the get_details drops out failures occuring in the
+    # By default, the list_methods drops out failures occuring in the
     # platform stage
-    assert ar.get_details() == [
+    assert ar.list_methods() == [
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
         UNUSED_RESULT,
     ]
 
     # The same as above but with explicit arguments.
-    assert ar.get_details(ignore_platform_fails=True) == [
+    assert ar.list_methods(ignore_platform_fails=True) == [
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
         UNUSED_RESULT,
     ]
 
     # Do not ignore platform fails
-    assert ar.get_details(ignore_platform_fails=False) == [
+    assert ar.list_methods(ignore_platform_fails=False) == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,
@@ -96,7 +96,7 @@ def test_activation_result_get_details():
     ]
 
     # ignore unused
-    assert ar.get_details(ignore_platform_fails=False, ignore_unused=True) == [
+    assert ar.list_methods(ignore_platform_fails=False, ignore_unused=True) == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
         SUCCESS_RESULT,

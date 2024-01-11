@@ -74,12 +74,12 @@ class ActivationResult:
 
     Methods
     -------
-    get_details:
+    list_methods:
         Get details of the activation results. This is the higher-level
         interface. If you want more control, use .query().
     query:
         Lower-level interface for getting details of the activation results.
-        If you want easier access, use .get_details().
+        If you want easier access, use .list_methods().
     """
 
     def __init__(self, results: Optional[List[MethodActivationResult]] = None):
@@ -132,13 +132,14 @@ class ActivationResult:
                 f"Active methods: {methods}"
             )
 
-    def get_details(
+    def list_methods(
         self,
         ignore_platform_fails: bool = True,
         ignore_unused: bool = False,
     ) -> list[MethodActivationResult]:
-        """Get details of the activation results. This is the higher-level
-        interface. If you want more control, use .query().
+        """Get a list of the methods in present in the activation process, and
+        their activation results. This is the higher-level interface. If you
+        want more control, use .query().
 
         Parameters
         ----------
@@ -168,7 +169,7 @@ class ActivationResult:
         ),
     ) -> list[MethodActivationResult]:
         """Get details of the activation results. This is the lower-level
-        interface. If you want easier access, use .get_details().
+        interface. If you want easier access, use .list_methods().
 
         Parameters
         ----------
