@@ -38,7 +38,7 @@ def get_mocks_and_testmode():
     return mocks, TestMode
 
 
-def test_mode_contextmanager_protocol():
+def test_mode_contextmanager_protocol(monkeypatch):
     """Test that the Mode fulfills the context manager protocol; i.e. it is
     possible to use instances of Mode in a with statement like this:
 
@@ -82,9 +82,15 @@ def test_mode_contextmanager_protocol():
         # The __enter__ returns the Mode
         assert m is mode
 
+        # When activating, the .active is set to result.success
+        assert m.active is m.result.success
+
         # The m.result contains the value from the ModeController.activate()
         # call
         assert m.result == mocks.controller_class.return_value.activate.return_value
+
+    # After exiting the mode, Mode.active is set to False
+    assert m.active is False
 
     # If we get here, the __exit__ works without errors
     # ModeController.deactivate() is called during __exit__
