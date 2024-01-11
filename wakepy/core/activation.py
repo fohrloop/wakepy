@@ -199,7 +199,7 @@ class ActivationResult:
         for res in self._results:
             if res.success not in success:
                 continue
-            if res.success == False and res.failure_stage not in fail_stages:
+            if res.success is False and res.failure_stage not in fail_stages:
                 continue
             out.append(res)
 
