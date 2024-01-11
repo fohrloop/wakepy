@@ -22,7 +22,6 @@ from testmethods import (
 from wakepy.core import MethodActivationResult
 from wakepy.core.activation import (
     StageName,
-    UsageStatus,
     activate_method,
     activate_one_of_multiple,
     caniuse_fails,
@@ -115,7 +114,7 @@ def _arrange_for_test_activate(monkeypatch):
         return (
             MethodActivationResult(
                 method_name=method.name,
-                status=UsageStatus.SUCCESS if success else UsageStatus.FAIL,
+                success=True if success else False,
                 failure_stage=None if success else StageName.ACTIVATION,
             ),
             mocks.heartbeat,
@@ -153,7 +152,7 @@ def test_activate_method_method_without_platform_support(monkeypatch):
     # should fail.
     res, heartbeat = activate_method(winmethod)
     assert res.failure_stage == StageName.PLATFORM_SUPPORT
-    assert res.status == UsageStatus.FAIL
+    assert res.success is False
     assert heartbeat is None
 
 
@@ -161,9 +160,9 @@ def test_activate_method_method_caniuse_fails():
     # Case 1: Fail by returning False from caniuse
     method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
     res, heartbeat = activate_method(method)
-    assert res.status == UsageStatus.FAIL
+    assert res.success is False
     assert res.failure_stage == StageName.REQUIREMENTS
-    assert res.message == ""
+    assert res.failure_reason == ""
     assert heartbeat is None
 
     # Case 2: Fail by returning some error reason from caniuse
@@ -171,9 +170,9 @@ def test_activate_method_method_caniuse_fails():
         caniuse="SomeSW version <2.1.5 not supported", enter_mode=True, exit_mode=True
     )()
     res, heartbeat = activate_method(method)
-    assert res.status == UsageStatus.FAIL
+    assert res.success is False
     assert res.failure_stage == StageName.REQUIREMENTS
-    assert res.message == "SomeSW version <2.1.5 not supported"
+    assert res.failure_reason == "SomeSW version <2.1.5 not supported"
     assert heartbeat is None
 
 
@@ -181,18 +180,18 @@ def test_activate_method_method_enter_mode_fails():
     # Case: Fail by returning False from enter_mode
     method = get_test_method_class(caniuse=True, enter_mode=RuntimeError("failed"))()
     res, heartbeat = activate_method(method)
-    assert res.status == UsageStatus.FAIL
+    assert res.success is False
     assert res.failure_stage == StageName.ACTIVATION
-    assert "Original error: failed" in res.message
+    assert "Original error: failed" in res.failure_reason
     assert heartbeat is None
 
 
 def test_activate_method_enter_mode_success():
     method = get_test_method_class(caniuse=True, enter_mode=None)()
     res, heartbeat = activate_method(method)
-    assert res.status == UsageStatus.SUCCESS
+    assert res.success is True
     assert res.failure_stage is None
-    assert res.message == ""
+    assert res.failure_reason == ""
     # No heartbeat on success, as the used Method does not have heartbeat()
     assert heartbeat is None
 
@@ -200,9 +199,9 @@ def test_activate_method_enter_mode_success():
 def test_activate_method_heartbeat_success():
     method = get_test_method_class(heartbeat=None)()
     res, heartbeat = activate_method(method)
-    assert res.status == UsageStatus.SUCCESS
+    assert res.success is True
     assert res.failure_stage is None
-    assert res.message == ""
+    assert res.failure_reason == ""
     # We get a Heartbeat instance on success, as the used Method does has a
     # heartbeat()
     assert isinstance(heartbeat, Heartbeat)
@@ -457,24 +456,24 @@ def test_caniuse_fails(params):
 
 
 @pytest.mark.parametrize(
-    "status, failure_stage, method_name, message, expected_string_representation",
+    "success, failure_stage, method_name, message, expected_string_representation",
     [
         (
-            UsageStatus.FAIL,
+            False,
             StageName.PLATFORM_SUPPORT,
             "fail-platform",
             "Platform XYZ not supported!",
             '(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!")',
         ),
         (
-            UsageStatus.FAIL,
+            False,
             StageName.REQUIREMENTS,
             "other-fail-method",
             "Need SW X version >= 8.9!",
             '(FAIL @REQUIREMENTS, other-fail-method, "Need SW X version >= 8.9!")',
         ),
         (
-            UsageStatus.SUCCESS,
+            True,
             None,
             "successfulMethod",
             "",
@@ -482,7 +481,7 @@ def test_caniuse_fails(params):
             "(SUCCESS, successfulMethod)",
         ),
         (
-            UsageStatus.UNUSED,
+            None,
             None,
             "SomeMethod",
             "",
@@ -492,23 +491,23 @@ def test_caniuse_fails(params):
     ],
 )
 def test_method_usage_result(
-    status,
+    success,
     failure_stage,
     method_name,
     message,
     expected_string_representation,
 ):
     mur = MethodActivationResult(
-        status=status,
+        success=success,
         failure_stage=failure_stage,
         method_name=method_name,
-        message=message,
+        failure_reason=message,
     )
     # These attributes are available
-    assert mur.status == status
-    assert mur.failure_stage == failure_stage
     assert mur.method_name == method_name
-    assert mur.message == message
+    assert mur.success == success
+    assert mur.failure_stage == failure_stage
+    assert mur.failure_reason == message
 
     assert str(mur) == expected_string_representation
 
@@ -579,12 +578,6 @@ def test_stagename():
     assert StageName.PLATFORM_SUPPORT == "PLATFORM_SUPPORT"
     assert StageName.ACTIVATION == "ACTIVATION"
     assert StageName.REQUIREMENTS == "REQUIREMENTS"
-
-
-def test_usagestatus():
-    assert UsageStatus.FAIL == "FAIL"
-    assert UsageStatus.SUCCESS == "SUCCESS"
-    assert UsageStatus.UNUSED == "UNUSED"
 
 
 def test_should_fake_success(monkeypatch):

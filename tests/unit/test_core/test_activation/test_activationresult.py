@@ -1,26 +1,26 @@
 import pytest
 
 from wakepy.core import ActivationResult, MethodActivationResult
-from wakepy.core.activation import StageName, UsageStatus
+from wakepy.core.activation import StageName
 
 PLATFORM_SUPPORT_FAIL = MethodActivationResult(
-    status=UsageStatus.FAIL,
+    success=False,
     failure_stage=StageName.PLATFORM_SUPPORT,
     method_name="fail-platform",
-    message="Platform XYZ not supported!",
+    failure_reason="Platform XYZ not supported!",
 )
 REQUIREMENTS_FAIL = MethodActivationResult(
-    status=UsageStatus.FAIL,
+    success=False,
     failure_stage=StageName.REQUIREMENTS,
     method_name="fail-requirements",
-    message="Missing requirement: Some SW v.1.2.3",
+    failure_reason="Missing requirement: Some SW v.1.2.3",
 )
 SUCCESS_RESULT = MethodActivationResult(
-    status=UsageStatus.SUCCESS,
+    success=True,
     method_name="a-successful-method",
 )
 UNUSED_RESULT = MethodActivationResult(
-    status=UsageStatus.UNUSED,
+    success=None,
     method_name="some-unused-method",
 )
 METHODACTIVATIONRESULTS_1 = [
@@ -32,32 +32,32 @@ METHODACTIVATIONRESULTS_1 = [
 
 METHODACTIVATIONRESULTS_2 = [
     MethodActivationResult(
-        status=UsageStatus.SUCCESS,
+        success=True,
         method_name="1st.successfull.method",
     ),
     REQUIREMENTS_FAIL,
     MethodActivationResult(
-        status=UsageStatus.SUCCESS,
+        success=True,
         method_name="2nd-successful-method",
     ),
     MethodActivationResult(
-        status=UsageStatus.SUCCESS,
+        success=True,
         method_name="last-successful-method",
     ),
 ]
 
 METHODACTIVATIONRESULTS_3_FAIL = [
     MethodActivationResult(
-        status=UsageStatus.FAIL,
+        success=False,
         failure_stage=StageName.PLATFORM_SUPPORT,
         method_name="fail-platform",
-        message="Platform XYZ not supported!",
+        failure_reason="Platform XYZ not supported!",
     ),
     MethodActivationResult(
-        status=UsageStatus.FAIL,
+        success=False,
         failure_stage=StageName.REQUIREMENTS,
         method_name="fail-requirements",
-        message="Missing requirement: Some SW v.1.2.3",
+        failure_reason="Missing requirement: Some SW v.1.2.3",
     ),
 ]
 
@@ -120,7 +120,7 @@ def test_activation_result_get_detailed_results():
     ]
 
     # Possible to filter with status
-    assert ar.get_detailed_results(statuses=("FAIL",)) == [
+    assert ar.get_detailed_results(success=(False,)) == [
         PLATFORM_SUPPORT_FAIL,
         REQUIREMENTS_FAIL,
     ]
@@ -133,9 +133,7 @@ def test_activation_result_get_detailed_results():
     ]
 
     # or with both
-    assert ar.get_detailed_results(
-        statuses=("FAIL",), fail_stages=("REQUIREMENTS",)
-    ) == [
+    assert ar.get_detailed_results(success=(False,), fail_stages=("REQUIREMENTS",)) == [
         REQUIREMENTS_FAIL,
     ]
 
