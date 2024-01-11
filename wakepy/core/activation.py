@@ -40,12 +40,6 @@ if typing.TYPE_CHECKING:
 MethodsPriorityOrder = List[Union[str, Set[str]]]
 
 
-class UsageStatus(StrEnum):
-    FAIL = auto()
-    SUCCESS = auto()
-    UNUSED = auto()
-
-
 class StageName(StrEnum):
     # These are stages which occur in order for each of the methods
     # when using a Method for activation.
@@ -112,7 +106,7 @@ class ActivationResult:
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
         """
         for res in self._results:
-            if res.status == UsageStatus.SUCCESS:
+            if res.success:
                 return True
         return False
 
@@ -134,11 +128,7 @@ class ActivationResult:
     @property
     def active_methods(self) -> list[str]:
         """List of the names of all the successful (active) methods"""
-        return [
-            res.method_name
-            for res in self._results
-            if res.status == UsageStatus.SUCCESS
-        ]
+        return [res.method_name for res in self._results if res.success]
 
     @property
     def active_methods_string(self) -> str:
@@ -172,28 +162,19 @@ class ActivationResult:
             If True, ignores all unused / remaining methods. Default: False.
         """
 
-        statuses = [
-            UsageStatus.FAIL,
-            UsageStatus.SUCCESS,
-        ]
-        if not ignore_unused:
-            statuses.append(UsageStatus.UNUSED)
+        success_values = (True, False) if ignore_unused else (True, False, None)
 
-        fail_stages = [
-            StageName.REQUIREMENTS,
-            StageName.ACTIVATION,
-        ]
+        fail_stages = [StageName.REQUIREMENTS, StageName.ACTIVATION]
         if not ignore_platform_fails:
             fail_stages.insert(0, StageName.PLATFORM_SUPPORT)
-        return self.get_detailed_results(statuses=statuses, fail_stages=fail_stages)
+
+        return self.get_detailed_results(
+            success=success_values, fail_stages=fail_stages
+        )
 
     def get_detailed_results(
         self,
-        statuses: Sequence[UsageStatus] = (
-            UsageStatus.FAIL,
-            UsageStatus.SUCCESS,
-            UsageStatus.UNUSED,
-        ),
+        success: Sequence[bool | None] = (True, False, None),
         fail_stages: Sequence[StageName] = (
             StageName.PLATFORM_SUPPORT,
             StageName.REQUIREMENTS,
@@ -205,18 +186,20 @@ class ActivationResult:
 
         Parameters
         ----------
-        statuses:
-            The method usage statuses to include in the output. The options
-            are "FAIL", "SUCCESS" and "UNUSED".
+        success:
+            Controls what methods to include in the output. Options are:
+            True (success), False (failure) and None (method not used). If
+            `success = (True, False)`, returns only methods which did succeed
+            or failer (do not return unused methods).
         fail_stages:
             The fail stages to include in the output. The options are
             "PLATFORM_SUPPORT", "REQUIREMENTS" and "ACTIVATION".
         """
         out = []
         for res in self._results:
-            if res.status not in statuses:
+            if res.success not in success:
                 continue
-            if res.status == UsageStatus.FAIL and res.failure_stage not in fail_stages:
+            if res.success == False and res.failure_stage not in fail_stages:
                 continue
             out.append(res)
 
@@ -227,7 +210,10 @@ class ActivationResult:
 class MethodActivationResult:
     """This class is a result from using a single Method to activate a mode."""
 
-    status: UsageStatus
+    # True: Using Method was successful
+    # False: Using Method failed
+    # None: Method is unused
+    success: bool | None
 
     method_name: str
 
@@ -239,8 +225,11 @@ class MethodActivationResult:
 
     def __repr__(self):
         error_at = " @" + self.failure_stage if self.failure_stage else ""
-        message_part = f', "{self.message}"' if self.status == UsageStatus.FAIL else ""
-        return f"({self.status}{error_at}, {self.method_name}{message_part})"
+        message_part = f', "{self.message}"' if self.success is False else ""
+        success_str = (
+            "SUCCESS" if self.success else "FAIL" if self.success is False else "UNUSED"
+        )
+        return f"({success_str}{error_at}, {self.method_name}{message_part})"
 
 
 def activate_one_of_multiple(
@@ -279,7 +268,7 @@ def activate_one_of_multiple(
         method = methodcls(call_processor=call_processor)
         methodresult, heartbeat = activate_method(method)
         results.append(methodresult)
-        if methodresult.status == UsageStatus.SUCCESS:
+        if methodresult.success:
             break
     else:
         # Tried activate with all methods, but none of them succeed
@@ -522,7 +511,7 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     if method.name is None:
         raise ValueError("Methods without a name may not be used to activate modes!")
 
-    result = MethodActivationResult(status=UsageStatus.FAIL, method_name=method.name)
+    result = MethodActivationResult(success=False, method_name=method.name)
 
     if not get_platform_supported(method, platform=CURRENT_PLATFORM):
         result.failure_stage = StageName.PLATFORM_SUPPORT
@@ -540,7 +529,7 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
         result.message = err_message
         return result, None
 
-    result.status = UsageStatus.SUCCESS
+    result.success = True
 
     if not heartbeat_call_time:
         # Success, using just enter_mode(); no heartbeat()
