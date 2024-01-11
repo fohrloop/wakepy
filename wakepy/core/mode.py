@@ -105,7 +105,7 @@ class Mode(ABC):
         The list of methods associated for this mode.
     active: bool
         True if the mode is active. Otherwise, False.
-    result: ActivationResult | None
+    activation_result: ActivationResult | None
         The activation result which tells more about the activation process
         outcome. None if Mode has not yet been activated.
     """
@@ -140,7 +140,7 @@ class Mode(ABC):
         self.methods_classes = methods
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
-        self.result: ActivationResult | None = None
+        self.activation_result: ActivationResult | None = None
         self.active: bool = False
         self._dbus_adapter_cls = dbus_adapter
 
@@ -150,11 +150,11 @@ class Mode(ABC):
                 dbus_adapter=self._dbus_adapter_cls
             )
             self.controller = self._controller_class(call_processor=call_processor)
-        self.result = self.controller.activate(
+        self.activation_result = self.controller.activate(
             self.methods_classes,
             methods_priority=self.methods_priority,
         )
-        self.active = self.result.success
+        self.active = self.activation_result.success
         return self
 
     def __exit__(

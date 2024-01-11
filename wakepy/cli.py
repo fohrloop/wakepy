@@ -100,12 +100,12 @@ def start(
         if keep_running:
             m = stack.enter_context(keep.running())
             real_successes["keep_running"] = (
-                m.result.real_success if m.result else False
+                m.activation_result.real_success if m.activation_result else False
             )
         if presentation_mode:
             m = stack.enter_context(keep.presenting())
             real_successes["presentation_mode"] = (
-                m.result.real_success if m.result else False
+                m.activation_result.real_success if m.activation_result else False
             )
 
         # A quick fix (Fix this better in next release)

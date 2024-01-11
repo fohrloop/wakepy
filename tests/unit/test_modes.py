@@ -84,10 +84,10 @@ def test_keep_running(monkeypatch, fake_dbus_adapter):
     with mode as m:
         assert mode is m
         assert m.active is True
-        assert m.result.success is True
+        assert m.activation_result.success is True
 
     assert m.active is False
-    assert isinstance(m.result, ActivationResult)
+    assert isinstance(m.activation_result, ActivationResult)
 
 
 def test_keep_running(monkeypatch, fake_dbus_adapter):
@@ -100,14 +100,14 @@ def test_keep_running(monkeypatch, fake_dbus_adapter):
     with mode as m:
         assert mode is m
         assert m.active is False
-        assert m.result.success is False
+        assert m.activation_result.success is False
 
     assert m.active is False
-    assert isinstance(m.result, ActivationResult)
+    assert isinstance(m.activation_result, ActivationResult)
 
 
 def test_keep_presenting(fake_dbus_adapter):
     """Simple smoke test for keep.presenting()"""
     with keep.presenting(dbus_adapter=fake_dbus_adapter) as m:
         assert isinstance(m, Mode)
-        assert isinstance(m.result.success, bool)
+        assert isinstance(m.activation_result.success, bool)

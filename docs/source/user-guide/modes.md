@@ -13,7 +13,7 @@ The available modes are
 The wakepy modes are implemented as context managers of type `wakepy.Mode`. When entering the context, the `wakepy.Mode` instance (`m`) is returned, which has following attributes:
 
 - `m.active`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
-- `m.result`: An ActivationResult instance which gives more detailed information about the activation process.
+- `m.activation_result`: An ActivationResult instance which gives more detailed information about the activation process.
 
 ````{tip} 
 You may want to inform user about failure in activating a mode. For example:

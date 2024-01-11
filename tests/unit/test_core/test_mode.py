@@ -22,7 +22,7 @@ def mocks_for_test_mode():
     methods = [Mock() for _ in range(3)]
 
     # Record calls in a "mock manager"
-    mocks.result = result
+    mocks.activation_result = result
     mocks.methods = methods
     return mocks
 
@@ -82,12 +82,15 @@ def test_mode_contextmanager_protocol(monkeypatch):
         # The __enter__ returns the Mode
         assert m is mode
 
-        # When activating, the .active is set to result.success
-        assert m.active is m.result.success
+        # When activating, the .active is set to activation_result.success
+        assert m.active is m.activation_result.success
 
-        # The m.result contains the value from the ModeController.activate()
+        # The m.activation_result contains the value from the ModeController.activate()
         # call
-        assert m.result == mocks.controller_class.return_value.activate.return_value
+        assert (
+            m.activation_result
+            == mocks.controller_class.return_value.activate.return_value
+        )
 
     # After exiting the mode, Mode.active is set to False
     assert m.active is False
