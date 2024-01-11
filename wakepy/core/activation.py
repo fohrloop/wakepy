@@ -210,12 +210,12 @@ class ActivationResult:
 class MethodActivationResult:
     """This class is a result from using a single Method to activate a mode."""
 
+    method_name: str
+
     # True: Using Method was successful
     # False: Using Method failed
     # None: Method is unused
     success: bool | None
-
-    method_name: str
 
     # None if the method did not fail. Otherwise, the name of the stage where
     # the method failed.
