@@ -41,9 +41,6 @@ Collection = Union[List[T], Tuple[T, ...], Set[T]]
 MethodClsCollection = Collection[MethodCls]
 StrCollection = Collection[str]
 
-"""The strings in MethodsPriorityOrder are names of Methods or the asterisk
-('*')"""
-
 
 class MethodError(RuntimeError):
     """Occurred inside wakepy.core.method.Method"""

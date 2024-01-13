@@ -37,6 +37,8 @@ if typing.TYPE_CHECKING:
 
     from .method import Method, MethodCls
 
+"""The strings in MethodsPriorityOrder are names of wakepy.Methods or the
+asterisk ('*')."""
 MethodsPriorityOrder = List[Union[str, Set[str]]]
 
 
