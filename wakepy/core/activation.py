@@ -101,7 +101,7 @@ class ActivationResult:
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
         """
         for res in self._results:
-            if res.success:
+            if res.success and res.method_name != WakepyFakeSuccess.name:
                 return True
         return False
 
@@ -111,9 +111,11 @@ class ActivationResult:
 
         Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
         variable (for tests). See also: real_success.
-
         """
-        return self.real_success or should_fake_success()
+        for res in self._results:
+            if res.success:
+                return True
+        return False
 
     @property
     def failure(self) -> bool:
@@ -190,7 +192,12 @@ class ActivationResult:
         for res in self._results:
             if res.success not in success:
                 continue
-            if res.success is False and res.failure_stage not in fail_stages:
+            elif res.success is False and res.failure_stage not in fail_stages:
+                continue
+            elif res.success is False and res.method_name == WakepyFakeSuccess.name:
+                # The fake method is only listed if it was requested to be,
+                # used, and when it is not requested to be used, the
+                # res.success is False.
                 continue
             out.append(res)
 
