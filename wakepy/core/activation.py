@@ -771,29 +771,3 @@ def _rollback_with_exit(method):
             f"Entered {method.__class__.__name__} ({method.name}) but could not exit!"
             + f" Original error: {str(exc)}"
         ) from exc
-
-
-def should_fake_success() -> bool:
-    """Function which says if fake success should be enabled
-
-    Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
-    If that variable is set to a truthy value,fake success is activated.
-
-    Falsy values: '0', 'no', 'false' (case ignored)
-    Truthy values: everything else
-
-    Motivation:
-    -----------
-    When running on CI system, wakepy might fail to acquire an inhibitor lock
-    just because there is no Desktop Environment running. In these cases, it
-    might be useful to just tell with an environment variable that wakepy
-    should fake the successful inhibition anyway. Faking the success is done
-    after every other method is tried (and failed).
-    """
-    if "WAKEPY_FAKE_SUCCESS" not in os.environ:
-        return False
-
-    val_from_env = os.environ["WAKEPY_FAKE_SUCCESS"].lower()
-    if val_from_env in ("0", "no", "false"):
-        return False
-    return True
