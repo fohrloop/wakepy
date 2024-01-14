@@ -4,21 +4,23 @@ This document serves as documentation for the package developers.
 
 ## Branches and tags
 
-
 - **`dev`** branch: for development. All PRs should be against it.
 - **`latest-release`** branch: The latest wakepy release. This is used to select the where [wakepy.readthedocs.io](https://wakepy.readthedocs.io/) redirects to (the "latest" version). 
 - Use a local short-lived feature branch for development.
 - Release versions use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the dev branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
 
-
 ## Installing for development
+
+Requirements: 
+- At least of of the supported Python versions installed (see README.md and/or tox.ini). 
+- pip >= 21.3 (for pyproject.toml support)
 
 Install in editable state with the `doc` and `dev` options:
 ```
 python -m pip install -e .[doc,dev]
 ```
 
-where `.` means the current directory (assuming cwd is at root of the repository).
+where `.` means the current directory (assuming cwd is at root of the repository). 
 
 ## Documentation
 
@@ -40,13 +42,13 @@ sphinx-build -b html docs/source/ docs/build
   
 
 
-
 # Testing 
 
 - wakepy uses pytest for tests and tox for testing the library with multiple python versions.
 
 ## Running tests with single environment
 
+- Requirement: Any one python version `python -m pytest` within the range of supported versions (see README.md or tox.ini)
 - Use pytest to run tests within a single environment:
 
 ```
@@ -61,6 +63,7 @@ python -m pytest --cov-branch --cov wakepy && coverage html && python -m webbrow
 
 ## Running tests with multiple environments
 
+- Requirement:  All the python versions mentioned in the envlist in tox.ini have to be installed and available for tox.  
 - To run the tests with multiple python versions, use tox:
 
 ```
