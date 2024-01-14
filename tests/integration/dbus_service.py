@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 import logging
+import queue
+import threading
 import time
-import typing
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple, Type
 
 from jeepney import HeaderFields, MessageType, new_error, new_method_return
 from jeepney.bus_messages import message_bus
 from jeepney.io.blocking import open_dbus_connection
 
-if typing.TYPE_CHECKING:
-    import queue
+from wakepy.core import DbusAddress
 
-    from wakepy.core import DbusAddress
+logger = logging.getLogger(__name__)
+
 
 DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER = 1
 
@@ -40,7 +41,7 @@ class DbusService:
 
     addr: DbusAddress
 
-    def __init__(self, bus_address: str, queue_: queue.Queue, stop: typing.Callable):
+    def __init__(self, bus_address: str, queue_: queue.Queue, stop: Callable):
         """
         Parameters
         ----------
@@ -143,3 +144,46 @@ class DbusService:
         output signature (like "ii" or "sus", etc.), and output values which
         are of the type defined by the output signature
         """
+
+
+def start_dbus_service(service_cls: Type[DbusService]):
+    """Start a Dbus Service in a separate thread."""
+
+    queue_ = queue.Queue()
+    should_stop = False
+
+    def start_service(
+        service: Type[DbusService], queue_: queue.Queue, should_stop: Callable
+    ):
+        logger.info(f"Launching dbus service: {service.addr.service}")
+
+        service_ = service(service.addr.bus, queue_, stop=should_stop)
+        service_.start(
+            server_name=service.addr.service,
+            object_path=service.addr.path,
+        )
+
+    th = threading.Thread(
+        target=start_service,
+        kwargs=dict(
+            service=service_cls, queue_=queue_, should_stop=lambda: should_stop
+        ),
+        daemon=True,
+    )
+
+    th.start()
+    # Wait until the dbus service is ready to receive messages. This is needed
+    # as there is slight chance that the test try to connect to nonexisting
+    # service, which will make the test fail randomly (but rarely) for no
+    # apparent reason
+    assert queue_.get(timeout=2) == "ready"
+    logger.info(f"Initialization of {service_cls.addr.service} ready")
+
+    yield
+
+    should_stop = True
+    logger.info(f"Stopping {service_cls.addr.service}")
+    th.join(1)
+    if th.is_alive():
+        raise Exception(f"Service {service_cls.addr.service} did not stop!")
+    logger.info(f"Stopped {service_cls.addr.service}")
