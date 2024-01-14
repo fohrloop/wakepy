@@ -146,8 +146,17 @@ class DbusService:
         """
 
 
-def start_dbus_service(service_cls: Type[DbusService]):
-    """Start a Dbus Service in a separate thread."""
+def start_dbus_service(
+    service_cls: Type[DbusService], bus_address: Optional[str] = None
+):
+    """Start a Dbus Service in a separate thread.
+
+    Parameters
+    ----------
+    bus_address:
+        If given, should be an address of a bus from dbus-daemon
+        --print-address. If not given, uses the service_cls.addr.bus.
+    """
 
     queue_ = queue.Queue()
     should_stop = False
@@ -157,7 +166,7 @@ def start_dbus_service(service_cls: Type[DbusService]):
     ):
         logger.info(f"Launching dbus service: {service.addr.service}")
 
-        service_ = service(service.addr.bus, queue_, stop=should_stop)
+        service_ = service(bus_address or service.addr.bus, queue_, stop=should_stop)
         service_.start(
             server_name=service.addr.service,
             object_path=service.addr.path,

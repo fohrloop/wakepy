@@ -2,6 +2,9 @@
 provides the services as fixtures. The services run in separate threads.
 """
 
+import logging
+import os
+import subprocess
 import sys
 
 import pytest
@@ -10,10 +13,14 @@ if sys.platform.lower().startswith("linux"):
     from dbus_service import DbusService, start_dbus_service
 else:
     DbusService = None
+
     def start_dbus_service():
         return None
 
+
 from wakepy.core import BusType, DbusAddress, DbusMethod
+
+logger = logging.getLogger(__name__)
 
 _calculator_service_addr = DbusAddress(
     bus=BusType.SESSION,
@@ -75,8 +82,40 @@ def string_shorten_method():
     return _string_shorten_method
 
 
+@pytest.fixture(scope="session", autouse=True)
+def private_bus():
+    """A real, private message bus (dbus-daemon) instance which can be used
+    to test dbus adapters. You can see the bus running with
+
+    $ ps -x | grep dbus-daemon | grep -v grep | grep dbus-daemon
+
+    It is listed as `PrivateSessionBus._start_cmd`  (e.g. "dbus-daemon
+    --session --print-address")
+    """
+
+    _start_cmd = "dbus-daemon --session --print-address"
+
+    p = subprocess.Popen(
+        _start_cmd.split(),
+        stdout=subprocess.PIPE,
+        shell=False,
+        env={"DBUS_VERBOSE": "1"},
+    )
+
+    bus_address = p.stdout.readline().decode("utf-8").strip()
+
+    logger.info("Initiated private bus: %s", bus_address)
+
+    os.environ["DBUS_SESSION_BUS_ADDRESS"] = bus_address
+
+    yield bus_address
+
+    logger.info("Terminating private bus")
+    p.terminate()
+
+
 @pytest.fixture(scope="session")
-def dbus_calculator_service():
+def dbus_calculator_service(private_bus: str):
     """Provides a Dbus service called org.github.wakepy.TestCalculatorService
     in the session bus"""
 
@@ -91,7 +130,7 @@ def dbus_calculator_service():
                 res = args[0] * args[1]
                 return _numbermultiply_method.output_signature, (res,)
 
-    yield from start_dbus_service(TestCalculatorService)
+    yield from start_dbus_service(TestCalculatorService, bus_address=private_bus)
 
 
 @pytest.fixture(scope="session")
