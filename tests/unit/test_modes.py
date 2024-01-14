@@ -75,7 +75,7 @@ def test_keep_running_mode_creation(input_args, monkeypatch):
     assert mode._dbus_adapter_cls == MyDbusAdapter
 
 
-def test_keep_running(monkeypatch, fake_dbus_adapter):
+def test_keep_running_with_fake_success(monkeypatch, fake_dbus_adapter):
     """Simple smoke test for keep.running()"""
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "1")
     mode = keep.running(dbus_adapter=fake_dbus_adapter)
@@ -90,7 +90,7 @@ def test_keep_running(monkeypatch, fake_dbus_adapter):
     assert isinstance(m.activation_result, ActivationResult)
 
 
-def test_keep_running(monkeypatch, fake_dbus_adapter):
+def test_keep_running_without_fake_success(monkeypatch, fake_dbus_adapter):
     """Simple smoke test for keep.running()"""
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
     # This we expect to fail as the only adapter is the fake_dbus_adapter

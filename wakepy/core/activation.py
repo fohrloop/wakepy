@@ -20,7 +20,6 @@ MethodActivationResult
 from __future__ import annotations
 
 import datetime as dt
-import os
 import typing
 from dataclasses import dataclass
 from typing import List, Set, Union
@@ -28,14 +27,14 @@ from typing import List, Set, Union
 from .calls import CallProcessor
 from .constants import PlatformName
 from .heartbeat import Heartbeat
-from .method import MethodError, MethodOutcome
+from .method import Method, MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
     from typing import Optional, Sequence, Tuple, Type
 
-    from .method import Method, MethodCls
+    from .method import MethodCls
 
 """The strings in MethodsPriorityOrder are names of wakepy.Methods or the
 asterisk ('*')."""
@@ -94,15 +93,19 @@ class ActivationResult:
             The MethodActivationResults to be used to fill the ActivationResult
 
         """
-        self._results: list[MethodActivationResult] = results or []
+
+        # These are the retuls for each of the used wakepy.Methods, in the
+        # order the methods were tried (first = highest priority, last =
+        # lowest priority)
+        self._method_results: list[MethodActivationResult] = results or []
 
     @property
     def real_success(self) -> bool:
         """Tells is entering into a mode was successful. This
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
         """
-        for res in self._results:
-            if res.success:
+        for res in self._method_results:
+            if res.success and res.method_name != WakepyFakeSuccess.name:
                 return True
         return False
 
@@ -112,9 +115,11 @@ class ActivationResult:
 
         Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
         variable (for tests). See also: real_success.
-
         """
-        return self.real_success or should_fake_success()
+        for res in self._method_results:
+            if res.success:
+                return True
+        return False
 
     @property
     def failure(self) -> bool:
@@ -125,7 +130,7 @@ class ActivationResult:
     def active_method(self) -> str | None:
         """The name of the active (successful) method. If no methods are
         active, this is None."""
-        methods = [res.method_name for res in self._results if res.success]
+        methods = [res.method_name for res in self._method_results if res.success]
         if not methods:
             return None
         elif len(methods) == 1:
@@ -188,10 +193,15 @@ class ActivationResult:
             "PLATFORM_SUPPORT", "REQUIREMENTS" and "ACTIVATION".
         """
         out = []
-        for res in self._results:
+        for res in self._method_results:
             if res.success not in success:
                 continue
-            if res.success is False and res.failure_stage not in fail_stages:
+            elif res.success is False and res.failure_stage not in fail_stages:
+                continue
+            elif res.success is False and res.method_name == WakepyFakeSuccess.name:
+                # The fake method is only listed if it was requested to be,
+                # used, and when it is not requested to be used, the
+                # res.success is False.
                 continue
             out.append(res)
 
@@ -233,6 +243,9 @@ def activate_one_of_multiple(
     Method which succeeds activation will be used, in order from highest
     priority to lowest priority.
 
+    The activation may be faked as to be successful by using the
+    WAKEPY_FAKE_SUCCESS environment variable.
+
     Parameters
     ----------
     methods:
@@ -254,6 +267,9 @@ def activate_one_of_multiple(
         return ActivationResult(), None, None
 
     prioritized_methods = get_prioritized_methods(methods, methods_priority)
+    # The fake method is always checked first (WAKEPY_FAKE_SUCCESS)
+    prioritized_methods.insert(0, WakepyFakeSuccess)
+
     results = []
 
     for methodcls in prioritized_methods:
@@ -773,27 +789,49 @@ def _rollback_with_exit(method):
         ) from exc
 
 
-def should_fake_success() -> bool:
-    """Function which says if fake success should be enabled
-
-    Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
-    If that variable is set to a truthy value,fake success is activated.
-
-    Falsy values: '0', 'no', 'false' (case ignored)
-    Truthy values: everything else
-
-    Motivation:
-    -----------
-    When running on CI system, wakepy might fail to acquire an inhibitor lock
-    just because there is no Desktop Environment running. In these cases, it
-    might be useful to just tell with an environment variable that wakepy
-    should fake the successful inhibition anyway. Faking the success is done
-    after every other method is tried (and failed).
+class WakepyFakeSuccess(Method):
+    """This is a special fake method to be used with any mode. It can be used
+    in tests for faking wakepy mode activation. This way all IO and real
+    executable, library and dbus calls are prevented. To use this method (and
+    skip using any other methods), set WAKEPY_FAKE_SUCCESS environment variable
+    to a truthy value (e.g. "1", or "True").
     """
-    if "WAKEPY_FAKE_SUCCESS" not in os.environ:
-        return False
 
-    val_from_env = os.environ["WAKEPY_FAKE_SUCCESS"].lower()
-    if val_from_env in ("0", "no", "false"):
-        return False
-    return True
+    name = "WAKEPY_FAKE_SUCCESS"
+    environment_variable = name
+
+    # All other values are considered to be truthy. Comparison is case
+    # insensitive
+    falsy_values = ("0", "no", "false")
+
+    supported_platforms = (CURRENT_PLATFORM,)
+
+    def enter_mode(self):
+        """Function which says if fake success should be enabled
+
+        Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
+        If that variable is set to a truthy value,fake success is activated.
+
+        Falsy values: '0', 'no', 'false' (case ignored)
+        Truthy values: everything else
+
+        Motivation:
+        -----------
+        When running on CI system, wakepy might fail to acquire an inhibitor lock
+        just because there is no Desktop Environment running. In these cases, it
+        might be useful to just tell with an environment variable that wakepy
+        should fake the successful inhibition anyway. Faking the success is done
+        after every other method is tried (and failed).
+        """
+        # The os.environ seems to be populated when os is imported -> delay the
+        # import until here.
+        import os
+
+        if self.environment_variable not in os.environ:
+            raise RuntimeError(f"{self.environment_variable} not set.")
+
+        val = os.environ[self.environment_variable]
+        if val.lower() in self.falsy_values:
+            raise RuntimeError(
+                f"{self.environment_variable} set to falsy value: {val}."
+            )
