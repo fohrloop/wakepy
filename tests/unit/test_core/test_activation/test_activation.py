@@ -3,10 +3,10 @@
 Exception: ActivationResult is tested in it's own file
 """
 
-from contextlib import contextmanager
 import datetime as dt
 import os
 import re
+from contextlib import contextmanager
 from unittest.mock import Mock
 
 import pytest
@@ -114,7 +114,7 @@ def _arrange_for_test_activate(monkeypatch):
         try:
             assert method.enter_mode() is None
             success = True
-        except:
+        except Exception:
             success = False
 
         return (
@@ -610,7 +610,7 @@ def test_wakepy_fake_success_without_the_env_var_set(monkeypatch):
     if "WAKEPY_FAKE_SUCCESS" in os.environ:
         monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
 
-    with pytest.raises(RuntimeError, match=f"WAKEPY_FAKE_SUCCESS not set"):
+    with pytest.raises(RuntimeError, match="WAKEPY_FAKE_SUCCESS not set"):
         method.enter_mode()
 
 
