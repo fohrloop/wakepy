@@ -12,7 +12,6 @@ from jeepney.io.blocking import open_dbus_connection
 
 from wakepy.core import DbusAddress
 
-
 logger = logging.getLogger(__name__)
 
 

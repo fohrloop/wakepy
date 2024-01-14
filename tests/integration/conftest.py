@@ -2,14 +2,16 @@
 provides the services as fixtures. The services run in separate threads.
 """
 
-import pytest
 import sys
+
+import pytest
 
 if sys.platform.lower().startswith("linux"):
     from dbus_service import DbusService, start_dbus_service
 else:
     DbusService = None
-    start_dbus_service = lambda: None
+    def start_dbus_service():
+        return None
 
 from wakepy.core import BusType, DbusAddress, DbusMethod
 

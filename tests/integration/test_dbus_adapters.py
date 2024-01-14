@@ -2,9 +2,9 @@
 
 import re
 import struct
+import sys
 
 import pytest
-import sys
 
 if not sys.platform.lower().startswith("linux"):
     # D-Bus methods currently support only linux.
