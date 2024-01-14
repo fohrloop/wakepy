@@ -3,7 +3,13 @@ provides the services as fixtures. The services run in separate threads.
 """
 
 import pytest
-from dbus_service import DbusService, start_dbus_service
+import sys
+
+if sys.platform.lower().startswith("linux"):
+    from dbus_service import DbusService, start_dbus_service
+else:
+    DbusService = None
+    start_dbus_service = lambda: None
 
 from wakepy.core import BusType, DbusAddress, DbusMethod
 

@@ -1,5 +1,14 @@
+"""Test D-bus adapters."""
+
 import re
 import struct
+
+import pytest
+import sys
+
+if not sys.platform.lower().startswith("linux"):
+    # D-Bus methods currently support only linux.
+    pytest.skip(allow_module_level=True)
 
 import jeepney
 import pytest
