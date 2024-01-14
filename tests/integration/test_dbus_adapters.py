@@ -84,11 +84,11 @@ def test_jeepney_dbus_adapter_nonexisting_method(calculator_service_addr):
 
 
 @pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_wrong_service_definition():
+def test_jeepney_dbus_adapter_wrong_service_definition(private_bus: str):
     adapter = JeepneyDbusAdapter()
 
     wrong_service_addr = DbusAddress(
-        bus=BusType.SESSION,
+        bus=private_bus,
         service="org.github.wakepy.WrongService",
         path="/org/github/wakepy/TestCalculatorService",
         interface="org.github.wakepy.TestCalculatorService",
