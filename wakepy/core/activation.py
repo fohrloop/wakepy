@@ -93,14 +93,18 @@ class ActivationResult:
             The MethodActivationResults to be used to fill the ActivationResult
 
         """
-        self._results: list[MethodActivationResult] = results or []
+
+        # These are the retuls for each of the used wakepy.Methods, in the
+        # order the methods were tried (first = highest priority, last =
+        # lowest priority)
+        self._method_results: list[MethodActivationResult] = results or []
 
     @property
     def real_success(self) -> bool:
         """Tells is entering into a mode was successful. This
         may not faked with WAKEPY_FAKE_SUCCESS environment variable.
         """
-        for res in self._results:
+        for res in self._method_results:
             if res.success and res.method_name != WakepyFakeSuccess.name:
                 return True
         return False
@@ -112,7 +116,7 @@ class ActivationResult:
         Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
         variable (for tests). See also: real_success.
         """
-        for res in self._results:
+        for res in self._method_results:
             if res.success:
                 return True
         return False
@@ -126,7 +130,7 @@ class ActivationResult:
     def active_method(self) -> str | None:
         """The name of the active (successful) method. If no methods are
         active, this is None."""
-        methods = [res.method_name for res in self._results if res.success]
+        methods = [res.method_name for res in self._method_results if res.success]
         if not methods:
             return None
         elif len(methods) == 1:
@@ -189,7 +193,7 @@ class ActivationResult:
             "PLATFORM_SUPPORT", "REQUIREMENTS" and "ACTIVATION".
         """
         out = []
-        for res in self._results:
+        for res in self._method_results:
             if res.success not in success:
                 continue
             elif res.success is False and res.failure_stage not in fail_stages:
