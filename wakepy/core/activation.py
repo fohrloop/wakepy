@@ -794,7 +794,11 @@ class WakepyFakeSuccess(Method):
     """
 
     name = "WAKEPY_FAKE_SUCCESS"
-    _env_var = name
+    environment_variable = name
+
+    # All other values are considered to be truthy. Comparison is case
+    # insensitive
+    falsy_values = ("0", "no", "false")
 
     def enter_mode(self) -> bool:
         """Function which says if fake success should be enabled
@@ -817,7 +821,7 @@ class WakepyFakeSuccess(Method):
         # import until here.
         import os
 
-        if self._env_var not in os.environ:
+        if self.environment_variable not in os.environ:
             return False
 
-        return os.environ[self._env_var].lower() in ("0", "no", "false")
+        return os.environ[self.environment_variable].lower() not in self.falsy_values
