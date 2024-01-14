@@ -168,7 +168,11 @@ def _assert_context_manager_used_correctly(mocks):
     ]
 
 
-def test_modecontroller():
+def test_modecontroller(monkeypatch):
+    # Disable fake success here, because we want to use method_cls for the
+    # activation (and not WakepyFakeSuccess)
+    monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
+
     method_cls = get_test_method_class(enter_mode=None, heartbeat=None, exit_mode=None)
     controller = ModeController(Mock(spec_set=CallProcessor))
 
