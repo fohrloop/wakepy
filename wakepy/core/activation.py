@@ -820,7 +820,4 @@ class WakepyFakeSuccess(Method):
         if self._env_var not in os.environ:
             return False
 
-        val_from_env = os.environ[self._env_var].lower()
-        if val_from_env in ("0", "no", "false"):
-            return False
-        return True
+        return os.environ[self._env_var].lower() in ("0", "no", "false")
