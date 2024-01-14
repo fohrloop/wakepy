@@ -26,8 +26,11 @@ def private_bus():
 
     $ ps -x | grep dbus-daemon | grep -v grep | grep dbus-daemon
 
-    It is listed as `PrivateSessionBus._start_cmd`  (e.g. "dbus-daemon
-    --session --print-address")
+    It is listed as something like
+
+        11150 pts/0    S      0:00 dbus-daemon --session --print-address
+
+    (includes the _start_cmd which is defined below)
     """
 
     _start_cmd = "dbus-daemon --session --print-address"
