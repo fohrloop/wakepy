@@ -22,13 +22,13 @@ from testmethods import (
 from wakepy.core import MethodActivationResult
 from wakepy.core.activation import (
     StageName,
+    WakepyFakeSuccess,
     activate_method,
     activate_one_of_multiple,
     caniuse_fails,
     deactivate_method,
     get_platform_supported,
     try_enter_and_heartbeat,
-    WakepyFakeSuccess,
 )
 from wakepy.core.calls import CallProcessor
 from wakepy.core.heartbeat import Heartbeat

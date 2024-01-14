@@ -1,4 +1,5 @@
 import re
+
 import pytest
 
 from wakepy.core import ActivationResult, MethodActivationResult
@@ -189,7 +190,9 @@ def test_active_method_with_multiple_success():
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "The ActivationResult cannot have more than one active methods! Active methods: ['1st.successfull.method', '2nd-successful-method', 'last-successful-method']"
+            "The ActivationResult cannot have more than one active methods! Active "
+            "methods: ['1st.successfull.method', '2nd-successful-method', "
+            "'last-successful-method']"
         ),
     ):
         ar.active_method
