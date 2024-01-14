@@ -3,7 +3,7 @@
 If you're using wakepy in Continuous Integration tests, note that typically CI is running on a system where there is no Desktop Environment available. In addition, the available services and executables might be different from the services and executables you have on your machine. For this reason, even if wakepy is able to activate a mode on your machine, it might not be able to do so in CI tests.
 
 ## WAKEPY_FAKE_SUCCESS
-To force wakepy to fake a successful mode activation, you may set an environment variable `WAKEPY_FAKE_SUCCESS` to `yes`. This makes wakepy to fake the successful mode change after all other methods have failed.
+To force wakepy to fake a successful mode activation, you may set an environment variable `WAKEPY_FAKE_SUCCESS` to a *truthy value* like `1`. This makes wakepy to use a fake method to always guarantee a successful mode change. This works with any modes. The WAKEPY_FAKE_SUCCESS Method is tried *before* any other possible Methods, which guarantees that there will be no IO (except for the env var check), and no calling of any executables or 3rd party services when WAKEPY_FAKE_SUCCESS is used. 
 
 In tox, this would be:
 
@@ -13,6 +13,13 @@ In tox, this would be:
 setenv = 
     WAKEPY_FAKE_SUCCESS = "yes"
 ```
+
+
+```{admonition} Truthy and falsy values
+:class: info
+Only `0`, `no` and `false` are considered as falsy values (case ignored). Any other value is considered truthy.
+```
+
 
 ## DBUS_SESSION_BUS_ADDRESS
 
