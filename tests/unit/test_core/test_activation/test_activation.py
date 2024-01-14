@@ -27,8 +27,8 @@ from wakepy.core.activation import (
     caniuse_fails,
     deactivate_method,
     get_platform_supported,
-    should_fake_success,
     try_enter_and_heartbeat,
+    WakepyFakeSuccess,
 )
 from wakepy.core.calls import CallProcessor
 from wakepy.core.heartbeat import Heartbeat
@@ -580,22 +580,24 @@ def test_stagename():
     assert StageName.REQUIREMENTS == "REQUIREMENTS"
 
 
-def test_should_fake_success(monkeypatch):
+def test_wakepy_fake_success(monkeypatch):
+    method = WakepyFakeSuccess()
+
     # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
     for val in ("0", "no", "NO", "False", "false", "FALSE"):
         with monkeypatch.context() as mp:
             mp.setenv("WAKEPY_FAKE_SUCCESS", val)
             val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
             assert val_from_env == str(val)
-            assert should_fake_success() is False
+            assert method.enter_mode() is False
     # Anything else is considered truthy
     for val in ("1", "yes", "True", "anystring"):
         with monkeypatch.context() as mp:
             mp.setenv("WAKEPY_FAKE_SUCCESS", val)
             val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
             assert val_from_env == str(val)
-            assert should_fake_success() is True
+            assert method.enter_mode() is True
 
     if "WAKEPY_FAKE_SUCCESS" in os.environ:
         monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
-    assert should_fake_success() is False
+    assert method.enter_mode() is False

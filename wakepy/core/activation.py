@@ -20,7 +20,6 @@ MethodActivationResult
 from __future__ import annotations
 
 import datetime as dt
-import os
 import typing
 from dataclasses import dataclass
 from typing import List, Set, Union
@@ -28,14 +27,14 @@ from typing import List, Set, Union
 from .calls import CallProcessor
 from .constants import PlatformName
 from .heartbeat import Heartbeat
-from .method import MethodError, MethodOutcome
+from .method import Method, MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
     from typing import Optional, Sequence, Tuple, Type
 
-    from .method import Method, MethodCls
+    from .method import MethodCls
 
 """The strings in MethodsPriorityOrder are names of wakepy.Methods or the
 asterisk ('*')."""
@@ -771,3 +770,44 @@ def _rollback_with_exit(method):
             f"Entered {method.__class__.__name__} ({method.name}) but could not exit!"
             + f" Original error: {str(exc)}"
         ) from exc
+
+
+class WakepyFakeSuccess(Method):
+    """This is a special fake method for any methods. It can be used in tests
+    for faking wakepy mode entry. This way all IO and real excutable, library
+    and dbus calls are prevented. To make this method active, set
+    WAKEPY_FAKE_SUCCESS environment variable to a truthy value (e.g. "1", or
+    "True").
+    """
+
+    name = "WAKEPY_FAKE_SUCCESS"
+    _env_var = name
+
+    def enter_mode(self) -> bool:
+        """Function which says if fake success should be enabled
+
+        Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
+        If that variable is set to a truthy value,fake success is activated.
+
+        Falsy values: '0', 'no', 'false' (case ignored)
+        Truthy values: everything else
+
+        Motivation:
+        -----------
+        When running on CI system, wakepy might fail to acquire an inhibitor lock
+        just because there is no Desktop Environment running. In these cases, it
+        might be useful to just tell with an environment variable that wakepy
+        should fake the successful inhibition anyway. Faking the success is done
+        after every other method is tried (and failed).
+        """
+        # The os.environ seems to be populated when os is imported -> delay the
+        # import until here.
+        import os
+
+        if self._env_var not in os.environ:
+            return False
+
+        val_from_env = os.environ[self._env_var].lower()
+        if val_from_env in ("0", "no", "false"):
+            return False
+        return True
