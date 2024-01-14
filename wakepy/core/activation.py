@@ -790,11 +790,11 @@ def _rollback_with_exit(method):
 
 
 class WakepyFakeSuccess(Method):
-    """This is a special fake method for any methods. It can be used in tests
-    for faking wakepy mode entry. This way all IO and real excutable, library
-    and dbus calls are prevented. To make this method active, set
-    WAKEPY_FAKE_SUCCESS environment variable to a truthy value (e.g. "1", or
-    "True").
+    """This is a special fake method to be used with any mode. It can be used
+    in tests for faking wakepy mode activation. This way all IO and real
+    executable, library and dbus calls are prevented. To use this method (and
+    skip using any other methods), set WAKEPY_FAKE_SUCCESS environment variable
+    to a truthy value (e.g. "1", or "True").
     """
 
     name = "WAKEPY_FAKE_SUCCESS"
