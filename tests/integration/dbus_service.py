@@ -188,9 +188,6 @@ def start_dbus_service(
     assert queue_.get(timeout=2) == "ready"
     logger.info(f"Initialization of {service_cls.addr.service} ready")
 
-    import time
-
-    time.sleep(60)
     yield
 
     should_stop = True
