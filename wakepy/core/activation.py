@@ -232,6 +232,9 @@ def activate_one_of_multiple(
     Method which succeeds activation will be used, in order from highest
     priority to lowest priority.
 
+    The activation may be faked as to be successful by using the
+    WAKEPY_FAKE_SUCCESS environment variable.
+
     Parameters
     ----------
     methods:
@@ -253,6 +256,9 @@ def activate_one_of_multiple(
         return ActivationResult(), None, None
 
     prioritized_methods = get_prioritized_methods(methods, methods_priority)
+    # The fake method is always checked first (WAKEPY_FAKE_SUCCESS)
+    prioritized_methods.insert(0, WakepyFakeSuccess)
+
     results = []
 
     for methodcls in prioritized_methods:
