@@ -37,7 +37,7 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          $PYTHON_EXECUTABLE -m pip install tox~=4.6.0
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install tox~=4.6.0
       - name: Run tests with tox
         run: tox -e py310,check
   test-linux-py37:
