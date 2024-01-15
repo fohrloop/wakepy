@@ -16,8 +16,9 @@ jobs:
   test-linux-py310:
     runs-on: ubuntu-22.04
     env:
-      PYTHON_VERSION: '3.11'
-      PYTHON_EXECUTABLE: 'python3.11'
+      PYTHON_VERSION: '3.10'
+      PYTHON_TOX_ENVs: 'py310, check'
+      PYTHON_EXECUTABLE: 'python3.10'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
