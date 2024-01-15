@@ -16,7 +16,7 @@ jobs:
   test-linux-py310:
     runs-on: ubuntu-22.04
     env:
-      PYTHON_VERSION: '3.10'
+      PYTHON_VERSION: '3.11'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
