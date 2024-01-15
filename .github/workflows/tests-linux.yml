@@ -43,16 +43,20 @@ jobs:
         run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
   test-linux-py37:
     # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
+    runs-on: ubuntu-22.04
     env:
       PYTHON_VERSION: '3.7'
       PYTHON_EXECUTABLE: 'python3.7'
       PYTHON_TOX_ENVS: 'py37'
-    steps: *job-steps
+    steps: 
+      - *job-steps
   test-linux-py312:
+    runs-on: ubuntu-22.04
     env:
       PYTHON_VERSION: '3.12'
       PYTHON_EXECUTABLE: 'python3.12'
       PYTHON_TOX_ENVS: 'py312'
-    steps: *job-steps
+    steps: 
+      - *job-steps
 
       
