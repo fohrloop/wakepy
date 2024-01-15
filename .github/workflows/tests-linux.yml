@@ -18,7 +18,7 @@ jobs:
     env:
       PYTHON_VERSION: '3.10'
       PYTHON_EXECUTABLE: 'python3.10'
-      PYTHON_TOX_ENVS: 'py310, check'
+      PYTHON_TOX_ENVS: 'py310,check'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
