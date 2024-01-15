@@ -11,6 +11,9 @@ concurrency:
   group: linux-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Common environment variables
+env:
+  TOX_REQUIREMENT: 'tox~=4.6.0'
   
 jobs:  
   test-linux-py310:
@@ -38,7 +41,7 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          ${{ env.PYTHON_EXECUTABLE }} -m pip install tox~=4.6.0
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
   test-linux-py37:
@@ -67,7 +70,7 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          ${{ env.PYTHON_EXECUTABLE }} -m pip install tox~=4.6.0
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
   test-linux-py312:
@@ -95,7 +98,7 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          ${{ env.PYTHON_EXECUTABLE }} -m pip install tox~=4.6.0
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
 
