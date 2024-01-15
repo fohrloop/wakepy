@@ -11,7 +11,7 @@ concurrency:
   group: linux-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-
+  
 jobs:  
   test-linux-py310:
     runs-on: ubuntu-22.04
@@ -41,6 +41,8 @@ jobs:
         run: tox -e py310,check
   test-linux-py37:
     runs-on: ubuntu-20.04
+    env:
+      PYTHON_VERSION: '3.11'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -51,7 +53,7 @@ jobs:
       - name: Install python 
         uses: actions/setup-python@v4 
         with:
-          python-version: '3.7' 
+          python-version: ${{ env.PYTHON_VERSION }} 
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
