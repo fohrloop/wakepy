@@ -42,7 +42,7 @@ jobs:
   test-linux-py37:
     runs-on: ubuntu-20.04
     env:
-      PYTHON_VERSION: '3.11'
+      PYTHON_VERSION: '3.7'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
