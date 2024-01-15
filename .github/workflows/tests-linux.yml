@@ -101,10 +101,10 @@ jobs:
           ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
-  test-linux-py313:
+  test-linux-py313-alpha:
     runs-on: ubuntu-22.04
     env:
-      PYTHON_VERSION: '3.13'
+      PYTHON_VERSION: '3.13.0-alpha.2'
       PYTHON_EXECUTABLE: 'python3.13'
       PYTHON_TOX_ENVS: 'py313'
     steps: 
