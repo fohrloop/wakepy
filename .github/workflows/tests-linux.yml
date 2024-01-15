@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHON_VERSION: '3.10'
-      PYTHON_TOX_ENVs: 'py310, check'
       PYTHON_EXECUTABLE: 'python3.10'
+      PYTHON_TOX_ENVS: 'py310, check'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -40,7 +40,7 @@ jobs:
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
           ${{ env.PYTHON_EXECUTABLE }} -m pip install tox~=4.6.0
       - name: Run tests with tox
-        run: tox -e py310,check
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
   test-linux-py37:
     runs-on: ubuntu-20.04
     env:
