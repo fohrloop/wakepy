@@ -16,13 +16,14 @@ env:
   TOX_REQUIREMENT: 'tox~=4.6.0'
   
 jobs:  
-  test-linux-py310:
+  test-linux-py37:
+    # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
     runs-on: ubuntu-22.04
     env:
-      PYTHON_VERSION: '3.10'
-      PYTHON_EXECUTABLE: 'python3.10'
-      PYTHON_TOX_ENVS: 'py310,check'
-    steps:
+      PYTHON_VERSION: '3.7'
+      PYTHON_EXECUTABLE: 'python3.7'
+      PYTHON_TOX_ENVS: 'py37'
+    steps: 
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install python 
@@ -44,14 +45,13 @@ jobs:
           ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
-  test-linux-py37:
-    # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
+  test-linux-py310:
     runs-on: ubuntu-22.04
     env:
-      PYTHON_VERSION: '3.7'
-      PYTHON_EXECUTABLE: 'python3.7'
-      PYTHON_TOX_ENVS: 'py37'
-    steps: 
+      PYTHON_VERSION: '3.10'
+      PYTHON_EXECUTABLE: 'python3.10'
+      PYTHON_TOX_ENVS: 'py310,check'
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install python 
