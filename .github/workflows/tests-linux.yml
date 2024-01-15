@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PYTHON_VERSION: '3.11'
+      PYTHON_EXECUTABLE: 'python3.11'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,8 +36,8 @@ jobs:
         run: python -c "import platform; print(platform.platform())"
       - name: install tox
         run: |
-          python3.10 -m pip install -U pip wheel && \
-          python3.10 -m pip install tox~=4.6.0
+          $PYTHON_EXECUTABLE -m pip install -U pip wheel && \
+          $PYTHON_EXECUTABLE -m pip install tox~=4.6.0
       - name: Run tests with tox
         run: tox -e py310,check
   test-linux-py37:
