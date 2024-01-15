@@ -19,7 +19,7 @@ jobs:
       PYTHON_VERSION: '3.10'
       PYTHON_EXECUTABLE: 'python3.10'
       PYTHON_TOX_ENVS: 'py310, check'
-    steps:
+    steps: &job-steps
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install python 
@@ -42,60 +42,17 @@ jobs:
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
   test-linux-py37:
-    runs-on: ubuntu-20.04
+    # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
     env:
       PYTHON_VERSION: '3.7'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      # Install python 3.7
-      # Ubuntu 22.04 comes with Python 3.10.6 and Ubuntu 20.04 comes with 3.8.10
-      # Ubuntu 20.04 has 3.5, 3.6 and 3.7 as an option.
-      # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
-      - name: Install python 
-        uses: actions/setup-python@v4 
-        with:
-          python-version: ${{ env.PYTHON_VERSION }} 
-      - name: Show OS version
-        run: cat /etc/os-release
-      - run: printenv
-      - name: Check D-Bus
-        run: ps -ef | grep dbus | grep -v grep
-      - name: Show python version
-        run: python --version
-      - name: Show platform information
-        run: python -c "import platform; print(platform.platform())"
-      - name: install tox
-        run: |
-          python3.7 -m pip install -U pip wheel && \
-          python3.7 -m pip install tox~=4.6.0
-      - name: Run tests with tox
-        run: tox -e py37
+      PYTHON_EXECUTABLE: 'python3.7'
+      PYTHON_TOX_ENVS: 'py37'
+    steps: *job-steps
   test-linux-py312:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      # Install python 3.12
-      # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
-      - name: Install python 
-        uses: actions/setup-python@v4 
-        with:
-          python-version: '3.12' 
-      - name: Show OS version
-        run: cat /etc/os-release
-      - run: printenv
-      - name: Check D-Bus
-        run: ps -ef | grep dbus | grep -v grep
-      - name: Show python version
-        run: python --version
-      - name: Show platform information
-        run: python -c "import platform; print(platform.platform())"
-      - name: install tox
-        run: |
-          python3.12 -m pip install -U pip wheel && \
-          python3.12 -m pip install tox~=4.6.0
-      - name: Run tests with tox
-        run: tox -e py312
+    env:
+      PYTHON_VERSION: '3.12'
+      PYTHON_EXECUTABLE: 'python3.12'
+      PYTHON_TOX_ENVS: 'py312'
+    steps: *job-steps
 
-    
+      
