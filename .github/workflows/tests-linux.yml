@@ -1,7 +1,7 @@
 name: Run tests (Linux)
 
 # Manual start only. Trying the save some minutes :) 
-on:  
+'on':  
   [workflow_dispatch]
 
 # Cancel in-progress jobs/runs for the same workflow; if you push to same
@@ -11,17 +11,53 @@ concurrency:
   group: linux-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-
+# Common environment variables
+env:
+  TOX_REQUIREMENT: 'tox~=4.6.0'
+  
 jobs:  
+  test-linux-py37:
+    runs-on: ubuntu-22.04
+    env:
+      # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
+      PYTHON_VERSION: '3.7'
+      PYTHON_EXECUTABLE: 'python3.7'
+      PYTHON_TOX_ENVS: 'py37'
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install python 
+        uses: actions/setup-python@v4 
+        with:
+          python-version: ${{ env.PYTHON_VERSION }} 
+      - name: Show OS version
+        run: cat /etc/os-release
+      - run: printenv
+      - name: Check D-Bus
+        run: ps -ef | grep dbus | grep -v grep
+      - name: Show python version
+        run: python --version
+      - name: Show platform information
+        run: python -c "import platform; print(platform.platform())"
+      - name: install tox
+        run: |
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
+      - name: Run tests with tox
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
   test-linux-py310:
     runs-on: ubuntu-22.04
+    env:
+      PYTHON_VERSION: '3.10'
+      PYTHON_EXECUTABLE: 'python3.10'
+      PYTHON_TOX_ENVS: 'py310,check'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install python 
         uses: actions/setup-python@v4 
         with:
-          python-version: '3.10' 
+          python-version: ${{ env.PYTHON_VERSION }} 
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
@@ -33,23 +69,23 @@ jobs:
         run: python -c "import platform; print(platform.platform())"
       - name: install tox
         run: |
-          python3.10 -m pip install -U pip wheel && \
-          python3.10 -m pip install tox~=4.6.0
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
       - name: Run tests with tox
-        run: tox -e py310,check
-  test-linux-py37:
-    runs-on: ubuntu-20.04
-    steps:
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
+  test-linux-py312:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHON_VERSION: '3.12'
+      PYTHON_EXECUTABLE: 'python3.12'
+      PYTHON_TOX_ENVS: 'py312'
+    steps: 
       - name: Checkout
         uses: actions/checkout@v3
-      # Install python 3.7
-      # Ubuntu 22.04 comes with Python 3.10.6 and Ubuntu 20.04 comes with 3.8.10
-      # Ubuntu 20.04 has 3.5, 3.6 and 3.7 as an option.
-      # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
       - name: Install python 
         uses: actions/setup-python@v4 
         with:
-          python-version: '3.7' 
+          python-version: ${{ env.PYTHON_VERSION }} 
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
@@ -61,9 +97,37 @@ jobs:
         run: python -c "import platform; print(platform.platform())"
       - name: install tox
         run: |
-          python3.7 -m pip install -U pip wheel && \
-          python3.7 -m pip install tox~=4.6.0
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
       - name: Run tests with tox
-        run: tox -e py37
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
+  test-linux-py313-alpha:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHON_VERSION: '3.13.0-alpha.2'
+      PYTHON_EXECUTABLE: 'python3.13'
+      PYTHON_TOX_ENVS: 'py313'
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install python 
+        uses: actions/setup-python@v4 
+        with:
+          python-version: ${{ env.PYTHON_VERSION }} 
+      - name: Show OS version
+        run: cat /etc/os-release
+      - run: printenv
+      - name: Check D-Bus
+        run: ps -ef | grep dbus | grep -v grep
+      - name: Show python version
+        run: python --version
+      - name: Show platform information
+        run: python -c "import platform; print(platform.platform())"
+      - name: install tox
+        run: |
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
+      - name: Run tests with tox
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
 
-    
+      
