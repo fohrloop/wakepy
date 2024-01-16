@@ -137,8 +137,7 @@ The {numref}`fig-activate-with-a-method` presents the activity diagram for the "
 4. Tries to start the heartbeat using the `Method.heartbeat()`, if defined
 5. Starts the Heartbeat, if the `Method.heartbeat()` exists. This will run in a separate thread.
   
-If the first two steps do not fail, at least one of `Method.enter_mode()` and `Method.caniuse()` is defined and they do not raise Exceptions, the Mode activation is successful.
-
+If the first two steps do not fail, at least one of `Method.enter_mode()` and `Method.caniuse()` is defined and they do not raise Exceptions, the Mode activation is successful. This process happens in the `activate_method` function and it returns an `MethodActivationResult` object, and a `Heartbeat` instance (if used and activation was successful).
 :::{figure-md} fig-activate-with-a-method
 ![activity diagram for the "Activate Mode" action](./img/activate-mode-using-method-activity-diagram.svg){width=430px}
 
