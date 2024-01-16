@@ -116,7 +116,7 @@ The {numref}`fig-activate-mode-activity-diagram` presents an activity diagram fr
 - ***Prioritize Methods***: In this step, methods are prioritized first with `methods_priority` from the user, if given. Then, the methods are prioritized using platform support information from `Method.supported_platform`.
 - ***Activate with a Method***: Try to activate the Mode using the Method with highest priority. This is explained in more detail in the [next section](#section-activating-with-a-method). Note that only *one* Method is ever used to activate a Mode; the first one which does not fail, in priority order.
 
-This process happens in the `activate_one_of_multiple` function and it returns an `ActivationResult` object, the used `wakepy.Method` instance (if successful)  and a `Heartbeat` instance (if used).
+This process happens in the `activate_mode` function and it returns an `ActivationResult` object, the used `wakepy.Method` instance (if successful)  and a `Heartbeat` instance (if used).
 
 :::{figure-md} fig-activate-mode-activity-diagram
 ![activity diagram for the "Activate Mode" action](./img/activate-mode-activity-diagram.svg){width=430px}

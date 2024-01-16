@@ -234,7 +234,7 @@ class MethodActivationResult:
         return f"({success_str}{error_at}, {self.method_name}{failure_reason})"
 
 
-def activate_one_of_multiple(
+def activate_mode(
     methods: list[Type[Method]],
     call_processor: CallProcessor,
     methods_priority: Optional[MethodsPriorityOrder] = None,

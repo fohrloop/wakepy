@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 from abc import ABC
 
-from .activation import ActivationResult, activate_one_of_multiple, deactivate_method
+from .activation import ActivationResult, activate_mode, deactivate_method
 from .calls import CallProcessor
 from .heartbeat import Heartbeat
 from .method import get_methods_for_mode, select_methods
@@ -54,7 +54,7 @@ class ModeController:
         classes. The methods are used with descending priority; highest
         priority first.
         """
-        result, active_method, heartbeat = activate_one_of_multiple(
+        result, active_method, heartbeat = activate_mode(
             methods=method_classes,
             methods_priority=methods_priority,
             call_processor=self.call_processor,

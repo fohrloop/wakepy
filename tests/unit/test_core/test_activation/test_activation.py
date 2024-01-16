@@ -25,7 +25,7 @@ from wakepy.core.activation import (
     StageName,
     WakepyFakeSuccess,
     activate_method,
-    activate_one_of_multiple,
+    activate_mode,
     caniuse_fails,
     deactivate_method,
     get_platform_supported,
@@ -38,7 +38,7 @@ from wakepy.core.method import Method, MethodError, PlatformName, get_methods
 
 def test_activate_without_methods(monkeypatch):
     _arrange_for_test_activate(monkeypatch)
-    res, active_method, heartbeat = activate_one_of_multiple([], None)
+    res, active_method, heartbeat = activate_mode([], None)
     assert res.list_methods() == []
     assert res.success is False
     assert active_method is None
@@ -46,7 +46,7 @@ def test_activate_without_methods(monkeypatch):
 
 
 def test_activate_function_success(monkeypatch):
-    """Here we test the activate_one_of_multiple() function. It calls some
+    """Here we test the activate_mode() function. It calls some
     other functions which we do not care about as they're tested elsewhere.
     That is we why monkeypatch those functions with fakes"""
 
@@ -59,7 +59,7 @@ def test_activate_function_success(monkeypatch):
     # Note: prioritize the failing first, so that the failing one will also be
     # used. This also tests at that the prioritization is used at least
     # somehow
-    result, active_method, heartbeat = activate_one_of_multiple(
+    result, active_method, heartbeat = activate_mode(
         [methodcls_success, methodcls_fail],
         call_processor=mocks.call_processor,
         methods_priority=[
@@ -90,7 +90,7 @@ def test_activate_function_failure(monkeypatch):
     methodcls_fail = get_test_method_class(enter_mode=False)
 
     # Act
-    result, active_method, heartbeat = activate_one_of_multiple(
+    result, active_method, heartbeat = activate_mode(
         [methodcls_fail],
         call_processor=mocks.call_processor,
     )
@@ -104,7 +104,7 @@ def test_activate_function_failure(monkeypatch):
 
 def _arrange_for_test_activate(monkeypatch):
     """This is the test arrangement step for tests for the
-    `activate_one_of_multiple` function"""
+    `activate_mode` function"""
 
     mocks = Mock()
     mocks.heartbeat = Mock(spec_set=Heartbeat)
