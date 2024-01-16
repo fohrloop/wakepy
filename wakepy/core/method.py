@@ -33,7 +33,7 @@ from .constants import ModeName, PlatformName
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
-    from wakepy.core import Call, CallProcessor
+    from wakepy.core import DbusAdapter, DbusMethodCall
 
 MethodCls = Type["Method"]
 T = TypeVar("T")
@@ -117,8 +117,10 @@ class Method(ABC, metaclass=MethodMeta):
     _has_exit: bool
     _has_heartbeat: bool
 
-    def __init__(self, call_processor: Optional[CallProcessor] = None):
-        self._call_processor = call_processor
+    def __init__(self, dbus_adapter: Optional[DbusAdapter] = None):
+        # The dbus-adapter may be used to process dbus calls. This is relevant
+        # only on methods using D-Bus.
+        self._dbus_adapter = dbus_adapter
 
     def __init_subclass__(cls, **kwargs) -> None:
         """These are automatically added. They tell if the `enter_mode`,
@@ -234,13 +236,13 @@ class Method(ABC, metaclass=MethodMeta):
         """
         return
 
-    def process_call(self, call: Call) -> Any:
-        if self._call_processor is None:
+    def call_dbus_method(self, call: DbusMethodCall) -> Any:
+        if self._dbus_adapter is None:
             raise RuntimeError(
-                f'{self.__class__.__name__ }cannot process call "{call}" as it does not'
-                " have CallProcessor."
+                f'{self.__class__.__name__ }cannot process dbus method call "{call}" as'
+                "it does not have a DbusAdapter."
             )
-        return self._call_processor.process(call)
+        return self._dbus_adapter.process(call)
 
     @property
     def has_enter(self):

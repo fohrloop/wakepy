@@ -3,7 +3,7 @@ from unittest.mock import Mock, call
 import pytest
 from testmethods import get_test_method_class
 
-from wakepy.core.calls import CallProcessor
+from wakepy.core.dbus import DbusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
 
@@ -12,8 +12,8 @@ def mocks_for_test_mode():
     # Setup test
     mocks = Mock()
 
-    mocks.call_processor_cls = Mock()
-    mocks.call_processor_cls.return_value = Mock(spec_set=CallProcessor)
+    mocks.dbus_adapter_cls = Mock()
+    mocks.dbus_adapter_cls.return_value = Mock(spec_set=DbusAdapter)
 
     mocks.mode_controller_cls = Mock()
     mocks.mode_controller_cls.return_value = Mock(spec_set=ModeController)
@@ -32,7 +32,6 @@ def get_mocks_and_testmode():
     mocks = mocks_for_test_mode()
 
     class TestMode(Mode):
-        _call_processor_class = mocks.call_processor_class
         _controller_class = mocks.controller_class
 
     return mocks, TestMode
@@ -67,10 +66,6 @@ def test_mode_contextmanager_protocol(monkeypatch):
         # We have also called activate
         assert len(mocks.mock_calls) == 3
 
-        # We have now created a new CallProcessor instance
-        assert mocks.mock_calls[0] == call.call_processor_class(
-            dbus_adapter=mocks.dbus_adapter
-        )
         # We have also created a ModeController instance
         assert mocks.mock_calls[1] == call.controller_class(
             call_processor=mocks.call_processor_class.return_value
@@ -174,7 +169,7 @@ def test_modecontroller(monkeypatch):
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
 
     method_cls = get_test_method_class(enter_mode=None, heartbeat=None, exit_mode=None)
-    controller = ModeController(Mock(spec_set=CallProcessor))
+    controller = ModeController(Mock(spec_set=DbusAdapter))
 
     # When controller was created, it has not active method or heartbeat
     assert controller.active_method is None

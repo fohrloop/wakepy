@@ -13,7 +13,7 @@ if not sys.platform.lower().startswith("linux"):
 import jeepney
 import pytest
 
-from wakepy.core import BusType, DbusAddress, DbusMethod, DbusMethodCall
+from wakepy.core import DbusAddress, DbusMethod, DbusMethodCall
 from wakepy.io.dbus.jeepney import JeepneyDbusAdapter
 
 

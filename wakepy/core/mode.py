@@ -4,7 +4,7 @@ import typing
 from abc import ABC
 
 from .activation import ActivationResult, activate_mode, deactivate_method
-from .calls import CallProcessor
+from .dbus import get_dbus_adapter
 from .heartbeat import Heartbeat
 from .method import get_methods_for_mode, select_methods
 
@@ -40,8 +40,8 @@ class ModeExit(Exception):
 
 
 class ModeController:
-    def __init__(self, call_processor: CallProcessor):
-        self.call_processor = call_processor
+    def __init__(self, dbus_adapter: DbusAdapter):
+        self.dbus_adapter = dbus_adapter
         self.active_method: Method | None = None
         self.heartbeat: Heartbeat | None = None
 
@@ -57,7 +57,7 @@ class ModeController:
         result, active_method, heartbeat = activate_mode(
             methods=method_classes,
             methods_priority=methods_priority,
-            call_processor=self.call_processor,
+            dbus_adapter=self.dbus_adapter,
         )
         self.active_method = active_method
         self.heartbeat = heartbeat
@@ -110,7 +110,6 @@ class Mode(ABC):
         outcome. None if Mode has not yet been activated.
     """
 
-    _call_processor_class: Type[CallProcessor] = CallProcessor
     _controller_class: Type[ModeController] = ModeController
 
     def __init__(
@@ -146,10 +145,9 @@ class Mode(ABC):
 
     def __enter__(self) -> Mode:
         if self.controller is None:
-            call_processor = self._call_processor_class(
-                dbus_adapter=self._dbus_adapter_cls
+            self.controller = self._controller_class(
+                dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
             )
-            self.controller = self._controller_class(call_processor=call_processor)
         self.activation_result = self.controller.activate(
             self.methods_classes,
             methods_priority=self.methods_priority,
@@ -220,7 +218,7 @@ def create_mode(
     methods_priority: list[str | set[str]]
         The methods_priority parameter for Mode. Used to prioritize methods.
     dbus_adapter:
-        Optional argument which can be used to define a customer DBus adapter.
+        Optional argument which can be used to define a custom DBus adapter.
 
     Returns
     -------

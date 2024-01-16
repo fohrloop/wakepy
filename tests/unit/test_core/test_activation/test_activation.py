@@ -20,7 +20,7 @@ from testmethods import (
     iterate_test_methods,
 )
 
-from wakepy.core import MethodActivationResult
+from wakepy.core import DbusAdapter, MethodActivationResult
 from wakepy.core.activation import (
     StageName,
     WakepyFakeSuccess,
@@ -31,7 +31,6 @@ from wakepy.core.activation import (
     get_platform_supported,
     try_enter_and_heartbeat,
 )
-from wakepy.core.calls import CallProcessor
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import Method, MethodError, PlatformName, get_methods
 
@@ -61,7 +60,7 @@ def test_activate_function_success(monkeypatch):
     # somehow
     result, active_method, heartbeat = activate_mode(
         [methodcls_success, methodcls_fail],
-        call_processor=mocks.call_processor,
+        dbus_adapter=mocks.dbus_adapter,
         methods_priority=[
             methodcls_fail.name,
             methodcls_success.name,
@@ -92,7 +91,7 @@ def test_activate_function_failure(monkeypatch):
     # Act
     result, active_method, heartbeat = activate_mode(
         [methodcls_fail],
-        call_processor=mocks.call_processor,
+        dbus_adapter=mocks.dbus_adapter,
     )
 
     # Assert
@@ -108,7 +107,7 @@ def _arrange_for_test_activate(monkeypatch):
 
     mocks = Mock()
     mocks.heartbeat = Mock(spec_set=Heartbeat)
-    mocks.call_processor = Mock(spec_set=CallProcessor)
+    mocks.dbus_adapter = Mock(spec_set=DbusAdapter)
 
     def fake_activate_method(method):
         try:
