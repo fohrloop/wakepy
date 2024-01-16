@@ -135,3 +135,27 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-tim
 ### keep.presenting (GNOME)
 
 Follow the [same steps as in with keep.running](#gnome-keep-running-manual-test), but enter the [keep.presenting](#enter-keep-presenting-script) mode
+
+
+## Windows
+
+(windows-keep-running-manual-test)=
+### keep.running (Windows)
+
+Change your current settings from windows menu -> "Edit Power Plan". Change "Turn off the display" and "Put the computer to sleep"  both to 1 minute. -> Save Changes. 
+
+
+Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script)  or in the in another. After you're done, reset the Power Plan values to what they were. 
+
+
+```{admonition} About Windows idle timers
+:class: info
+Note: Windows does not seem to always respect low values in the power settings. To make Windows sleep faster, if using laptop, disconnect the charging cable (use battery). A one minute setting might start the sleep after 1:50 to 2:30 minutes.
+
+```
+
+
+
+
+### keep.presenting (Windows)
+Follow the [same steps as in with keep.running](#windows-keep-running-manual-test), but enter the [keep.presenting](#enter-keep-presenting-script) mode
