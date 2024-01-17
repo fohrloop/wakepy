@@ -237,6 +237,14 @@ class Method(ABC, metaclass=MethodMeta):
         return
 
     def process_dbus_call(self, call: DbusMethodCall) -> Any:
+        # Notes for subclassing
+        # =====================
+        # This method is always available for all subclasses of Method. This
+        # can be used to get to call dbus methods and get return values. The
+        # Method subclass does not have to get the _dbus_adapter from anywhere
+        # as it is available automatically (if there is one). Any Exceptions
+        # raised by this method does not need to be handled in the Method
+        # subclass, either. Typically one would *not* override this method.
         if self._dbus_adapter is None:
             raise RuntimeError(
                 f'{self.__class__.__name__ }cannot process dbus method call "{call}" as'
