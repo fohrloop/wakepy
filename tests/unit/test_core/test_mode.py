@@ -12,7 +12,7 @@ def mocks_for_test_mode():
     # Setup test
     mocks = Mock()
 
-    mocks.dbus_adapter_cls = Mock()
+    mocks.dbus_adapter_cls = Mock(spec_set=type(DbusAdapter))
     mocks.dbus_adapter_cls.return_value = Mock(spec_set=DbusAdapter)
 
     mocks.mode_controller_cls = Mock()
@@ -37,7 +37,7 @@ def get_mocks_and_testmode():
     return mocks, TestMode
 
 
-def test_mode_contextmanager_protocol(monkeypatch):
+def test_mode_contextmanager_protocol():
     """Test that the Mode fulfills the context manager protocol; i.e. it is
     possible to use instances of Mode in a with statement like this:
 
@@ -55,7 +55,7 @@ def test_mode_contextmanager_protocol(monkeypatch):
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
-    mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter)
+    mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls)
 
     # No calls during init
     assert len(mocks.mock_calls) == 0
@@ -68,7 +68,7 @@ def test_mode_contextmanager_protocol(monkeypatch):
 
         # We have also created a ModeController instance
         assert mocks.mock_calls[1] == call.controller_class(
-            call_processor=mocks.call_processor_class.return_value
+            dbus_adapter=mocks.dbus_adapter_cls.return_value
         )
         # And called ModeController.activate
         assert mocks.mock_calls[2] == call.controller_class().activate(
@@ -100,7 +100,7 @@ def test_mode_exits():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Normal exit
-    with TestMode(mocks.methods):
+    with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
         testval = 1
 
     assert testval == 1
@@ -112,7 +112,7 @@ def test_mode_exits_with_modeexit():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Exit with ModeExit
-    with TestMode(mocks.methods):
+    with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
         testval = 2
         raise ModeExit
         testval = 0  # never hit
@@ -126,7 +126,7 @@ def test_mode_exits_with_modeexit_with_args():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Exit with ModeExit with args
-    with TestMode(mocks.methods):
+    with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
         testval = 3
         raise ModeExit("FOOO")
         testval = 0  # never hit
@@ -144,7 +144,7 @@ def test_mode_exits_with_other_exception():
         ...
 
     with pytest.raises(MyException):
-        with TestMode(mocks.methods):
+        with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
             testval = 4
             raise MyException
             testval = 0
@@ -156,8 +156,8 @@ def test_mode_exits_with_other_exception():
 
 def _assert_context_manager_used_correctly(mocks):
     assert mocks.mock_calls.copy() == [
-        call.call_processor_class(dbus_adapter=None),
-        call.controller_class(call_processor=mocks.call_processor_class()),
+        call.dbus_adapter_cls(),
+        call.controller_class(dbus_adapter=mocks.dbus_adapter_cls.return_value),
         call.controller_class().activate(mocks.methods, methods_priority=None),
         call.controller_class().deactivate(),
     ]
