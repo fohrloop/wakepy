@@ -236,7 +236,7 @@ class MethodActivationResult:
 
 def activate_mode(
     methods: list[Type[Method]],
-    dbus_adapter: DbusAdapter,
+    dbus_adapter: Optional[DbusAdapter] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
 ) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
     """Activates a mode defined by a collection of Methods. Only the first

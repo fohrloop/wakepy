@@ -40,7 +40,7 @@ class ModeExit(Exception):
 
 
 class ModeController:
-    def __init__(self, dbus_adapter: DbusAdapter):
+    def __init__(self, dbus_adapter: Optional[DbusAdapter] = None):
         self.dbus_adapter = dbus_adapter
         self.active_method: Method | None = None
         self.heartbeat: Heartbeat | None = None
