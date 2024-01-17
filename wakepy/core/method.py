@@ -236,7 +236,7 @@ class Method(ABC, metaclass=MethodMeta):
         """
         return
 
-    def call_dbus_method(self, call: DbusMethodCall) -> Any:
+    def process_dbus_call(self, call: DbusMethodCall) -> Any:
         if self._dbus_adapter is None:
             raise RuntimeError(
                 f'{self.__class__.__name__ }cannot process dbus method call "{call}" as'
