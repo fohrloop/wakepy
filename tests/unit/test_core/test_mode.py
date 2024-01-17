@@ -18,6 +18,8 @@ def mocks_for_test_mode():
     mocks.mode_controller_cls = Mock()
     mocks.mode_controller_cls.return_value = Mock(spec_set=ModeController)
 
+    mocks.methods_priority = Mock()
+
     result = Mock(spec_set=ActivationResult)
     methods = [Mock() for _ in range(3)]
 
@@ -55,7 +57,11 @@ def test_mode_contextmanager_protocol():
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
-    mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls)
+    mode = TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    )
 
     # No calls during init
     assert len(mocks.mock_calls) == 0
@@ -72,7 +78,7 @@ def test_mode_contextmanager_protocol():
         )
         # And called ModeController.activate
         assert mocks.mock_calls[2] == call.controller_class().activate(
-            mocks.methods, methods_priority=None
+            mocks.methods, methods_priority=mocks.methods_priority
         )
         # The __enter__ returns the Mode
         assert m is mode
@@ -100,7 +106,11 @@ def test_mode_exits():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Normal exit
-    with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
+    with TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    ):
         testval = 1
 
     assert testval == 1
@@ -112,7 +122,11 @@ def test_mode_exits_with_modeexit():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Exit with ModeExit
-    with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
+    with TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    ):
         testval = 2
         raise ModeExit
         testval = 0  # never hit
@@ -126,7 +140,11 @@ def test_mode_exits_with_modeexit_with_args():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Exit with ModeExit with args
-    with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
+    with TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    ):
         testval = 3
         raise ModeExit("FOOO")
         testval = 0  # never hit
@@ -144,7 +162,11 @@ def test_mode_exits_with_other_exception():
         ...
 
     with pytest.raises(MyException):
-        with TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter_cls):
+        with TestMode(
+            mocks.methods,
+            methods_priority=mocks.methods_priority,
+            dbus_adapter=mocks.dbus_adapter_cls,
+        ):
             testval = 4
             raise MyException
             testval = 0
@@ -158,7 +180,9 @@ def _assert_context_manager_used_correctly(mocks):
     assert mocks.mock_calls.copy() == [
         call.dbus_adapter_cls(),
         call.controller_class(dbus_adapter=mocks.dbus_adapter_cls.return_value),
-        call.controller_class().activate(mocks.methods, methods_priority=None),
+        call.controller_class().activate(
+            mocks.methods, methods_priority=mocks.methods_priority
+        ),
         call.controller_class().deactivate(),
     ]
 
