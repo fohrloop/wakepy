@@ -24,8 +24,8 @@ import typing
 from dataclasses import dataclass
 from typing import List, Set, Union
 
-from .calls import CallProcessor
 from .constants import PlatformName
+from .dbus import DbusAdapter
 from .heartbeat import Heartbeat
 from .method import Method, MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
@@ -236,7 +236,7 @@ class MethodActivationResult:
 
 def activate_mode(
     methods: list[Type[Method]],
-    call_processor: CallProcessor,
+    dbus_adapter: Optional[DbusAdapter] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
 ) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
     """Activates a mode defined by a collection of Methods. Only the first
@@ -250,10 +250,10 @@ def activate_mode(
     ----------
     methods:
         The list of Methods to be used for activating this Mode.
-    call_processor:
-        The call processor to use for processing Calls in the .caniuse(),
-        .enter_mode(), .heartbeat() and .exit_mode() of the Method. Used for
-        example for using a custom Dbus library adapter. Optional.
+    dbus_adapter:
+        Can be used to define a custom DBus adapter for processing Dbus calls
+        in the .caniuse(), .enter_mode(), .heartbeat() and .exit_mode() of the
+        Method. Optional.
     methods_priority: list[str | set[str]]
         The priority order, which is a list of method names or asterisk
         ('*'). The asterisk means "all rest methods" and may occur only
@@ -273,7 +273,7 @@ def activate_mode(
     results = []
 
     for methodcls in prioritized_methods:
-        method = methodcls(call_processor=call_processor)
+        method = methodcls(dbus_adapter=dbus_adapter)
         methodresult, heartbeat = activate_method(method)
         results.append(methodresult)
         if methodresult.success:

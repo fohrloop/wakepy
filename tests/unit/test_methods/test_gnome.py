@@ -8,8 +8,7 @@ import re
 
 import pytest
 
-from wakepy.core import BusType, CallProcessor, DbusAddress, DbusMethod
-from wakepy.core.dbus import DbusAdapter
+from wakepy.core.dbus import BusType, DbusAdapter, DbusAddress, DbusMethod
 from wakepy.methods.gnome import (
     GnomeFlag,
     GnomeSessionManagerNoIdle,
@@ -56,7 +55,7 @@ def test_gnome_enter_mode(method_cls, flag):
 
             return (fake_cookie,)
 
-    method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
+    method = method_cls(dbus_adapter=TestAdapter())
     assert method.inhibit_cookie is None
 
     # Act
@@ -85,7 +84,7 @@ def test_gnome_exit_mode(method_cls):
             assert call.method == method_uninhibit
             assert call.get_kwargs() == {"inhibit_cookie": fake_cookie}
 
-    method = method_cls(CallProcessor(dbus_adapter=TestAdapter))
+    method = method_cls(dbus_adapter=TestAdapter())
     method.inhibit_cookie = fake_cookie
 
     # Act
@@ -102,7 +101,7 @@ def test_gnome_exit_mode(method_cls):
     [GnomeSessionManagerNoSuspend, GnomeSessionManagerNoIdle],
 )
 def test_gnome_exit_before_enter(method_cls):
-    method = method_cls(CallProcessor(dbus_adapter=DbusAdapter))
+    method = method_cls(dbus_adapter=DbusAdapter())
     assert method.inhibit_cookie is None
     assert method.exit_mode() is None
 
@@ -116,7 +115,7 @@ def test_with_dbus_adapter_which_returns_none(method_cls):
         def process(self, _):
             return None
 
-    method = method_cls(CallProcessor(dbus_adapter=BadAdapterReturnNone))
+    method = method_cls(dbus_adapter=BadAdapterReturnNone())
 
     with pytest.raises(
         RuntimeError,

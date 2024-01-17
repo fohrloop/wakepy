@@ -3,7 +3,7 @@ from unittest.mock import Mock, call
 import pytest
 from testmethods import get_test_method_class
 
-from wakepy.core.calls import CallProcessor
+from wakepy.core.dbus import DbusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
 
@@ -12,11 +12,13 @@ def mocks_for_test_mode():
     # Setup test
     mocks = Mock()
 
-    mocks.call_processor_cls = Mock()
-    mocks.call_processor_cls.return_value = Mock(spec_set=CallProcessor)
+    mocks.dbus_adapter_cls = Mock(spec_set=type(DbusAdapter))
+    mocks.dbus_adapter_cls.return_value = Mock(spec_set=DbusAdapter)
 
     mocks.mode_controller_cls = Mock()
     mocks.mode_controller_cls.return_value = Mock(spec_set=ModeController)
+
+    mocks.methods_priority = Mock()
 
     result = Mock(spec_set=ActivationResult)
     methods = [Mock() for _ in range(3)]
@@ -32,13 +34,12 @@ def get_mocks_and_testmode():
     mocks = mocks_for_test_mode()
 
     class TestMode(Mode):
-        _call_processor_class = mocks.call_processor_class
         _controller_class = mocks.controller_class
 
     return mocks, TestMode
 
 
-def test_mode_contextmanager_protocol(monkeypatch):
+def test_mode_contextmanager_protocol():
     """Test that the Mode fulfills the context manager protocol; i.e. it is
     possible to use instances of Mode in a with statement like this:
 
@@ -56,7 +57,11 @@ def test_mode_contextmanager_protocol(monkeypatch):
     # starting point: No mock calls
     assert mocks.mock_calls == []
 
-    mode = TestMode(mocks.methods, dbus_adapter=mocks.dbus_adapter)
+    mode = TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    )
 
     # No calls during init
     assert len(mocks.mock_calls) == 0
@@ -67,17 +72,13 @@ def test_mode_contextmanager_protocol(monkeypatch):
         # We have also called activate
         assert len(mocks.mock_calls) == 3
 
-        # We have now created a new CallProcessor instance
-        assert mocks.mock_calls[0] == call.call_processor_class(
-            dbus_adapter=mocks.dbus_adapter
-        )
         # We have also created a ModeController instance
         assert mocks.mock_calls[1] == call.controller_class(
-            call_processor=mocks.call_processor_class.return_value
+            dbus_adapter=mocks.dbus_adapter_cls.return_value
         )
         # And called ModeController.activate
         assert mocks.mock_calls[2] == call.controller_class().activate(
-            mocks.methods, methods_priority=None
+            mocks.methods, methods_priority=mocks.methods_priority
         )
         # The __enter__ returns the Mode
         assert m is mode
@@ -105,7 +106,11 @@ def test_mode_exits():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Normal exit
-    with TestMode(mocks.methods):
+    with TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    ):
         testval = 1
 
     assert testval == 1
@@ -117,7 +122,11 @@ def test_mode_exits_with_modeexit():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Exit with ModeExit
-    with TestMode(mocks.methods):
+    with TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    ):
         testval = 2
         raise ModeExit
         testval = 0  # never hit
@@ -131,7 +140,11 @@ def test_mode_exits_with_modeexit_with_args():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Exit with ModeExit with args
-    with TestMode(mocks.methods):
+    with TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    ):
         testval = 3
         raise ModeExit("FOOO")
         testval = 0  # never hit
@@ -149,7 +162,11 @@ def test_mode_exits_with_other_exception():
         ...
 
     with pytest.raises(MyException):
-        with TestMode(mocks.methods):
+        with TestMode(
+            mocks.methods,
+            methods_priority=mocks.methods_priority,
+            dbus_adapter=mocks.dbus_adapter_cls,
+        ):
             testval = 4
             raise MyException
             testval = 0
@@ -161,9 +178,11 @@ def test_mode_exits_with_other_exception():
 
 def _assert_context_manager_used_correctly(mocks):
     assert mocks.mock_calls.copy() == [
-        call.call_processor_class(dbus_adapter=None),
-        call.controller_class(call_processor=mocks.call_processor_class()),
-        call.controller_class().activate(mocks.methods, methods_priority=None),
+        call.dbus_adapter_cls(),
+        call.controller_class(dbus_adapter=mocks.dbus_adapter_cls.return_value),
+        call.controller_class().activate(
+            mocks.methods, methods_priority=mocks.methods_priority
+        ),
         call.controller_class().deactivate(),
     ]
 
@@ -174,7 +193,7 @@ def test_modecontroller(monkeypatch):
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
 
     method_cls = get_test_method_class(enter_mode=None, heartbeat=None, exit_mode=None)
-    controller = ModeController(Mock(spec_set=CallProcessor))
+    controller = ModeController(Mock(spec_set=DbusAdapter))
 
     # When controller was created, it has not active method or heartbeat
     assert controller.active_method is None

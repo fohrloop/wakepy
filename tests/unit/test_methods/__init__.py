@@ -3,9 +3,10 @@ Mode.
 
 Tests include:
 * Test for using all the defined methods; for example, running `enter_mode()`
- and  `exit_mode` using fake/mock adapters (DBusAdapter, etc.)
+ and  `exit_mode` using fake/mock adapters (DBusAdapter, etc.), or mocks for
+ io related things.
 
 Tests Exclude:
-* IO when processing Calls
+* IO of any kind & calling 3rd party executables
 * Usage of Dbus services, even fake ones
 """
