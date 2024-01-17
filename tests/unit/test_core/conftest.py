@@ -9,9 +9,8 @@ SECOND_MODE = "second_mode"
 
 
 @pytest.fixture(scope="function")
-def provide_methods_different_platforms(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
+def provide_methods_different_platforms(monkeypatch, testutils):
+    testutils.empty_method_registry(monkeypatch)
 
     class WindowsA(Method):
         name = "WinA"
@@ -47,9 +46,8 @@ def provide_methods_different_platforms(monkeypatch):
 
 
 @pytest.fixture(scope="function")
-def provide_methods_a_f(monkeypatch):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
+def provide_methods_a_f(monkeypatch, testutils):
+    testutils.empty_method_registry(monkeypatch)
 
     class MethodA(Method):
         name = "A"

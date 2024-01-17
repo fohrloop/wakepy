@@ -8,7 +8,8 @@ from wakepy.core.activation import (
     get_prioritized_methods_groups,
     sort_methods_by_priority,
 )
-from wakepy.core.method import PlatformName, get_methods
+from wakepy.core.method import PlatformName
+from wakepy.core.registry import get_methods
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

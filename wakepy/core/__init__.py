@@ -16,4 +16,7 @@ from .dbus import DbusMethodCall as DbusMethodCall
 from .method import Method as Method
 from .mode import Mode as Mode
 from .platform import CURRENT_PLATFORM as CURRENT_PLATFORM
+from .registry import get_method as get_method
+from .registry import get_methods as get_methods
+from .registry import get_methods_for_mode as get_methods_for_mode
 from .strenum import StrEnum as StrEnum
