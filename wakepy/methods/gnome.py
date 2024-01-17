@@ -73,7 +73,7 @@ class _GnomeSessionManager(Method, ABC):
             ),
         )
 
-        retval = self.process_call(call)
+        retval = self.call_dbus_method(call)
         if retval is None:
             raise RuntimeError(
                 "Could not get inhibit cookie from org.gnome.SessionManager"
@@ -89,7 +89,7 @@ class _GnomeSessionManager(Method, ABC):
             method=self.method_uninhibit,
             args=dict(inhibit_cookie=self.inhibit_cookie),
         )
-        self.process_call(call)
+        self.call_dbus_method(call)
         self.inhibit_cookie = None
 
 
