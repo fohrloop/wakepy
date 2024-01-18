@@ -18,6 +18,11 @@ def test_get_method_which_is_not_yet_defined():
         ValueError, match=re.escape('No Method with name "Some name" found!')
     ):
         get_method("Some name")
+    with pytest.raises(
+        ValueError, match=re.escape('No Method with name "Some name" found!')
+    ):
+        # for test coverage, test this branch, too.
+        get_method("Some name", mode="foo")
 
 
 @pytest.mark.usefixtures("empty_method_registry")
