@@ -2,15 +2,20 @@ import re
 
 import pytest
 
-from wakepy.core import Method, get_method, get_methods_for_mode, get_methods
+from wakepy.core import Method, get_method, get_methods, get_methods_for_mode
 from wakepy.core.registry import register_method
+
+
+class TestMethod(Method):
+    __test__ = False  # for pytest
+    mode = "_test"
 
 
 @pytest.mark.usefixtures("empty_method_registry")
 def test_get_method_which_is_not_yet_defined():
     # The method registry is empty so there is no Methods with the name
     with pytest.raises(
-        KeyError, match=re.escape('No Method with name "Some name" found!')
+        ValueError, match=re.escape('No Method with name "Some name" found!')
     ):
         get_method("Some name")
 
@@ -20,7 +25,7 @@ def test_get_method_working_example():
     somename = "Some name"
 
     # Create a method
-    class SomeMethod(Method):
+    class SomeMethod(TestMethod):
         name = somename
 
     # Check that we can retrieve the method
@@ -31,13 +36,13 @@ def test_get_method_working_example():
 def test_get_methods(testutils, monkeypatch):
     testutils.empty_method_registry(monkeypatch)
 
-    class A(Method):
+    class A(TestMethod):
         name = "A"
 
-    class B(Method):
+    class B(TestMethod):
         name = "B"
 
-    class C(Method):
+    class C(TestMethod):
         name = "C"
 
     # Asking for a list, getting a list
@@ -58,7 +63,7 @@ def test_get_methods(testutils, monkeypatch):
     assert get_methods(None) is None
 
     # Asking something that does not exists will raise KeyError
-    with pytest.raises(KeyError, match=re.escape('No Method with name "foo" found!')):
+    with pytest.raises(ValueError, match=re.escape('No Method with name "foo" found!')):
         get_methods(["A", "foo"])
 
     # Using unsupported type raises TypeError
@@ -86,6 +91,7 @@ def test_register_method():
     # Note that defining a subclass automatically registers a method.
     class MethodA(Method):
         name = "A"
+        mode = "foo"
 
     assert get_method("A") is MethodA
 
@@ -100,8 +106,7 @@ def test_register_method():
         mode = "somemode"
 
     #  We can get both of the methods from the register
-    assert get_method("A") is MethodA
-    assert get_method("A", mode=None) is MethodA
+    assert get_method("A", mode="foo") is MethodA
     assert get_method("A", mode="somemode") is MethodA2
 
     # We can get the method from register after registering it.
@@ -109,6 +114,17 @@ def test_register_method():
         name = "A"
         mode = "yet_another_mode"
 
-    assert get_method("A", mode=None) is MethodA
+    assert get_method("A", mode="foo") is MethodA
     assert get_method("A", mode="somemode") is MethodA2
     assert get_method("A", mode="yet_another_mode") is MethodA3
+
+    ## We get ValueError if trying to get a method by name when there are
+    # multiple alternatives (unambiguity)
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            """Multiple (3) Methods with name "A" found! The selection is """
+            """unambiguous. Found modes: ('foo', 'somemode', 'yet_another_mode')"""
+        ),
+    ):
+        get_method("A")

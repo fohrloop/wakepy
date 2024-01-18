@@ -798,6 +798,8 @@ class WakepyFakeSuccess(Method):
     """
 
     name = "WAKEPY_FAKE_SUCCESS"
+    mode = "_fake"
+
     environment_variable = name
 
     # All other values are considered to be truthy. Comparison is case

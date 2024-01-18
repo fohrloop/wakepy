@@ -6,13 +6,18 @@ from wakepy.core.method import Method, select_methods
 from wakepy.core.registry import MethodRegistryError, get_method, get_methods
 
 
+class TestMethod(Method):
+    __test__ = False  # for pytest
+    mode = "_test"
+
+
 def test_overridden_methods_autodiscovery():
     """The enter_mode, heartbeat and exit_mode methods by default do nothing
     (on the Method base class). In subclasses, these are usually overriden.
     Check that detecting the overridden methods works correctly
     """
 
-    class WithEnterAndExit(Method):
+    class WithEnterAndExit(TestMethod):
         def enter_mode(self):
             return
 
@@ -25,7 +30,7 @@ def test_overridden_methods_autodiscovery():
     assert method1.has_exit
     assert not method1.has_heartbeat
 
-    class WithJustHeartBeat(Method):
+    class WithJustHeartBeat(TestMethod):
         def heartbeat(self):
             return
 
@@ -35,7 +40,7 @@ def test_overridden_methods_autodiscovery():
     assert not method2.has_exit
     assert method2.has_heartbeat
 
-    class WithEnterExitAndHeartBeat(Method):
+    class WithEnterExitAndHeartBeat(TestMethod):
         def heartbeat(self):
             return
 
@@ -71,7 +76,7 @@ def test_overridden_methods_autodiscovery():
 
 
 def test_method_has_x_is_not_writeable():
-    class MethodWithEnter(Method):
+    class MethodWithEnter(TestMethod):
         def enter_mode(self):
             return
 
@@ -95,7 +100,7 @@ def test_method_has_x_is_not_writeable():
 def test_not_possible_to_define_two_methods_with_same_name(testutils, monkeypatch):
     somename = "Some name"
 
-    class SomeMethod(Method):
+    class SomeMethod(TestMethod):
         name = somename
 
     # It is not possible to define two methods if same name
@@ -103,14 +108,14 @@ def test_not_possible_to_define_two_methods_with_same_name(testutils, monkeypatc
         MethodRegistryError, match=re.escape('Duplicate Method name "Some name"')
     ):
 
-        class SomeMethod(Method):  # noqa:F811
+        class SomeMethod(TestMethod):  # noqa:F811
             name = somename
 
     testutils.empty_method_registry(monkeypatch)
 
     # Now as the registry is empty it is possible to define method with
     # the same name again
-    class SomeMethod(Method):  # noqa:F811
+    class SomeMethod(TestMethod):  # noqa:F811
         name = somename
 
 
