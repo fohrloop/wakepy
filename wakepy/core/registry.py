@@ -23,11 +23,14 @@ from .constants import ModeName
 
 if typing.TYPE_CHECKING:
     from wakepy.core.method import Method, MethodCls
+    from typing import Optional
 
 T = TypeVar("T")
 Collection = Union[List[T], Tuple[T, ...], Set[T]]
+MethodDict = dict[str, MethodCls]
+MethodRegistry = dict[str, MethodDict]
 
-_method_registry: dict[str, MethodCls] = dict()
+_method_registry: MethodRegistry = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
 a module with a subclass of Method, the Method class is added to this registry.
 """
@@ -37,23 +40,31 @@ class MethodRegistryError(RuntimeError):
     """Any error which is related to the method registry"""
 
 
-def register_method(cls: Type[Method]):
+def register_method(method_class: Type[Method]):
     """Registers a subclass of Method to the method registry"""
 
-    if cls.name is None:
+    if method_class.name is None:
         # Methods without a name will not be registered
         return
 
-    if cls.name in _method_registry:
-        if _method_registry[cls.name] is not cls:
+    method_dict: MethodDict = _method_registry.get(method_class.mode, dict())
+
+    if method_class.name in method_dict:
+        if _method_registry[method_class.name] is not method_class:
+            # The same class registered with different name -> raise Exception
             raise MethodRegistryError(
-                f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
-                f"(already registered to {_method_registry[cls.name].__qualname__})"
+                f'Duplicate Method name "{method_class.name}": '
+                f"{method_class.__qualname__} "
+                "(already registered to "
+                f"{_method_registry[method_class.name].__qualname__})"
             )
         else:
+            # The same class registered with same name. No action required.
             return
 
-    _method_registry[cls.name] = cls
+    # Register a new method class
+    method_dict[method_class.name] = method_class
+    _method_registry.setdefault(method_class.mode, method_dict)
 
 
 def get_method(method_name: str) -> MethodCls:
