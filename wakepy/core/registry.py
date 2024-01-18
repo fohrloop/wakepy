@@ -67,16 +67,12 @@ def get_method(method_name: str) -> MethodCls:
     return _method_registry[method_name]
 
 
-def get_methods(method_names: List[str]) -> List[MethodCls]:
-    """Get Method classes based on their names."""
-    return [get_method(name) for name in method_names]
-
-
-def method_names_to_classes(
+def get_methods(
     names: Collection[str] | None = None,
 ) -> Collection[MethodCls] | None:
-    """Convert a collection (list, tuple or set) of method names to a
-    collection of method classes"""
+    """Get a collection (list, tuple or set) of Method classes based on their
+    names."""
+
     if names is None:
         return None
 
