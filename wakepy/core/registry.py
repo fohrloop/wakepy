@@ -1,3 +1,19 @@
+"""This module constains registry of wakepy.Methods. All the subclasses of
+wakepy.Method are automatically added to this registry. The registry can be
+accessed with the functions listed below.
+
+Functions for getting Methods
+-----------------------------
+get_method
+    Get a single method by name
+get_methods
+    Get multiple methods be name
+method_names_to_classes
+    Convert multiple method names to Method classes
+get_methods_for_mode
+    Get Methods based on a Mode name
+"""
+
 from __future__ import annotations
 
 import typing

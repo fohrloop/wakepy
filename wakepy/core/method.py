@@ -10,17 +10,6 @@ General functions
 select_methods
     Select Methods from a collection based on a white- or blacklist.
 
-Functions for getting Methods
------------------------------
-get_method
-    Get a single method by name
-get_methods
-    Get multiple methods be name
-method_names_to_classes
-    Convert multiple method names to Method classes
-get_methods_for_mode
-    Get Methods based on a Mode name
-
 """
 
 from __future__ import annotations
