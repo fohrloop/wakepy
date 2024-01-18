@@ -133,7 +133,7 @@ def get_methods(
 
     Parameters
     ----------
-    names: array-like of str
+    names: list, tuple or set of str
         The names of the wakepy.Methods to get. The methods must be registered
         which means that the modules containing the subclass definitions must
         have been imported.
