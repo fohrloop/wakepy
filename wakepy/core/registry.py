@@ -22,8 +22,9 @@ from typing import List, Set, Tuple, Type, TypeVar, Union
 from .constants import ModeName
 
 if typing.TYPE_CHECKING:
-    from wakepy.core.method import Method, MethodCls
     from typing import Optional
+
+    from wakepy.core.method import Method, MethodCls
 
     T = TypeVar("T")
 
@@ -91,32 +92,73 @@ def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
         selection unambiguous.
 
     """
-    method_dict = _method_registry.get(mode, dict())
 
-    if method_name not in method_dict:
+    notfound = ValueError(
+        f'No Method with name "{method_name}" found!'
+        " Check that the name is correctly spelled and that the module containing"
+        " the class is being imported."
+    )
+
+    if mode is not None:
+        method_dict = _method_registry.get(mode, dict())
+        if method_name not in method_dict:
+            raise notfound
+        return method_dict[method_name]
+
+    # mode is None -> search from all modes.
+    methods_from_all_modes = []
+    for method_dict in _method_registry.values():
+        if method_name not in method_dict:
+            continue
+        methods_from_all_modes.append(method_dict[method_name])
+
+    if not methods_from_all_modes:
+        raise notfound
+    elif len(methods_from_all_modes) > 1:
+        n = len(methods_from_all_modes)
+        modes = tuple(m.mode for m in methods_from_all_modes)
         raise ValueError(
-            f'No Method with name "{method_name}" found!'
-            " Check that the name is correctly spelled and that the module containing"
-            " the class is being imported."
+            f'Multiple ({n}) Methods with name "{method_name}" found! '
+            f"The selection is unambiguous. Found modes: {modes}"
         )
-    return method_dict[method_name]
+
+    return methods_from_all_modes[0]
 
 
 def get_methods(
-    names: Collection[str] | None = None,
+    names: Collection[str] | None = None, mode: Optional[ModeName] = None
 ) -> Collection[MethodCls] | None:
     """Get a collection (list, tuple or set) of Method classes based on their
-    names."""
+    names, and optionally the mode name.
+
+    Parameters
+    ----------
+    names: array-like of str
+        The names of the wakepy.Methods to get. The methods must be registered
+        which means that the modules containing the subclass definitions must
+        have been imported.
+    mode: str | None
+        If a string, only gets methods for the given mode. If None, searches
+        the methods from all the modes. In this case, each Method must be found
+        only in one mode. Otherwise raises ValueError.
+
+    Raises
+    ------
+    ValueError
+        Raised if any of the  methods does not exist, or if any of the existing
+        methods exists in multiple modes and the mode name (str) was not
+        provided as argument to make the selection unambiguous.
+    """
 
     if names is None:
         return None
 
     if isinstance(names, list):
-        return [get_method(name) for name in names]
+        return [get_method(name, mode) for name in names]
     elif isinstance(names, tuple):
-        return tuple(get_method(name) for name in names)
+        return tuple(get_method(name, mode) for name in names)
     elif isinstance(names, set):
-        return set(get_method(name) for name in names)
+        return set(get_method(name, mode) for name in names)
 
     raise TypeError("`names` must be a list, tuple or set")
 
