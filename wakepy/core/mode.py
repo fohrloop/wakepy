@@ -6,7 +6,8 @@ from abc import ABC
 from .activation import ActivationResult, activate_mode, deactivate_method
 from .dbus import get_dbus_adapter
 from .heartbeat import Heartbeat
-from .method import get_methods_for_mode, select_methods
+from .method import select_methods
+from .registry import get_methods_for_mode
 
 if typing.TYPE_CHECKING:
     from types import TracebackType

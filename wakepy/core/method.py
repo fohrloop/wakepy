@@ -10,17 +10,6 @@ General functions
 select_methods
     Select Methods from a collection based on a white- or blacklist.
 
-Functions for getting Methods
------------------------------
-get_method
-    Get a single method by name
-get_methods
-    Get multiple methods be name
-method_names_to_classes
-    Convert multiple method names to Method classes
-get_methods_for_mode
-    Get Methods based on a Mode name
-
 """
 
 from __future__ import annotations
@@ -30,6 +19,7 @@ from abc import ABC, ABCMeta
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from .constants import ModeName, PlatformName
+from .registry import register_method
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
@@ -90,7 +80,8 @@ class Method(ABC, metaclass=MethodMeta):
     but also the hybrid option is possible.
     """
 
-    mode: ModeName | None = None
+    mode: ModeName | str
+
     """The mode for the method. Each method may be connected to single mode.
     Use None for methods which do not implement any mode."""
 
@@ -271,71 +262,6 @@ class Method(ABC, metaclass=MethodMeta):
         return f"<wakepy Method: {self.__class__.__name__} at {hex(id(self))}>"
 
 
-_method_registry: dict[str, MethodCls] = dict()
-"""A name -> Method class mapping. Updated automatically; when python loads
-a module with a subclass of Method, the Method class is added to this registry.
-"""
-
-
-def get_method(method_name: str) -> MethodCls:
-    """Get a Method class based on its name."""
-    if method_name not in _method_registry:
-        raise KeyError(
-            f'No Method with name "{method_name}" found!'
-            " Check that the name is correctly spelled and that the module containing"
-            " the class is being imported."
-        )
-    return _method_registry[method_name]
-
-
-def get_methods(method_names: List[str]) -> List[MethodCls]:
-    """Get Method classes based on their names."""
-    return [get_method(name) for name in method_names]
-
-
-def method_names_to_classes(
-    names: Collection[str] | None = None,
-) -> Collection[MethodCls] | None:
-    """Convert a collection (list, tuple or set) of method names to a
-    collection of method classes"""
-    if names is None:
-        return None
-
-    if isinstance(names, list):
-        return [get_method(name) for name in names]
-    elif isinstance(names, tuple):
-        return tuple(get_method(name) for name in names)
-    elif isinstance(names, set):
-        return set(get_method(name) for name in names)
-
-    raise TypeError("`names` must be a list, tuple or set")
-
-
-def get_methods_for_mode(
-    modename: ModeName,
-) -> List[MethodCls]:
-    """Get the Method classes belonging to a Mode; Methods with
-    Method.mode = `modename`.
-
-    Parameters
-    ----------
-    modename: str | ModeName
-        The name of the Mode from which to select the Methods.
-
-    Returns
-    -------
-    methods: list[MethodCls]
-        The Method classes for the Mode.
-    """
-    methods = []
-    for method_cls in _method_registry.values():
-        if method_cls.mode != modename:
-            continue
-        methods.append(method_cls)
-
-    return methods
-
-
 def select_methods(
     methods: MethodClsCollection,
     omit: Optional[StrCollection] = None,
@@ -387,22 +313,3 @@ def select_methods(
     else:  # pragma: no cover
         raise ValueError("Invalid `omit` and/or `use_only`!")
     return selected_methods
-
-
-def register_method(cls: Type[Method]):
-    """Registers a subclass of Method to the method registry"""
-
-    if cls.name is None:
-        # Methods without a name will not be registered
-        return
-
-    if cls.name in _method_registry:
-        if _method_registry[cls.name] is not cls:
-            raise MethodDefinitionError(
-                f'Duplicate Method name "{cls.name}": {cls.__qualname__} '
-                f"(already registered to {_method_registry[cls.name].__qualname__})"
-            )
-        else:
-            return
-
-    _method_registry[cls.name] = cls

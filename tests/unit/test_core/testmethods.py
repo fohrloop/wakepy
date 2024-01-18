@@ -80,7 +80,11 @@ def get_test_method_class(
 
     def _create_class():
         clsname = get_new_classname()
-        clskwargs = {"supported_platforms": supported_platforms, "name": clsname}
+        clskwargs = {
+            "supported_platforms": supported_platforms,
+            "name": clsname,
+            "mode": "_tests",
+        }
         clsmethods = dict()
         clsmethods["caniuse"] = _create_function(caniuse)
         clsmethods["enter_mode"] = _create_function(enter_mode)

@@ -4,25 +4,6 @@ from wakepy.core import ActivationResult, DbusAdapter, Method, Mode, ModeName
 from wakepy.modes import keep
 
 
-def create_methods(monkeypatch, name_prefix: str, modename: ModeName):
-    # empty method registry
-    monkeypatch.setattr("wakepy.core.method._method_registry", dict())
-
-    class MethodA(Method):
-        name = f"{name_prefix}A"
-        mode = modename
-
-    class MethodB(Method):
-        name = f"{name_prefix}B"
-        mode = modename
-
-    class MethodC(Method):
-        name = f"{name_prefix}C"
-        mode = modename
-
-    return MethodA, MethodB, MethodC
-
-
 @pytest.mark.parametrize(
     "input_args",
     [
@@ -38,16 +19,28 @@ def create_methods(monkeypatch, name_prefix: str, modename: ModeName):
         ),
     ],
 )
-def test_keep_running_mode_creation(input_args, monkeypatch):
+def test_keep_running_mode_creation(input_args, monkeypatch, testutils):
     """Simple test for keep.running and keep.presenting. Tests that all input
     arguments for the functions are passed to the Mode.__init__
     """
+
+    testutils.empty_method_registry(monkeypatch)
+
     name_prefix = input_args["name_prefix"]
     function_under_test = input_args["function_under_test"]
+    modename = input_args["modename"]
 
-    MethodA, MethodB, MethodC = create_methods(
-        monkeypatch, name_prefix=name_prefix, modename=input_args["modename"]
-    )
+    class MethodA(Method):
+        name = f"{name_prefix}A"
+        mode = modename
+
+    class MethodB(Method):
+        name = f"{name_prefix}B"
+        mode = modename
+
+    class MethodC(Method):
+        name = f"{name_prefix}C"
+        mode = modename
 
     mode = function_under_test()
     # All the methods for the mode are selected automatically
