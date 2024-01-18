@@ -80,7 +80,8 @@ class Method(ABC, metaclass=MethodMeta):
     but also the hybrid option is possible.
     """
 
-    mode: ModeName | None = None
+    mode: ModeName | str
+
     """The mode for the method. Each method may be connected to single mode.
     Use None for methods which do not implement any mode."""
 
