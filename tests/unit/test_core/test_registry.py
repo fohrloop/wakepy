@@ -83,6 +83,7 @@ def test_get_methods_for_mode():
 
 @pytest.mark.usefixtures("empty_method_registry")
 def test_register_method():
+    # Note that defining a subclass automatically registers a method.
     class MethodA(Method):
         name = "A"
 
@@ -91,6 +92,23 @@ def test_register_method():
     # It is possible to register the same method many times without issues.
     register_method(MethodA)
     register_method(MethodA)
-    register_method(MethodA)
 
     assert get_method("A") is MethodA
+
+    class MethodA2(Method):
+        name = "A"
+        mode = "somemode"
+
+    #  We can get both of the methods from the register
+    assert get_method("A") is MethodA
+    assert get_method("A", mode=None) is MethodA
+    assert get_method("A", mode="somemode") is MethodA2
+
+    # We can get the method from register after registering it.
+    class MethodA3(Method):
+        name = "A"
+        mode = "yet_another_mode"
+
+    assert get_method("A", mode=None) is MethodA
+    assert get_method("A", mode="somemode") is MethodA2
+    assert get_method("A", mode="yet_another_mode") is MethodA3

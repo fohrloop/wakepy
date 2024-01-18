@@ -25,10 +25,11 @@ if typing.TYPE_CHECKING:
     from wakepy.core.method import Method, MethodCls
     from typing import Optional
 
-T = TypeVar("T")
-Collection = Union[List[T], Tuple[T, ...], Set[T]]
-MethodDict = dict[str, MethodCls]
-MethodRegistry = dict[str, MethodDict]
+    T = TypeVar("T")
+
+    Collection = Union[List[T], Tuple[T, ...], Set[T]]
+    MethodDict = dict[str, MethodCls]
+    MethodRegistry = dict[str, MethodDict]
 
 _method_registry: MethodRegistry = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
@@ -50,13 +51,13 @@ def register_method(method_class: Type[Method]):
     method_dict: MethodDict = _method_registry.get(method_class.mode, dict())
 
     if method_class.name in method_dict:
-        if _method_registry[method_class.name] is not method_class:
+        if method_dict[method_class.name] is not method_class:
             # The same class registered with different name -> raise Exception
             raise MethodRegistryError(
                 f'Duplicate Method name "{method_class.name}": '
                 f"{method_class.__qualname__} "
                 "(already registered to "
-                f"{_method_registry[method_class.name].__qualname__})"
+                f"{method_dict[method_class.name].__qualname__})"
             )
         else:
             # The same class registered with same name. No action required.
@@ -67,15 +68,38 @@ def register_method(method_class: Type[Method]):
     _method_registry.setdefault(method_class.mode, method_dict)
 
 
-def get_method(method_name: str) -> MethodCls:
-    """Get a Method class based on its name."""
-    if method_name not in _method_registry:
-        raise KeyError(
+def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
+    """Get a Method class based on its name and optionally the mode.
+
+    Parameters
+    ----------
+    method_name: str
+        The name of the wakepy.Method. The method must be registered which
+        means that the module containing the subclass definition must have
+        been imported.
+    mode: str | ModeName | None
+        If the method_name is registered to methods belonging to multiple
+        Modes, you must provide the mode name, to make the selection
+        unambiguous. Typical mode names are "keep.running" and
+        "keep.presenting".
+
+    Raises
+    ------
+    ValueError
+        Raised if the method does not exist, or if the method exists in
+        multiple modes, but the mode was not provided as argument to make the
+        selection unambiguous.
+
+    """
+    method_dict = _method_registry.get(mode, dict())
+
+    if method_name not in method_dict:
+        raise ValueError(
             f'No Method with name "{method_name}" found!'
             " Check that the name is correctly spelled and that the module containing"
             " the class is being imported."
         )
-    return _method_registry[method_name]
+    return method_dict[method_name]
 
 
 def get_methods(
