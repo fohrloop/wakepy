@@ -27,3 +27,4 @@ Examples
 # definition is executed (if the module containing the Method class definition
 # is imported)
 from . import gnome as gnome
+from . import windows as windows
