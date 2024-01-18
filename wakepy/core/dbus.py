@@ -1,4 +1,17 @@
-# TODO: Add description
+"""This module is contains classes and functions related to D-Bus, which is
+a message bus for communication between processes operating systems like 
+Linux and DSD. 
+
+When creating a subclass of wakepy.Method, which uses D-Bus methods, one needs
+to create DbusMethodCall, and use the Method.process_dbus_call to get the
+response. 
+
+Wakepy is not tied to any specific D-Bus implementation. If you want to use a
+non-standard way to communicate with D-Bus, you need to subclass DbusAdapter.
+
+There's also get_dbus_adapter function, which is used for getting a D-Bus
+adapter instance.
+"""
 
 from __future__ import annotations
 
