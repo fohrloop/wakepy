@@ -122,14 +122,14 @@ def get_methods(
 
 
 def get_methods_for_mode(
-    modename: ModeName,
+    mode: ModeName | str,
 ) -> List[MethodCls]:
     """Get the Method classes belonging to a Mode; Methods with
-    Method.mode = `modename`.
+    Method.mode = `mode`.
 
     Parameters
     ----------
-    modename: str | ModeName
+    mode: str | ModeName
         The name of the Mode from which to select the Methods.
 
     Returns
@@ -137,4 +137,4 @@ def get_methods_for_mode(
     methods: list[MethodCls]
         The Method classes for the Mode.
     """
-    return [m for m in _method_registry.get(modename, dict()).values()]
+    return [m for m in _method_registry.get(mode, dict()).values()]
