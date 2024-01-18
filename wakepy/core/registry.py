@@ -137,10 +137,4 @@ def get_methods_for_mode(
     methods: list[MethodCls]
         The Method classes for the Mode.
     """
-    methods = []
-    for method_cls in _method_registry.values():
-        if method_cls.mode != modename:
-            continue
-        methods.append(method_cls)
-
-    return methods
+    return [m for m in _method_registry.get(modename, dict()).values()]
