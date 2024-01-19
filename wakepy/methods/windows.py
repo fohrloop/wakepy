@@ -1,6 +1,7 @@
 import ctypes
 import enum
 from abc import ABC, abstractmethod
+
 from wakepy.core import Method, ModeName, PlatformName
 
 # Different flags for WindowsSetThreadExecutionState
