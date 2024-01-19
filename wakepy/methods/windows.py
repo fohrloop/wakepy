@@ -1,6 +1,6 @@
 import ctypes
 import enum
-
+from abc import ABC, abstractmethod
 from wakepy.core import Method, ModeName, PlatformName
 
 # Different flags for WindowsSetThreadExecutionState
@@ -16,7 +16,7 @@ class Flags(enum.IntFlag):
     RELEASE = ES_CONTINUOUS
 
 
-class WindowsSetThreadExecutionState(Method):
+class WindowsSetThreadExecutionState(Method, ABC):
     """This is a method which calls the SetThreadExecutionState function from
     the kernel32.dll. The SetThreadExecutionState informs the system that it
     is in use preventing the system from entering sleep or turning off
@@ -37,9 +37,14 @@ class WindowsSetThreadExecutionState(Method):
 
     def _call_set_thread_execution_state(self, flags: int):
         try:
-            ctypes.windll.kernel32.SetThreadExecutionState(flags)
+            ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type:ignore
         except AttributeError as exc:
             raise RuntimeError("Could not use kernel32.dll!") from exc
+
+    @property
+    @abstractmethod
+    def flags(self) -> Flags:
+        ...
 
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
