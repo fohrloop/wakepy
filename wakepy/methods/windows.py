@@ -1,4 +1,5 @@
 import ctypes
+import enum
 
 from wakepy.core import (
     Method,
@@ -20,14 +21,18 @@ ES_SYSTEM_REQUIRED = 0x00000001
 ES_DISPLAY_REQUIRED = 0x00000002
 
 
+class Flags(enum.IntFlag):
+    KEEP_RUNNING = ES_CONTINUOUS | ES_SYSTEM_REQUIRED
+    KEEP_PRESENTING = ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
+    RELEASE = ES_CONTINUOUS
+
+
 class WindowsSetThreadExecutionState(Method):
     """This is a method which calls the SetThreadExecutionState function from
     the kernel32.dll. The SetThreadExecutionState informs "the system that it
     is in use, thereby preventing the system from entering sleep or turning off
     the display while the application is running"[1] (depending on the used
     flags)."""
-
-    name = "SetThreadExecutionState"
 
     # The docs say that supports Windows XP and above (client) or Windows
     # Server 2003 and above (server)
@@ -36,20 +41,22 @@ class WindowsSetThreadExecutionState(Method):
     def enter_mode(self):
         # Sets the flags until ES_CONTINUOUS is called or until the thread
         # which called this dies.
-        ctypes.windll.kernel32.SetThreadExecutionState(self.flags)
+        ctypes.windll.kernel32.SetThreadExecutionState(self.flags.value)
 
     def exit_mode(self):
-        ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)
+        ctypes.windll.kernel32.SetThreadExecutionState(Flags.RELEASE.value)
 
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
     mode = ModeName.KEEP_RUNNING
-    flags = ES_CONTINUOUS | ES_SYSTEM_REQUIRED
+    flags = Flags.KEEP_RUNNING
+    name = "SetThreadExecutionState"
 
 
 class WindowsKeepPresenting(WindowsSetThreadExecutionState):
     mode = ModeName.KEEP_PRESENTING
-    flags = ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
+    flags = Flags.KEEP_PRESENTING
+    name = "SetThreadExecutionState"
 
 
 """
