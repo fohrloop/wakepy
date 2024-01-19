@@ -1,11 +1,7 @@
 import ctypes
 import enum
 
-from wakepy.core import (
-    Method,
-    ModeName,
-    PlatformName,
-)
+from wakepy.core import Method, ModeName, PlatformName
 
 # Different flags for WindowsSetThreadExecutionState
 # See: https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate

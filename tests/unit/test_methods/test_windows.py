@@ -1,12 +1,13 @@
-import pytest
 from unittest.mock import patch
 
+import pytest
+
 from wakepy.methods.windows import (
+    ES_CONTINUOUS,
+    ES_DISPLAY_REQUIRED,
+    ES_SYSTEM_REQUIRED,
     WindowsKeepPresenting,
     WindowsKeepRunning,
-    ES_CONTINUOUS,
-    ES_SYSTEM_REQUIRED,
-    ES_DISPLAY_REQUIRED,
 )
 
 
