@@ -39,12 +39,18 @@ class WindowsSetThreadExecutionState(Method):
     supported_platforms = (PlatformName.WINDOWS,)
 
     def enter_mode(self):
-        # Sets the flags until ES_CONTINUOUS is called or until the thread
+        # Sets the flags until Flags.RELEASE is used or until the thread
         # which called this dies.
-        ctypes.windll.kernel32.SetThreadExecutionState(self.flags.value)
+        self._call_set_thread_execution_state(self.flags.value)
 
     def exit_mode(self):
-        ctypes.windll.kernel32.SetThreadExecutionState(Flags.RELEASE.value)
+        self._call_set_thread_execution_state(Flags.RELEASE.value)
+
+    def _call_set_thread_execution_state(self, flags: int):
+        try:
+            ctypes.windll.kernel32.SetThreadExecutionState(flags)
+        except AttributeError as exc:
+            raise RuntimeError("Could not use kernel32.dll!") from exc
 
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
