@@ -1,8 +1,16 @@
 (wakepy-methods)=
-# Wakepy Methods 
+# List of Wakepy Methods
 
-## What are wakepy Methods?
-**Methods** are different ways of entering/keeping in a Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html) D-Bus service is one way of entering  the [`keep.running`](#keep-running-section) mode, and it required D-Bus and (a certain version of) GNOME. 
+
+**What are wakepy Methods?**
+Methods are different ways of entering/keeping in a Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) D-Bus service is one way of entering  the [`keep.running`](#keep-running-section) mode, and it required D-Bus and (a certain version of) GNOME. The following methods exist:
+
+
+```{contents}
+:local: True
+:depth: 2
+:class: this-will-duplicate-information-and-it-is-still-useful-here
+```
 
 (keep-running-section)=
 ## keep.running
