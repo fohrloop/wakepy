@@ -57,7 +57,7 @@ def test_screensaver_enter_mode():
 def test_screensaver_exit_mode():
     # Arrange
     method_uninhibit = DbusMethod(
-        name="Uninhibit",
+        name="UnInhibit",
         signature="u",
         params=("cookie",),
     ).of(screen_saver)
