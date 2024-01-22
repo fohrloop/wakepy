@@ -28,4 +28,5 @@ Examples
 # is imported)
 from . import freedesktop as freedesktop
 from . import gnome as gnome
+from . import macos as macos
 from . import windows as windows
