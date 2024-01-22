@@ -8,7 +8,7 @@
 ## keep.running
 
 (keep-running-org-gnome-sessionmanager)=
-#### D-Bus: org.gnome.SessionManager
+### D-Bus: org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager:Inhibit:Suspend`
 - **Introduced in**: wakepy 0.8.0
 - **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service with flag 4 ("Inhibit suspending the session or computer") when activating and saves the returned cookie on the Method instance. Uses the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie when deactivating.  
@@ -19,7 +19,7 @@
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
 
 (keep-running-windows-stes)=
-#### SetThreadExecutionState
+### SetThreadExecutionState
 
 ````{admonition} Windows will not lock the screen automatically if Screen Saver settings do not require it
 :class: warning
@@ -75,7 +75,7 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 ## keep.presenting
 
 
-#### D-Bus: org.gnome.SessionManager
+### D-Bus: org.gnome.SessionManager
 
 - **Name**: `org.gnome.SessionManager:Inhibit:Idle`
 - **Introduced in**: wakepy 0.8.0
@@ -87,7 +87,7 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
 
 (keep-presenting-windows-stes)=
-#### SetThreadExecutionState
+### SetThreadExecutionState
 
 
 
