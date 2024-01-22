@@ -17,7 +17,7 @@ Methods are different ways of entering/keeping in a Mode. A Method may support o
 
 (keep-running-org-gnome-sessionmanager)=
 ### org.gnome.SessionManager
-- **Name**: `org.gnome.SessionManager:Inhibit:Suspend`
+- **Name**: `org.gnome.SessionManager`
 - **Introduced in**: wakepy 0.8.0
 - **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service with flag 4 ("Inhibit suspending the session or computer") when activating and saves the returned cookie on the Method instance. Uses the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie when deactivating.  
 - **Multiprocess safe?**: Yes
@@ -85,7 +85,7 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 
 ### org.gnome.SessionManager
 
-- **Name**: `org.gnome.SessionManager:Inhibit:Idle`
+- **Name**: `org.gnome.SessionManager`
 - **Introduced in**: wakepy 0.8.0
 - **How it works**: Exactly the same as the [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager, but using the flag 8 ("Inhibit the session being marked as idle").
 - **Multiprocess safe?**: Yes
