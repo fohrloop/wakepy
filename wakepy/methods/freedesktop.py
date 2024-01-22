@@ -38,7 +38,7 @@ class FreedesktopScreenSaverInhibit(Method):
     ).of(screen_saver)
 
     method_uninhibit = DbusMethod(
-        name="Uninhibit",
+        name="UnInhibit",
         signature="u",
         params=("cookie",),
     ).of(screen_saver)
