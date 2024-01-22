@@ -19,7 +19,7 @@ class FreedesktopScreenSaverInhibit(Method):
     https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html
     """
 
-    name = "org.gnome.ScreenSaver"
+    name = "org.freedesktop.ScreenSaver"
     mode = ModeName.KEEP_PRESENTING
 
     screen_saver = DbusAddress(
