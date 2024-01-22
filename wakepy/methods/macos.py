@@ -18,7 +18,7 @@ class _MacCaffeinate(Method, ABC):
     Also: https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html
     """
 
-    supported_platforms = (PlatformName.MACOS, PlatformName.LINUX)
+    supported_platforms = (PlatformName.MACOS,)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,7 +49,7 @@ class CaffeinateKeepRunning(_MacCaffeinate):
     name = "caffeinate"
 
 
-class CaffeinatePresenting(_MacCaffeinate):
+class CaffeinateKeepPresenting(_MacCaffeinate):
     mode = ModeName.KEEP_PRESENTING
     # -d:  Create an assertion to prevent the display from sleeping.
     command = "caffeinate -d"
