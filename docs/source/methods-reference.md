@@ -1,14 +1,22 @@
 (wakepy-methods)=
-# Wakepy Methods 
+# List of Wakepy Methods
 
-## What are wakepy Methods?
-**Methods** are different ways of entering/keeping in a Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html) D-Bus service is one way of entering  the [`keep.running`](#keep-running-section) mode, and it required D-Bus and (a certain version of) GNOME. 
+
+**What are wakepy Methods?**
+Methods are different ways of entering/keeping in a Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) D-Bus service is one way of entering  the [`keep.running`](#keep-running-section) mode, and it required D-Bus and (a certain version of) GNOME. The following methods exist:
+
+
+```{contents}
+:local: True
+:depth: 2
+:class: this-will-duplicate-information-and-it-is-still-useful-here
+```
 
 (keep-running-section)=
 ## keep.running
 
 (keep-running-org-gnome-sessionmanager)=
-#### D-Bus: org.gnome.SessionManager
+### org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager:Inhibit:Suspend`
 - **Introduced in**: wakepy 0.8.0
 - **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service with flag 4 ("Inhibit suspending the session or computer") when activating and saves the returned cookie on the Method instance. Uses the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie when deactivating.  
@@ -19,7 +27,7 @@
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
 
 (keep-running-windows-stes)=
-#### SetThreadExecutionState
+### SetThreadExecutionState
 
 ````{admonition} Windows will not lock the screen automatically if Screen Saver settings do not require it
 :class: warning
@@ -75,7 +83,7 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 ## keep.presenting
 
 
-#### D-Bus: org.gnome.SessionManager
+### org.gnome.SessionManager
 
 - **Name**: `org.gnome.SessionManager:Inhibit:Idle`
 - **Introduced in**: wakepy 0.8.0
@@ -86,8 +94,19 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **Requirements**: Same as [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager.
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
 
+(keep-presenting-org-freedesktop-screensaver)=
+### org.freedesktop.ScreenSaver
+- **Name**: `org.freedesktop.ScreenSaver`
+- **Introduced in**: wakepy 0.6.0
+- **How it works**: Uses the Inhibit method of [org.freedesktop.ScreenSaver](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) D-Bus service when activating and saves the returned cookie on the Method instance. Uses the org.freedesktop.ScreenSaver.UnInhibit method with the cookie when deactivating. The org.freedesktop.ScreenSaver can only be used to prevent idle; that is why there is no "keep.running" mode counterpart.  
+- **Multiprocess safe?**: Yes
+- **What if the process holding the lock dies?**: The lock is automatically removed.
+- **How to check it?**:  The org.freedesktop.ScreenSaver does not expose a method for listing the inhibitors, but you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
+- **Requirements**: D-Bus, and a [freedesktop.org compliant desktop environment](https://www.freedesktop.org/wiki/Desktops/), which should implement the org.freedesktop.ScreenSaver.Inhibit method. 
+- **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([PR #171](https://github.com/fohrloop/wakepy/pull/171) by [fohrloop](https://github.com/fohrloop/)).
+
 (keep-presenting-windows-stes)=
-#### SetThreadExecutionState
+### SetThreadExecutionState
 
 
 
@@ -99,3 +118,6 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **How to check it?**: Like the [keep.running](keep-running-windows-stes)
 - **Requirements**: Same as for the [keep.running](keep-running-windows-stes) using SetThreadExecutionState.
 - **Tested on**:  Windows 10 Pro version 22H2 build 19045.332 with and without Screen Saver + ScreenSaverIsSecure set in settings, Windows 10 Enterprise version 22H2 build 19045.3803 with Group Policies enforcing ScreenSaverIsSecure ([Issue #169](https://github.com/fohrloop/wakepy/issues/169) by [fohrloop](https://github.com/fohrloop/)).
+
+
+
