@@ -23,7 +23,7 @@ class _MacCaffeinate(Method, ABC):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logging.getLogger(__name__)
-        self._process: Optional[Popen] = None
+        self._process: Optional[Popen[bytes]] = None
 
     def enter_mode(self):
         self.logger.debug('Running "%s"', self.command)
