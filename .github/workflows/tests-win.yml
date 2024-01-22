@@ -4,6 +4,22 @@ name: Run tests (Win)
 on:  
   [workflow_dispatch]
 
+# See: https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+permissions:
+  actions: write
+  checks: none
+  contents: read
+  deployments: none
+  id-token: none
+  issues: none
+  discussions: none
+  packages: none
+  pages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: read
+  statuses: none
+
 # Cancel in-progress jobs/runs for the same workflow; if you push to same
 # pull request twice, the previous workflow should be canceled.
 # From: https://docs.github.com/en/actions/using-jobs/using-concurrency#example-only-cancel-in-progress-jobs-or-runs-for-the-current-workflow
