@@ -20,7 +20,7 @@ from wakepy.core.constants import ModeName
 from wakepy.core.mode import create_mode
 
 if typing.TYPE_CHECKING:
-    from typing import Dict, List
+    from typing import List
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
@@ -38,20 +38,23 @@ WAKEPY_TICKBOXES_TEMPLATE = """
 
 
 def main():
-    kwargs = parse_arguments(sys.argv[1:])
-    mode = create_mode(**kwargs)
+    modename = parse_arguments(sys.argv[1:])
+    mode = create_mode(modename=modename)
     with mode:
         if not mode.active:
             raise RuntimeError("Could not activate")
-        print(get_startup_text(mode=kwargs["modename"]))
+        print(get_startup_text(mode=modename))
         wait_until_keyboardinterrupt()
 
     print("\nExited.")
 
 
-def parse_arguments(args: List[str]) -> Dict[str, ModeName]:
+def parse_arguments(
+    sysargs: List[str],
+) -> ModeName:
     """Parses arguments from sys.argv and returns kwargs for"""
-    args = _get_argparser().parse_args(args)
+
+    args = _get_argparser().parse_args(sysargs)
 
     n_flags_selected = sum((args.keep_running, args.presentation))
 
@@ -65,7 +68,7 @@ def parse_arguments(args: List[str]) -> Dict[str, ModeName]:
         assert args.presentation
         mode = ModeName.KEEP_PRESENTING
 
-    return dict(modename=mode)
+    return mode
 
 
 def _get_argparser() -> argparse.ArgumentParser:
@@ -78,8 +81,6 @@ def _get_argparser() -> argparse.ArgumentParser:
         ),
     )
 
-    common_kwargs = dict(action="store_true", default=False)
-
     parser.add_argument(
         "-k",
         "--keep-running",
@@ -91,7 +92,8 @@ def _get_argparser() -> argparse.ArgumentParser:
             "not stop programs from executing. This is used as the default if no modes "
             "are selected."
         ),
-        **common_kwargs,
+        action="store_true",
+        default=False,
     )
 
     parser.add_argument(
@@ -101,7 +103,8 @@ def _get_argparser() -> argparse.ArgumentParser:
             "Presentation mode; inhibit automatic idle timer based sleep, screensaver, "
             "screenlock and display power management."
         ),
-        **common_kwargs,
+        action="store_true",
+        default=False,
     )
 
     return parser
