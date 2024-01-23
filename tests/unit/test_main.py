@@ -23,7 +23,7 @@ from wakepy.core.constants import ModeName
     ],
 )
 def test_get_argparser_keep_running(args):
-    assert parse_arguments(args) == dict(modename=ModeName.KEEP_RUNNING)
+    assert parse_arguments(args) == ModeName.KEEP_RUNNING
 
 
 @pytest.mark.parametrize(
@@ -34,7 +34,7 @@ def test_get_argparser_keep_running(args):
     ],
 )
 def test_get_argparser_keep_presenting(args):
-    assert parse_arguments(args) == dict(modename=ModeName.KEEP_PRESENTING)
+    assert parse_arguments(args) == ModeName.KEEP_PRESENTING
 
 
 @pytest.mark.parametrize(
@@ -82,7 +82,7 @@ def get_mocks_for_main(
     mockmode = MagicMock(spec_set=TestMode)
     mockmode.active = mode_works
     sysarg = ["programname", cli_arg]
-    parse_arguments.return_value = dict(modename=mockmodename)
+    parse_arguments.return_value = mockmodename
     get_startup_text.return_value = "startuptext"
     create_mode.return_value = mockmode
 
@@ -121,9 +121,9 @@ def test_main(
 
     assert mocks.mock_calls == [
         call.parse_arguments(mocks.sysarg[1:]),
-        call.create_mode(**parse_arguments.return_value),
+        call.create_mode(modename=parse_arguments.return_value),
         call.mode.__enter__(),
-        call.get_startup_text(mode=parse_arguments.return_value["modename"]),
+        call.get_startup_text(mode=parse_arguments.return_value),
         call.print(get_startup_text.return_value),
         call.wait_until_keyboardinterrupt(),
         call.mode.__exit__(None, None, None),
