@@ -33,15 +33,22 @@ def get_argparser() -> argparse.ArgumentParser:
         "-k",
         "--keep-running",
         help=(
-            "Keep programs running; inhibit automatic sleep/suspend. This is"
-            " used as a default if no modes are selected."
+            "Keep programs running; inhibit automatic idle timer based sleep / suspend. "
+            "If a screen lock (or a screen saver) with a password is enabled, your "
+            "system *may* still lock the session automatically. You may, and probably "
+            "should, lock the session manually. Locking the workstation does not stop "
+            "programs from executing. This is used as the default if no modes are "
+            "selected."
         ),
     )
 
     add_mode(
         "-p",
         "--presentation",
-        help=("Presentation mode; inhibit automatic sleep, screensaver and screenlock"),
+        help=(
+            "Presentation mode; inhibit automatic idle timer based sleep, screensaver, "
+            "screenlock and display power management."
+        ),
     )
 
     return parser
