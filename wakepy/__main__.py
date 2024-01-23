@@ -52,15 +52,12 @@ def parse_arguments(args: list[str]) -> Dict[str, ModeName]:
     if n_flags_selected > 1:
         raise ValueError('You may only select one of the modes! See: "wakepy -h"')
 
-    if n_flags_selected == 0:
+    if args.keep_running or n_flags_selected == 0:
         # The default action, if nothing is selected, is "keep running"
         mode = ModeName.KEEP_RUNNING
     else:
-        if args.keep_running:
-            mode = ModeName.KEEP_RUNNING
-        else:
-            assert args.presentation
-            mode = ModeName.KEEP_PRESENTING
+        assert args.presentation
+        mode = ModeName.KEEP_PRESENTING
 
     return dict(modename=mode)
 
