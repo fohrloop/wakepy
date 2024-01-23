@@ -8,14 +8,19 @@ or using the executable
 
     wakepy [args]
 """
+from __future__ import annotations
+
 import argparse
 import itertools
 import sys
 import time
-from typing import Dict
+import typing
 
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import create_mode
+
+if typing.TYPE_CHECKING:
+    from typing import Dict, List
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
@@ -44,7 +49,7 @@ def main():
     print("\nExited.")
 
 
-def parse_arguments(args: list[str]) -> Dict[str, ModeName]:
+def parse_arguments(args: List[str]) -> Dict[str, ModeName]:
     """Parses arguments from sys.argv and returns kwargs for"""
     args = _get_argparser().parse_args(args)
 
