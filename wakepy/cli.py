@@ -9,11 +9,11 @@ start()
 
 import time
 import warnings
-from contextlib import ExitStack
 
-from wakepy.core.constants import PlatformName
+from wakepy.core.constants import PlatformName, ModeName
 from wakepy.core.platform import CURRENT_PLATFORM
-from wakepy.modes import keep
+from wakepy.core import Mode
+from wakepy.core.mode import create_mode
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
@@ -86,42 +86,14 @@ def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
 
 
 def start(
-    keep_running: bool = False,
-    presentation_mode: bool = False,
-    deprecation_warning: bool = False,
+    modename: ModeName,
 ):
-    """
-    Start the keep-awake. During keep-awake, the CPU is not allowed to
-    go to sleep automatically until the CTRL+C is pressed.
-    """
-
-    real_successes = dict()
-    with ExitStack() as stack:
-        if keep_running:
-            m = stack.enter_context(keep.running())
-            real_successes["keep_running"] = (
-                m.activation_result.real_success if m.activation_result else False
-            )
-        if presentation_mode:
-            m = stack.enter_context(keep.presenting())
-            real_successes["presentation_mode"] = (
-                m.activation_result.real_success if m.activation_result else False
-            )
-
-        # A quick fix (Fix this better in next release)
-        # On linux, D-Bus methods for keep_running use presentation_mode.
-        if CURRENT_PLATFORM == PlatformName.LINUX and real_successes.get(
-            "keep_running"
-        ):
-            real_successes["presentation_mode"] = True
+    mode = create_mode(modename)
+    with mode:
+        if not mode.active:
+            raise RuntimeError(f"Could not activate")
 
         print_on_start(**real_successes)
-
-        if deprecation_warning:
-            warnings.warn(
-                "The -s/--keep-screen-awake option is deprecated and will be removed in"
-                " a future release! Use the -p/--presentation flag, instead!\n"
-            )
         wait_until_keyboardinterrupt()
 
     print("\nExited.")
