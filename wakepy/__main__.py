@@ -41,7 +41,7 @@ def wakepy_text():
 
 
 def main():
-    kwargs = parse_arguments(sys.argv)
+    kwargs = parse_arguments(sys.argv[1:])
     mode = create_mode(**kwargs)
     with mode:
         if not mode.active:
