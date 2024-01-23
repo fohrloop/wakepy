@@ -79,12 +79,12 @@ def _get_argparser() -> argparse.ArgumentParser:
         "-k",
         "--keep-running",
         help=(
-            "Keep programs running; inhibit automatic idle timer based sleep / suspend. "
-            "If a screen lock (or a screen saver) with a password is enabled, your "
-            "system *may* still lock the session automatically. You may, and probably "
-            "should, lock the session manually. Locking the workstation does not stop "
-            "programs from executing. This is used as the default if no modes are "
-            "selected."
+            "Keep programs running; inhibit automatic idle timer based sleep / "
+            "suspend. If a screen lock (or a screen saver) with a password is enabled, "
+            "your system *may* still lock the session automatically. You may, and "
+            "probably should, lock the session manually. Locking the workstation does "
+            "not stop programs from executing. This is used as the default if no modes "
+            "are selected."
         ),
         **common_kwargs,
     )

@@ -1,5 +1,5 @@
 """Tests for the __main__ CLI"""
-from unittest.mock import patch, Mock, MagicMock, call
+from unittest.mock import MagicMock, Mock, call, patch
 
 import pytest
 
@@ -9,8 +9,8 @@ from wakepy.__main__ import (
     parse_arguments,
     wait_until_keyboardinterrupt,
 )
-from wakepy.core.constants import ModeName
 from wakepy.core import Mode
+from wakepy.core.constants import ModeName
 
 
 @pytest.mark.parametrize(
