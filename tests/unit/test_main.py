@@ -1,5 +1,5 @@
 """Tests for the __main__ CLI"""
-from unittest.mock import patch, Mock, call
+from unittest.mock import patch, Mock, MagicMock, call
 
 import pytest
 
@@ -10,6 +10,7 @@ from wakepy.__main__ import (
     wait_until_keyboardinterrupt,
 )
 from wakepy.core.constants import ModeName
+from wakepy.core import Mode
 
 
 @pytest.mark.parametrize(
@@ -77,12 +78,20 @@ def test_main(
     cli_arg = Mock()
     mockmodename = Mock(spec_set=ModeName.KEEP_PRESENTING)
     mockprint = Mock()
+
+    class TestWorkingMode(Mode):
+        active = True
+
+    mockmode = MagicMock(autospec=TestWorkingMode)
+
     sysarg = ["programname", cli_arg]
     parse_arguments.return_value = dict(modename=mockmodename)
     get_startup_text.return_value = "startuptext"
+    create_mode.return_value = mockmode
 
     mocks = Mock()
     mocks.attach_mock(mockprint, "print")
+    mocks.attach_mock(mockmode, "mode")
     mocks.attach_mock(parse_arguments, "parse_arguments")
     mocks.attach_mock(create_mode, "create_mode")
     mocks.attach_mock(get_startup_text, "get_startup_text")
@@ -94,11 +103,13 @@ def test_main(
     assert mocks.mock_calls == [
         call.parse_arguments([cli_arg]),
         call.create_mode(modename=mockmodename),
-        call.create_mode().__enter__(),
-        call.create_mode().active.__bool__(),
+        call.mode.__enter__(),
+        call.mode.active.__bool__(),
         call.get_startup_text(mode=mockmodename),
         call.print(get_startup_text.return_value),
         call.wait_until_keyboardinterrupt(),
-        call.create_mode().__exit__(None, None, None),
+        call.mode.__exit__(None, None, None),
         call.print("\nExited."),
     ]
+
+    # Special case: Test that
