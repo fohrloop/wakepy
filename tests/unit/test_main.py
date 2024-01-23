@@ -79,8 +79,8 @@ def get_mocks_for_main(
     class TestMode(Mode):
         active = mode_works
 
-    mockmode = MagicMock(autospec=TestMode)
-
+    mockmode = MagicMock(spec_set=TestMode)
+    mockmode.active = mode_works
     sysarg = ["programname", cli_arg]
     parse_arguments.return_value = dict(modename=mockmodename)
     get_startup_text.return_value = "startuptext"
@@ -123,10 +123,29 @@ def test_main(
         call.parse_arguments(mocks.sysarg[1:]),
         call.create_mode(**parse_arguments.return_value),
         call.mode.__enter__(),
-        call.mode.active.__bool__(),
         call.get_startup_text(mode=parse_arguments.return_value["modename"]),
         call.print(get_startup_text.return_value),
         call.wait_until_keyboardinterrupt(),
         call.mode.__exit__(None, None, None),
         call.print("\nExited."),
     ]
+
+
+@patch("wakepy.__main__.wait_until_keyboardinterrupt")
+@patch("wakepy.__main__.get_startup_text")
+@patch("wakepy.__main__.create_mode")
+@patch("wakepy.__main__.parse_arguments")
+def test_main_with_non_working_mode(
+    parse_arguments, create_mode, get_startup_text, wait_until_keyboardinterrupt
+):
+    mocks = get_mocks_for_main(
+        parse_arguments,
+        create_mode,
+        get_startup_text,
+        wait_until_keyboardinterrupt,
+        mode_works=False,
+    )
+
+    with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
+        with pytest.raises(RuntimeError, match="Could not activate"):
+            main()
