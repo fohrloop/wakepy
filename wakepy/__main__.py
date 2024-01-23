@@ -120,7 +120,7 @@ def get_startup_text(mode: ModeName) -> str:
 def wait_until_keyboardinterrupt():
     spinning_chars = ["|", "/", "-", "\\"]
     try:
-        for char in itertools.cycle(spinning_chars):
+        for char in itertools.cycle(spinning_chars):  # pragma: no branch
             print("\r" + char + r" [Press Ctrl+C to exit]", end="")
             time.sleep(1)
     except KeyboardInterrupt:
@@ -128,4 +128,4 @@ def wait_until_keyboardinterrupt():
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pragma: no cover
