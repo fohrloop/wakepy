@@ -11,6 +11,7 @@ or using the executable
 import argparse
 import time
 from typing import Dict
+import sys
 
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import create_mode
@@ -40,20 +41,40 @@ def wakepy_text():
 
 
 def main():
-    parser = get_argparser()
-    kwargs = parse_arguments(parser)
+    kwargs = parse_arguments(sys.argv)
     mode = create_mode(**kwargs)
     with mode:
         if not mode.active:
             raise RuntimeError("Could not activate")
-
-        print_on_start(**real_successes)
+        print_on_start(mode=kwargs["modename"])
         wait_until_keyboardinterrupt()
 
     print("\nExited.")
 
 
-def get_argparser() -> argparse.ArgumentParser:
+def parse_arguments(args: list[str]) -> Dict[str, ModeName]:
+    """Parses arguments from sys.argv and returns kwargs for"""
+    args = _get_argparser().parse_args(args)
+
+    n_flags_selected = sum((args.keep_running, args.presentation))
+
+    if n_flags_selected > 1:
+        raise ValueError('You may only select one of the modes! See: "wakepy -h"')
+
+    if n_flags_selected == 0:
+        # The default action, if nothing is selected, is "keep running"
+        mode = ModeName.KEEP_RUNNING
+    else:
+        if args.keep_running:
+            mode = ModeName.KEEP_RUNNING
+        else:
+            assert args.presentation
+            mode = ModeName.KEEP_PRESENTING
+
+    return dict(modename=mode)
+
+
+def _get_argparser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="wakepy",
         formatter_class=lambda prog: argparse.HelpFormatter(
@@ -90,19 +111,6 @@ def get_argparser() -> argparse.ArgumentParser:
     )
 
     return parser
-
-
-def parse_arguments(parser: argparse.ArgumentParser) -> Dict[str, bool]:
-    args = parser.parse_args()
-
-    if not any((args.keep_running, args.presentation, args.keep_screen_awake)):
-        # The default action, if nothing is selected, is "keep running"
-        args.keep_running = True
-
-    return dict(
-        keep_running=args.keep_running,
-        presentation_mode=args.presentation,
-    )
 
 
 def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
