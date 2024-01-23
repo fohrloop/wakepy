@@ -301,7 +301,7 @@ def get_dbus_adapter(
 
 def get_default_dbus_adapter() -> DbusAdapter | None:
     try:
-        from wakepy.io.dbus.jeepney import JeepneyDbusAdapter
+        from wakepy.dbus_adapters.jeepney import JeepneyDbusAdapter
     except ImportError:
         return None
     return JeepneyDbusAdapter()

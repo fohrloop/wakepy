@@ -14,7 +14,7 @@ import jeepney
 import pytest
 
 from wakepy.core import DbusAddress, DbusMethod, DbusMethodCall
-from wakepy.io.dbus.jeepney import JeepneyDbusAdapter
+from wakepy.dbus_adapters.jeepney import JeepneyDbusAdapter
 
 
 @pytest.mark.usefixtures("dbus_calculator_service")
