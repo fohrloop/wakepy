@@ -12,7 +12,7 @@ import argparse
 import time
 from typing import Dict
 import sys
-
+import itertools
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import create_mode
 
@@ -120,10 +120,9 @@ def get_startup_text(mode: ModeName) -> str:
 def wait_until_keyboardinterrupt():
     spinning_chars = ["|", "/", "-", "\\"]
     try:
-        while True:
-            for i in range(0, 4):
-                print("\r" + spinning_chars[i] + r" [Press Ctrl+C to exit]", end="")
-                time.sleep(1)
+        for char in itertools.cycle(spinning_chars):
+            print("\r" + char + r" [Press Ctrl+C to exit]", end="")
+            time.sleep(1)
     except KeyboardInterrupt:
         pass
 
