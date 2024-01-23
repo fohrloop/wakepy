@@ -1,10 +1,11 @@
 """Tests for the __main__ CLI"""
+from unittest.mock import patch
+
 import pytest
 
-from unittest.mock import patch
 from wakepy.__main__ import (
-    parse_arguments,
     get_startup_text,
+    parse_arguments,
     wait_until_keyboardinterrupt,
 )
 from wakepy.core.constants import ModeName

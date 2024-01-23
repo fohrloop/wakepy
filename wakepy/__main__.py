@@ -9,10 +9,11 @@ or using the executable
     wakepy [args]
 """
 import argparse
+import itertools
+import sys
 import time
 from typing import Dict
-import sys
-import itertools
+
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import create_mode
 
