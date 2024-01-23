@@ -42,7 +42,7 @@ def wakepy_text():
 def main():
     parser = get_argparser()
     kwargs = parse_arguments(parser)
-    mode = create_mode(modename)
+    mode = create_mode(**kwargs)
     with mode:
         if not mode.active:
             raise RuntimeError("Could not activate")
@@ -63,12 +63,9 @@ def get_argparser() -> argparse.ArgumentParser:
         ),
     )
 
-    def add_mode(short, long, help, default=False):
-        parser.add_argument(
-            short, long, help=help, action="store_true", default=default
-        )
+    common_kwargs = dict(action="store_true", default=False)
 
-    add_mode(
+    parser.add_argument(
         "-k",
         "--keep-running",
         help=(
@@ -79,15 +76,17 @@ def get_argparser() -> argparse.ArgumentParser:
             "programs from executing. This is used as the default if no modes are "
             "selected."
         ),
+        **common_kwargs,
     )
 
-    add_mode(
+    parser.add_argument(
         "-p",
         "--presentation",
         help=(
             "Presentation mode; inhibit automatic idle timer based sleep, screensaver, "
             "screenlock and display power management."
         ),
+        **common_kwargs,
     )
 
     return parser
