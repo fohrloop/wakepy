@@ -65,6 +65,38 @@ def test_wait_until_keyboardinterrupt():
         wait_until_keyboardinterrupt()
 
 
+def get_mocks_for_main(
+    parse_arguments,
+    create_mode,
+    get_startup_text,
+    wait_until_keyboardinterrupt,
+    mode_works: bool,
+):
+    cli_arg = Mock()
+    mockmodename = Mock(spec_set=ModeName.KEEP_PRESENTING)
+    mockprint = Mock()
+
+    class TestMode(Mode):
+        active = mode_works
+
+    mockmode = MagicMock(autospec=TestMode)
+
+    sysarg = ["programname", cli_arg]
+    parse_arguments.return_value = dict(modename=mockmodename)
+    get_startup_text.return_value = "startuptext"
+    create_mode.return_value = mockmode
+
+    mocks = Mock()
+    mocks.sysarg = sysarg
+    mocks.attach_mock(mockprint, "print")
+    mocks.attach_mock(mockmode, "mode")
+    mocks.attach_mock(parse_arguments, "parse_arguments")
+    mocks.attach_mock(create_mode, "create_mode")
+    mocks.attach_mock(get_startup_text, "get_startup_text")
+    mocks.attach_mock(wait_until_keyboardinterrupt, "wait_until_keyboardinterrupt")
+    return mocks
+
+
 @patch("wakepy.__main__.wait_until_keyboardinterrupt")
 @patch("wakepy.__main__.get_startup_text")
 @patch("wakepy.__main__.create_mode")
@@ -75,41 +107,26 @@ def test_main(
     """This is just a smoke test for the main() function. It checks that
     correct functions are called in the correct order and correct arguments,
     but the functionality of each of the functions is tested elsewhere."""
-    cli_arg = Mock()
-    mockmodename = Mock(spec_set=ModeName.KEEP_PRESENTING)
-    mockprint = Mock()
 
-    class TestWorkingMode(Mode):
-        active = True
+    mocks = get_mocks_for_main(
+        parse_arguments,
+        create_mode,
+        get_startup_text,
+        wait_until_keyboardinterrupt,
+        mode_works=True,
+    )
 
-    mockmode = MagicMock(autospec=TestWorkingMode)
-
-    sysarg = ["programname", cli_arg]
-    parse_arguments.return_value = dict(modename=mockmodename)
-    get_startup_text.return_value = "startuptext"
-    create_mode.return_value = mockmode
-
-    mocks = Mock()
-    mocks.attach_mock(mockprint, "print")
-    mocks.attach_mock(mockmode, "mode")
-    mocks.attach_mock(parse_arguments, "parse_arguments")
-    mocks.attach_mock(create_mode, "create_mode")
-    mocks.attach_mock(get_startup_text, "get_startup_text")
-    mocks.attach_mock(wait_until_keyboardinterrupt, "wait_until_keyboardinterrupt")
-
-    with patch("sys.argv", sysarg), patch("builtins.print", mockprint):
+    with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
         main()
 
     assert mocks.mock_calls == [
-        call.parse_arguments([cli_arg]),
-        call.create_mode(modename=mockmodename),
+        call.parse_arguments(mocks.sysarg[1:]),
+        call.create_mode(**parse_arguments.return_value),
         call.mode.__enter__(),
         call.mode.active.__bool__(),
-        call.get_startup_text(mode=mockmodename),
+        call.get_startup_text(mode=parse_arguments.return_value["modename"]),
         call.print(get_startup_text.return_value),
         call.wait_until_keyboardinterrupt(),
         call.mode.__exit__(None, None, None),
         call.print("\nExited."),
     ]
-
-    # Special case: Test that
