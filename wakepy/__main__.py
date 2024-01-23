@@ -33,6 +33,26 @@ WAKEPY_TICKBOXES_TEMPLATE = """
 )
 
 
+def wakepy_text():
+    from wakepy import __version__
+
+    return WAKEPY_TEXT_TEMPLATE.format(VERSION_STRING=f"{'  v.'+__version__: <20}")
+
+
+def main():
+    parser = get_argparser()
+    kwargs = parse_arguments(parser)
+    mode = create_mode(modename)
+    with mode:
+        if not mode.active:
+            raise RuntimeError("Could not activate")
+
+        print_on_start(**real_successes)
+        wait_until_keyboardinterrupt()
+
+    print("\nExited.")
+
+
 def get_argparser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="wakepy",
@@ -86,35 +106,6 @@ def parse_arguments(parser: argparse.ArgumentParser) -> Dict[str, bool]:
     )
 
 
-def wakepy_text():
-    from wakepy import __version__
-
-    return WAKEPY_TEXT_TEMPLATE.format(VERSION_STRING=f"{'  v.'+__version__: <20}")
-
-
-def create_wakepy_opts_text(keep_running: bool, presentation_mode: bool) -> str:
-    opts = dict(
-        no_auto_suspend=keep_running or presentation_mode,
-        presentation_mode=presentation_mode,
-    )
-    option_to_string = {True: "x", False: " ", None: "?"}
-
-    return WAKEPY_TICKBOXES_TEMPLATE.format(
-        **{key: option_to_string.get(val) for key, val in opts.items()}
-    )
-
-
-def wait_until_keyboardinterrupt():
-    spinning_chars = ["|", "/", "-", "\\"]
-    try:
-        while True:
-            for i in range(0, 4):
-                print("\r" + spinning_chars[i] + r" [Press Ctrl+C to exit]", end="")
-                time.sleep(1)
-    except KeyboardInterrupt:
-        pass
-
-
 def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
     """
     Parameters
@@ -138,24 +129,27 @@ def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
     print(" ")
 
 
-def start(
-    modename: ModeName,
-):
-    mode = create_mode(modename)
-    with mode:
-        if not mode.active:
-            raise RuntimeError("Could not activate")
+def create_wakepy_opts_text(keep_running: bool, presentation_mode: bool) -> str:
+    opts = dict(
+        no_auto_suspend=keep_running or presentation_mode,
+        presentation_mode=presentation_mode,
+    )
+    option_to_string = {True: "x", False: " ", None: "?"}
 
-        print_on_start(**real_successes)
-        wait_until_keyboardinterrupt()
-
-    print("\nExited.")
+    return WAKEPY_TICKBOXES_TEMPLATE.format(
+        **{key: option_to_string.get(val) for key, val in opts.items()}
+    )
 
 
-def main():
-    parser = get_argparser()
-    kwargs = parse_arguments(parser)
-    start(**kwargs)
+def wait_until_keyboardinterrupt():
+    spinning_chars = ["|", "/", "-", "\\"]
+    try:
+        while True:
+            for i in range(0, 4):
+                print("\r" + spinning_chars[i] + r" [Press Ctrl+C to exit]", end="")
+                time.sleep(1)
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
