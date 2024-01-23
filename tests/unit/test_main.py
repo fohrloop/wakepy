@@ -25,7 +25,7 @@ def test_get_argparser_keep_running(args):
         ["--presentation"],
     ],
 )
-def test_get_argparser_keep_running(args):
+def test_get_argparser_keep_presenting(args):
     assert parse_arguments(args) == dict(modename=ModeName.KEEP_PRESENTING)
 
 
@@ -38,6 +38,6 @@ def test_get_argparser_keep_running(args):
         ["--presentation", "--keep-running"],
     ],
 )
-def test_get_argparser_keep_running(args):
+def test_get_argparser_too_many_modes(args):
     with pytest.raises(ValueError, match="You may only select one of the modes!"):
         assert parse_arguments(args)
