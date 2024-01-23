@@ -28,16 +28,7 @@ WAKEPY_TEXT_TEMPLATE = r"""                  _
 WAKEPY_TICKBOXES_TEMPLATE = """
  [{no_auto_suspend}] System will continue running programs
  [{presentation_mode}] Presentation mode is on 
-
-""".strip(
-    "\n"
-)
-
-
-def wakepy_text():
-    from wakepy import __version__
-
-    return WAKEPY_TEXT_TEMPLATE.format(VERSION_STRING=f"{'  v.'+__version__: <20}")
+"""
 
 
 def main():
@@ -46,7 +37,7 @@ def main():
     with mode:
         if not mode.active:
             raise RuntimeError("Could not activate")
-        print_on_start(mode=kwargs["modename"])
+        print(get_startup_text(mode=kwargs["modename"]))
         wait_until_keyboardinterrupt()
 
     print("\nExited.")
@@ -113,39 +104,17 @@ def _get_argparser() -> argparse.ArgumentParser:
     return parser
 
 
-def print_on_start(keep_running: bool = False, presentation_mode: bool = False):
-    """
-    Parameters
-    ----------
-    presentation_mode: bool
-        The option to select if screen is to be kept on.
-    """
+def get_startup_text(mode: ModeName) -> str:
+    from wakepy import __version__
 
-    wakepy_opts_text = create_wakepy_opts_text(
-        keep_running=keep_running, presentation_mode=presentation_mode
+    wakepy_text = WAKEPY_TEXT_TEMPLATE.format(
+        VERSION_STRING=f"{'  v.'+__version__: <20}"
     )
-
-    print(wakepy_text())
-    print(wakepy_opts_text)
-    if "[?]" in wakepy_opts_text:
-        print(
-            """\nThe reason you are seeing "[?]" is because the feature is untested """
-            "on your platform.\nIf you wish, you can contribute and inform the "
-            "behaviour at https://github.com/fohrloop/wakepy"
-        )
-    print(" ")
-
-
-def create_wakepy_opts_text(keep_running: bool, presentation_mode: bool) -> str:
-    opts = dict(
-        no_auto_suspend=keep_running or presentation_mode,
-        presentation_mode=presentation_mode,
+    options_txt = WAKEPY_TICKBOXES_TEMPLATE.strip("\n").format(
+        no_auto_suspend="x",
+        presentation_mode="x" if mode == ModeName.KEEP_PRESENTING else " ",
     )
-    option_to_string = {True: "x", False: " ", None: "?"}
-
-    return WAKEPY_TICKBOXES_TEMPLATE.format(
-        **{key: option_to_string.get(val) for key, val in opts.items()}
-    )
+    return "\n".join((wakepy_text, options_txt)) + "\n"
 
 
 def wait_until_keyboardinterrupt():
