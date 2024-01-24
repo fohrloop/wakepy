@@ -1,9 +1,9 @@
-from unittest.mock import patch, Mock, call
+from subprocess import PIPE
+from unittest.mock import Mock, call, patch
 
 import pytest
 
 from wakepy.methods import macos
-from subprocess import PIPE
 
 
 @pytest.mark.parametrize(
