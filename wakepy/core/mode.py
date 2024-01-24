@@ -122,6 +122,7 @@ class Mode(ABC):
         self,
         methods: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
+        on_fail: OnFail = "error",
         dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
         """Initialize a Mode using Methods.
@@ -138,6 +139,14 @@ class Mode(ABC):
             ('*'). The asterisk means "all rest methods" and may occur only
             once in the priority order, and cannot be part of a set. All method
             names must be unique and must be part of the `methods`.
+        on_fail:
+            Determines what to do in case mode activation fails. Valid options
+            are: "error", "warn", "pass" and a callable. If the option is
+            "error", raises wakepy.ActivationError. Is selected "warn", issues
+            warning. If "pass", does nothing. If `on_fail` is a callable, it
+            must take one positional argument: result, which is an instance of
+            ActivationResult. The ActivationResult contains more detailed
+            information about the activation process.
         dbus_adapter:
             For using a custom dbus-adapter. Optional.
         """
@@ -147,6 +156,7 @@ class Mode(ABC):
         self.controller: ModeController | None = None
         self.activation_result: ActivationResult | None = None
         self.active: bool = False
+        self.on_fail = on_fail
         self._dbus_adapter_cls = dbus_adapter
 
     def __enter__(self) -> Mode:

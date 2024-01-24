@@ -11,13 +11,14 @@ if typing.TYPE_CHECKING:
     from ..core.activation import MethodsPriorityOrder
     from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
     from ..core.method import StrCollection
-    from ..core.mode import Mode
+    from ..core.mode import Mode, OnFail
 
 
 def running(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
+    on_fail: OnFail = "error",
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
@@ -41,9 +42,6 @@ def running(
 
     ```
     with keep.running() as k:
-        if k.failed:
-            # fall back or notify user
-
         # do something that takes a long time.
     ```
 
@@ -75,7 +73,14 @@ def running(
         and may occur only once in the priority order, and cannot be part of a
         set. If asterisk is not part of the `methods_priority`, it will be
         added as the last element automatically.
-
+    on_fail:
+        Determines what to do in case mode activation fails. Valid options are:
+        "error", "warn", "pass" and a callable. If the option is "error",
+        raises wakepy.ActivationError. Is selected "warn", issues warning. If
+        "pass", does nothing. If `on_fail` is a callable, it must take one
+        positional argument: result, which is an instance of ActivationResult.
+        The ActivationResult contains more detailed information about the
+        activation process.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
 
@@ -90,6 +95,7 @@ def running(
         omit=omit,
         methods=methods,
         methods_priority=methods_priority,
+        on_fail=on_fail,
         dbus_adapter=dbus_adapter,
     )
 
@@ -98,6 +104,7 @@ def presenting(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
+    on_fail: OnFail = "error",
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping a system running
@@ -107,9 +114,6 @@ def presenting(
 
     ```
     with keep.presenting() as k:
-        if k.failed:
-            # fall back or notify user
-
         # do something that takes a long time.
     ```
 
@@ -141,9 +145,16 @@ def presenting(
         and may occur only once in the priority order, and cannot be part of a
         set. If asterisk is not part of the `methods_priority`, it will be
         added as the last element automatically.
+    on_fail:
+        Determines what to do in case mode activation fails. Valid options are:
+        "error", "warn", "pass" and a callable. If the option is "error",
+        raises wakepy.ActivationError. Is selected "warn", issues warning. If
+        "pass", does nothing. If `on_fail` is a callable, it must take one
+        positional argument: result, which is an instance of ActivationResult.
+        The ActivationResult contains more detailed information about the
+        activation process.
     dbus_adapter:
         Optional argument which can be used to define a customer DBus adapter.
-
 
     Returns
     -------
@@ -155,5 +166,6 @@ def presenting(
         methods=methods,
         omit=omit,
         methods_priority=methods_priority,
+        on_fail=on_fail,
         dbus_adapter=dbus_adapter,
     )
