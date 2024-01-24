@@ -126,6 +126,7 @@ class Mode(ABC):
 
     def __init__(
         self,
+        name: str,
         methods: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
         on_fail: OnFail = "error",
@@ -138,6 +139,9 @@ class Mode(ABC):
 
         Parameters
         ----------
+        name:
+            Name of the Mode. Used for communication to user, logging and in
+            error messages (can be "any string" which makes sense to you).
         methods:
             The list of Methods to be used for activating this Mode.
         methods_priority: list[str | set[str]]
@@ -157,6 +161,7 @@ class Mode(ABC):
             For using a custom dbus-adapter. Optional.
         """
 
+        self.name = name
         self.methods_classes = methods
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
@@ -254,6 +259,7 @@ def create_mode(
     methods_for_mode = get_methods_for_mode(modename)
     selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
     return Mode(
+        name=modename,
         methods=selected_methods,
         methods_priority=methods_priority,
         dbus_adapter=dbus_adapter,
