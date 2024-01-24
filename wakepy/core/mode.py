@@ -24,6 +24,11 @@ OnFail: Literal["error"] | Literal["warn"] | Literal["pass"] | Callable[
 ]
 
 
+class ActivationError(RuntimeError):
+    """Raised if activation is not successful and on-fail action is to raise
+    Exception."""
+
+
 class ModeExit(Exception):
     """This can be used to exit from any wakepy mode with block. Just raise it
     within any with block which is a wakepy mode, and no code below it will
