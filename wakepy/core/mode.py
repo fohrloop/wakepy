@@ -11,12 +11,17 @@ from .registry import get_methods_for_mode
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Optional, Type
+    from typing import Optional, Type, Literal, Callable
 
     from .activation import MethodsPriorityOrder
     from .constants import ModeName
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
     from .method import Method, StrCollection
+
+
+OnFail: Literal["error"] | Literal["warn"] | Literal["pass"] | Callable[
+    [ActivationResult], None
+]
 
 
 class ModeExit(Exception):
