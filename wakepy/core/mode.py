@@ -126,9 +126,9 @@ class Mode(ABC):
 
     def __init__(
         self,
-        name: str,
         methods: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
+        name: ModeName | str = "[unnamed mode]",
         on_fail: OnFail = "error",
         dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
@@ -139,9 +139,6 @@ class Mode(ABC):
 
         Parameters
         ----------
-        name:
-            Name of the Mode. Used for communication to user, logging and in
-            error messages (can be "any string" which makes sense to you).
         methods:
             The list of Methods to be used for activating this Mode.
         methods_priority: list[str | set[str]]
@@ -149,6 +146,10 @@ class Mode(ABC):
             ('*'). The asterisk means "all rest methods" and may occur only
             once in the priority order, and cannot be part of a set. All method
             names must be unique and must be part of the `methods`.
+        name:
+            Name of the Mode. Used for communication to user, logging and in
+            error messages (can be "any string" which makes sense to you).
+            Defaults to "[unnamed mode]".
         on_fail:
             Determines what to do in case mode activation fails. Valid options
             are: "error", "warn", "pass" and a callable. If the option is
