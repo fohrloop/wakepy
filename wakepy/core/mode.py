@@ -169,6 +169,10 @@ class Mode(ABC):
             methods_priority=self.methods_priority,
         )
         self.active = self.activation_result.success
+
+        if not self.active:
+            handle_activation_fail(self.on_fail, self.activation_result)
+
         return self
 
     def __exit__(
