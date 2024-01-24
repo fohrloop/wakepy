@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 from abc import ABC
+import warnings
 
 from .activation import ActivationResult, activate_mode, deactivate_method
 from .dbus import get_dbus_adapter
@@ -257,3 +258,20 @@ def create_mode(
         methods_priority=methods_priority,
         dbus_adapter=dbus_adapter,
     )
+
+
+def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
+    if on_fail == "pass":
+        return
+    elif on_fail == "warn" or on_fail == "error":
+        err_txt = "Could not activate mode"
+        if on_fail == "warn":
+            warnings.warn(err_txt)
+        else:
+            raise ActivationError(err_txt)
+    elif not callable(on_fail):
+        raise ValueError(
+            'on_fail must be one of "error", "warn", pass" or a callable which takes '
+            "single positional argument (ActivationResult)"
+        )
+    callable(result)
