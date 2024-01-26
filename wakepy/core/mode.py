@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import typing
-from abc import ABC
 import warnings
+from abc import ABC
 
 from .activation import ActivationResult, activate_mode, deactivate_method
 from .dbus import get_dbus_adapter
@@ -12,7 +12,7 @@ from .registry import get_methods_for_mode
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Optional, Type, Literal, Callable
+    from typing import Callable, Literal, Optional, Type
 
     from .activation import MethodsPriorityOrder
     from .constants import ModeName

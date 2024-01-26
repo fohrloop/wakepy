@@ -14,8 +14,8 @@ from .dbus import DbusAddress as DbusAddress
 from .dbus import DbusMethod as DbusMethod
 from .dbus import DbusMethodCall as DbusMethodCall
 from .method import Method as Method
-from .mode import Mode as Mode
 from .mode import ActivationError as ActivationError
+from .mode import Mode as Mode
 from .platform import CURRENT_PLATFORM as CURRENT_PLATFORM
 from .registry import get_method as get_method
 from .registry import get_methods as get_methods

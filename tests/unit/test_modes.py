@@ -2,9 +2,9 @@ import re
 
 import pytest
 
+from wakepy import ActivationError
 from wakepy.core import ActivationResult, DbusAdapter, Method, Mode, ModeName
 from wakepy.modes import keep
-from wakepy import ActivationError
 
 
 @pytest.mark.parametrize(
