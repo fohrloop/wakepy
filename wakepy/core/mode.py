@@ -128,7 +128,7 @@ class Mode(ABC):
         self,
         methods: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
-        name: ModeName | str = "[unnamed mode]",
+        name: Optional[ModeName | str] = None,
         on_fail: OnFail = "error",
         dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
@@ -149,7 +149,7 @@ class Mode(ABC):
         name:
             Name of the Mode. Used for communication to user, logging and in
             error messages (can be "any string" which makes sense to you).
-            Defaults to "[unnamed mode]".
+            Optional.
         on_fail:
             Determines what to do in case mode activation fails. Valid options
             are: "error", "warn", "pass" and a callable. If the option is
