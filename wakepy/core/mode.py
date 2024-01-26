@@ -273,6 +273,7 @@ def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
         err_txt = f'Could not activate Mode "{modename}"!'
         if on_fail == "warn":
             warnings.warn(err_txt)
+            return
         else:
             raise ActivationError(err_txt)
     elif not callable(on_fail):
@@ -280,4 +281,4 @@ def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
             'on_fail must be one of "error", "warn", pass" or a callable which takes '
             "single positional argument (ActivationResult)"
         )
-    callable(result)
+    on_fail(result)
