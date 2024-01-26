@@ -229,14 +229,16 @@ def create_mode(
     modename: ModeName,
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
-    methods_priority: Optional[MethodsPriorityOrder] = None,
-    dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+    **kwargs,
 ) -> Mode:
     """
     Creates and returns a Mode (a context manager).
 
     Parameters
     ----------
+    modename:
+        The name of the mode to create. Used for debugging, logging, warning
+        and error messaged. Could be basically any string.
     methods: list, tuple or set of str
         The names of Methods to select from the mode defined with `modename`;
         a "whitelist" filter. Means "use these and only these Methods". Any
@@ -247,10 +249,9 @@ def create_mode(
         a "blacklist" filter. Any Method in `omit` but not in the selected mode
         will be silently ignored. Cannot be used same time with `methods`.
         Optional.
-    methods_priority: list[str | set[str]]
-        The methods_priority parameter for Mode. Used to prioritize methods.
-    dbus_adapter:
-        Optional argument which can be used to define a custom DBus adapter.
+    **kwargs
+        Passed to Mode as initialization arguments.
+
 
     Returns
     -------
@@ -259,12 +260,7 @@ def create_mode(
     """
     methods_for_mode = get_methods_for_mode(modename)
     selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
-    return Mode(
-        name=modename,
-        methods=selected_methods,
-        methods_priority=methods_priority,
-        dbus_adapter=dbus_adapter,
-    )
+    return Mode(name=modename, methods=selected_methods, **kwargs)
 
 
 def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
