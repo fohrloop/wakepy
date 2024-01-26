@@ -19,10 +19,7 @@ if typing.TYPE_CHECKING:
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
     from .method import Method, StrCollection
 
-
-OnFail: Literal["error"] | Literal["warn"] | Literal["pass"] | Callable[
-    [ActivationResult], None
-]
+    OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
 
 
 class ActivationError(RuntimeError):
