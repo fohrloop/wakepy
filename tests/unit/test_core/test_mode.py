@@ -61,6 +61,7 @@ def test_mode_contextmanager_protocol():
         mocks.methods,
         methods_priority=mocks.methods_priority,
         dbus_adapter=mocks.dbus_adapter_cls,
+        name="TestMode",
     )
 
     # No calls during init
@@ -78,7 +79,7 @@ def test_mode_contextmanager_protocol():
         )
         # And called ModeController.activate
         assert mocks.mock_calls[2] == call.controller_class().activate(
-            mocks.methods, methods_priority=mocks.methods_priority
+            mocks.methods, methods_priority=mocks.methods_priority, modename="TestMode"
         )
         # The __enter__ returns the Mode
         assert m is mode
@@ -110,12 +111,12 @@ def test_mode_exits():
         mocks.methods,
         methods_priority=mocks.methods_priority,
         dbus_adapter=mocks.dbus_adapter_cls,
-    ):
+    ) as mode:
         testval = 1
 
     assert testval == 1
 
-    _assert_context_manager_used_correctly(mocks)
+    _assert_context_manager_used_correctly(mocks, mode)
 
 
 def test_mode_exits_with_modeexit():
@@ -126,14 +127,14 @@ def test_mode_exits_with_modeexit():
         mocks.methods,
         methods_priority=mocks.methods_priority,
         dbus_adapter=mocks.dbus_adapter_cls,
-    ):
+    ) as mode:
         testval = 2
         raise ModeExit
         testval = 0  # never hit
 
     assert testval == 2
 
-    _assert_context_manager_used_correctly(mocks)
+    _assert_context_manager_used_correctly(mocks, mode)
 
 
 def test_mode_exits_with_modeexit_with_args():
@@ -144,14 +145,14 @@ def test_mode_exits_with_modeexit_with_args():
         mocks.methods,
         methods_priority=mocks.methods_priority,
         dbus_adapter=mocks.dbus_adapter_cls,
-    ):
+    ) as mode:
         testval = 3
         raise ModeExit("FOOO")
         testval = 0  # never hit
 
     assert testval == 3
 
-    _assert_context_manager_used_correctly(mocks)
+    _assert_context_manager_used_correctly(mocks, mode)
 
 
 def test_mode_exits_with_other_exception():
@@ -166,22 +167,22 @@ def test_mode_exits_with_other_exception():
             mocks.methods,
             methods_priority=mocks.methods_priority,
             dbus_adapter=mocks.dbus_adapter_cls,
-        ):
+        ) as mode:
             testval = 4
             raise MyException
             testval = 0
 
     assert testval == 4
 
-    _assert_context_manager_used_correctly(mocks)
+    _assert_context_manager_used_correctly(mocks, mode)
 
 
-def _assert_context_manager_used_correctly(mocks):
+def _assert_context_manager_used_correctly(mocks, mode):
     assert mocks.mock_calls.copy() == [
         call.dbus_adapter_cls(),
         call.controller_class(dbus_adapter=mocks.dbus_adapter_cls.return_value),
         call.controller_class().activate(
-            mocks.methods, methods_priority=mocks.methods_priority
+            mocks.methods, methods_priority=mocks.methods_priority, modename=mode.name
         ),
         call.controller_class().deactivate(),
     ]
