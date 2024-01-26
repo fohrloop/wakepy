@@ -4,6 +4,7 @@ import pytest
 
 from wakepy.core import ActivationResult, DbusAdapter, Method, Mode, ModeName
 from wakepy.modes import keep
+from wakepy import ActivationError
 
 
 @pytest.mark.parametrize(
@@ -111,6 +112,12 @@ class TestOnFail:
         err_txt = f'Could not activate Mode "{expected_name}"!'
         with pytest.warns(UserWarning, match=re.escape(err_txt)):
             with modefactory(methods=[], on_fail="warn") as m:
+                self._assertions_for_activation_failure(m, expected_name)
+
+    def test_on_fail_error(self, modefactory, expected_name):
+        err_txt = f'Could not activate Mode "{expected_name}"!'
+        with pytest.raises(ActivationError, match=re.escape(err_txt)):
+            with modefactory(methods=[], on_fail="error") as m:
                 self._assertions_for_activation_failure(m, expected_name)
 
     @staticmethod
