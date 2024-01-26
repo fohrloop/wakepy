@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from wakepy.core import ActivationResult, DbusAdapter, Method, Mode, ModeName
@@ -98,9 +100,21 @@ def test_keep_presenting(monkeypatch, fake_dbus_adapter):
         (keep.presenting, "keep.presenting"),
     ],
 )
-def test_keep_x_failure_pass(modefactory, expected_name):
+class TestOnFail:
     """Test failure handling for keep.presenting and keep.running."""
-    with modefactory(methods=[], on_fail="pass") as m:
+
+    def test_on_fail_pass(self, modefactory, expected_name):
+        with modefactory(methods=[], on_fail="pass") as m:
+            self._assertions_for_activation_failure(m, expected_name)
+
+    def test_on_fail_warn(self, modefactory, expected_name):
+        err_txt = f'Could not activate Mode "{expected_name}"!'
+        with pytest.warns(UserWarning, match=re.escape(err_txt)):
+            with modefactory(methods=[], on_fail="warn") as m:
+                self._assertions_for_activation_failure(m, expected_name)
+
+    @staticmethod
+    def _assertions_for_activation_failure(m: Mode, expected_name):
         assert m.active is False
         assert isinstance(m, Mode)
         assert m.name == expected_name
