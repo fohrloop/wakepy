@@ -174,10 +174,9 @@ class Mode(ABC):
         self._dbus_adapter_cls = dbus_adapter
 
     def __enter__(self) -> Mode:
-        if self.controller is None:
-            self.controller = self._controller_class(
-                dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
-            )
+        self.controller = self.controller or self._controller_class(
+            dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
+        )
         self.activation_result = self.controller.activate(
             self.methods_classes,
             methods_priority=self.methods_priority,
