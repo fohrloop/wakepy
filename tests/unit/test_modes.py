@@ -83,8 +83,9 @@ def test_keep_running_with_fake_success(monkeypatch, fake_dbus_adapter):
     assert isinstance(m.activation_result, ActivationResult)
 
 
-def test_keep_presenting(fake_dbus_adapter):
+def test_keep_presenting(monkeypatch, fake_dbus_adapter):
     """Simple smoke test for keep.presenting()"""
+    monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "1")
     with keep.presenting(dbus_adapter=fake_dbus_adapter) as m:
         assert isinstance(m, Mode)
-        assert isinstance(m.activation_result.success, bool)
+        assert m.activation_result.success is True
