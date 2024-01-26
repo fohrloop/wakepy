@@ -180,6 +180,7 @@ class Mode(ABC):
         self.activation_result = self.controller.activate(
             self.methods_classes,
             methods_priority=self.methods_priority,
+            modename=self.name,
         )
         self.active = self.activation_result.success
 
