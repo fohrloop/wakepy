@@ -61,6 +61,7 @@ class ModeController:
         self,
         method_classes: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
+        modename: Optional[str] = None,
     ) -> ActivationResult:
         """Activates the mode with one of the methods in the input method
         classes. The methods are used with descending priority; highest
@@ -70,6 +71,7 @@ class ModeController:
             methods=method_classes,
             methods_priority=methods_priority,
             dbus_adapter=self.dbus_adapter,
+            modename=modename,
         )
         self.active_method = active_method
         self.heartbeat = heartbeat
