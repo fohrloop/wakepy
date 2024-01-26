@@ -102,7 +102,8 @@ def test_keep_presenting(monkeypatch, fake_dbus_adapter):
     ],
 )
 class TestOnFail:
-    """Test failure handling for keep.presenting and keep.running."""
+    """Test failure handling for keep.presenting and keep.running. (the on_fail
+    parameter)"""
 
     def test_on_fail_pass(self, modefactory, expected_name):
         with modefactory(methods=[], on_fail="pass") as m:
