@@ -120,6 +120,18 @@ class TestOnFail:
             with modefactory(methods=[], on_fail="error") as m:
                 self._assertions_for_activation_failure(m, expected_name)
 
+    def test_on_fail_callable(self, modefactory, expected_name):
+        called = False
+
+        def my_callable(result):
+            nonlocal called
+            called = True
+            assert isinstance(result, ActivationResult)
+
+        with modefactory(methods=[], on_fail=my_callable) as m:
+            assert called is True
+            self._assertions_for_activation_failure(m, expected_name)
+
     @staticmethod
     def _assertions_for_activation_failure(m: Mode, expected_name):
         assert m.active is False
