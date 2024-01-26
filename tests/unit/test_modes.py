@@ -89,3 +89,19 @@ def test_keep_presenting(monkeypatch, fake_dbus_adapter):
     with keep.presenting(dbus_adapter=fake_dbus_adapter) as m:
         assert isinstance(m, Mode)
         assert m.activation_result.success is True
+
+
+@pytest.mark.parametrize(
+    "modefactory, expected_name",
+    [
+        (keep.running, "keep.running"),
+        (keep.presenting, "keep.presenting"),
+    ],
+)
+def test_keep_x_failure_pass(modefactory, expected_name):
+    """Test failure handling for keep.presenting and keep.running."""
+    with modefactory(methods=[], on_fail="pass") as m:
+        assert m.active is False
+        assert isinstance(m, Mode)
+        assert m.name == expected_name
+        assert m.activation_result.modename == expected_name
