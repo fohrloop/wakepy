@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+import warnings
 from abc import ABC
 
 from .activation import ActivationResult, activate_mode, deactivate_method
@@ -11,12 +12,19 @@ from .registry import get_methods_for_mode
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Optional, Type
+    from typing import Callable, Literal, Optional, Type
 
     from .activation import MethodsPriorityOrder
     from .constants import ModeName
     from .dbus import DbusAdapter, DbusAdapterTypeSeq
     from .method import Method, StrCollection
+
+    OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
+
+
+class ActivationError(RuntimeError):
+    """Raised if activation is not successful and on-fail action is to raise
+    Exception."""
 
 
 class ModeExit(Exception):
@@ -50,6 +58,7 @@ class ModeController:
         self,
         method_classes: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
+        modename: Optional[str] = None,
     ) -> ActivationResult:
         """Activates the mode with one of the methods in the input method
         classes. The methods are used with descending priority; highest
@@ -59,6 +68,7 @@ class ModeController:
             methods=method_classes,
             methods_priority=methods_priority,
             dbus_adapter=self.dbus_adapter,
+            modename=modename,
         )
         self.active_method = active_method
         self.heartbeat = heartbeat
@@ -117,6 +127,8 @@ class Mode(ABC):
         self,
         methods: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
+        name: Optional[ModeName | str] = None,
+        on_fail: OnFail = "error",
         dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
     ):
         """Initialize a Mode using Methods.
@@ -133,27 +145,45 @@ class Mode(ABC):
             ('*'). The asterisk means "all rest methods" and may occur only
             once in the priority order, and cannot be part of a set. All method
             names must be unique and must be part of the `methods`.
+        name:
+            Name of the Mode. Used for communication to user, logging and in
+            error messages (can be "any string" which makes sense to you).
+            Optional.
+        on_fail:
+            Determines what to do in case mode activation fails. Valid options
+            are: "error", "warn", "pass" and a callable. If the option is
+            "error", raises wakepy.ActivationError. Is selected "warn", issues
+            warning. If "pass", does nothing. If `on_fail` is a callable, it
+            must take one positional argument: result, which is an instance of
+            ActivationResult. The ActivationResult contains more detailed
+            information about the activation process.
         dbus_adapter:
             For using a custom dbus-adapter. Optional.
         """
 
+        self.name = name
         self.methods_classes = methods
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
         self.activation_result: ActivationResult | None = None
         self.active: bool = False
+        self.on_fail = on_fail
         self._dbus_adapter_cls = dbus_adapter
 
     def __enter__(self) -> Mode:
-        if self.controller is None:
-            self.controller = self._controller_class(
-                dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
-            )
+        self.controller = self.controller or self._controller_class(
+            dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
+        )
         self.activation_result = self.controller.activate(
             self.methods_classes,
             methods_priority=self.methods_priority,
+            modename=self.name,
         )
         self.active = self.activation_result.success
+
+        if not self.active:
+            handle_activation_fail(self.on_fail, self.activation_result)
+
         return self
 
     def __exit__(
@@ -198,14 +228,16 @@ def create_mode(
     modename: ModeName,
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
-    methods_priority: Optional[MethodsPriorityOrder] = None,
-    dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+    **kwargs,
 ) -> Mode:
     """
     Creates and returns a Mode (a context manager).
 
     Parameters
     ----------
+    modename:
+        The name of the mode to create. Used for debugging, logging, warning
+        and error messaged. Could be basically any string.
     methods: list, tuple or set of str
         The names of Methods to select from the mode defined with `modename`;
         a "whitelist" filter. Means "use these and only these Methods". Any
@@ -216,10 +248,9 @@ def create_mode(
         a "blacklist" filter. Any Method in `omit` but not in the selected mode
         will be silently ignored. Cannot be used same time with `methods`.
         Optional.
-    methods_priority: list[str | set[str]]
-        The methods_priority parameter for Mode. Used to prioritize methods.
-    dbus_adapter:
-        Optional argument which can be used to define a custom DBus adapter.
+    **kwargs
+        Passed to Mode as initialization arguments.
+
 
     Returns
     -------
@@ -228,8 +259,23 @@ def create_mode(
     """
     methods_for_mode = get_methods_for_mode(modename)
     selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
-    return Mode(
-        methods=selected_methods,
-        methods_priority=methods_priority,
-        dbus_adapter=dbus_adapter,
-    )
+    return Mode(name=modename, methods=selected_methods, **kwargs)
+
+
+def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
+    if on_fail == "pass":
+        return
+    elif on_fail == "warn" or on_fail == "error":
+        modename = result.modename or "[unnamed mode]"
+        err_txt = f'Could not activate Mode "{modename}"!'
+        if on_fail == "warn":
+            warnings.warn(err_txt)
+            return
+        else:
+            raise ActivationError(err_txt)
+    elif not callable(on_fail):
+        raise ValueError(
+            'on_fail must be one of "error", "warn", pass" or a callable which takes '
+            "single positional argument (ActivationResult)"
+        )
+    on_fail(result)

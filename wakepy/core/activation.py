@@ -60,6 +60,9 @@ class ActivationResult:
 
     Attributes
     ----------
+    modename: str | None
+        The name of the Mode. If the Mode did not have a name, the modename
+        is None.
     success: bool
         Tells is entering into a mode was successful. Note that this may be
         faked with WAKEPY_FAKE_SUCCESS environment variable e.g. for testing
@@ -71,7 +74,6 @@ class ActivationResult:
         Always opposite of `success`. Included for convenience.
     active_method: str | None
         The name of the the active (successful) method, if any.
-
 
     Methods
     -------
@@ -85,19 +87,25 @@ class ActivationResult:
         easier access, use .list_methods().
     """
 
-    def __init__(self, results: Optional[List[MethodActivationResult]] = None):
+    def __init__(
+        self,
+        results: Optional[List[MethodActivationResult]] = None,
+        modename: Optional[str] = None,
+    ):
         """
         Parameters
         ---------
         results:
             The MethodActivationResults to be used to fill the ActivationResult
-
+        modename:
+            Name of the Mode. Optional.
         """
 
         # These are the retuls for each of the used wakepy.Methods, in the
         # order the methods were tried (first = highest priority, last =
         # lowest priority)
         self._method_results: list[MethodActivationResult] = results or []
+        self.modename = modename
 
     @property
     def real_success(self) -> bool:
@@ -238,6 +246,7 @@ def activate_mode(
     methods: list[Type[Method]],
     dbus_adapter: Optional[DbusAdapter] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
+    modename: Optional[str] = None,
 ) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
     """Activates a mode defined by a collection of Methods. Only the first
     Method which succeeds activation will be used, in order from highest
@@ -259,12 +268,16 @@ def activate_mode(
         ('*'). The asterisk means "all rest methods" and may occur only
         once in the priority order, and cannot be part of a set. All method
         names must be unique and must be part of the `methods`.
+    modename:
+        Name of the Mode. Used for communication to user, logging and in
+        error messages (can be "any string" which makes sense to you).
+        Optional.
     """
     check_methods_priority(methods_priority, methods)
 
     if not methods:
         # Cannot activate anything as there are no methods.
-        return ActivationResult(), None, None
+        return ActivationResult(modename=modename), None, None
 
     prioritized_methods = get_prioritized_methods(methods, methods_priority)
     # The fake method is always checked first (WAKEPY_FAKE_SUCCESS)
@@ -280,10 +293,10 @@ def activate_mode(
             break
     else:
         # Tried activate with all methods, but none of them succeed
-        return ActivationResult(results), None, None
+        return ActivationResult(results, modename=modename), None, None
 
     # Activation was succesful.
-    return ActivationResult(results), method, heartbeat
+    return ActivationResult(results, modename=modename), method, heartbeat
 
 
 def check_methods_priority(
