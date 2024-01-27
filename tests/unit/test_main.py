@@ -3,10 +3,12 @@ from unittest.mock import MagicMock, Mock, call, patch
 
 import pytest
 
+from wakepy import ModeExit
 from wakepy.__main__ import (
     get_startup_text,
     main,
     parse_arguments,
+    handle_activation_error,
     wait_until_keyboardinterrupt,
 )
 from wakepy.core import Mode
@@ -122,6 +124,7 @@ def test_main(
     assert mocks.mock_calls == [
         call.parse_arguments(mocks.sysarg[1:]),
         call.create_mode(modename=parse_arguments.return_value),
+        call.print("startuptext"),
         call.mode.__enter__(),
         call.get_startup_text(mode=parse_arguments.return_value),
         call.print(get_startup_text.return_value),
@@ -147,5 +150,18 @@ def test_main_with_non_working_mode(
     )
 
     with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
-        with pytest.raises(RuntimeError, match="Could not activate"):
+        with pytest.raises(ModeExit):
             main()
+    assert mocks.mock_calls == [
+        call.parse_arguments(mocks.sysarg[1:]),
+        call.create_mode(
+            modename=parse_arguments.return_value, on_fail=handle_activation_error
+        ),
+        call.get_startup_text(mode=parse_arguments.return_value),
+        call.print(get_startup_text.return_value),
+        call.mode.__enter__(),
+        # Checking only the exception type here. The exception and the trackeback
+        # instances are assumed to be correct. Too complicated to catch them
+        # just for the test.
+        call.mode.__exit__(ModeExit, *mocks.mock_calls[-1].args[1:]),
+    ]
