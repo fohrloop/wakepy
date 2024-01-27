@@ -5,11 +5,10 @@ description = "wakelock / keep-awake / stay-awake"
 authors = [
     {name = "Niko Föhr", email = "fohrloop@gmail.com"},
 ]
-
-# wakepy does not have any required python dependencies
-# For using dbus-based methods, install a supported dbus package or `dbus`
-# extras;  pip install wakepy[dbus]
-dependencies = []
+dependencies = [
+    # For using the D-Bus based methods 
+    "jeepney >= 0.7.1;sys_platform=='linux'"
+]
 
 # Python 3.7 introduces from __future__ import annotations
 requires-python = ">=3.7"
@@ -51,11 +50,6 @@ dev = [
     "isort==5.12.0",
     "ruff==0.0.270",
     # Jeepney is used in the integration tests for creating a D-Bus server
-    "jeepney >= 0.7.1;sys_platform=='linux'"
-]
-dbus = [
-    # Install this with `pip install wakepy[dbus]` if you wnat to use the 
-    # D-Bus based methods 
     "jeepney >= 0.7.1;sys_platform=='linux'"
 ]
 
