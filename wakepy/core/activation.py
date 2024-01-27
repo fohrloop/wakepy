@@ -223,6 +223,20 @@ class ActivationResult:
 
         return out
 
+    def get_error_text(self) -> str:
+        """Gets information about a failure as text. In case the mode
+        activation was successful, returns an empty string."""
+
+        if self.success:
+            return ""
+        debug_info = str(self.query())
+        modename = self.modename or "[unnamed mode]"
+
+        return (
+            f'Could not activate Mode "{modename}"!\n\nMethod usage results, in '
+            f"order (highest priority first):\n{debug_info}"
+        )
+
 
 @dataclass
 class MethodActivationResult:
