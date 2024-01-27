@@ -156,7 +156,11 @@ class ActivationResult:
     ) -> list[MethodActivationResult]:
         """Get a list of the methods present in the activation process, and
         their activation results. This is the higher-level interface. If you
-        want more control, use .query().
+        want more control, use .query(). The returned methods are in the order
+        as given in when initializing ActivationResult. If you did not create
+        the ActivationReult manually, the methods are in the priority order;
+        the highest priority methods (those which are/were tried first) are
+        listed first.
 
         Parameters
         ----------
@@ -187,7 +191,11 @@ class ActivationResult:
     ) -> list[MethodActivationResult]:
         """Get a list of the methods present in the activation process, and
         their activation results. This is the lower-level interface. If you
-        want easier access, use .list_methods().
+        want easier access, use .list_methods(). The methods are in the order
+        as given in when initializing ActivationResult. If you did not create
+        the ActivationReult manually, the methods are in the priority order;
+        the highest priority methods (those which are/were tried first) are
+        listed first.
 
         Parameters
         ----------
