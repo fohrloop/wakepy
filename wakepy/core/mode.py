@@ -266,8 +266,12 @@ def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
     if on_fail == "pass":
         return
     elif on_fail == "warn" or on_fail == "error":
+        debug_info = str(result.query())
         modename = result.modename or "[unnamed mode]"
-        err_txt = f'Could not activate Mode "{modename}"!'
+        err_txt = (
+            f'Could not activate Mode "{modename}"!\n\nMethod usage results, in '
+            f"order (highest priority first):\n{debug_info}"
+        )
         if on_fail == "warn":
             warnings.warn(err_txt)
             return
