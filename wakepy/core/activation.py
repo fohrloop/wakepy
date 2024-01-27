@@ -789,10 +789,7 @@ def _try_method_call(method: Method, mthdname: str) -> Tuple[MethodOutcome, str]
         outcome = MethodOutcome.SUCCESS
         err_message = ""
     except Exception as exc:
-        err_message = (
-            f"Error in the {mthdname} of {method.__class__.__name__} "
-            f"({method.name})! Original error: {str(exc)}"
-        )
+        err_message = repr(exc)
         outcome = MethodOutcome.FAILURE
     return outcome, err_message
 
