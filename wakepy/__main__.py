@@ -50,7 +50,7 @@ def main():
             raise ModeExit
         wait_until_keyboardinterrupt()
 
-    if mode.activation_result.success:
+    if mode.activation_result and mode.activation_result.success:
         # If activation did not succeed, there is also no deactivation / exit.
         print("\n\nExited.")
 
