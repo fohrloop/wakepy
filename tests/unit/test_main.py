@@ -1,6 +1,7 @@
 """Tests for the __main__ CLI"""
 from unittest.mock import MagicMock, Mock, call, patch
 
+from typing import Optional
 import pytest
 
 from wakepy import ModeExit, ActivationResult
@@ -127,6 +128,8 @@ class TestMain:
         with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
             with pytest.raises(ModeExit):
                 main()
+
+        exit_call_args = mocks.mock_calls[-1][1]
         assert mocks.mock_calls == [
             call.parse_arguments(mocks.sysarg[1:]),
             call.create_mode(
@@ -138,7 +141,7 @@ class TestMain:
             # Checking only the exception type here. The exception and the trackeback
             # instances are assumed to be correct. Too complicated to catch them
             # just for the test.
-            call.mode.__exit__(ModeExit, *mocks.mock_calls[-1].args[1:]),
+            call.mode.__exit__(ModeExit, *exit_call_args[1:]),
         ]
 
     @staticmethod
@@ -155,7 +158,7 @@ class TestMain:
 
         class TestMode(Mode):
             active = mode_works
-            activation_result: ActivationResult | None = None
+            activation_result: Optional[ActivationResult] = None
 
         mockresult = MagicMock(spec_set=ActivationResult)
         mockresult.success = mode_works
