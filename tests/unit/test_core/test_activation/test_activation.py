@@ -187,7 +187,7 @@ def test_activate_method_method_enter_mode_fails():
     res, heartbeat = activate_method(method)
     assert res.success is False
     assert res.failure_stage == StageName.ACTIVATION
-    assert "Original error: failed" in res.failure_reason
+    assert "RuntimeError('failed')" in res.failure_reason
     assert heartbeat is None
 
 
@@ -352,7 +352,7 @@ def test_try_enter_and_heartbeat_success_failing():
     ):
         success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
         assert success is False
-        assert f"Original error: {FAILURE_REASON}" in err_message
+        assert f"{FAILURE_REASON}" in err_message
         assert heartbeat_call_time is None
 
     # Case: The heartbeat fails, and because enter_mode() has succeed, wakepy
