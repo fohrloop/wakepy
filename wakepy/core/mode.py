@@ -266,13 +266,11 @@ def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
     if on_fail == "pass":
         return
     elif on_fail == "warn" or on_fail == "error":
-        modename = result.modename or "[unnamed mode]"
-        err_txt = f'Could not activate Mode "{modename}"!'
         if on_fail == "warn":
-            warnings.warn(err_txt)
+            warnings.warn(result.get_error_text())
             return
         else:
-            raise ActivationError(err_txt)
+            raise ActivationError(result.get_error_text())
     elif not callable(on_fail):
         raise ValueError(
             'on_fail must be one of "error", "warn", pass" or a callable which takes '

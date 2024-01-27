@@ -175,6 +175,21 @@ def test_activation_result_success(
         assert ar.failure == (not success_expected)
 
 
+def test_activationresult_get_error_text_success():
+    ar = ActivationResult(METHODACTIVATIONRESULTS_1)
+    # error text is empty string in case of success.
+    assert ar.get_error_text() == ""
+
+
+def test_activationresult_get_error_text_failure():
+    ar = ActivationResult(
+        [PLATFORM_SUPPORT_FAIL, REQUIREMENTS_FAIL], modename="SomeMode"
+    )
+    assert ar.get_error_text() == (
+        'Could not activate Mode "SomeMode"!\n\nMethod usage results, in order (highest priority first):\n[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3")]'
+    )
+
+
 def test_active_method():
     ar = ActivationResult(METHODACTIVATIONRESULTS_1)
     assert ar.active_method == "a-successful-method"

@@ -156,7 +156,11 @@ class ActivationResult:
     ) -> list[MethodActivationResult]:
         """Get a list of the methods present in the activation process, and
         their activation results. This is the higher-level interface. If you
-        want more control, use .query().
+        want more control, use .query(). The returned methods are in the order
+        as given in when initializing ActivationResult. If you did not create
+        the ActivationReult manually, the methods are in the priority order;
+        the highest priority methods (those which are/were tried first) are
+        listed first.
 
         Parameters
         ----------
@@ -187,7 +191,11 @@ class ActivationResult:
     ) -> list[MethodActivationResult]:
         """Get a list of the methods present in the activation process, and
         their activation results. This is the lower-level interface. If you
-        want easier access, use .list_methods().
+        want easier access, use .list_methods(). The methods are in the order
+        as given in when initializing ActivationResult. If you did not create
+        the ActivationReult manually, the methods are in the priority order;
+        the highest priority methods (those which are/were tried first) are
+        listed first.
 
         Parameters
         ----------
@@ -214,6 +222,20 @@ class ActivationResult:
             out.append(res)
 
         return out
+
+    def get_error_text(self) -> str:
+        """Gets information about a failure as text. In case the mode
+        activation was successful, returns an empty string."""
+
+        if self.success:
+            return ""
+        debug_info = str(self.query())
+        modename = self.modename or "[unnamed mode]"
+
+        return (
+            f'Could not activate Mode "{modename}"!\n\nMethod usage results, in '
+            f"order (highest priority first):\n{debug_info}"
+        )
 
 
 @dataclass
