@@ -15,12 +15,16 @@ import itertools
 import sys
 import time
 import typing
+from textwrap import dedent, fill
 
+from wakepy import ModeExit
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import create_mode
 
 if typing.TYPE_CHECKING:
     from typing import List
+
+    from wakepy import ActivationResult
 
 WAKEPY_TEXT_TEMPLATE = r"""                  _                       
                  | |                      
@@ -39,14 +43,38 @@ WAKEPY_TICKBOXES_TEMPLATE = """
 
 def main():
     modename = parse_arguments(sys.argv[1:])
-    mode = create_mode(modename=modename)
+    mode = create_mode(modename=modename, on_fail=handle_activation_error)
+    print(get_startup_text(mode=modename))
     with mode:
         if not mode.active:
-            raise RuntimeError("Could not activate")
-        print(get_startup_text(mode=modename))
+            raise ModeExit
         wait_until_keyboardinterrupt()
 
-    print("\nExited.")
+    if mode.activation_result.success:
+        # If activation did not succeed, there is also no deactivation / exit.
+        print("\n\nExited.")
+
+
+def handle_activation_error(result: ActivationResult):
+    from wakepy import __version__
+
+    error_text = f"""
+    Wakepy could not activate the "{result.modename}" mode. This might occur because of a bug or because your current platform is not yet supported or your system is missing required software.
+
+    Check if there is already a related issue in the issue tracker at https://github.com/fohrloop/wakepy/issues/ and if not, please create a new one.
+
+    Include the following:
+    - wakepy version: {__version__}
+    - Mode: {result.modename}
+    - Python version: {sys.version}
+    - Operating system & version: [PLEASE FILL THIS]
+    - Desktop Environment & version (if not default): [FILL OR REMOVE THIS LINE]
+    - Additional details: [FILL OR REMOVE THIS LINE]
+
+    Thank you!
+    """  # noqa 501
+    for block in dedent(error_text.strip("\n")).split("\n"):
+        print(fill(block, 80))
 
 
 def parse_arguments(
