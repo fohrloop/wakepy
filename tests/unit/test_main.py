@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, Mock, call, patch
 
 import pytest
 
-from wakepy import ModeExit
+from wakepy import ModeExit, ActivationResult
 from wakepy.__main__ import (
     get_startup_text,
     main,
@@ -98,14 +98,15 @@ class TestMain:
 
         assert mocks.mock_calls == [
             call.parse_arguments(mocks.sysarg[1:]),
-            call.create_mode(modename=parse_arguments.return_value),
-            call.print("startuptext"),
-            call.mode.__enter__(),
+            call.create_mode(
+                modename=parse_arguments.return_value, on_fail=handle_activation_error
+            ),
             call.get_startup_text(mode=parse_arguments.return_value),
             call.print(get_startup_text.return_value),
+            call.mode.__enter__(),
             call.wait_until_keyboardinterrupt(),
             call.mode.__exit__(None, None, None),
-            call.print("\nExited."),
+            call.print("\n\nExited."),
         ]
 
     def test_main_with_non_working_mode(
@@ -154,8 +155,13 @@ class TestMain:
 
         class TestMode(Mode):
             active = mode_works
+            activation_result: ActivationResult | None = None
 
+        mockresult = MagicMock(spec_set=ActivationResult)
+        mockresult.success = mode_works
         mockmode = MagicMock(spec_set=TestMode)
+        mockmode.__enter__.return_value = mockmode
+        mockmode.activation_result = mockresult
         mockmode.active = mode_works
         sysarg = ["programname", cli_arg]
         parse_arguments.return_value = mockmodename
