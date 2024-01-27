@@ -37,9 +37,9 @@ class JeepneyDbusAdapter(DbusAdapter):
                     "The environment variable DBUS_SESSION_BUS_ADDRESS is not set! "
                     "To use dbus-based methods with jeepney, a session (not system) "
                     "bus (dbus-daemon process) must be running, and the address of the "
-                    "bus should be available at the DBUS_SESSION_BUS_ADDRESS environment "
-                    "variable. To check if you're running a session dbus-daemon, run "
-                    "`ps -x | grep dbus-daemon`"
+                    "bus should be available at the DBUS_SESSION_BUS_ADDRESS "
+                    "environment variable. To check if you're running a session "
+                    "dbus-daemon, run `ps -x | grep dbus-daemon`"
                 ) from exc
         reply = connection.send_and_get_reply(msg, timeout=self.timeout)
         resp = unwrap_msg(reply)
