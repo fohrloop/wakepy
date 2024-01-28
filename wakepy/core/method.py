@@ -239,7 +239,7 @@ class Method(ABC, metaclass=MethodMeta):
         if self._dbus_adapter is None:
             raise RuntimeError(
                 f'{self.__class__.__name__ }cannot process dbus method call "{call}" as'
-                "it does not have a DbusAdapter."
+                " it does not have a DbusAdapter."
             )
         return self._dbus_adapter.process(call)
 
