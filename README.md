@@ -3,10 +3,7 @@
 
 # ⏰😴 wakepy 
 
- Cross-platform wakelock written in Python. 
- - It has zero required python dependencies.
- - Python API for application and library developers, and a wakepy executable (CLI) for everyone.
-
+Cross-platform wakelock / keep-awake / stay-awake written in Python. 
 
 ## Supports
 - Python: 3.7 to 3.12 
@@ -15,7 +12,7 @@
 ## What it can do? 
 
 Wakepy has two main modes:
-1. **`keep.running`**: keep your tasks & CPU running even if you lock your session and turn screenlock on; This mode prevents your system from going to sleep (*e.g.* for training machine learning models, video encoding, web scraping, ...)
+1. **`keep.running`**: keep your tasks & CPU running even if you lock your session and turn screenlock on; This mode prevents your system from going to sleep automatically (*e.g.* for training machine learning models, video encoding, web scraping, ...)
 2. **`keep.presenting`**: same as `keep.running` but keep also the screen awake and prevent automatic screen lock & screensaver  (*e.g.* for showing a video, updating dashboard, monitoring apps, ...)
 <!-- end before docs link -->
 
@@ -32,11 +29,12 @@ Wakepy has two main modes:
 ### 👉 **[wakepy.readthedocs.io](http://wakepy.readthedocs.io)**
 <!-- start after docs link -->
 ## ⚖️👑 Key selling points
-- Wakepy supports multiple operating systems and desktop environments
-- Wakepy has permissive MIT licence
-- It has a simple command line interface and a python API
-- Wakepy has zero required python dependencies
-  - For using the D-Bus methods on Linux, one may use [jeepney](https://jeepney.readthedocs.io/) (optional)
+- Supports multiple operating systems and desktop environments
+- Simple command line interface and a python API
+- Permissive MIT licence
+- Low amount of python dependencies
+  - For using the D-Bus methods on Linux: [jeepney](https://jeepney.readthedocs.io/)  
+  - Otherwise: None
 
 
 ## Deprecation timeline (wakepy 0.7.0+) 
