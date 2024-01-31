@@ -1,5 +1,5 @@
 (wakepy-methods)=
-# List of Wakepy Methods
+# Wakepy Methods
 
 
 **What are wakepy Methods?**
