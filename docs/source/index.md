@@ -17,7 +17,7 @@ pip install wakepy
 On Linux will install also **[`jeepney`](https://jeepney.readthedocs.io/)** for DBus communication (if not installed). On other systems there are no python requirements.
 ```
 
-## Quick Start
+## Basic Usage
 
 If you want to keep a long task running, but do not want to prevent screen from locking and/or blanking, you can use `keep.running` context manager. If you also want to prevent screen lock and screen blank, use `keep.presenting`:
 
