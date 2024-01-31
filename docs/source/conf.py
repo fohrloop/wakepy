@@ -83,7 +83,7 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "sphinx_book_theme"
-
+html_title = f"wakepy {__version__}"
 html_theme_options = {
     "repository_url": "https://github.com/fohrloop/wakepy",
     "use_repository_button": True,
