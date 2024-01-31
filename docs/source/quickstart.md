@@ -1,11 +1,5 @@
-# User Guide
+# Quickstart
 
-```{toctree}
-:hidden:
-
-modes
-tests-and-ci
-```
 
 ## Requirements
 

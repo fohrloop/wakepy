@@ -18,7 +18,9 @@
 :numbered: -1
 :titlesonly:
 
-user-guide/index
+quickstart
+modes
+tests-and-ci
 methods-reference
 technical-details/index
 cli-api
