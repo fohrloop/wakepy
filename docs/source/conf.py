@@ -87,6 +87,7 @@ html_title = f"wakepy {__version__}"
 html_theme_options = {
     "repository_url": "https://github.com/fohrloop/wakepy",
     "use_repository_button": True,
+    "use_download_button": False,
     # Shows the landing page in the sidebar
     # See: https://sphinx-book-theme.readthedocs.io/en/stable/sections/sidebar-primary.html#add-the-home-page-to-your-table-of-contents
     "home_page_in_toc": True,
