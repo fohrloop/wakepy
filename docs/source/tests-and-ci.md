@@ -7,7 +7,7 @@ To force wakepy to fake a successful mode activation, you may set an environment
 
 In tox, this would be:
 
-```ini
+```{code-block} ini
 [testenv]
 # ... other settings
 setenv = 
@@ -27,7 +27,7 @@ On Linux, wakepy uses D-Bus methods to inhibit screensaver or power management. 
 
 To pass the `DBUS_SESSION_BUS_ADDRESS` with tox, one would use:
 
-```ini
+```{code-block} ini
 [testenv]
 # ... other settings
 passenv = 

@@ -92,4 +92,6 @@ html_theme_options = {
     # Shows the landing page in the sidebar
     # See: https://sphinx-book-theme.readthedocs.io/en/stable/sections/sidebar-primary.html#add-the-home-page-to-your-table-of-contents
     "home_page_in_toc": True,
+    "pygment_light_style": "friendly",
+    "pygment_dark_style": "lightbulb",
 }

@@ -9,7 +9,8 @@ Wakepy supports Windows, MacOS and Linux flavours which Desktop Environment that
 ## Installing
 
 To install wakepy from PyPI, run
-```
+
+```{code-block} text
 pip install wakepy
 ```
 

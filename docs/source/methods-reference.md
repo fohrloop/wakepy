@@ -57,7 +57,7 @@ There are two ways how a Windows system might automatically set a screen lock
 
 if you want to check if your system will sleep automatically when using this method, you may either check the  `ScreenSaverIsSecure`, `ScreenSaveActive` and `ScreenSaveTimeout` from  "HKCU:\Control Panel\Desktop" and "HKCU:\Software\Policies\Microsoft\Windows\Control Panel\Desktop", or use the following python snippet: 
 
-```python
+```{code-block} python
 import ctypes
 
 SPI_GETSCREENSAVESECURE = 0x0076
