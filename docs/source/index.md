@@ -22,8 +22,17 @@ quickstart
 modes
 tests-and-ci
 methods-reference
-technical-details/index
 cli-api
+```
+
+```{toctree}
+:caption: 'Technical Details:'
+:maxdepth: 2
+:numbered: -1
+:titlesonly:
+
+wakepy-mode-lifecycle
+test-manually
 ```
 
 ```{toctree}
