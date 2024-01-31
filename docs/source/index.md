@@ -71,8 +71,8 @@ The table above only considers the *automatic* actions (go to sleep, start scree
 - GitHub: [github.com/fohrloop/wakepy](https://github.com/fohrloop/wakepy)
 - PyPI: [pypi.org/project/wakepy](https://pypi.org/project/wakepy/)
 
-## Documentation TOC
 ```{toctree}
+:hidden:
 :maxdepth: 2
 :numbered: -1
 :titlesonly:
@@ -85,6 +85,7 @@ cli-api
 ```
 
 ```{toctree}
+:hidden:
 :caption: 'Technical Details:'
 :maxdepth: 2
 :numbered: -1
@@ -95,6 +96,7 @@ test-manually
 ```
 
 ```{toctree}
+:hidden:
 :caption: 'Development:'
 :maxdepth: 2
 :numbered: -1
