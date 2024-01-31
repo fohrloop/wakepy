@@ -79,10 +79,21 @@ The table above only considers the *automatic* actions (go to sleep, start scree
 
 quickstart
 modes
-tests-and-ci
 methods-reference
+
 cli-api
 ```
+
+```{toctree}
+:hidden:
+:caption: 'Advanced Usage:'
+:maxdepth: 2
+:numbered: -1
+:titlesonly:
+
+tests-and-ci
+```
+
 
 ```{toctree}
 :hidden:
