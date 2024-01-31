@@ -19,7 +19,7 @@ All wakepy Modes rely somehow on external software, library or dbus service. Thi
 This is a test script for helping to determine if the wakepy modes work correctly on your system:
 
 (code-wakepy-test-script)=
-```python
+```{code-block} python
 import datetime as dt
 import time
 
@@ -36,7 +36,7 @@ while True:
 
 This will print something like:
 
-```
+```{code-block} output
 Dec 25 12:28:34 | elapsed 0:00:00.000176 | delta: 2e-06s
 Dec 25 12:28:36 | elapsed 0:00:02.000403 | delta: 2.000227s
 Dec 25 12:28:38 | elapsed 0:00:04.001173 | delta: 2.00077s
@@ -63,14 +63,14 @@ In the above example, the delta (time between two prints) was 2 seconds, until 1
 
 Either on CLI
 
-```
+```{code-block} text
 wakepy
 ```
 
 or in python 
 
 
-```python
+```{code-block} python
 import time
 from wakepy import keep
 with keep.running():
@@ -83,14 +83,14 @@ with keep.running():
 
 Either on CLI
 
-```
+```{code-block} text
 wakepy -p
 ```
 
 or in python 
 
 
-```python
+```{code-block} python
 import time
 from wakepy import keep
 with keep.presenting():
@@ -110,15 +110,15 @@ with keep.presenting():
 
 Before you start. Check the current timeout values (seconds), and write the number down somewhere. The first one (org.gnome.desktop.session idle-delay) is time until "screen blank", and the rest are timeouts for automatic sleep.
 
-```
-gsettings get org.gnome.desktop.session idle-delay 
+```{code-block} text
+gsettings get org.gnome.desktop.session idle-delay
 gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout
 gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout
 ```
 
 Then, set a low value to the timeouts (here, 15 seconds):
 
-```
+```{code-block} text
 gsettings set org.gnome.desktop.session idle-delay 15
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 15
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 15
@@ -126,7 +126,7 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-tim
 
 Test that your system sleeps automatically and blanks the screen after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script)  or in the in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
 
-```
+```{code-block} text
 gsettings set org.gnome.desktop.session idle-delay 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1800

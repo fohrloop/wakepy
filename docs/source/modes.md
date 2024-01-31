@@ -1,4 +1,4 @@
-# About wakepy modes
+# Wakepy Modes
 
 
 

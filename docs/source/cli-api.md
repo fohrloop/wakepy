@@ -1,17 +1,20 @@
 # CLI API
 
 It is possibe to start wakepy from the command line either by running
-```
+
+```{code-block} text
 wakepy 
 ```
+
 or  
-```
+
+```{code-block} text
 python -m wakepy
 ```
 
 This starts wakepy in the *default mode* (`-k`), which corresponds to a call to `keep.running` with default arguments. The available options are:
 
-```
+```{code-block} output
 wakepy [-h] [-k] [-p]
 
 options:
