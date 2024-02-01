@@ -35,6 +35,12 @@ with keep.running() as m:
 **Can I lock my computer after entered `keep.running` mode?**: Yes, and you probably should, if you're not near your computer. The programs will continue execution regardless of the lock.
 
 
+| Platform | DE    | Method                                                             |
+| -------- | ----- | ------------------------------------------------------------------ |
+| Linux    | GNOME | [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) |
+| MacOS    | *     | [caffeinate](#keep-running-macos-caffeinate)                       |
+| Windows  | *     | [SetThreadExecutionState](#keep-running-windows-stes)              |
+
 
 ## wakepy.keep.presenting
 
@@ -43,6 +49,12 @@ with keep.running() as m:
 
 **Is my computer locked automatically in `keep.presenting` mode?**: No. Entering a screenlock automatically would stop presenting the content. 
 
+| Platform | DE              | Method                                                                      |
+| -------- | --------------- | --------------------------------------------------------------------------- |
+| Linux    | GNOME           | [org.gnome.SessionManager](#keep-presenting-org-gnome-sessionmanager)       |
+| Linux    | GNOME + others? | [org.freedesktop.ScreenSaver](#keep-presenting-org-freedesktop-screensaver) |
+| MacOS    | *               | [caffeinate](#keep-presenting-macos-caffeinate)                             |
+| Windows  | *               | [SetThreadExecutionState](#keep-presenting-windows-stes)                    |
 
 
 ## General questions
