@@ -3,10 +3,10 @@
 
 
 The available modes are 
-| Wakepy mode       | What it does                                        |
-| ----------------- | --------------------------------------------------- |
-| `keep.running`    | Automatic sleep is prevented                        |
-| `keep.presenting` | Automatic sleep, screensaver & screenlock prevented |
+| Wakepy mode                              | What it does                                        |
+| ---------------------------------------- | --------------------------------------------------- |
+| [keep.running](#keep-running-mode)       | Automatic sleep is prevented                        |
+| [keep.presenting](#keep-presenting-mode) | Automatic sleep, screensaver & screenlock prevented |
 
 ## Entering a mode
 
@@ -27,6 +27,8 @@ with keep.running() as m:
 ```
 ````
 
+
+(keep-running-mode)=
 ## wakepy.keep.running
 
 
@@ -41,7 +43,7 @@ with keep.running() as m:
 | MacOS    | *     | [caffeinate](#keep-running-macos-caffeinate)                       |
 | Windows  | *     | [SetThreadExecutionState](#keep-running-windows-stes)              |
 
-
+(keep-presenting-mode)=
 ## wakepy.keep.presenting
 
 
