@@ -94,7 +94,7 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 
 ## keep.presenting
 
-
+(keep-presenting-org-gnome-sessionmanager)=
 ### org.gnome.SessionManager
 
 - **Name**: `org.gnome.SessionManager`
@@ -119,8 +119,6 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 
 (keep-presenting-windows-stes)=
 ### SetThreadExecutionState
-
-
 
 - **Name**: `SetThreadExecutionState`
 - **Introduced in**: wakepy 0.1.0
