@@ -29,7 +29,7 @@ with keep.running() as m:
 
 
 (keep-running-mode)=
-## wakepy.keep.running
+## keep.running
 
 
 **Does keep.running prevent manually putting system to sleep?** All the methods, if not otherwise specified, only prevent the *automatic, idle timer timeout based* sleeping, so it is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. One exception is systemd mask method on Linux, which prevents suspend altogether.
@@ -44,7 +44,7 @@ with keep.running() as m:
 | Windows  | *     | [SetThreadExecutionState](#keep-running-windows-stes)              |
 
 (keep-presenting-mode)=
-## wakepy.keep.presenting
+## keep.presenting
 
 
 **Does keep.presenting prevent manually putting system to sleep?** All the methods, if not otherwise specified, only prevent the *automatic, idle timer timeout based*  sleeping and screensaver/screenlock, so it is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually start the screenlock/screensaver while presenting mode is on. 
