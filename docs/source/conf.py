@@ -33,6 +33,7 @@ extensions = [
     # Add copy button to code blocks
     # See: https://sphinx-copybutton.readthedocs.io/
     "sphinx_copybutton",
+    "sphinx.ext.autosummary",
 ]
 
 # Needed by sphinx_design
