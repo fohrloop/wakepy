@@ -78,7 +78,6 @@ The table above only considers the *automatic* actions (go to sleep, start scree
 :numbered: -1
 :titlesonly:
 
-quickstart
 modes
 methods-reference
 
