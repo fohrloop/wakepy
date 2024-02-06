@@ -23,8 +23,6 @@ release = __version__
 # ones.
 extensions = [
     "myst_parser",
-    # TODO: Check also autodoc2
-    # https://myst-parser.readthedocs.io/en/latest/syntax/code_and_apis.html#sphinx-autodoc2
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     # Sphinx Design adds some sphinx directives for UI components
