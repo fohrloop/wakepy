@@ -23,8 +23,7 @@ def running(
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
 
-    Properties
-    ----------
+    **Properties**
     1) The system may not go to sleep meaning that programs will continue
        running and can use CPU.
     2) Does prevent only the automatical, idle timer timeout based sleep /
@@ -36,14 +35,6 @@ def running(
        There are no methods in keep.running mode which for example would
        perform system-wide configuration changes or anything which would need
        manual reversal.
-
-    Usage
-    -----
-
-    ```
-    with keep.running() as k:
-        # do something that takes a long time.
-    ```
 
     Parameters
     ----------
@@ -89,6 +80,11 @@ def running(
     keep_running_mode: Mode
         The context manager for keeping a system running.
 
+        
+    Examples
+    --------
+    >>> with keep.running() as k:
+    >>>     # do something that takes a long time.
     """
     return create_mode(
         modename=ModeName.KEEP_RUNNING,
@@ -110,12 +106,6 @@ def presenting(
     """Create a wakepy mode (a context manager) for keeping a system running
     and showing content.
 
-    Usage:
-
-    ```
-    with keep.presenting() as k:
-        # do something that takes a long time.
-    ```
 
     Parameters
     ----------
@@ -160,6 +150,12 @@ def presenting(
     -------
     keep_presenting_mode: Mode
         The context manager for keeping a system presenting content.
+
+    Example
+    -------
+    >>> with keep.presenting() as k:
+    >>>     # do something that takes a long time.
+
     """
     return create_mode(
         modename=ModeName.KEEP_PRESENTING,
