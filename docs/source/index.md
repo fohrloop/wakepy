@@ -80,7 +80,7 @@ The table above only considers the *automatic* actions (go to sleep, start scree
 
 modes
 methods-reference
-
+api-reference
 cli-api
 ```
 
