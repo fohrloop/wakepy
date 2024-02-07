@@ -23,10 +23,7 @@ release = __version__
 # ones.
 extensions = [
     "myst_parser",
-    "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
-    # sphinx-autodoc-typehints must be placed after napoleon. Ref: https://github.com/tox-dev/sphinx-autodoc-typehints
-    "sphinx_autodoc_typehints",
     # Sphinx Design adds some sphinx directives for UI components
     # See: https://sphinx-design.readthedocs.io/
     "sphinx_design",
