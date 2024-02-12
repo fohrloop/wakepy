@@ -74,7 +74,8 @@ def running(
         activation process.
     dbus_adapter: class or sequence of classes 
         Optional argument which can be used to define a custom DBus adapter.
-        If given, should be a subclass of DbusAdapter, or a list of such.
+        If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
+        list of such.
 
     Returns
     -------
@@ -146,7 +147,8 @@ def presenting(
         activation process.
     dbus_adapter: class or sequence of classes 
         Optional argument which can be used to define a custom DBus adapter.
-        If given, should be a subclass of DbusAdapter, or a list of such.
+        If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
+        list of such.
 
     Returns
     -------
