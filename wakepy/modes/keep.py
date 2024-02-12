@@ -64,7 +64,7 @@ def running(
         and may occur only once in the priority order, and cannot be part of a
         set. If asterisk is not part of the `methods_priority`, it will be
         added as the last element automatically.
-    on_fail:
+    on_fail: str | callable
         Determines what to do in case mode activation fails. Valid options are:
         "error", "warn", "pass" and a callable. If the option is "error",
         raises wakepy.ActivationError. Is selected "warn", issues warning. If
@@ -72,8 +72,9 @@ def running(
         positional argument: result, which is an instance of ActivationResult.
         The ActivationResult contains more detailed information about the
         activation process.
-    dbus_adapter:
-        Optional argument which can be used to define a customer DBus adapter.
+    dbus_adapter: class or sequence of classes 
+        Optional argument which can be used to define a custom DBus adapter.
+        If given, should be a subclass of DbusAdapter, or a list of such.
 
     Returns
     -------
@@ -143,8 +144,9 @@ def presenting(
         positional argument: result, which is an instance of ActivationResult.
         The ActivationResult contains more detailed information about the
         activation process.
-    dbus_adapter:
-        Optional argument which can be used to define a customer DBus adapter.
+    dbus_adapter: class or sequence of classes 
+        Optional argument which can be used to define a custom DBus adapter.
+        If given, should be a subclass of DbusAdapter, or a list of such.
 
     Returns
     -------
