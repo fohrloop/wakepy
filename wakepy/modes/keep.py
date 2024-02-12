@@ -22,8 +22,8 @@ def running(
     dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
+    The properties of the keep.running mode are:
 
-    **Properties**
     1) The system may not go to sleep meaning that programs will continue
        running and can use CPU.
     2) Does prevent only the automatical, idle timer timeout based sleep /

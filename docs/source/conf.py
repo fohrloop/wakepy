@@ -22,8 +22,10 @@ release = __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    # Markdown (MyST) format support for Sphinx
     "myst_parser",
-    "sphinx.ext.napoleon",
+    # Adds support for NumPy style docstrings for autodoc
+    "numpydoc",
     # Sphinx Design adds some sphinx directives for UI components
     # See: https://sphinx-design.readthedocs.io/
     "sphinx_design",
