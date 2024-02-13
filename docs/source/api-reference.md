@@ -19,4 +19,7 @@ Dbus
 
      .. automethod:: process
 
+.. autoclass:: wakepy.DbusMethodCall
+    :members:
+
 ```  
