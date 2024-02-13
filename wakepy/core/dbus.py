@@ -202,8 +202,8 @@ class DbusMethodCall:
 
     def get_kwargs(self) -> dict[str, Any] | None:
         """Get a keyword-argument representation (dict) of the
-        :attr:`~wakepy.DbusMethodCall.args`. If the DbusMethod (self.method)
-        does not have params defined, returns None."""
+        :attr:`~wakepy.core.DbusMethodCall.args`. If the DbusMethod
+        (self.method) does not have params defined, returns None."""
         if self.method.params is None:
             return None
         assert isinstance(self.method.params, tuple)
@@ -271,7 +271,7 @@ class DbusAdapter:
     """
 
     def process(self, call: DbusMethodCall):
-        """Processes a :class:`~wakepy.DbusMethodCall`.
+        """Processes a :class:`~wakepy.core.DbusMethodCall`.
 
         Parameters
         ----------
