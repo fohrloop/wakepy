@@ -188,7 +188,7 @@ class DbusMethodCall:
     """
 
     args: Tuple[Any, ...]
-    """The method args (positional). This is used"""
+    """The method args (positional)."""
 
     def __init__(self, method: DbusMethod, args: CallArguments = None):
         """Converts the `args` argument is converted into a tuple and makes it
@@ -201,9 +201,9 @@ class DbusMethodCall:
         self.args = self._args_as_tuple(args, method)
 
     def get_kwargs(self) -> dict[str, Any] | None:
-        """Get a keyword-argument representation (dict) of the self.args. If
-        the DbusMethod (self.method) does not have params defined, returns
-        None."""
+        """Get a keyword-argument representation (dict) of the
+        :attr:`~wakepy.DbusMethodCall.args`. If the DbusMethod (self.method)
+        does not have params defined, returns None."""
         if self.method.params is None:
             return None
         assert isinstance(self.method.params, tuple)
