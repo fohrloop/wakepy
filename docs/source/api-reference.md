@@ -20,7 +20,10 @@ Dbus adapters are an advanced concept of wakepy. They would be used in such a ca
 .. autoclass:: wakepy.DbusAdapter
     :members:
 
-.. autoclass:: wakepy.DbusMethodCall
+.. autoclass:: wakepy.core.DbusMethodCall
+    :members:
+
+.. autoclass:: wakepy.core.DbusMethod
     :members:
 
 ```  
