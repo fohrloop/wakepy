@@ -165,11 +165,18 @@ class DbusMethod(NamedTuple):
         )
 
     def completely_defined(self) -> bool:
+        """Check if the DbusMethod is completely defined."""
         return all(
             x is not None for x in (self.service, self.path, self.interface, self.bus)
         )
 
     def to_call(self, args: CallArguments = None) -> DbusMethodCall:
+        """Convert to :class:`~wakepy.core.DbusMethodCall`.
+
+        Parameters
+        ----------
+        args:
+            The arguments to the D-Bus Method call."""
         return DbusMethodCall(self, args)
 
 
