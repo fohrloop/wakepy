@@ -16,8 +16,7 @@ Wakepy Modes
 Dbus
 -------------
 .. autoclass:: wakepy.DbusAdapter
-
-     .. automethod:: process
+    :members:
 
 .. autoclass:: wakepy.DbusMethodCall
     :members:

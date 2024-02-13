@@ -273,7 +273,7 @@ class DbusAdapter:
     """
 
     def process(self, call: DbusMethodCall):
-        ...
+        """Processes a :class:`~wakepy.DbusMethodCall`."""
 
 
 def get_dbus_adapter(
