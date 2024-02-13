@@ -262,10 +262,8 @@ class DbusAdapter:
     subclass is usually an implementation for a DbusAdapter using single
     python (dbus-)library.
 
-    When subclassing, implement the .process(call) method. The call
-    (DbusMethodCall) tells which bus to use (session/system/custom addr), and
-    therefore the connection must be created within the .process() call (this
-    can of course be cached).
+    When subclassing, implement the :func:`~wakepy.DbusAdapter.process`
+    method.
 
     The __init__() should not take any arguments, and it may raise any subtype
     of Exception, which simply means that the DbusAdapter may not be used. The
@@ -273,7 +271,15 @@ class DbusAdapter:
     """
 
     def process(self, call: DbusMethodCall):
-        """Processes a :class:`~wakepy.DbusMethodCall`."""
+        """Processes a :class:`~wakepy.DbusMethodCall`.
+
+        Parameters
+        ----------
+        call: DbusMethodCall
+          Represents a D-Bus method call with its arguments. As it tells which
+          bus to use (session / system / custom addr), the connection must be
+          created within the :func:`~wakepy.DbusAdapter.process` call (this may
+          of course be cached)."""
 
 
 def get_dbus_adapter(
