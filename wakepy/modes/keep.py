@@ -72,7 +72,7 @@ def running(
         positional argument: result, which is an instance of ActivationResult.
         The ActivationResult contains more detailed information about the
         activation process.
-    dbus_adapter: class or sequence of classes 
+    dbus_adapter: class or sequence of classes
         Optional argument which can be used to define a custom DBus adapter.
         If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
         list of such.
@@ -82,7 +82,7 @@ def running(
     keep_running_mode: Mode
         The context manager for keeping a system running.
 
-        
+
     Examples
     --------
     >>> with keep.running() as k:
@@ -145,7 +145,7 @@ def presenting(
         positional argument: result, which is an instance of ActivationResult.
         The ActivationResult contains more detailed information about the
         activation process.
-    dbus_adapter: class or sequence of classes 
+    dbus_adapter: class or sequence of classes
         Optional argument which can be used to define a custom DBus adapter.
         If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
         list of such.
