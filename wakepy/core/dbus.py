@@ -79,23 +79,23 @@ class DbusMethod(NamedTuple):
     signature: str | None
     """The signature for the method input parameters.
 
-    The types are: (Conventional name, ASCII type-code, meaning)
+    The types are: (Conventional name, ASCII type-code, meaning)::
     
-    BYTE	y (121)	Unsigned 8-bit integer
-    BOOLEAN	b (98)	Boolean value: 0 is false, 1 is true
-    INT16	n (110)	Signed 16-bit integer
-    UINT16	q (113)	Unsigned 16-bit integer
-    INT32	i (105)	Signed 32-bit integer
-    UINT32	u (117)	Unsigned 32-bit integer
-    INT64	x (120)	Signed 64-bit integer
-    UINT64	t (116)	Unsigned 64-bit integer
-    DOUBLE	d (100)	IEEE 754 double-precision floating point
-    UNIX_FD	h (104)	Unsigned 32-bit integer representing an index into an
-                    out-of-band array of file descriptors, transferred via some
-                    platform-specific mechanism
-    STRING  s (115) String
+        BYTE	y (121)	Unsigned 8-bit integer
+        BOOLEAN	b (98)	Boolean value: 0 is false, 1 is true
+        INT16	n (110)	Signed 16-bit integer
+        UINT16	q (113)	Unsigned 16-bit integer
+        INT32	i (105)	Signed 32-bit integer
+        UINT32	u (117)	Unsigned 32-bit integer
+        INT64	x (120)	Signed 64-bit integer
+        UINT64	t (116)	Unsigned 64-bit integer
+        DOUBLE	d (100)	IEEE 754 double-precision floating point
+        UNIX_FD	h (104)	Unsigned 32-bit integer representing an index into an
+                        out-of-band array of file descriptors, transferred via some
+                        platform-specific mechanism
+        STRING  s (115) String
     
-    Ref: https://dbus.freedesktop.org/doc/dbus-specification.html
+    Ref: `dbus-specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
     """
     params: Optional[tuple[str, ...]] = None
     """The names of the input arguments defined by the `signature`.
