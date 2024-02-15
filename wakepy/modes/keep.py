@@ -155,8 +155,8 @@ def presenting(
     keep_presenting_mode: Mode
         The context manager for keeping a system presenting content.
 
-    Example
-    -------
+    Examples
+    --------
     >>> with keep.presenting() as k:
     >>>     # do something that takes a long time.
 
