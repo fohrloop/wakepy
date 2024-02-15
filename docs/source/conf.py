@@ -91,3 +91,8 @@ html_theme_options = {
     "pygment_light_style": "friendly",
     "pygment_dark_style": "lightbulb",
 }
+
+# Whether to create a Sphinx table of contents for the lists of class methods
+# and attributes. If a table of contents is made, Sphinx expects each entry to
+# have a separate page. True by default.
+numpydoc_class_members_toctree = False
