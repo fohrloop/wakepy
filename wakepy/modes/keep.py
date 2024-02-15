@@ -23,27 +23,7 @@ def running(
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
 
-    Properties
-    ----------
-    1) The system may not go to sleep meaning that programs will continue
-       running and can use CPU.
-    2) Does prevent only the automatical, idle timer timeout based sleep /
-       suspend; Will not prevent user manually entering sleep from a menu, by
-       closing a laptop lid or by pressing a power button, for example.
-    3) System may still automatically log out user, enable lockscreen
-       or turn off the display.
-    4) If the process holding the lock dies, the lock is automatically removed.
-       There are no methods in keep.running mode which for example would
-       perform system-wide configuration changes or anything which would need
-       manual reversal.
-
-    Usage
-    -----
-
-    ```
-    with keep.running() as k:
-        # do something that takes a long time.
-    ```
+    :ref:`Documentation of keep.running mode. <keep-running-mode>`
 
     Parameters
     ----------
@@ -73,7 +53,7 @@ def running(
         and may occur only once in the priority order, and cannot be part of a
         set. If asterisk is not part of the `methods_priority`, it will be
         added as the last element automatically.
-    on_fail:
+    on_fail: str | callable
         Determines what to do in case mode activation fails. Valid options are:
         "error", "warn", "pass" and a callable. If the option is "error",
         raises wakepy.ActivationError. Is selected "warn", issues warning. If
@@ -81,14 +61,21 @@ def running(
         positional argument: result, which is an instance of ActivationResult.
         The ActivationResult contains more detailed information about the
         activation process.
-    dbus_adapter:
-        Optional argument which can be used to define a customer DBus adapter.
+    dbus_adapter: class or sequence of classes
+        Optional argument which can be used to define a custom DBus adapter.
+        If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
+        list of such.
 
     Returns
     -------
     keep_running_mode: Mode
         The context manager for keeping a system running.
 
+
+    Examples
+    --------
+    >>> with keep.running() as k:
+    >>>     # do something that takes a long time.
     """
     return create_mode(
         modename=ModeName.KEEP_RUNNING,
@@ -110,12 +97,7 @@ def presenting(
     """Create a wakepy mode (a context manager) for keeping a system running
     and showing content.
 
-    Usage:
-
-    ```
-    with keep.presenting() as k:
-        # do something that takes a long time.
-    ```
+    :ref:`Documentation of keep.presenting mode. <keep-presenting-mode>`
 
     Parameters
     ----------
@@ -153,13 +135,21 @@ def presenting(
         positional argument: result, which is an instance of ActivationResult.
         The ActivationResult contains more detailed information about the
         activation process.
-    dbus_adapter:
-        Optional argument which can be used to define a customer DBus adapter.
+    dbus_adapter: class or sequence of classes
+        Optional argument which can be used to define a custom DBus adapter.
+        If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
+        list of such.
 
     Returns
     -------
     keep_presenting_mode: Mode
         The context manager for keeping a system presenting content.
+
+    Examples
+    --------
+    >>> with keep.presenting() as k:
+    >>>     # do something that takes a long time.
+
     """
     return create_mode(
         modename=ModeName.KEEP_PRESENTING,

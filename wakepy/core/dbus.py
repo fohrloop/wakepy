@@ -79,23 +79,23 @@ class DbusMethod(NamedTuple):
     signature: str | None
     """The signature for the method input parameters.
 
-    The types are: (Conventional name, ASCII type-code, meaning)
+    The types are: (Conventional name, ASCII type-code, meaning)::
     
-    BYTE	y (121)	Unsigned 8-bit integer
-    BOOLEAN	b (98)	Boolean value: 0 is false, 1 is true
-    INT16	n (110)	Signed 16-bit integer
-    UINT16	q (113)	Unsigned 16-bit integer
-    INT32	i (105)	Signed 32-bit integer
-    UINT32	u (117)	Unsigned 32-bit integer
-    INT64	x (120)	Signed 64-bit integer
-    UINT64	t (116)	Unsigned 64-bit integer
-    DOUBLE	d (100)	IEEE 754 double-precision floating point
-    UNIX_FD	h (104)	Unsigned 32-bit integer representing an index into an
-                    out-of-band array of file descriptors, transferred via some
-                    platform-specific mechanism
-    STRING  s (115) String
+        BYTE	y (121)	Unsigned 8-bit integer
+        BOOLEAN	b (98)	Boolean value: 0 is false, 1 is true
+        INT16	n (110)	Signed 16-bit integer
+        UINT16	q (113)	Unsigned 16-bit integer
+        INT32	i (105)	Signed 32-bit integer
+        UINT32	u (117)	Unsigned 32-bit integer
+        INT64	x (120)	Signed 64-bit integer
+        UINT64	t (116)	Unsigned 64-bit integer
+        DOUBLE	d (100)	IEEE 754 double-precision floating point
+        UNIX_FD	h (104)	Unsigned 32-bit integer representing an index into an
+                        out-of-band array of file descriptors, transferred via some
+                        platform-specific mechanism
+        STRING  s (115) String
     
-    Ref: https://dbus.freedesktop.org/doc/dbus-specification.html
+    Ref: `dbus-specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
     """
     params: Optional[tuple[str, ...]] = None
     """The names of the input arguments defined by the `signature`.
@@ -165,11 +165,18 @@ class DbusMethod(NamedTuple):
         )
 
     def completely_defined(self) -> bool:
+        """Check if the DbusMethod is completely defined."""
         return all(
             x is not None for x in (self.service, self.path, self.interface, self.bus)
         )
 
     def to_call(self, args: CallArguments = None) -> DbusMethodCall:
+        """Convert to :class:`~wakepy.core.DbusMethodCall`.
+
+        Parameters
+        ----------
+        args:
+            The arguments to the D-Bus Method call."""
         return DbusMethodCall(self, args)
 
 
@@ -188,7 +195,7 @@ class DbusMethodCall:
     """
 
     args: Tuple[Any, ...]
-    """The method args (positional). This is used"""
+    """The method args (positional)."""
 
     def __init__(self, method: DbusMethod, args: CallArguments = None):
         """Converts the `args` argument is converted into a tuple and makes it
@@ -201,9 +208,9 @@ class DbusMethodCall:
         self.args = self._args_as_tuple(args, method)
 
     def get_kwargs(self) -> dict[str, Any] | None:
-        """Get a keyword-argument representation (dict) of the self.args. If
-        the DbusMethod (self.method) does not have params defined, returns
-        None."""
+        """Get a keyword-argument representation (dict) of the
+        :attr:`~wakepy.core.DbusMethodCall.args`. If the DbusMethod
+        (self.method) does not have params defined, returns None."""
         if self.method.params is None:
             return None
         assert isinstance(self.method.params, tuple)
@@ -262,10 +269,8 @@ class DbusAdapter:
     subclass is usually an implementation for a DbusAdapter using single
     python (dbus-)library.
 
-    When subclassing, implement the .process(call) method. The call
-    (DbusMethodCall) tells which bus to use (session/system/custom addr), and
-    therefore the connection must be created within the .process() call (this
-    can of course be cached).
+    When subclassing, implement the :func:`~wakepy.DbusAdapter.process`
+    method.
 
     The __init__() should not take any arguments, and it may raise any subtype
     of Exception, which simply means that the DbusAdapter may not be used. The
@@ -273,7 +278,15 @@ class DbusAdapter:
     """
 
     def process(self, call: DbusMethodCall):
-        ...
+        """Processes a :class:`~wakepy.core.DbusMethodCall`.
+
+        Parameters
+        ----------
+        call: DbusMethodCall
+          Represents a D-Bus method call with its arguments. As it tells which
+          bus to use (session / system / custom addr), the connection must be
+          created within the :func:`~wakepy.DbusAdapter.process` call (this may
+          of course be cached)."""
 
 
 def get_dbus_adapter(

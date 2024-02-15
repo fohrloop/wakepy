@@ -31,10 +31,8 @@ with keep.running() as m:
 (keep-running-mode)=
 ## keep.running
 
-
-**Does keep.running prevent manually putting system to sleep?** All the methods, if not otherwise specified, only prevent the *automatic, idle timer timeout based* sleeping, so it is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. One exception is systemd mask method on Linux, which prevents suspend altogether.
-
-**Can I lock my computer after entered `keep.running` mode?**: Yes, and you probably should, if you're not near your computer. The programs will continue execution regardless of the lock.
+While `keep.running` mode is activated, the system may not automatically go to sleep (or
+suspend) meaning that programs will continue running and can use CPU.
 
 
 | Platform | DE    | Method                                                             |
@@ -43,13 +41,35 @@ with keep.running() as m:
 | MacOS    | *     | [caffeinate](#keep-running-macos-caffeinate)                       |
 | Windows  | *     | [SetThreadExecutionState](#keep-running-windows-stes)              |
 
+
+Does keep.running prevent manually putting system to sleep?
+: Only the  automatical, idle timer timeout based sleep / suspend is prevented; Will not
+prevent user manually entering sleep from a menu, by closing a laptop lid or by pressing
+a power button, for example.
+
+Can I lock my computer after entered `keep.running` mode?
+: Yes, and you probably should, if you're not near your computer. The program will
+continue execution regardless of the lock.
+
+What about automatical lockscreen / screensaver?
+: The system may still automatically log out user, enable lockscreen or turn off the
+display. Automatic lock screen is not guaranteed, but it is  not prevented in any way.
+
+What happens id the process holding the lock dies?
+: The lock is automatically removed. There are no methods in keep.running mode which for
+example would perform system-wide configuration changes or anything which would need
+manual reversal.
+
+
+
 (keep-presenting-mode)=
 ## keep.presenting
 
+While `keep.presenting` mode is activated, the system may not automatically go to sleep (or
+suspend) meaning that programs will continue running and can use CPU. In addition to
+that, automatic start of screensaver & screenlock are prevented, meaning that you can 
+show content in the `keep.presenting` mode.
 
-**Does keep.presenting prevent manually putting system to sleep?** All the methods, if not otherwise specified, only prevent the *automatic, idle timer timeout based*  sleeping and screensaver/screenlock, so it is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually start the screenlock/screensaver while presenting mode is on. 
-
-**Is my computer locked automatically in `keep.presenting` mode?**: No. Entering a screenlock automatically would stop presenting the content. 
 
 | Platform | DE              | Method                                                                      |
 | -------- | --------------- | --------------------------------------------------------------------------- |
@@ -57,6 +77,21 @@ with keep.running() as m:
 | Linux    | GNOME + others? | [org.freedesktop.ScreenSaver](#keep-presenting-org-freedesktop-screensaver) |
 | MacOS    | *               | [caffeinate](#keep-presenting-macos-caffeinate)                             |
 | Windows  | *               | [SetThreadExecutionState](#keep-presenting-windows-stes)                    |
+
+Does keep.presenting prevent manually putting system to sleep?
+: Only the  automatical, idle timer timeout based sleep / suspend is prevented; Will not
+prevent user manually entering sleep from a menu, by closing a laptop lid or by pressing
+a power button, for example.
+
+Can I still manually start lockscreen / screensaver?
+: Yes. Only the idle timer based screensaver / lockscreen is prevented. Note that
+manually entering screensaver does not deactivate the mode.
+
+
+What happens id the process holding the lock dies?
+: The lock is automatically removed. There are no methods in keep.presenting mode which for
+example would perform system-wide configuration changes or anything which would need
+manual reversal.
 
 
 ## General questions

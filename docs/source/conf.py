@@ -22,17 +22,17 @@ release = __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    # Markdown (MyST) format support for Sphinx
     "myst_parser",
-    # TODO: Check also autodoc2
-    # https://myst-parser.readthedocs.io/en/latest/syntax/code_and_apis.html#sphinx-autodoc2
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
+    # Adds support for NumPy style docstrings for autodoc
+    "numpydoc",
     # Sphinx Design adds some sphinx directives for UI components
     # See: https://sphinx-design.readthedocs.io/
     "sphinx_design",
     # Add copy button to code blocks
     # See: https://sphinx-copybutton.readthedocs.io/
     "sphinx_copybutton",
+    "sphinx.ext.autosummary",
 ]
 
 # Needed by sphinx_design
@@ -61,15 +61,9 @@ myst_heading_anchors = 3
 # Ref2: https://jupyterbook.org/en/stable/content/figures.html#numbered-references
 numfig = True
 
-
-# Add a border around Examples. Might or might not look good, depending on the
-# used theme.
-# See: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html#confval-napoleon_use_admonition_for_examples
-napoleon_use_admonition_for_examples = True
-napoleon_google_docstring = False
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+html_static_path = ["_static"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -95,3 +89,8 @@ html_theme_options = {
     "pygment_light_style": "friendly",
     "pygment_dark_style": "lightbulb",
 }
+
+# Whether to create a Sphinx table of contents for the lists of class methods
+# and attributes. If a table of contents is made, Sphinx expects each entry to
+# have a separate page. True by default.
+numpydoc_class_members_toctree = False
