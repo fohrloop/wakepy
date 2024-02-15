@@ -37,6 +37,7 @@ doc = [
     "sphinx-copybutton~=0.5.2",
     "myst-parser~=2.0.0",
     "sphinx-book-theme~=1.1.0",
+    "numpydoc"
 ]
 dev = [
     "sphinx-autobuild",
