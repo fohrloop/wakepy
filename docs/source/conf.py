@@ -61,13 +61,6 @@ myst_heading_anchors = 3
 # Ref2: https://jupyterbook.org/en/stable/content/figures.html#numbered-references
 numfig = True
 
-
-# Add a border around Examples. Might or might not look good, depending on the
-# used theme.
-# See: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html#confval-napoleon_use_admonition_for_examples
-napoleon_use_admonition_for_examples = True
-napoleon_google_docstring = False
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
