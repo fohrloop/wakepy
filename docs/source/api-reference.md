@@ -1,5 +1,6 @@
+<!-- NOTE: If you change the title (API Reference), you must update the code
+in wakepy.js! -->
 # API Reference 
-
 ```{eval-rst}
 
 .. autosummary::

@@ -22,10 +22,12 @@ release = __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    # Adds support for NumPy style docstrings for autodoc
+    # Note: numpydoc must be listed before myst_parser in order to make the
+    # NamedTuples fix (https://github.com/numpy/numpydoc/pull/527) work.
+    "numpydoc",
     # Markdown (MyST) format support for Sphinx
     "myst_parser",
-    # Adds support for NumPy style docstrings for autodoc
-    "numpydoc",
     # Sphinx Design adds some sphinx directives for UI components
     # See: https://sphinx-design.readthedocs.io/
     "sphinx_design",
@@ -63,13 +65,13 @@ numfig = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
-html_static_path = ["_static"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+html_static_path = ["_static"]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -94,3 +96,7 @@ html_theme_options = {
 # and attributes. If a table of contents is made, Sphinx expects each entry to
 # have a separate page. True by default.
 numpydoc_class_members_toctree = False
+
+
+def setup(app):
+    app.add_js_file("wakepy.js", loading_method="defer")
