@@ -22,10 +22,12 @@ release = __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    # Adds support for NumPy style docstrings for autodoc
+    # Note: numpydoc must be listed before myst_parser in order to make the
+    # NamedTuples fix (https://github.com/numpy/numpydoc/pull/527) work.
+    "numpydoc",
     # Markdown (MyST) format support for Sphinx
     "myst_parser",
-    # Adds support for NumPy style docstrings for autodoc
-    "numpydoc",
     # Sphinx Design adds some sphinx directives for UI components
     # See: https://sphinx-design.readthedocs.io/
     "sphinx_design",
