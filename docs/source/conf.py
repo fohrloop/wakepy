@@ -72,7 +72,6 @@ templates_path = ["_templates"]
 exclude_patterns = []
 
 html_static_path = ["_static"]
-html_js_files = ["wakepy.js"]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -97,3 +96,7 @@ html_theme_options = {
 # and attributes. If a table of contents is made, Sphinx expects each entry to
 # have a separate page. True by default.
 numpydoc_class_members_toctree = False
+
+
+def setup(app):
+    app.add_js_file("wakepy.js", loading_method="defer")
