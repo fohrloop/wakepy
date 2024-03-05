@@ -71,6 +71,8 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+html_static_path = ["_static"]
+html_js_files = ["wakepy.js"]
 
 # -- Options for HTML output -------------------------------------------------
 
