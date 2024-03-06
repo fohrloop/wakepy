@@ -47,21 +47,21 @@ def test_keep_running_mode_creation(input_args, monkeypatch, testutils):
 
     mode = function_under_test()
     # All the methods for the mode are selected automatically
-    assert set(mode.methods_classes) == {MethodA, MethodB, MethodC}
+    assert set(mode.method_classes) == {MethodA, MethodB, MethodC}
 
     # Case: Test "omit" parameter
     mode = function_under_test(omit=[f"{name_prefix}A"])
-    assert set(mode.methods_classes) == {MethodB, MethodC}
+    assert set(mode.method_classes) == {MethodB, MethodC}
 
     # Case: Test "methods" parameter
     mode = function_under_test(methods=[f"{name_prefix}A", f"{name_prefix}B"])
-    assert set(mode.methods_classes) == {MethodB, MethodA}
+    assert set(mode.method_classes) == {MethodB, MethodA}
 
     # Case: Test "methods_priority" parameter
     methods_priority = [f"{name_prefix}A", f"{name_prefix}B"]
     mode = function_under_test(methods_priority=methods_priority)
     assert mode.methods_priority == methods_priority
-    assert set(mode.methods_classes) == {MethodB, MethodA, MethodC}
+    assert set(mode.method_classes) == {MethodB, MethodA, MethodC}
 
     # Case: Test "dbus_adapter" parameter
     class MyDbusAdapter(DbusAdapter):
