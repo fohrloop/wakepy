@@ -162,7 +162,7 @@ class Mode(ABC):
         """
 
         self.name = name
-        self.methods_classes = methods
+        self.method_classes = methods
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
         self.activation_result: ActivationResult | None = None
@@ -175,7 +175,7 @@ class Mode(ABC):
             dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
         )
         self.activation_result = self.controller.activate(
-            self.methods_classes,
+            self.method_classes,
             methods_priority=self.methods_priority,
             modename=self.name,
         )
