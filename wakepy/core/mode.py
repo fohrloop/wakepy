@@ -139,6 +139,11 @@ class Mode(ABC):
     outcome. None if Mode has not yet been activated.
     """
 
+    name: str | None
+    """Name of the Mode. Used for communication to user, logging and in
+    error messages. May also be None.
+    """
+
     _controller_class: Type[ModeController] = ModeController
 
     def __init__(
