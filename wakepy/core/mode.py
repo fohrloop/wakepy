@@ -126,7 +126,8 @@ class Mode(ABC):
     """
 
     method_classes: list[Type[Method]]
-    """The list of methods associated for this mode.
+    """The list of methods associated for this mode. Given in :meth:`__init__`
+    as parameter ``methods``.
     """
 
     active: bool
