@@ -195,9 +195,9 @@ class Mode(ABC):
             ActivationResult. The ActivationResult contains more detailed
             information about the activation process.
         dbus_adapter:
-            For using a custom dbus-adapter. Optional. If not given, the default
-            dbus adapter is used, which is :class:`~wakepy.dbus_adapters.jeepney.JeepneyDbusAdapter`
-        """
+            For using a custom dbus-adapter. Optional. If not given, the
+            default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.jeepney.JeepneyDbusAdapter`
+        """  # noqa: E501
 
         self.name = name
         self.method_classes = methods
