@@ -150,6 +150,9 @@ class Mode(ABC):
     details, see the documentation of :meth:`__init__`.
     """
 
+    dbus_adapter: DbusAdapter | None
+    """The DBus adapter used with ``Method``\ s which require DBus (if any)."""
+
     _controller_class: Type[ModeController] = ModeController
 
     def __init__(
