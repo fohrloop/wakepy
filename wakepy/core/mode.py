@@ -140,8 +140,11 @@ class Mode(ABC):
     """
 
     name: str | None
-    """Name of the Mode. Used for communication to user, logging and in
-    error messages. May also be None.
+    """The ``name`` given to :meth:`__init__`.
+    """
+
+    methods_priority: list[str | set[str]]
+    """The ``methods_priority`` given to :meth:`__init__`.
     """
 
     _controller_class: Type[ModeController] = ModeController
