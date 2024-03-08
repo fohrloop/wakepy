@@ -10,8 +10,10 @@ class DbusNotFoundError(RuntimeError):
 
 
 class JeepneyDbusAdapter(DbusAdapter):
-    """An implementation of DbusAdapter using jeepney. Can be used to process
-    DbusMethodCalls (communication with Dbus services over a dbus-daemon)."""
+    """An implementation of :class:`~wakepy.DbusAdapter` using `jeepney <https://jeepney.readthedocs.io/>`_.
+    Can be used to process DbusMethodCalls (communication with Dbus services
+    over a dbus-daemon).
+    """
 
     # timeout for dbus calls, in seconds
     timeout = 2
