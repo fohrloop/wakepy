@@ -126,8 +126,9 @@ class Mode(ABC):
     """
 
     method_classes: list[Type[Method]]
-    """The list of methods associated for this mode. Given in :meth:`__init__`
-    as parameter ``methods``.
+    """The list of methods associated for this mode as given when creating the
+    ``Mode``. For details, see the documentation of ``methods`` in
+    :meth:`__init__`.
     """
 
     active: bool
@@ -140,11 +141,13 @@ class Mode(ABC):
     """
 
     name: str | None
-    """The ``name`` given to :meth:`__init__`.
+    """The ``name`` as given when creating the ``Mode``. For
+    details, see the documentation of :meth:`__init__`.
     """
 
     methods_priority: list[str | set[str]]
-    """The ``methods_priority`` given to :meth:`__init__`.
+    """The ``methods_priority`` as given when creating the ``Mode``. For
+    details, see the documentation of :meth:`__init__`.
     """
 
     _controller_class: Type[ModeController] = ModeController
