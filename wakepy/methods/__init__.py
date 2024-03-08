@@ -19,7 +19,7 @@ Examples
     or "least widespread" software.
 (3) If a method needs systemd and D-Bus, it is listed under systemd, as D-Bus
     is more widespread than systemd, and you may have D-Bus without systemd
-    but not vice versa. 
+    but not vice versa.
 """
 
 # NOTE: All modules containing wakepy.Methods must be imported here! The reason

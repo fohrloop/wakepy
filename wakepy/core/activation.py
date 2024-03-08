@@ -4,7 +4,7 @@ deactivation of Modes (using Methods).
 Most important functions
 ------------------------
 activate_method(method:Method) -> MethodActivationResult
-    Activate a mode using a single Method 
+    Activate a mode using a single Method
 get_prioritized_methods
     Prioritize of collection of Methods
 

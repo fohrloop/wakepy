@@ -19,7 +19,7 @@ Methods are different ways of entering/keeping in a Mode. A Method may support o
 ### org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager`
 - **Introduced in**: wakepy 0.8.0
-- **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service with flag 4 ("Inhibit suspending the session or computer") when activating and saves the returned cookie on the Method instance. Uses the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie when deactivating.  
+- **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service with flag 4 ("Inhibit suspending the session or computer") when activating and saves the returned cookie on the Method instance. Uses the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie when deactivating.
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**:  You may check the list of inhibitors using the [GetInhibitors](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.GetInhibitors) method, which gives you list of object paths like `["/org/gnome/SessionManager/Inhibitor20"]`. Then you can use the [GetAppId](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetAppId), [GetFlags](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetFlags) and [GetReason](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetReason) methods on the [org.gnome.SessionManager.Inhibitor](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor) interface of the listed objects on the org.gnome.SessionManager service to translate that into something meaningful. A good tool for this is [D-Spy](https://apps.gnome.org/Dspy/). Alternatively, you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
@@ -55,7 +55,7 @@ There are two ways how a Windows system might automatically set a screen lock
 1. When resuming from sleep, if "Require sign-in when PC wakes up from sleep" -setting is set.
 2. When Screen Saver idle timeout is reached *and it has set to have password protection in the Lock Screen Setting or that is enforced by a Group Policy*.
 
-if you want to check if your system will sleep automatically when using this method, you may either check the  `ScreenSaverIsSecure`, `ScreenSaveActive` and `ScreenSaveTimeout` from  "HKCU:\Control Panel\Desktop" and "HKCU:\Software\Policies\Microsoft\Windows\Control Panel\Desktop", or use the following python snippet: 
+if you want to check if your system will sleep automatically when using this method, you may either check the  `ScreenSaverIsSecure`, `ScreenSaveActive` and `ScreenSaveTimeout` from  "HKCU:\Control Panel\Desktop" and "HKCU:\Software\Policies\Microsoft\Windows\Control Panel\Desktop", or use the following python snippet:
 
 ```{code-block} python
 import ctypes
@@ -87,7 +87,7 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **Introduced in**: wakepy 0.3.0
 - **How it works**: It calls the `caffeinate` command. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
 - **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed. 
+- **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate` or similar associated with it using a task manager.
 - **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
 
@@ -110,11 +110,11 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 ### org.freedesktop.ScreenSaver
 - **Name**: `org.freedesktop.ScreenSaver`
 - **Introduced in**: wakepy 0.6.0
-- **How it works**: Uses the Inhibit method of [org.freedesktop.ScreenSaver](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) D-Bus service when activating and saves the returned cookie on the Method instance. Uses the org.freedesktop.ScreenSaver.UnInhibit method with the cookie when deactivating. The org.freedesktop.ScreenSaver can only be used to prevent idle; that is why there is no "keep.running" mode counterpart.  
+- **How it works**: Uses the Inhibit method of [org.freedesktop.ScreenSaver](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) D-Bus service when activating and saves the returned cookie on the Method instance. Uses the org.freedesktop.ScreenSaver.UnInhibit method with the cookie when deactivating. The org.freedesktop.ScreenSaver can only be used to prevent idle; that is why there is no "keep.running" mode counterpart.
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**:  The org.freedesktop.ScreenSaver does not expose a method for listing the inhibitors, but you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
-- **Requirements**: D-Bus, and a [freedesktop.org compliant desktop environment](https://www.freedesktop.org/wiki/Desktops/), which should implement the org.freedesktop.ScreenSaver.Inhibit method. 
+- **Requirements**: D-Bus, and a [freedesktop.org compliant desktop environment](https://www.freedesktop.org/wiki/Desktops/), which should implement the org.freedesktop.ScreenSaver.Inhibit method.
 - **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([PR #171](https://github.com/fohrloop/wakepy/pull/171) by [fohrloop](https://github.com/fohrloop/)).
 
 (keep-presenting-windows-stes)=
@@ -140,7 +140,7 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **Introduced in**: wakepy 0.3.0
 - **How it works**: It calls the `caffeinate` command with `-d` flag ("Create an assertion to prevent the display from sleeping."). See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
 - **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed. 
+- **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate -d` or similar associated with it using a task manager.
 - **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
 

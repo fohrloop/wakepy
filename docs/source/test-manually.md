@@ -7,8 +7,8 @@ All wakepy Modes rely somehow on external software, library or dbus service. Thi
 ```{admonition} Notes for manual testing
 :class: warning
 ###### Before testing
-- Close browser tabs which might prevent your system from going to sleep (e.g.  YouTube) 
-- Close applications which might prevent your system from going to sleep (e.g. video players apps) 
+- Close browser tabs which might prevent your system from going to sleep (e.g.  YouTube)
+- Close applications which might prevent your system from going to sleep (e.g. video players apps)
 
 ###### When ending the test
 - Avoid pressing the power button as it might force the computer to sleep.
@@ -53,7 +53,7 @@ Dec 25 12:29:16 | elapsed 0:00:41.484495 | delta: 2.00023s
 Dec 25 12:29:18 | elapsed 0:00:43.484847 | delta: 2.000352s
 Dec 25 12:29:20 | elapsed 0:00:45.485045 | delta: 2.000198s
 ```
- 
+
 In the above example, the delta (time between two prints) was 2 seconds, until 16 seconds elapsed. After that, CPU was sleeping for 19 seconds.
 
 ## Entering in wakepy modes for tests
@@ -67,7 +67,7 @@ Either on CLI
 wakepy
 ```
 
-or in python 
+or in python
 
 
 ```{code-block} python
@@ -87,7 +87,7 @@ Either on CLI
 wakepy -p
 ```
 
-or in python 
+or in python
 
 
 ```{code-block} python
@@ -142,9 +142,9 @@ Follow the [same steps as in with keep.running](#gnome-keep-running-manual-test)
 (windows-keep-running-manual-test)=
 ### keep.running (Windows)
 
-Change your current settings from windows menu -> "Edit Power Plan". Change "Turn off the display" and "Put the computer to sleep"  both to 1 minute. -> Save Changes. 
+Change your current settings from windows menu -> "Edit Power Plan". Change "Turn off the display" and "Put the computer to sleep"  both to 1 minute. -> Save Changes.
 
-Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script)  or in the in another. After you're done, reset the Power Plan values to what they were. 
+Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script)  or in the in another. After you're done, reset the Power Plan values to what they were.
 
 
 ```{admonition} About Windows idle timers

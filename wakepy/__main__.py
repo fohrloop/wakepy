@@ -26,9 +26,9 @@ if typing.TYPE_CHECKING:
 
     from wakepy import ActivationResult
 
-WAKEPY_TEXT_TEMPLATE = r"""                  _                       
-                 | |                      
- __      __ __ _ | | __ ___  _ __   _   _ 
+WAKEPY_TEXT_TEMPLATE = r"""                  _
+                 | |
+ __      __ __ _ | | __ ___  _ __   _   _
  \ \ /\ / // _` || |/ // _ \| '_ \ | | | |
   \ V  V /| (_| ||   <|  __/| |_) || |_| |
    \_/\_/  \__,_||_|\_\\___|| .__/  \__, |
@@ -37,7 +37,7 @@ WAKEPY_TEXT_TEMPLATE = r"""                  _
 
 WAKEPY_TICKBOXES_TEMPLATE = """
  [{no_auto_suspend}] System will continue running programs
- [{presentation_mode}] Presentation mode is on 
+ [{presentation_mode}] Presentation mode is on
 """
 
 

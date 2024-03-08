@@ -1,13 +1,13 @@
-# Changelog 
+# Changelog
 
 ## Not published
 ### Changed
 - Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: `keep.running` and `keep.presenting` context managers.
 - The `WAKEPY_FAKE_SUCCESS` check is done *before* any other Methods (previously, it would be checked if all other methods failed)
-- Added `on_fail` parameter for modes. 
-- If Mode activation fails, raise `wakepy.ActivationError` by default. Previously 
+- Added `on_fail` parameter for modes.
+- If Mode activation fails, raise `wakepy.ActivationError` by default. Previously
   there was no "on fail" action, but users needed to check the
-  `result.success` to make sure the activation was successful. 
+  `result.success` to make sure the activation was successful.
 - It is now possible to select the used wakepy.Methods with `methods` and
  `omit` and to change the priority order of methods with `methods_priority`.
 
@@ -18,22 +18,22 @@
 ## [0.7.1] (2023-06-11)
 ### Fixed
 - `keep.running` and `keep.presenting` return an object `m` with `success` value of `True`.
-   
+
 ## [0.7.0] (2023-06-11)
 ### Added
-- New API: `keep.running()` and `keep.presenting()` context managers. These are currently simple wrappers of the old methods but the internals will be re-written in a future version. 
+- New API: `keep.running()` and `keep.presenting()` context managers. These are currently simple wrappers of the old methods but the internals will be re-written in a future version.
 - The context managers now return the result of the action, `m`. Users may check with `m.success` if changing the mode was succesful.
 - Possibility to fake succesful change of mode with `WAKEPY_FAKE_SUCCESS` (for CI / tests).
 ### Fixed
 - No exceptions anymore on import-time. All exceptions should be handled now gracefully, and user is informed if switching to a `keep.running` or `keep.presenting` mode failed.
-  
+
 ### Deprecated
 - Old Python API:  The `keepawake()`, `set_keepawake` and `unset_keepwake`. These will be removed in a future version of wakepy. Use `keep.running()`or `keep.presenting()`, instead.
-- The `-s, --keep-screen-awake` option of the `wakepy` CLI command. Use `-p, --presentation ` option, instead. 
+- The `-s, --keep-screen-awake` option of the `wakepy` CLI command. Use `-p, --presentation ` option, instead.
 
 ## [0.6.0] (2023-02-27)
 ### Added
-- Support for using wakepy without sudo on linux! There are now D-bus solutions (1) using  jeepney and (2) using dbus-python (libdbus). Thanks to [Stehlampe2020](https://github.com/Stehlampe2020) for the dbus-python based solution ([PR #22](https://github.com/np-8/wakepy/pull/22)) and [NicoWeio](https://github.com/NicoWeio) for raising  [Issue #17](https://github.com/np-8/wakepy/issues/17). 
+- Support for using wakepy without sudo on linux! There are now D-bus solutions (1) using  jeepney and (2) using dbus-python (libdbus). Thanks to [Stehlampe2020](https://github.com/Stehlampe2020) for the dbus-python based solution ([PR #22](https://github.com/np-8/wakepy/pull/22)) and [NicoWeio](https://github.com/NicoWeio) for raising  [Issue #17](https://github.com/np-8/wakepy/issues/17).
 ### Changed
 - Linux+systemd approach has sudo check. The program won't start without `SUDO_UID` environment variable set.
 
@@ -60,7 +60,7 @@
 
 
 ## [0.4.0] (2021-06-09)
-### Added 
+### Added
 - `keepawake` context manager. [[PR #6](https://github.com/np-8/wakepy/pull/6)]. Thanks to [HoustonFortney](https://github.com/HoustonFortney).
 
 ## [0.3.2] (2021-06-06)

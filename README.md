@@ -1,15 +1,15 @@
 <!-- start before docs link -->
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/fohrloop/wakepy)&nbsp;![PyPI](https://img.shields.io/pypi/v/wakepy)&nbsp;![PyPI - Downloads](https://img.shields.io/pypi/dm/wakepy)&nbsp;![GitHub](https://img.shields.io/github/license/fohrloop/wakepy)
 
-# ⏰😴 wakepy 
+# ⏰😴 wakepy
 
-Cross-platform wakelock / keep-awake / stay-awake written in Python. 
+Cross-platform wakelock / keep-awake / stay-awake written in Python.
 
 ## Supports
-- Python: 3.7 to 3.12 
-- OS: Windows, Linux and macOS 
+- Python: 3.7 to 3.12
+- OS: Windows, Linux and macOS
 
-## What it can do? 
+## What it can do?
 
 Wakepy has two main modes:
 1. **`keep.running`**: keep your tasks & CPU running even if you lock your session and turn screenlock on; This mode prevents your system from going to sleep automatically (*e.g.* for training machine learning models, video encoding, web scraping, ...)
@@ -22,10 +22,10 @@ Wakepy has two main modes:
 - [viskillz-blender](https://github.com/viskillz/viskillz-blender) — Generating assets of Mental Cutting Test exercises
 - [mpc-autofill](https://github.com/chilli-axe/mpc-autofill) — Automating MakePlayingCards' online ordering system
 - [lakeshorecryotronics/python-driver](https://github.com/lakeshorecryotronics/python-driver) — Lake Shore instruments python Driver
-- [UCSD-E4E/baboon-tracking](https://github.com/UCSD-E4E/baboon-tracking) — In pipelines of a Computer Vision project tracking baboons  
-- [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI 
+- [UCSD-E4E/baboon-tracking](https://github.com/UCSD-E4E/baboon-tracking) — In pipelines of a Computer Vision project tracking baboons
+- [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI
 - [minarca](https://github.com/ikus060/minarca) — Cross-platform data backup software
-## Documentation 
+## Documentation
 ### 👉 **[wakepy.readthedocs.io](http://wakepy.readthedocs.io)**
 <!-- start after docs link -->
 ## ⚖️👑 Key selling points
@@ -33,11 +33,11 @@ Wakepy has two main modes:
 - Simple command line interface and a python API
 - Permissive MIT licence
 - Low amount of python dependencies
-  - For using the D-Bus methods on Linux: [jeepney](https://jeepney.readthedocs.io/)  
+  - For using the D-Bus methods on Linux: [jeepney](https://jeepney.readthedocs.io/)
   - Otherwise: None
 
 
-## Deprecation timeline (wakepy 0.7.0+) 
+## Deprecation timeline (wakepy 0.7.0+)
 
 Since deprecations may affect many users, they are communicated well before and time is given for project maintainers for migration. Timeline:
 
