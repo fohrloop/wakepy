@@ -16,7 +16,7 @@ if typing.TYPE_CHECKING:
 
     from .activation import MethodsPriorityOrder
     from .constants import ModeName
-    from .dbus import DbusAdapter, DbusAdapterTypeSeq
+    from .dbus import DBusAdapter, DBusAdapterTypeSeq
     from .method import Method, StrCollection
 
     OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
@@ -49,7 +49,7 @@ class ModeExit(Exception):
 
 
 class ModeController:
-    def __init__(self, dbus_adapter: Optional[DbusAdapter] = None):
+    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None):
         self.dbus_adapter = dbus_adapter
         self.active_method: Method | None = None
         self.heartbeat: Heartbeat | None = None
@@ -147,7 +147,7 @@ class Mode(ABC):
         information about the activation process.
     dbus_adapter:
         For using a custom dbus-adapter. Optional. If not given, the
-        default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.jeepney.JeepneyDbusAdapter`
+        default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter`
     """  # noqa: E501
 
     method_classes: list[Type[Method]]
@@ -177,7 +177,7 @@ class Mode(ABC):
     """The ``on_fail`` given when creating the :class:`Mode`.
     """
 
-    dbus_adapter: DbusAdapter | None
+    dbus_adapter: DBusAdapter | None
     """The DBus adapter used with ``Method``\ s which require DBus (if any)."""
 
     _controller_class: Type[ModeController] = ModeController
@@ -188,7 +188,7 @@ class Mode(ABC):
         methods_priority: Optional[MethodsPriorityOrder] = None,
         name: Optional[ModeName | str] = None,
         on_fail: OnFail = "error",
-        dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+        dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
     ):
         """Initialize a `Mode` using `Method`\ s.
 

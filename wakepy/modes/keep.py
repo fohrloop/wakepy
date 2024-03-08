@@ -9,7 +9,7 @@ if typing.TYPE_CHECKING:
     from typing import Optional, Type
 
     from ..core.activation import MethodsPriorityOrder
-    from ..core.dbus import DbusAdapter, DbusAdapterTypeSeq
+    from ..core.dbus import DBusAdapter, DBusAdapterTypeSeq
     from ..core.method import StrCollection
     from ..core.mode import Mode, OnFail
 
@@ -19,7 +19,7 @@ def running(
     omit: Optional[StrCollection] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
     on_fail: OnFail = "error",
-    dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+    dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
 
@@ -63,7 +63,7 @@ def running(
         activation process.
     dbus_adapter: class or sequence of classes
         Optional argument which can be used to define a custom DBus adapter.
-        If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
+        If given, should be a subclass of :class:`~wakepy.DBusAdapter`, or a
         list of such.
 
     Returns
@@ -92,7 +92,7 @@ def presenting(
     omit: Optional[StrCollection] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
     on_fail: OnFail = "error",
-    dbus_adapter: Type[DbusAdapter] | DbusAdapterTypeSeq | None = None,
+    dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping a system running
     and showing content.
@@ -137,7 +137,7 @@ def presenting(
         activation process.
     dbus_adapter: class or sequence of classes
         Optional argument which can be used to define a custom DBus adapter.
-        If given, should be a subclass of :class:`~wakepy.DbusAdapter`, or a
+        If given, should be a subclass of :class:`~wakepy.DBusAdapter`, or a
         list of such.
 
     Returns

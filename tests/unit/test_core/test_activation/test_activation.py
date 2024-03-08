@@ -20,7 +20,7 @@ from testmethods import (
     iterate_test_methods,
 )
 
-from wakepy.core import DbusAdapter, MethodActivationResult, get_methods
+from wakepy.core import DBusAdapter, MethodActivationResult, get_methods
 from wakepy.core.activation import (
     StageName,
     WakepyFakeSuccess,
@@ -107,7 +107,7 @@ def _arrange_for_test_activate(monkeypatch):
 
     mocks = Mock()
     mocks.heartbeat = Mock(spec_set=Heartbeat)
-    mocks.dbus_adapter = Mock(spec_set=DbusAdapter)
+    mocks.dbus_adapter = Mock(spec_set=DBusAdapter)
 
     def fake_activate_method(method):
         try:

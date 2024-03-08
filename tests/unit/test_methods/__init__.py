@@ -8,5 +8,5 @@ Tests include:
 
 Tests Exclude:
 * IO of any kind & calling 3rd party executables
-* Usage of Dbus services, even fake ones
+* Usage of DBus services, even fake ones
 """

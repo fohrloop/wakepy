@@ -9,12 +9,12 @@ import sys
 import pytest
 
 if sys.platform.lower().startswith("linux"):
-    from dbus_service import DbusService, start_dbus_service
+    from dbus_service import DBusService, start_dbus_service
 else:
-    DbusService = None
+    DBusService = None
     start_dbus_service = None
 
-from wakepy.core import DbusAddress, DbusMethod
+from wakepy.core import DBusAddress, DBusMethod
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +53,8 @@ def private_bus():
 
 
 @pytest.fixture(scope="session")
-def string_operation_service_addr(private_bus: str) -> DbusAddress:
-    return DbusAddress(
+def string_operation_service_addr(private_bus: str) -> DBusAddress:
+    return DBusAddress(
         bus=private_bus,
         service="org.github.wakepy.TestStringOperationService",
         path="/org/github/wakepy/TestStringOperationService",
@@ -63,8 +63,8 @@ def string_operation_service_addr(private_bus: str) -> DbusAddress:
 
 
 @pytest.fixture(scope="session")
-def calculator_service_addr(private_bus: str) -> DbusAddress:
-    return DbusAddress(
+def calculator_service_addr(private_bus: str) -> DBusAddress:
+    return DBusAddress(
         bus=private_bus,
         service="org.github.wakepy.TestCalculatorService",
         path="/org/github/wakepy/TestCalculatorService",
@@ -73,8 +73,8 @@ def calculator_service_addr(private_bus: str) -> DbusAddress:
 
 
 @pytest.fixture(scope="session")
-def numberadd_method(calculator_service_addr: DbusAddress) -> DbusMethod:
-    return DbusMethod(
+def numberadd_method(calculator_service_addr: DBusAddress) -> DBusMethod:
+    return DBusMethod(
         name="SimpleNumberAdd",
         signature="uu",
         params=("first_number", "second_number"),
@@ -84,8 +84,8 @@ def numberadd_method(calculator_service_addr: DbusAddress) -> DbusMethod:
 
 
 @pytest.fixture(scope="session")
-def numbermultiply_method(calculator_service_addr: DbusAddress) -> DbusMethod:
-    return DbusMethod(
+def numbermultiply_method(calculator_service_addr: DBusAddress) -> DBusMethod:
+    return DBusMethod(
         name="SimpleNumberMultiply",
         signature="ii",
         params=("first_number", "second_number"),
@@ -95,8 +95,8 @@ def numbermultiply_method(calculator_service_addr: DbusAddress) -> DbusMethod:
 
 
 @pytest.fixture(scope="session")
-def string_shorten_method(string_operation_service_addr: DbusAddress) -> DbusMethod:
-    return DbusMethod(
+def string_shorten_method(string_operation_service_addr: DBusAddress) -> DBusMethod:
+    return DBusMethod(
         name="ShortenToNChars",
         signature="su",
         params=("the_string", "max_chars"),
@@ -107,15 +107,15 @@ def string_shorten_method(string_operation_service_addr: DbusAddress) -> DbusMet
 
 @pytest.fixture(scope="session")
 def dbus_calculator_service(
-    calculator_service_addr: DbusAddress,
-    numberadd_method: DbusMethod,
-    numbermultiply_method: DbusMethod,
+    calculator_service_addr: DBusAddress,
+    numberadd_method: DBusMethod,
+    numbermultiply_method: DBusMethod,
     private_bus: str,
 ):
-    """Provides a Dbus service called org.github.wakepy.TestCalculatorService
+    """Provides a DBus service called org.github.wakepy.TestCalculatorService
     in the session bus"""
 
-    class TestCalculatorService(DbusService):
+    class TestCalculatorService(DBusService):
         addr = calculator_service_addr
 
         def handle_method(self, method: str, args):
@@ -131,14 +131,14 @@ def dbus_calculator_service(
 
 @pytest.fixture(scope="session")
 def dbus_string_operation_service(
-    string_operation_service_addr: DbusAddress,
-    string_shorten_method: DbusMethod,
+    string_operation_service_addr: DBusAddress,
+    string_shorten_method: DBusMethod,
     private_bus: str,
 ):
-    """Provides a Dbus service called org.github.wakepy.TestStringOperationService
+    """Provides a DBus service called org.github.wakepy.TestStringOperationService
     in the session bus"""
 
-    class TestStringOperationService(DbusService):
+    class TestStringOperationService(DBusService):
         addr = string_operation_service_addr
 
         def handle_method(self, method: str, args):

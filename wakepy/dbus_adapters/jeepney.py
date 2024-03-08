@@ -2,23 +2,23 @@ from jeepney import DBusAddress, new_method_call
 from jeepney.io.blocking import open_dbus_connection
 from jeepney.wrappers import unwrap_msg
 
-from wakepy.core import DbusAdapter, DbusMethodCall
+from wakepy.core import DBusAdapter, DBusMethodCall
 
 
-class DbusNotFoundError(RuntimeError):
+class DBusNotFoundError(RuntimeError):
     ...
 
 
-class JeepneyDbusAdapter(DbusAdapter):
-    """An implementation of :class:`~wakepy.DbusAdapter` using `jeepney <https://jeepney.readthedocs.io/>`_.
-    Can be used to process DbusMethodCalls (communication with Dbus services
+class JeepneyDBusAdapter(DBusAdapter):
+    """An implementation of :class:`~wakepy.DBusAdapter` using `jeepney <https://jeepney.readthedocs.io/>`_.
+    Can be used to process DBusMethodCalls (communication with DBus services
     over a dbus-daemon).
     """
 
     # timeout for dbus calls, in seconds
     timeout = 2
 
-    def process(self, call: DbusMethodCall):
+    def process(self, call: DBusMethodCall):
         addr = DBusAddress(
             object_path=call.method.path,
             bus_name=call.method.service,
@@ -35,7 +35,7 @@ class JeepneyDbusAdapter(DbusAdapter):
             connection = open_dbus_connection(bus=call.method.bus)
         except KeyError as exc:
             if "DBUS_SESSION_BUS_ADDRESS" in str(exc):
-                raise DbusNotFoundError(
+                raise DBusNotFoundError(
                     "The environment variable DBUS_SESSION_BUS_ADDRESS is not set! "
                     "To use dbus-based methods with jeepney, a session (not system) "
                     "bus (dbus-daemon process) must be running, and the address of the "

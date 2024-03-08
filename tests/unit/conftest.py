@@ -1,15 +1,15 @@
 import pytest
 
-from wakepy import DbusAdapter
+from wakepy import DBusAdapter
 
 
-class TestDbusAdapter(DbusAdapter):
+class TestDBusAdapter(DBusAdapter):
     """A fake dbus adapter used in tests"""
 
 
 @pytest.fixture(scope="session")
 def fake_dbus_adapter():
-    return TestDbusAdapter
+    return TestDBusAdapter
 
 
 class TestUtils:

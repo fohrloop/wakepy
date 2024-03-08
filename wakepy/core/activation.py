@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from typing import List, Set, Union
 
 from .constants import PlatformName
-from .dbus import DbusAdapter
+from .dbus import DBusAdapter
 from .heartbeat import Heartbeat
 from .method import Method, MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
@@ -266,7 +266,7 @@ class MethodActivationResult:
 
 def activate_mode(
     methods: list[Type[Method]],
-    dbus_adapter: Optional[DbusAdapter] = None,
+    dbus_adapter: Optional[DBusAdapter] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
     modename: Optional[str] = None,
 ) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
@@ -282,7 +282,7 @@ def activate_mode(
     methods:
         The list of Methods to be used for activating this Mode.
     dbus_adapter:
-        Can be used to define a custom DBus adapter for processing Dbus calls
+        Can be used to define a custom DBus adapter for processing DBus calls
         in the .caniuse(), .enter_mode(), .heartbeat() and .exit_mode() of the
         Method. Optional.
     methods_priority: list[str | set[str]]
