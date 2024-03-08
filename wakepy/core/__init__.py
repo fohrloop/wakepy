@@ -9,10 +9,10 @@ from .activation import MethodActivationResult as MethodActivationResult
 from .constants import BusType as BusType
 from .constants import ModeName as ModeName
 from .constants import PlatformName as PlatformName
-from .dbus import DbusAdapter as DbusAdapter
-from .dbus import DbusAddress as DbusAddress
-from .dbus import DbusMethod as DbusMethod
-from .dbus import DbusMethodCall as DbusMethodCall
+from .dbus import DBusAdapter as DBusAdapter
+from .dbus import DBusAddress as DBusAddress
+from .dbus import DBusMethod as DBusMethod
+from .dbus import DBusMethodCall as DBusMethodCall
 from .method import Method as Method
 from .mode import ActivationError as ActivationError
 from .mode import Mode as Mode

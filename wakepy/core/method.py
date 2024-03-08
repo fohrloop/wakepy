@@ -23,7 +23,7 @@ from .registry import register_method
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
-    from wakepy.core import DbusAdapter, DbusMethodCall
+    from wakepy.core import DBusAdapter, DBusMethodCall
 
 MethodCls = Type["Method"]
 T = TypeVar("T")
@@ -108,7 +108,7 @@ class Method(ABC, metaclass=MethodMeta):
     _has_exit: bool
     _has_heartbeat: bool
 
-    def __init__(self, dbus_adapter: Optional[DbusAdapter] = None):
+    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None):
         # The dbus-adapter may be used to process dbus calls. This is relevant
         # only on methods using D-Bus.
         self._dbus_adapter = dbus_adapter
@@ -151,7 +151,7 @@ class Method(ABC, metaclass=MethodMeta):
 
         # Examples
         # --------
-        # - Test that system is running KDE using DbusMethodCalls to some service
+        # - Test that system is running KDE using DBusMethodCalls to some service
         #   that should be running on KDE. Could also test that the version of
         #   KDE is something that is needed.
         # - If a Method depends on availability of certain software on PATH,
@@ -227,7 +227,7 @@ class Method(ABC, metaclass=MethodMeta):
         """
         return
 
-    def process_dbus_call(self, call: DbusMethodCall) -> Any:
+    def process_dbus_call(self, call: DBusMethodCall) -> Any:
         # Notes for subclassing
         # =====================
         # This method is always available for all subclasses of Method. This
@@ -239,7 +239,7 @@ class Method(ABC, metaclass=MethodMeta):
         if self._dbus_adapter is None:
             raise RuntimeError(
                 f'{self.__class__.__name__ }cannot process dbus method call "{call}" as'
-                " it does not have a DbusAdapter."
+                " it does not have a DBusAdapter."
             )
         return self._dbus_adapter.process(call)
 

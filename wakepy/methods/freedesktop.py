@@ -4,9 +4,9 @@ from typing import Optional
 
 from wakepy.core import (
     BusType,
-    DbusAddress,
-    DbusMethod,
-    DbusMethodCall,
+    DBusAddress,
+    DBusMethod,
+    DBusMethodCall,
     Method,
     ModeName,
     PlatformName,
@@ -22,14 +22,14 @@ class FreedesktopScreenSaverInhibit(Method):
     name = "org.freedesktop.ScreenSaver"
     mode = ModeName.KEEP_PRESENTING
 
-    screen_saver = DbusAddress(
+    screen_saver = DBusAddress(
         bus=BusType.SESSION,
         service="org.freedesktop.ScreenSaver",
         path="/org/freedesktop/ScreenSaver",
         interface="org.freedesktop.ScreenSaver",
     )
 
-    method_inhibit = DbusMethod(
+    method_inhibit = DBusMethod(
         name="Inhibit",
         signature="ss",
         params=("application_name", "reason_for_inhibit"),
@@ -37,7 +37,7 @@ class FreedesktopScreenSaverInhibit(Method):
         output_params=("cookie",),
     ).of(screen_saver)
 
-    method_uninhibit = DbusMethod(
+    method_uninhibit = DBusMethod(
         name="UnInhibit",
         signature="u",
         params=("cookie",),
@@ -50,7 +50,7 @@ class FreedesktopScreenSaverInhibit(Method):
         self.inhibit_cookie: Optional[int] = None
 
     def enter_mode(self):
-        call = DbusMethodCall(
+        call = DBusMethodCall(
             method=self.method_inhibit,
             args=dict(
                 application_name="wakepy",
@@ -70,7 +70,7 @@ class FreedesktopScreenSaverInhibit(Method):
             # Nothing to exit from.
             return
 
-        call = DbusMethodCall(
+        call = DBusMethodCall(
             method=self.method_uninhibit,
             args=dict(cookie=self.inhibit_cookie),
         )

@@ -3,7 +3,7 @@ import re
 import pytest
 
 from wakepy import ActivationError
-from wakepy.core import ActivationResult, DbusAdapter, Method, Mode, ModeName
+from wakepy.core import ActivationResult, DBusAdapter, Method, Mode, ModeName
 from wakepy.modes import keep
 
 
@@ -64,11 +64,11 @@ def test_keep_running_mode_creation(input_args, monkeypatch, testutils):
     assert set(mode.method_classes) == {MethodB, MethodA, MethodC}
 
     # Case: Test "dbus_adapter" parameter
-    class MyDbusAdapter(DbusAdapter):
+    class MyDBusAdapter(DBusAdapter):
         ...
 
-    mode = function_under_test(dbus_adapter=MyDbusAdapter)
-    assert mode._dbus_adapter_cls == MyDbusAdapter
+    mode = function_under_test(dbus_adapter=MyDBusAdapter)
+    assert mode._dbus_adapter_cls == MyDBusAdapter
 
 
 def test_keep_running_with_fake_success(monkeypatch, fake_dbus_adapter):

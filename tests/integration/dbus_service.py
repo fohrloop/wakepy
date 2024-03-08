@@ -10,7 +10,7 @@ from jeepney import HeaderFields, MessageType, new_error, new_method_return
 from jeepney.bus_messages import message_bus
 from jeepney.io.blocking import open_dbus_connection
 
-from wakepy.core import DbusAddress
+from wakepy.core import DBusAddress
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +18,11 @@ logger = logging.getLogger(__name__)
 DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER = 1
 
 
-class DbusService:
-    """A class for defining Dbus services, which can be made available in a
+class DBusService:
+    """A class for defining DBus services, which can be made available in a
     bus. To define a dbus service, create a subclass and provide
 
-    (1) addr: DbusAddress
+    (1) addr: DBusAddress
         Where the dbus service is located at.
     (2) handle_method
         A function which handles dbus method calls. Use if statements for
@@ -34,12 +34,12 @@ class DbusService:
         The address of the message bus
     bus_name: None | str
         If None, there is no service running. If not None, will be the well-
-        known bus name this service has reserved. A DbusService can only have
+        known bus name this service has reserved. A DBusService can only have
         one well-known bus name at a time. For example:
         "org.gnome.SessionManager"
     """
 
-    addr: DbusAddress
+    addr: DBusAddress
 
     def __init__(self, bus_address: str, queue_: queue.Queue, stop: Callable):
         """
@@ -147,9 +147,9 @@ class DbusService:
 
 
 def start_dbus_service(
-    service_cls: Type[DbusService], bus_address: Optional[str] = None
+    service_cls: Type[DBusService], bus_address: Optional[str] = None
 ):
-    """Start a Dbus Service in a separate thread.
+    """Start a DBus Service in a separate thread.
 
     Parameters
     ----------
@@ -162,7 +162,7 @@ def start_dbus_service(
     should_stop = False
 
     def start_service(
-        service: Type[DbusService], queue_: queue.Queue, should_stop: Callable
+        service: Type[DBusService], queue_: queue.Queue, should_stop: Callable
     ):
         logger.info(f"Launching dbus service: {service.addr.service}")
 

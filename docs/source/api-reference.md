@@ -7,7 +7,7 @@ in wakepy.js! -->
 
     wakepy.keep.running
     wakepy.keep.presenting
-    wakepy.DbusAdapter
+    wakepy.DBusAdapter
 
 Wakepy Modes
 -------------
@@ -25,19 +25,19 @@ Wakepy Core
 
 DBus Adapter
 -------------
-Dbus adapters are an advanced concept of wakepy. They would be used in such a case where wants to use other D-Bus python library than the default (which is `jeepney <https://jeepney.readthedocs.io/>`_).
+DBus adapters are an advanced concept of wakepy. They would be used in such a case where wants to use other D-Bus python library than the default (which is `jeepney <https://jeepney.readthedocs.io/>`_).
 
-.. autoclass:: wakepy.DbusAdapter
+.. autoclass:: wakepy.DBusAdapter
     :members:
 
-.. autoclass:: wakepy.core.DbusMethodCall
+.. autoclass:: wakepy.core.DBusMethodCall
     :members:
 
-.. autoclass:: wakepy.core.DbusMethod
+.. autoclass:: wakepy.core.DBusMethod
     :members:
     :exclude-members: count, index
 
-.. autoclass:: wakepy.dbus_adapters.jeepney.JeepneyDbusAdapter
+.. autoclass:: wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter
     :members:
 
 ```

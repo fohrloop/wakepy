@@ -3,7 +3,7 @@ from unittest.mock import Mock, call
 import pytest
 from testmethods import get_test_method_class
 
-from wakepy.core.dbus import DbusAdapter
+from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
 
@@ -12,8 +12,8 @@ def mocks_for_test_mode():
     # Setup test
     mocks = Mock()
 
-    mocks.dbus_adapter_cls = Mock(spec_set=type(DbusAdapter))
-    mocks.dbus_adapter_cls.return_value = Mock(spec_set=DbusAdapter)
+    mocks.dbus_adapter_cls = Mock(spec_set=type(DBusAdapter))
+    mocks.dbus_adapter_cls.return_value = Mock(spec_set=DBusAdapter)
 
     mocks.mode_controller_cls = Mock()
     mocks.mode_controller_cls.return_value = Mock(spec_set=ModeController)
@@ -194,7 +194,7 @@ def test_modecontroller(monkeypatch):
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
 
     method_cls = get_test_method_class(enter_mode=None, heartbeat=None, exit_mode=None)
-    controller = ModeController(Mock(spec_set=DbusAdapter))
+    controller = ModeController(Mock(spec_set=DBusAdapter))
 
     # When controller was created, it has not active method or heartbeat
     assert controller.active_method is None

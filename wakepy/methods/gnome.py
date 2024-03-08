@@ -4,9 +4,9 @@ from typing import Optional
 
 from wakepy.core import (
     BusType,
-    DbusAddress,
-    DbusMethod,
-    DbusMethodCall,
+    DBusAddress,
+    DBusMethod,
+    DBusMethodCall,
     Method,
     ModeName,
     PlatformName,
@@ -30,14 +30,14 @@ class _GnomeSessionManager(Method, ABC):
     https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit
     """
 
-    session_manager = DbusAddress(
+    session_manager = DBusAddress(
         bus=BusType.SESSION,
         service="org.gnome.SessionManager",
         path="/org/gnome/SessionManager",
         interface="org.gnome.SessionManager",
     )
 
-    method_inhibit = DbusMethod(
+    method_inhibit = DBusMethod(
         name="Inhibit",
         signature="susu",
         params=("app_id", "toplevel_xid", "reason", "flags"),
@@ -45,7 +45,7 @@ class _GnomeSessionManager(Method, ABC):
         output_params=("inhibit_cookie",),
     ).of(session_manager)
 
-    method_uninhibit = DbusMethod(
+    method_uninhibit = DBusMethod(
         name="Uninhibit",
         signature="u",
         params=("inhibit_cookie",),
@@ -63,7 +63,7 @@ class _GnomeSessionManager(Method, ABC):
         self.inhibit_cookie: Optional[int] = None
 
     def enter_mode(self):
-        call = DbusMethodCall(
+        call = DBusMethodCall(
             method=self.method_inhibit,
             args=dict(
                 app_id="wakepy",
@@ -85,7 +85,7 @@ class _GnomeSessionManager(Method, ABC):
             # Nothing to exit from.
             return
 
-        call = DbusMethodCall(
+        call = DBusMethodCall(
             method=self.method_uninhibit,
             args=dict(inhibit_cookie=self.inhibit_cookie),
         )

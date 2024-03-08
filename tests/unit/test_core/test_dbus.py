@@ -1,8 +1,8 @@
 import pytest
 
-from wakepy.core.dbus import BusType, DbusAddress, DbusMethod, DbusMethodCall
+from wakepy.core.dbus import BusType, DBusAddress, DBusMethod, DBusMethodCall
 
-session_manager = DbusAddress(
+session_manager = DBusAddress(
     bus=BusType.SESSION,
     service="org.gnome.SessionManager",
     path="/org/gnome/SessionManager",
@@ -12,7 +12,7 @@ session_manager = DbusAddress(
 
 @pytest.fixture
 def method_inhibit():
-    return DbusMethod(
+    return DBusMethod(
         name="Inhibit",
         signature="susu",
         params=("app_id", "toplevel_xid", "reason", "flags"),
@@ -31,7 +31,7 @@ def test_dbus_method_to_call(method_inhibit, args_for_inhibit):
 
     call = method_inhibit.to_call(args_for_inhibit)
 
-    assert isinstance(call, DbusMethodCall)
+    assert isinstance(call, DBusMethodCall)
     assert call.args == args_for_inhibit
     assert call.method == method_inhibit
 
@@ -39,6 +39,6 @@ def test_dbus_method_to_call(method_inhibit, args_for_inhibit):
 def test_dbus_method_to_call_not_fully_defined_method(method_inhibit, args_for_inhibit):
     # The method is not fully defined as it is not tied to any address.
     with pytest.raises(
-        ValueError, match="DbusMethodCall requires completely defined DBusMethod"
+        ValueError, match="DBusMethodCall requires completely defined DBusMethod"
     ):
         method_inhibit.to_call(args_for_inhibit)
