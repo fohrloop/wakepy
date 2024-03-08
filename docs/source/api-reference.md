@@ -1,6 +1,6 @@
 <!-- NOTE: If you change the title (API Reference), you must update the code
 in wakepy.js! -->
-# API Reference 
+# API Reference
 ```{eval-rst}
 
 .. autosummary::
@@ -20,7 +20,7 @@ Wakepy Core
     :members:
 
     .. automethod:: __init__
-    
+
     .. automethod:: __enter__
 
     .. automethod:: __exit__
@@ -40,4 +40,4 @@ Dbus adapters are an advanced concept of wakepy. They would be used in such a ca
     :exclude-members: count, index
 
 
-```  
+```
