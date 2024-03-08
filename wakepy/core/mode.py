@@ -137,7 +137,7 @@ class Mode(ABC):
         Name of the Mode. Used for communication to user, logging and in
         error messages (can be "any string" which makes sense to you).
         Optional.
-    on_fail:
+    on_fail: "error" | "warn" | "pass" | Callable
         Determines what to do in case mode activation fails. Valid options
         are: "error", "warn", "pass" and a callable. If the option is
         "error", raises wakepy.ActivationError. Is selected "warn", issues
@@ -152,8 +152,8 @@ class Mode(ABC):
 
     method_classes: list[Type[Method]]
     """The list of methods associated for this mode as given when creating the
-    ``Mode``. For details, see the documentation of ``methods`` in
-    :meth:`__init__`.
+    ``Mode``. For details, see the documentation of  ``methods`` in the
+    :class:`Mode` constructor parameters.
     """
 
     active: bool
@@ -166,18 +166,15 @@ class Mode(ABC):
     """
 
     name: str | None
-    """The ``name`` as given when creating the ``Mode``. For
-    details, see the documentation of :meth:`__init__`.
+    """The ``name`` given when creating the :class:`Mode`.
     """
 
-    methods_priority: list[str | set[str]]
-    """The ``methods_priority`` as given when creating the ``Mode``. For
-    details, see the documentation of :meth:`__init__`.
+    methods_priority: Optional[MethodsPriorityOrder]
+    """The ``methods_priority`` given when creating the :class:`Mode`.
     """
 
-    on_fail: str | Callable[[ActivationResult], None]
-    """The ``on_fail`` as given when creating the ``Mode``. For
-    details, see the documentation of :meth:`__init__`.
+    on_fail: OnFail
+    """The ``on_fail`` given when creating the :class:`Mode`.
     """
 
     dbus_adapter: DbusAdapter | None
