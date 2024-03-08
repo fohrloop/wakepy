@@ -123,7 +123,32 @@ class Mode(ABC):
     :func:`keep.presenting <wakepy.keep.presenting>` or  :func:`keep.running
     <wakepy.keep.running>`, but using the :class:`~wakepy.Mode` separately
     can be used for more fine-grained control.
-    """
+
+    Parameters
+    ----------
+    methods:
+        The list of Methods to be used for activating this Mode.
+    methods_priority: list[str | set[str]]
+        The priority order, which is a list of method names or asterisk
+        ('*'). The asterisk means "all rest methods" and may occur only
+        once in the priority order, and cannot be part of a set. All method
+        names must be unique and must be part of the `methods`.
+    name:
+        Name of the Mode. Used for communication to user, logging and in
+        error messages (can be "any string" which makes sense to you).
+        Optional.
+    on_fail:
+        Determines what to do in case mode activation fails. Valid options
+        are: "error", "warn", "pass" and a callable. If the option is
+        "error", raises wakepy.ActivationError. Is selected "warn", issues
+        warning. If "pass", does nothing. If `on_fail` is a callable, it
+        must take one positional argument: result, which is an instance of
+        ActivationResult. The ActivationResult contains more detailed
+        information about the activation process.
+    dbus_adapter:
+        For using a custom dbus-adapter. Optional. If not given, the
+        default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.jeepney.JeepneyDbusAdapter`
+    """  # noqa: E501
 
     method_classes: list[Type[Method]]
     """The list of methods associated for this mode as given when creating the
@@ -172,32 +197,7 @@ class Mode(ABC):
 
         This is also where the activation process related settings, such as the
         dbus adapter to be used, are defined.
-
-        Parameters
-        ----------
-        methods:
-            The list of Methods to be used for activating this Mode.
-        methods_priority: list[str | set[str]]
-            The priority order, which is a list of method names or asterisk
-            ('*'). The asterisk means "all rest methods" and may occur only
-            once in the priority order, and cannot be part of a set. All method
-            names must be unique and must be part of the `methods`.
-        name:
-            Name of the Mode. Used for communication to user, logging and in
-            error messages (can be "any string" which makes sense to you).
-            Optional.
-        on_fail:
-            Determines what to do in case mode activation fails. Valid options
-            are: "error", "warn", "pass" and a callable. If the option is
-            "error", raises wakepy.ActivationError. Is selected "warn", issues
-            warning. If "pass", does nothing. If `on_fail` is a callable, it
-            must take one positional argument: result, which is an instance of
-            ActivationResult. The ActivationResult contains more detailed
-            information about the activation process.
-        dbus_adapter:
-            For using a custom dbus-adapter. Optional. If not given, the
-            default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.jeepney.JeepneyDbusAdapter`
-        """  # noqa: E501
+        """
 
         self.name = name
         self.method_classes = methods
