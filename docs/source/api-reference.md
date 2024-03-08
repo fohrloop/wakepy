@@ -11,8 +11,8 @@ in wakepy.js! -->
 
 Wakepy Modes
 -------------
-.. autofunction:: wakepy.keep.running 
-.. autofunction:: wakepy.keep.presenting 
+.. autofunction:: wakepy.keep.running
+.. autofunction:: wakepy.keep.presenting
 
 Wakepy Core
 ------------

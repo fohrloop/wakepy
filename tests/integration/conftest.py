@@ -1,4 +1,4 @@
-"""The DBus adapters are tested against real DBus service(s). This module 
+"""The DBus adapters are tested against real DBus service(s). This module
 provides the services as fixtures. The services run in separate threads.
 """
 

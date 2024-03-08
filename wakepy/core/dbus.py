@@ -1,10 +1,10 @@
 """This module is contains classes and functions related to D-Bus, which is
-a message bus for communication between processes operating systems like 
-Linux and DSD. 
+a message bus for communication between processes operating systems like
+Linux and DSD.
 
 When creating a subclass of wakepy.Method, which uses D-Bus methods, one needs
 to create DbusMethodCall, and use the Method.process_dbus_call to get the
-response. 
+response.
 
 Wakepy is not tied to any specific D-Bus implementation. If you want to use a
 non-standard way to communicate with D-Bus, you need to subclass DbusAdapter.
@@ -59,7 +59,7 @@ class DbusAddress(NamedTuple):
     bus: Optional[Union[str, BusType]] = BusType.SESSION
     """The type of message bus used. Should be "SESSION" or "SYSTEM".
     Each running dbus-daemon process provides a new message bus.
-    If omitted, session bus is assumed.   
+    If omitted, session bus is assumed.
     """
 
 
@@ -73,14 +73,14 @@ class DbusMethod(NamedTuple):
 
     name: str
     """name of the method, without the interface part. For example if creating
-    method for  "org.spam.Manager.SomeMethod", the method name is "SomeMethod". 
+    method for  "org.spam.Manager.SomeMethod", the method name is "SomeMethod".
     """
 
     signature: str | None
     """The signature for the method input parameters.
 
     The types are: (Conventional name, ASCII type-code, meaning)::
-    
+
         BYTE	y (121)	Unsigned 8-bit integer
         BOOLEAN	b (98)	Boolean value: 0 is false, 1 is true
         INT16	n (110)	Signed 16-bit integer
@@ -94,7 +94,7 @@ class DbusMethod(NamedTuple):
                         out-of-band array of file descriptors, transferred via some
                         platform-specific mechanism
         STRING  s (115) String
-    
+
     Ref: `dbus-specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
     """
     params: Optional[tuple[str, ...]] = None
@@ -105,7 +105,7 @@ class DbusMethod(NamedTuple):
 
     output_signature: str | None = None
     """The signature for the method output / return values. See the docs for
-    signature. 
+    signature.
     """
 
     output_params: Optional[tuple[str, ...]] = None
@@ -142,7 +142,7 @@ class DbusMethod(NamedTuple):
     bus: Optional[Union[str, BusType]] = BusType.SESSION
     """The type of message bus used. Should be "SESSION" or "SYSTEM".
     Each running dbus-daemon process provides a new message bus.
-    If omitted, session bus is assumed.   
+    If omitted, session bus is assumed.
     """
 
     def of(

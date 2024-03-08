@@ -1,4 +1,4 @@
-"""This module tests the Freedesktop.org specific methods. 
+"""This module tests the Freedesktop.org specific methods.
 
 These tests do *not* use IO / real or fake Dbus calls. Instead, a special dbus
 adapter is used which simply asserts the Call objects and returns what we

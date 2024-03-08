@@ -5,7 +5,7 @@
 
 Wakepy supports Windows, MacOS and Linux flavours which Desktop Environment that implements the `org.freedesktop.ScreenSaver` interface[^linux-support].
 
-[^linux-support]: The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments. 
+[^linux-support]: The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.
 ## Installing
 
 To install wakepy from PyPI, run
@@ -50,8 +50,8 @@ with keep.presenting():
 ::::
 
 
-### Mode quick reference 
- 
+### Mode quick reference
+
 
 
 | Wakepy mode              | keep.running | keep.presenting |

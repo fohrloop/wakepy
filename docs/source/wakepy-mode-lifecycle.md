@@ -11,13 +11,13 @@ with keep.running():
     USER_CODE
 ```
 
-Before we talk about the Mode lifecycle, let's introduce the different states a Mode can have. There are five different states related to any wakepy Mode lifecycle. Out of them, *three* are states of the Mode class: 
+Before we talk about the Mode lifecycle, let's introduce the different states a Mode can have. There are five different states related to any wakepy Mode lifecycle. Out of them, *three* are states of the Mode class:
 - ***Inactive***: The initial state of Modes. Also the state after deactivation.
 - ***Active***: Where USER_CODE is meant to be run in.
 - ***Activation Failed***: Possible state if activation fails.
 
 The two other — *Activation Started* and *Deactivation Started* — are intermediate states in the Mode activation and deactivation processes. The five states are shown in the wakepy.Mode State Diagram in {numref}`state-diagram`.
-    
+
 :::{figure-md} state-diagram
 ![wakepy mode state diagram](./img/mode-state-diagram.svg){width=500px}
 
@@ -34,16 +34,16 @@ from wakepy import keep
 
 # Returns an instance of Mode
 mode = keep.running()
-# Inactive 
+# Inactive
 
 with mode:
-    # Active 
+    # Active
     USER_CODE
     # Still Active
-    
+
 # Inactive
 ```
-The above comments assume "the happy path" (the mode activation succeeds). Then, we compare the code with the actions in the [Activity Diagram](#mode-activity-diagram). 
+The above comments assume "the happy path" (the mode activation succeeds). Then, we compare the code with the actions in the [Activity Diagram](#mode-activity-diagram).
 
 ### Mode Activity Diagram
 
@@ -60,7 +60,7 @@ The wakepy.Mode Activity Diagram in {numref}`fig-mode-activity-diagram` shows th
 
 ## Creating a Mode instance
 
-This corresponds to the action "Create Mode" in {numref}`fig-mode-activity-diagram`. When you create an instance of the wakepy Mode class with 
+This corresponds to the action "Create Mode" in {numref}`fig-mode-activity-diagram`. When you create an instance of the wakepy Mode class with
 
 
 ```{code-block} python
@@ -71,7 +71,7 @@ from wakepy import keep
 
 # Returns an instance of Mode
 mode = keep.running()
-# Inactive 
+# Inactive
 
 ```
 
@@ -88,14 +88,14 @@ In order to set your system into a Mode, you need to activate it ("Activate Mode
 mode = keep.running()
 
 with mode:
-    # Active 
+    # Active
     USER_CODE
 ```
 
 This will put the Mode into *Active* or *Activation Failed* state through the intermediate *Activation Started* state. If the code is set to *Activation Failed* state, the *Action on Fail* occurs (See: {numref}`fig-mode-activity-diagram`). This action may be an exception or a warning.
 
 (activating-a-mode-note)=
-````{note} 
+````{note}
 **Using mode.activate directly**:
 
 It is also possible to call `mode.activate()` directly, but using the `with` statement is highly recommended as it makes sure that deactivation is done even if there are exceptions within the `USER_CODE`. The above `with mode:...` is roughly equal to
@@ -131,12 +131,12 @@ This process happens in the `activate_mode` function and it returns an `Activati
 The {numref}`fig-activate-with-a-method` presents the activity diagram for the "Activate with a Method" action from the {numref}`fig-activate-mode-activity-diagram`. This is what wakepy does with the Method:
 
 
-1. Checks platform support against the list in the `Method.supported_plaforms`. 
+1. Checks platform support against the list in the `Method.supported_plaforms`.
 2. Checks requirements using `Method.caniuse()`. Some Methods could require a certain version of some specific Desktop Environment, a version of a 3rd party software, or some DBus service running. During this step, if some 3rd party SW has known bugs on certain versions, the Method may be dismissed.
 3. Tries to activate the Mode using the `Method.enter_mode()`, if defined
 4. Tries to start the heartbeat using the `Method.heartbeat()`, if defined
 5. Starts the Heartbeat, if the `Method.heartbeat()` exists. This will run in a separate thread.
-  
+
 If the first two steps do not fail, at least one of `Method.enter_mode()` and `Method.caniuse()` is defined and they do not raise Exceptions, the Mode activation is successful. This process happens in the `activate_method` function and it returns an `MethodActivationResult` object, and a `Heartbeat` instance (if used and activation was successful).
 :::{figure-md} fig-activate-with-a-method
 ![activity diagram for the "Activate Mode" action](./img/activate-mode-using-method-activity-diagram.svg){width=430px}
@@ -158,10 +158,10 @@ The "Deactivate Mode" activity in {numref}`fig-mode-activity-diagram` occurs aut
 :lineno-start: 7
 
 with mode:
-    # Active 
+    # Active
     USER_CODE
     # Still Active
-    
+
 # Inactive
 ```
 

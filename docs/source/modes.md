@@ -2,7 +2,7 @@
 
 
 
-The available modes are 
+The available modes are
 | Wakepy mode                              | What it does                                        |
 | ---------------------------------------- | --------------------------------------------------- |
 | [keep.running](#keep-running-mode)       | Automatic sleep is prevented                        |
@@ -15,7 +15,7 @@ The wakepy modes are implemented as context managers of type `wakepy.Mode`. When
 - `m.active`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
 - `m.activation_result`: An ActivationResult instance which gives more detailed information about the activation process.
 
-````{tip} 
+````{tip}
 You may want to inform user about failure in activating a mode. For example:
 
 ```{code-block} python
@@ -67,7 +67,7 @@ manual reversal.
 
 While `keep.presenting` mode is activated, the system may not automatically go to sleep (or
 suspend) meaning that programs will continue running and can use CPU. In addition to
-that, automatic start of screensaver & screenlock are prevented, meaning that you can 
+that, automatic start of screensaver & screenlock are prevented, meaning that you can
 show content in the `keep.presenting` mode.
 
 
@@ -95,6 +95,6 @@ manual reversal.
 
 
 ## General questions
-**What if the process holding the lock dies?**: The lock is automatically removed. 
+**What if the process holding the lock dies?**: The lock is automatically removed.
 
 **How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a successful inhibit lock in tests, you may set an environment variable: `WAKEPY_FAKE_SUCCESS` to `yes`.

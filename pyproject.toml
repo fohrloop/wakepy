@@ -6,7 +6,7 @@ authors = [
     {name = "Niko Föhr", email = "fohrloop@gmail.com"},
 ]
 dependencies = [
-    # For using the D-Bus based methods 
+    # For using the D-Bus based methods
     "jeepney >= 0.7.1;sys_platform=='linux'"
 ]
 
