@@ -150,6 +150,11 @@ class Mode(ABC):
     details, see the documentation of :meth:`__init__`.
     """
 
+    on_fail: str | Callable[[ActivationResult], None]
+    """The ``on_fail`` as given when creating the ``Mode``. For
+    details, see the documentation of :meth:`__init__`.
+    """
+
     dbus_adapter: DbusAdapter | None
     """The DBus adapter used with ``Method``\ s which require DBus (if any)."""
 
