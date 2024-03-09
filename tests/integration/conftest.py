@@ -49,7 +49,14 @@ def private_bus():
     yield bus_address
 
     logger.info("Terminating private bus")
-    p.terminate()
+    p.terminate()  # send SIGTERM. Turns dbus-daemon into a zombie.
+    p.wait()  # cleaup the zombie
+    # This is required for closing the subprocess.PIPE. Otherwise, will get
+    # something like.
+    # ResourceWarning: unclosed file <_io.BufferedReader name=11>
+    # See: https://stackoverflow.com/a/58696973/3015186
+    p.stdout.close()
+    logger.info("Private bus terminated")
 
 
 @pytest.fixture(scope="session")
