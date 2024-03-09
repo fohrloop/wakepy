@@ -178,7 +178,7 @@ class Mode(ABC):
     """
 
     dbus_adapter: DBusAdapter | None
-    """The DBus adapter used with ``Method``\ s which require DBus (if any)."""
+    r"""The DBus adapter used with ``Method``\ s which require DBus (if any)."""
 
     _controller_class: Type[ModeController] = ModeController
 
@@ -190,7 +190,7 @@ class Mode(ABC):
         on_fail: OnFail = "error",
         dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
     ):
-        """Initialize a `Mode` using `Method`\ s.
+        r"""Initialize a `Mode` using `Method`\ s.
 
         This is also where the activation process related settings, such as the
         dbus adapter to be used, are defined.
