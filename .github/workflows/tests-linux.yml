@@ -1,10 +1,10 @@
 name: Run tests (Linux)
 
-'on':  
-  # Allows for manually starting tests 
+'on':
+  # Allows for manually starting tests
   workflow_dispatch:
   # Triggers when pull request is created
-  pull_request: 
+  pull_request:
 
 # See: https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
 permissions:
@@ -32,8 +32,8 @@ concurrency:
 # Common environment variables
 env:
   TOX_REQUIREMENT: 'tox~=4.6.0'
-  
-jobs:  
+
+jobs:
   test-linux-py37:
     runs-on: ubuntu-22.04
     env:
@@ -41,13 +41,13 @@ jobs:
       PYTHON_VERSION: '3.7'
       PYTHON_EXECUTABLE: 'python3.7'
       PYTHON_TOX_ENVS: 'py37'
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install python 
-        uses: actions/setup-python@v4 
+      - name: Install python
+        uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }} 
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
@@ -60,9 +60,9 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
-        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }}
   test-linux-py310:
     runs-on: ubuntu-22.04
     env:
@@ -72,10 +72,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install python 
-        uses: actions/setup-python@v4 
+      - name: Install python
+        uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }} 
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
@@ -88,22 +88,22 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
-        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }}
   test-linux-py312:
     runs-on: ubuntu-22.04
     env:
       PYTHON_VERSION: '3.12'
       PYTHON_EXECUTABLE: 'python3.12'
       PYTHON_TOX_ENVS: 'py312'
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install python 
-        uses: actions/setup-python@v4 
+      - name: Install python
+        uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }} 
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
@@ -116,22 +116,22 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
-        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }}
   test-linux-py313-alpha:
     runs-on: ubuntu-22.04
     env:
       PYTHON_VERSION: '3.13.0-alpha.2'
       PYTHON_EXECUTABLE: 'python3.13'
       PYTHON_TOX_ENVS: 'py313'
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install python 
-        uses: actions/setup-python@v4 
+      - name: Install python
+        uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }} 
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Show OS version
         run: cat /etc/os-release
       - run: printenv
@@ -144,8 +144,7 @@ jobs:
       - name: install tox
         run: |
           ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
-          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }} 
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
-        run: tox -e ${{ env.PYTHON_TOX_ENVS }} 
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }}
 
-      
