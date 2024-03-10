@@ -1,4 +1,4 @@
-"""Test D-bus adapters."""
+"""Test D-bus adapters using a real dbus-daemon service."""
 
 import re
 import struct
