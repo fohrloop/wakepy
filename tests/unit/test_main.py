@@ -1,16 +1,16 @@
 """Tests for the __main__ CLI"""
 
+from typing import Optional
 from unittest.mock import MagicMock, Mock, call, patch
 
-from typing import Optional
 import pytest
 
-from wakepy import ModeExit, ActivationResult
+from wakepy import ActivationResult, ModeExit
 from wakepy.__main__ import (
     get_startup_text,
+    handle_activation_error,
     main,
     parse_arguments,
-    handle_activation_error,
     wait_until_keyboardinterrupt,
 )
 from wakepy.core import Mode
