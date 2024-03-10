@@ -91,8 +91,8 @@ class DBusMethod(NamedTuple):
         UINT64	t (116)	Unsigned 64-bit integer
         DOUBLE	d (100)	IEEE 754 double-precision floating point
         UNIX_FD	h (104)	Unsigned 32-bit integer representing an index into an
-                        out-of-band array of file descriptors, transferred via some
-                        platform-specific mechanism
+                        out-of-band array of file descriptors, transferred via
+                        some platform-specific mechanism
         STRING  s (115) String
 
     Ref: `dbus-specification <https://dbus.freedesktop.org/doc/dbus-specification.html>`_
