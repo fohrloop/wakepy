@@ -33,7 +33,7 @@ classifiers = [
 [project.optional-dependencies]
 # For development
 dev = [
-    "wakepy[test,doc,checks]",
+    "wakepy[test,doc,check]",
     "sphinx-autobuild",
     "IPython",
 ]
@@ -58,7 +58,7 @@ test =[
     "jeepney >= 0.7.1;sys_platform=='linux'"
 ]
 # For linters, code analysis and formatting tools
-checks = [
+check = [
     "black==23.3.0",
     "mypy==1.3.0",
     "isort==5.12.0",
