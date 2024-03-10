@@ -6,6 +6,7 @@ class PlatformName(StrEnum):
     WINDOWS = auto()
     LINUX = auto()
     MACOS = auto()
+    WSL = auto()
     OTHER = auto()
 
 
