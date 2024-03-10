@@ -375,10 +375,10 @@ def check_methods_priority(
 def _iterate_methods_priority(
     methods_priority: Optional[MethodsPriorityOrder],
 ) -> typing.Iterator[Tuple[str, bool]]:
-    """Provides an iterator over the items in methods_priority. The items in the
-    iterator are (method_name, in_set) 2-tuples, where the method_name is the
-    method name (str) and the in_set is a boolean which is True if the returned
-    method_name is part of a set and False otherwise."""
+    """Provides an iterator over the items in methods_priority. The items in
+    the iterator are (method_name, in_set) 2-tuples, where the method_name is
+    the method name (str) and the in_set is a boolean which is True if the
+    returned method_name is part of a set and False otherwise."""
 
     if not methods_priority:
         return
@@ -423,7 +423,10 @@ def get_prioritized_methods_groups(
     with names "A", "B", "C", "D", "E", "F":
 
     >>> methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
-    >>> get_prioritized_methods_groups(methods, methods_priority=["A", "F", "*"])
+    >>> get_prioritized_methods_groups(
+            methods,
+            methods_priority=["A", "F", "*"]
+        )
     [
         {MethodA},
         {MethodF},
@@ -486,9 +489,9 @@ def get_prioritized_methods(
     methods_priority: Optional[MethodsPriorityOrder] = None,
 ) -> List[MethodCls]:
     """Take an unordered list of Methods and sort them by priority using the
-    methods_priority and automatic ordering. The methods_priority is used to define
-    groups of priority (sets of methods). The automatic ordering part is used
-    to order the methods *within* each priority group. In particular, all
+    methods_priority and automatic ordering. The methods_priority is used to
+    define groups of priority (sets of methods). The automatic ordering part is
+    used to order the methods *within* each priority group. In particular, all
     methods supported by the current platform are placed first, and all
     supported methods are then ordered alphabetically (ignoring case).
 
@@ -843,19 +846,20 @@ class WakepyFakeSuccess(Method):
     def enter_mode(self):
         """Function which says if fake success should be enabled
 
-        Fake success is controlled via WAKEPY_FAKE_SUCCESS environment variable.
-        If that variable is set to a truthy value,fake success is activated.
+        Fake success is controlled via WAKEPY_FAKE_SUCCESS environment
+        variable. If that variable is set to a truthy value,fake success is
+        activated.
 
         Falsy values: '0', 'no', 'false' (case ignored)
         Truthy values: everything else
 
         Motivation:
         -----------
-        When running on CI system, wakepy might fail to acquire an inhibitor lock
-        just because there is no Desktop Environment running. In these cases, it
-        might be useful to just tell with an environment variable that wakepy
-        should fake the successful inhibition anyway. Faking the success is done
-        after every other method is tried (and failed).
+        When running on CI system, wakepy might fail to acquire an inhibitor
+        lock just because there is no Desktop Environment running. In these
+        cases, it might be useful to just tell with an environment variable
+        that wakepy should fake the successful inhibition anyway. Faking the
+        success is done after every other method is tried (and failed).
         """
         # The os.environ seems to be populated when os is imported -> delay the
         # import until here.

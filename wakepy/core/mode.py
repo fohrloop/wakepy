@@ -147,8 +147,9 @@ class Mode(ABC):
         information about the activation process.
     dbus_adapter:
         For using a custom dbus-adapter. Optional. If not given, the
-        default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter`
-    """  # noqa: E501
+        default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.\\
+        jeepney.JeepneyDBusAdapter`
+    """
 
     method_classes: list[Type[Method]]
     """The list of methods associated for this mode as given when creating the
@@ -178,7 +179,8 @@ class Mode(ABC):
     """
 
     dbus_adapter: DBusAdapter | None
-    r"""The DBus adapter used with ``Method``\ s which require DBus (if any)."""
+    r"""The DBus adapter used with ``Method``\ s which require DBus (if any).
+    """
 
     _controller_class: Type[ModeController] = ModeController
 

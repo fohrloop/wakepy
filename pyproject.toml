@@ -115,8 +115,13 @@ exclude = [
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-select = ["E", "F"]
+# W505: doc-line-too-lon. Ref: https://docs.astral.sh/ruff/rules/doc-line-too-long/
+select = ["E", "F", "W505"]
 ignore = []
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
 unfixable = []
+
+[tool.ruff.lint.pycodestyle]
+# limits docstring and comments to 79 characters.
+max-doc-length = 79

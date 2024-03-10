@@ -151,11 +151,12 @@ class Method(ABC, metaclass=MethodMeta):
 
         # Examples
         # --------
-        # - Test that system is running KDE using DBusMethodCalls to some service
-        #   that should be running on KDE. Could also test that the version of
-        #   KDE is something that is needed.
+        # - Test that system is running KDE using DBusMethodCalls to some
+        #   service that should be running on KDE. Could also test that the
+        #   version of KDE is something that is needed.
         # - If a Method depends on availability of certain software on PATH,
-        #   could test that it exist on PATH. (and that the version is suitable)
+        #   could test that it exist on PATH. (and that the version is
+        #   suitable)
 
     def enter_mode(self):
         """Enter to a Mode using this Method. Pair with a `exit_mode`.
