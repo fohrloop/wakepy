@@ -39,8 +39,7 @@ class _MacCaffeinate(Method, ABC):
 
     @property
     @abstractmethod
-    def command(self) -> str:
-        ...
+    def command(self) -> str: ...
 
 
 class CaffeinateKeepRunning(_MacCaffeinate):

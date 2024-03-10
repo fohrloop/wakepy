@@ -59,7 +59,7 @@ test =[
 ]
 # For linters, code analysis and formatting tools
 check = [
-    "black==23.3.0",
+    "black==24.2.0",
     "mypy==1.3.0",
     # isort 5.12 drops Python 3.7 support
     "isort==5.12.0",

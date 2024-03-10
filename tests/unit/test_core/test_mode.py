@@ -159,8 +159,7 @@ def test_mode_exits_with_other_exception():
     mocks, TestMode = get_mocks_and_testmode()
 
     # Other exceptions are passed through
-    class MyException(Exception):
-        ...
+    class MyException(Exception): ...
 
     with pytest.raises(MyException):
         with TestMode(

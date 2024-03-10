@@ -17,6 +17,7 @@ MethodActivationResult
     One level lower than ActivationResult. This is result from activation task
     using a single Method.
 """
+
 from __future__ import annotations
 
 import datetime as dt

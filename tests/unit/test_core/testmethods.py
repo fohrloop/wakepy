@@ -7,8 +7,7 @@ from wakepy.core import CURRENT_PLATFORM
 from wakepy.core.method import Method
 
 
-class WakepyMethodTestError(Exception):
-    ...
+class WakepyMethodTestError(Exception): ...
 
 
 def get_new_classname(prefix="TestMethod") -> str:

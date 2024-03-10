@@ -1,4 +1,5 @@
 """Tests for the __main__ CLI"""
+
 from unittest.mock import MagicMock, Mock, call, patch
 
 from typing import Optional
