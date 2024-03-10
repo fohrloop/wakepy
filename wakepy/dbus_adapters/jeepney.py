@@ -5,8 +5,7 @@ from jeepney.wrappers import unwrap_msg
 from wakepy.core import DBusAdapter, DBusMethodCall
 
 
-class DBusNotFoundError(RuntimeError):
-    ...
+class DBusNotFoundError(RuntimeError): ...
 
 
 class JeepneyDBusAdapter(DBusAdapter):

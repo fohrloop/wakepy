@@ -8,6 +8,7 @@ or using the executable
 
     wakepy [args]
 """
+
 from __future__ import annotations
 
 import argparse

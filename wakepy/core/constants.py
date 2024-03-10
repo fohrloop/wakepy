@@ -1,4 +1,5 @@
 """Common terms and definitions used in many places"""
+
 from .strenum import StrEnum, auto
 
 

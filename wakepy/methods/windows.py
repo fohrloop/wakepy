@@ -44,8 +44,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
     @property
     @abstractmethod
-    def flags(self) -> Flags:
-        ...
+    def flags(self) -> Flags: ...
 
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):

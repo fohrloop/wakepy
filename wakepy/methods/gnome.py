@@ -55,8 +55,7 @@ class _GnomeSessionManager(Method, ABC):
 
     @property
     @abstractmethod
-    def flags(self) -> GnomeFlag:
-        ...
+    def flags(self) -> GnomeFlag: ...
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

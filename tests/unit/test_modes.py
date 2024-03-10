@@ -64,8 +64,7 @@ def test_keep_running_mode_creation(input_args, monkeypatch, testutils):
     assert set(mode.method_classes) == {MethodB, MethodA, MethodC}
 
     # Case: Test "dbus_adapter" parameter
-    class MyDBusAdapter(DBusAdapter):
-        ...
+    class MyDBusAdapter(DBusAdapter): ...
 
     mode = function_under_test(dbus_adapter=MyDBusAdapter)
     assert mode._dbus_adapter_cls == MyDBusAdapter
