@@ -31,6 +31,13 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+# For development
+dev = [
+    "wakepy[test,doc,checks]",
+    "sphinx-autobuild",
+    "IPython",
+]
+# For building documentation
 doc = [
     "sphinx~=7.0",
     "sphinx_design>0.4.1",
@@ -41,20 +48,23 @@ doc = [
     # At some point: Can use 1.7.0 (which is not available in PyPI at the time of writing)
     "numpydoc @ git+https://github.com/numpy/numpydoc.git@46f532a824639a97479039fc122533915cdfa10f"
 ]
-dev = [
-    "sphinx-autobuild",
-    "time-machine",
-    "IPython",
-    "black==23.3.0",
+# For running unit tests
+test =[
+    "tox==4.6.0",
     "pytest",
     "pytest-cov",
-    "mypy==1.3.0",
-    "tox==4.6.0",
-    "isort==5.12.0",
-    "ruff==0.3.2",
+    "time-machine",
     # Jeepney is used in the integration tests for creating a D-Bus server
     "jeepney >= 0.7.1;sys_platform=='linux'"
 ]
+# For linters, code analysis and formatting tools
+checks = [
+    "black==23.3.0",
+    "mypy==1.3.0",
+    "isort==5.12.0",
+    "ruff==0.3.2",
+]
+
 
 [project.urls]
 Homepage = "https://github.com/fohrloop/wakepy"
