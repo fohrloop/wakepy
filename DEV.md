@@ -15,9 +15,9 @@ Requirements:
 - At least of of the supported Python versions installed (see README.md and/or tox.ini).
 - pip >= 21.3 (for pyproject.toml support)
 
-Install in editable state with the `doc` and `dev` options:
+Install in editable state with the `dev` extras:
 ```
-python -m pip install -e .[doc,dev]
+python -m pip install -e .[dev]
 ```
 
 where `.` means the current directory (assuming cwd is at root of the repository).
