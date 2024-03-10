@@ -16,6 +16,18 @@ import pytest
 from wakepy.core import DBusAddress, DBusMethod, DBusMethodCall
 from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
 
+# For some unknown reason, when using jeepney, one will get a warning like
+# this:
+# ResourceWarning: unclosed <socket.socket fd=14, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, raddr=b'\x00/tmp/dbus-cTfPKAeBWk'>
+# This is just ignored. It only triggers at *random* line, on random test when
+# python does garbage collection.
+#
+# Ref1: https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-mark-filterwarnings
+# Ref2: https://docs.pytest.org/en/7.1.x/reference/reference.html#globalvar-pytestmark
+pytestmark = pytest.mark.filterwarnings(
+    r"ignore:unclosed.*raddr=b'\\x00/tmp/dbus-.*:ResourceWarning"
+)
+
 
 @pytest.mark.usefixtures("dbus_calculator_service")
 def test_jeepney_dbus_adapter_numberadd(numberadd_method):
