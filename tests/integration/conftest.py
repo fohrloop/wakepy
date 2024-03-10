@@ -2,6 +2,7 @@
 provides the services as fixtures. The services run in separate threads.
 """
 
+import gc
 import logging
 import subprocess
 import sys
@@ -17,6 +18,19 @@ else:
 from wakepy.core import DBusAddress, DBusMethod
 
 logger = logging.getLogger(__name__)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def gc_collect_after_dbus_integration_tests():
+    logger.debug("prepare for gc.collect")
+    yield
+    # A garbage collection has high change of triggering a ResourceWarning
+    # about an unclosed socket. Note that the warning can occur also before
+    # this as garbage colletion is triggered also automatically. The garbage
+    # collection must be triggered here manually as the warnings are
+    # ResourceWarning is only filtered away in the dbus integration tests.
+    gc.collect()
+    logger.debug("called gc.collect")
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -49,7 +63,14 @@ def private_bus():
     yield bus_address
 
     logger.info("Terminating private bus")
-    p.terminate()
+    p.terminate()  # send SIGTERM. Turns dbus-daemon into a zombie.
+    p.wait()  # cleaup the zombie
+    # This is required for closing the subprocess.PIPE. Otherwise, will get
+    # something like.
+    # ResourceWarning: unclosed file <_io.BufferedReader name=11>
+    # See: https://stackoverflow.com/a/58696973/3015186
+    p.stdout.close()
+    logger.info("Private bus terminated")
 
 
 @pytest.fixture(scope="session")
