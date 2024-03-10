@@ -115,7 +115,7 @@ exclude = [
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-# W505: doc-line-too-lon. Ref: https://docs.astral.sh/ruff/rules/doc-line-too-long/
+# W505: doc-line-too-long. Ref: https://docs.astral.sh/ruff/rules/doc-line-too-long/
 select = ["E", "F", "W505"]
 ignore = []
 # Allow autofix for all enabled rules (when `--fix`) is provided.
