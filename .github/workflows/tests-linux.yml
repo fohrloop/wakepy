@@ -34,6 +34,32 @@ env:
   TOX_REQUIREMENT: 'tox~=4.6.0'
 
 jobs:
+  test-building-docs:
+    runs-on: ubuntu-22.04
+    env:
+      PYTHON_VERSION: '3.10'
+      PYTHON_EXECUTABLE: 'python3.10'
+      PYTHON_TOX_ENVS: 'builddocs'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Show OS version
+        run: cat /etc/os-release
+      - run: printenv
+      - name: Show python version
+        run: python --version
+      - name: Show platform information
+        run: python -c "import platform; print(platform.platform())"
+      - name: install tox
+        run: |
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install -U pip wheel && \
+          ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
+      - name: Run tests with tox
+        run: tox -e ${{ env.PYTHON_TOX_ENVS }}
   test-linux-py37:
     runs-on: ubuntu-22.04
     env:
