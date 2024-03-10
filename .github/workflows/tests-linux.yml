@@ -66,7 +66,7 @@ jobs:
       # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
       PYTHON_VERSION: '3.7'
       PYTHON_EXECUTABLE: 'python3.7'
-      PYTHON_TOX_ENVS: 'py37'
+      PYTHON_TOX_ENVS: 'py37,check'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -122,7 +122,7 @@ jobs:
     env:
       PYTHON_VERSION: '3.12'
       PYTHON_EXECUTABLE: 'python3.12'
-      PYTHON_TOX_ENVS: 'py312'
+      PYTHON_TOX_ENVS: 'py312,check'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -150,7 +150,7 @@ jobs:
     env:
       PYTHON_VERSION: '3.13.0-alpha.2'
       PYTHON_EXECUTABLE: 'python3.13'
-      PYTHON_TOX_ENVS: 'py313'
+      PYTHON_TOX_ENVS: 'py313,check'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
