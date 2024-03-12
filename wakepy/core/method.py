@@ -134,9 +134,10 @@ class Method(ABC, metaclass=MethodMeta):
         ------
         (a) If the Method is suitable, and can be used, return True.
         (b) If the result is uncertain, return None.
-        (c) If the Method is unsuitable, you may return False or a string.
+        (c) If the Method is unsuitable, may return False or a string.
             Returning a string is recommended, as it  also explains *why* the
-            Method is unsuitable.
+            Method is unsuitable. May also simply raise an Exception, in which
+            case the Exception message is used as failure reason.
         """
 
         # Notes for subclassing
@@ -239,8 +240,8 @@ class Method(ABC, metaclass=MethodMeta):
         # subclass, either. Typically one would *not* override this method.
         if self._dbus_adapter is None:
             raise RuntimeError(
-                f'{self.__class__.__name__ }cannot process dbus method call "{call}" as'
-                " it does not have a DBusAdapter."
+                f'{self.__class__.__name__ } cannot process dbus method call "{call}" '
+                "as it does not have a DBusAdapter."
             )
         return self._dbus_adapter.process(call)
 

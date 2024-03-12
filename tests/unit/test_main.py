@@ -1,5 +1,6 @@
 """Tests for the __main__ CLI"""
 
+import sys
 from typing import Optional
 from unittest.mock import MagicMock, Mock, call, patch
 
@@ -12,6 +13,7 @@ from wakepy.__main__ import (
     main,
     parse_arguments,
     wait_until_keyboardinterrupt,
+    handle_activation_error,
 )
 from wakepy.core import Mode
 from wakepy.core.constants import ModeName
@@ -127,8 +129,7 @@ class TestMain:
         )
 
         with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
-            with pytest.raises(ModeExit):
-                main()
+            main()
 
         exit_call_args = mocks.mock_calls[-1][1]
         assert mocks.mock_calls == [
@@ -139,7 +140,7 @@ class TestMain:
             call.get_startup_text(mode=parse_arguments.return_value),
             call.print(get_startup_text.return_value),
             call.mode.__enter__(),
-            # Checking only the exception type here. The exception and the trackeback
+            # Checking only the exception type here. The exception and the traceback
             # instances are assumed to be correct. Too complicated to catch them
             # just for the test.
             call.mode.__exit__(ModeExit, *exit_call_args[1:]),
@@ -165,6 +166,7 @@ class TestMain:
         mockresult.success = mode_works
         mockmode = MagicMock(spec_set=TestMode)
         mockmode.__enter__.return_value = mockmode
+        mockmode.__exit__.return_value = True
         mockmode.activation_result = mockresult
         mockmode.active = mode_works
         sysarg = ["programname", cli_arg]
@@ -181,3 +183,16 @@ class TestMain:
         mocks.attach_mock(get_startup_text, "get_startup_text")
         mocks.attach_mock(wait_until_keyboardinterrupt, "wait_until_keyboardinterrupt")
         return mocks
+
+
+@patch("builtins.print")
+def test_handle_activation_error(print_mock):
+    result = ActivationResult()
+    handle_activation_error(result)
+    if sys.version_info[:2] == (3, 7):
+        # on python 3.7, need to do other way.
+        printed_text = print_mock.mock_calls[0][1][0]
+    else:
+        printed_text = "\n".join(print_mock.mock_calls[0].args)
+    # Some sensible text was printed to the user
+    assert "Wakepy could not activate" in printed_text

@@ -1,6 +1,18 @@
 import pytest
 
-from wakepy.core.dbus import BusType, DBusAddress, DBusMethod, DBusMethodCall
+from unittest.mock import patch
+
+from wakepy.core.platform import CURRENT_PLATFORM, PlatformName
+
+from wakepy.core.dbus import (
+    BusType,
+    DBusAddress,
+    DBusMethod,
+    DBusMethodCall,
+    DBusAdapter,
+    get_dbus_adapter,
+    get_default_dbus_adapter,
+)
 
 session_manager = DBusAddress(
     bus=BusType.SESSION,
@@ -42,3 +54,59 @@ def test_dbus_method_to_call_not_fully_defined_method(method_inhibit, args_for_i
         ValueError, match="DBusMethodCall requires completely defined DBusMethod"
     ):
         method_inhibit.to_call(args_for_inhibit)
+
+
+@pytest.fixture(scope="session")
+def unsupported_dbus_adapter():
+    class DBusAdapterNotSupported(DBusAdapter):
+        def __init__(self):
+            raise Exception("not supported")
+
+    return DBusAdapterNotSupported
+
+
+@pytest.fixture(scope="session")
+def supported_dbus_adapter():
+
+    class DBusAdapterSupported(DBusAdapter):
+        """This one does not raise Exception on __init__ so it's supported"""
+
+    return DBusAdapterSupported
+
+
+class TestGetDbusAdapter:
+    """Tests for get_dbus_adapter"""
+
+    def test_get_first_working_one_in_list(
+        self, unsupported_dbus_adapter, supported_dbus_adapter
+    ):
+        adapter = get_dbus_adapter([unsupported_dbus_adapter, supported_dbus_adapter])
+        assert isinstance(adapter, supported_dbus_adapter)
+
+    def test_get_first_working_one_in_list_reversed(
+        self, unsupported_dbus_adapter, supported_dbus_adapter
+    ):
+        adapter = get_dbus_adapter([supported_dbus_adapter, unsupported_dbus_adapter])
+        assert isinstance(adapter, supported_dbus_adapter)
+
+    def test_no_supported_adapters(self, unsupported_dbus_adapter):
+        adapter = get_dbus_adapter([unsupported_dbus_adapter])
+        assert adapter is None
+
+
+def test_get_default_dbus_adapter_nonworking():
+    with patch.dict("sys.modules", {"wakepy.dbus_adapters.jeepney": None}):
+        # When jeepney is not installed, there is not default dbus adapter
+        assert get_default_dbus_adapter() is None
+
+
+def test_get_default_dbus_adapter_working():
+    try:
+        import jeepney as jeepney  # noqa
+    except:
+        assert get_default_dbus_adapter() is None
+    else:
+        from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
+
+        # When jeepney is installed, we get the JeepneyDBusAdapter as default.
+        assert isinstance(get_default_dbus_adapter(), JeepneyDBusAdapter)

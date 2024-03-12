@@ -169,3 +169,15 @@ def test_method_string_representations():
     method = MethodB()
     assert method.__str__() == "<wakepy Method: MethodB>"
     assert method.__repr__() == f"<wakepy Method: MethodB at {hex(id(method))}>"
+
+
+def test_process_dbus_call():
+    method = Method()
+    # when there is no dbus adapter..
+    assert method._dbus_adapter is None
+    # we get RuntimeError
+    with pytest.raises(
+        RuntimeError,
+        match=".*cannot process dbus method call.*as it does not have a DBusAdapter",
+    ):
+        assert method.process_dbus_call(None)
