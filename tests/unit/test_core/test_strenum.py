@@ -66,3 +66,13 @@ def test_constant_uniqueness():
         ANOTHER_FOO = "fooval"
 
     assert MyConst.ANOTHER_FOO == "fooval"
+
+
+def test_keys_and_values():
+    class MyConst(StrEnum):
+        FOO = "fooval"
+        ANOTHER = "another_val"
+
+    expected = dict(FOO="fooval", ANOTHER="another_val")
+    assert MyConst.keys() == expected.keys()
+    assert list(MyConst.values()) == list(expected.values())
