@@ -256,6 +256,9 @@ class Mode(ABC):
         self.active = False
 
         if exception is None or isinstance(exception, ModeExit):
+            # Returning True means that the exception within the with block is
+            # swallowed. We skip only ModeExit which should simply exit the
+            # with block.
             return True
 
         # Other types of exceptions are not handled; ignoring them here and
