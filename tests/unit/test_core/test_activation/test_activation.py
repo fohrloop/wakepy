@@ -460,6 +460,18 @@ def test_caniuse_fails(params):
     assert caniuse_fails(SomeMethod()) == params["expected"]
 
 
+def test_caniuse_fails_special_case():
+    """Tests the case when Method.caniuse raises an exception"""
+    err = ValueError("Cannot use")
+
+    class SomeMethod(Method):
+        def caniuse(self):
+            raise err
+
+    method = SomeMethod()
+    assert caniuse_fails(method) == (True, str(err))
+
+
 @pytest.mark.parametrize(
     "success, failure_stage, method_name, message, expected_string_representation",
     [
