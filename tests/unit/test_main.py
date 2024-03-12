@@ -12,6 +12,7 @@ from wakepy.__main__ import (
     main,
     parse_arguments,
     wait_until_keyboardinterrupt,
+    handle_activation_error,
 )
 from wakepy.core import Mode
 from wakepy.core.constants import ModeName
@@ -181,3 +182,12 @@ class TestMain:
         mocks.attach_mock(get_startup_text, "get_startup_text")
         mocks.attach_mock(wait_until_keyboardinterrupt, "wait_until_keyboardinterrupt")
         return mocks
+
+
+@patch("builtins.print")
+def test_handle_activation_error(print_mock):
+    result = ActivationResult()
+    handle_activation_error(result)
+    printed_text = "\n".join(print_mock.mock_calls[0].args)
+    # Some sensible text was printed to the user
+    assert "Wakepy could not activate" in printed_text
