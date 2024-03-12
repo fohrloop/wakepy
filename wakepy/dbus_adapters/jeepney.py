@@ -42,6 +42,8 @@ class JeepneyDBusAdapter(DBusAdapter):
                     "environment variable. To check if you're running a session "
                     "dbus-daemon, run `ps -x | grep dbus-daemon`"
                 ) from exc
+            else:
+                raise
         reply = connection.send_and_get_reply(msg, timeout=self.timeout)
         resp = unwrap_msg(reply)
         return resp

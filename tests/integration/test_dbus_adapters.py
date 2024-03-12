@@ -3,6 +3,7 @@
 import re
 import struct
 import sys
+from unittest.mock import patch
 
 import pytest
 
@@ -14,7 +15,7 @@ import jeepney
 import pytest
 
 from wakepy.core import DBusAddress, DBusMethod, DBusMethodCall
-from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
+from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter, DBusNotFoundError
 
 # For some unknown reason, when using jeepney, one will get a warning like
 # this:
@@ -132,3 +133,49 @@ def test_jeepney_dbus_adapter_string_shorten(string_shorten_method):
     adapter = JeepneyDBusAdapter()
     call = DBusMethodCall(string_shorten_method, ("cat pinky", 3))
     assert adapter.process(call) == ("cat", 6)
+
+
+class TestFailuresOnConnectionCreation:
+    adapter = JeepneyDBusAdapter()
+
+    @pytest.fixture(autouse=True)
+    def _create_call(self, string_shorten_method):
+        # This could be any valid call.
+        self.call = DBusMethodCall(string_shorten_method, ("1", 2))
+
+    @staticmethod
+    def failing_open_dbus_connection(bus):
+        raise KeyError("Could not find DBUS_SESSION_BUS_ADDRESS")
+
+    @staticmethod
+    def failing_open_dbus_connection_random_reason(bus):
+        raise KeyError("Some other reason")
+
+    def test_dbus_session_bus_keyerror_on_connection_creation(
+        self,
+    ):
+        # The open_dbus_connection may sometimes raise KeyError when
+        # DBUS_SESSION_BUS_ADDRESS env var is not set. This test that case.
+
+        with patch(
+            "wakepy.dbus_adapters.jeepney.open_dbus_connection",
+            self.failing_open_dbus_connection,
+        ):
+            with pytest.raises(
+                DBusNotFoundError,
+                match="The environment variable DBUS_SESSION_BUS_ADDRESS is not set!",
+            ):
+                self.adapter.process(self.call)
+
+    def test_random_keyerror_on_connection_creation(
+        self,
+    ):
+        with patch(
+            "wakepy.dbus_adapters.jeepney.open_dbus_connection",
+            self.failing_open_dbus_connection_random_reason,
+        ):
+            with pytest.raises(
+                KeyError,
+                match="Some other reason",
+            ):
+                self.adapter.process(self.call)
