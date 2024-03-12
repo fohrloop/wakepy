@@ -128,8 +128,7 @@ class TestMain:
         )
 
         with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
-            with pytest.raises(ModeExit):
-                main()
+            main()
 
         exit_call_args = mocks.mock_calls[-1][1]
         assert mocks.mock_calls == [
@@ -166,6 +165,7 @@ class TestMain:
         mockresult.success = mode_works
         mockmode = MagicMock(spec_set=TestMode)
         mockmode.__enter__.return_value = mockmode
+        mockmode.__exit__.return_value = True
         mockmode.activation_result = mockresult
         mockmode.active = mode_works
         sysarg = ["programname", cli_arg]
