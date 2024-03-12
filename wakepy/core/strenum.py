@@ -57,11 +57,11 @@ class ConstantEnumMeta(EnumMeta):
         value:
             The `val` in the example
         """
-        return value in self.__members__.values()
+        return value in self.values()
 
     @property
     def keys(self):
-        return self.__members__.keys()
+        return self.__members__.keys
 
     @property
     def values(self):
