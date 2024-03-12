@@ -239,8 +239,8 @@ class Method(ABC, metaclass=MethodMeta):
         # subclass, either. Typically one would *not* override this method.
         if self._dbus_adapter is None:
             raise RuntimeError(
-                f'{self.__class__.__name__ }cannot process dbus method call "{call}" as'
-                " it does not have a DBusAdapter."
+                f'{self.__class__.__name__ } cannot process dbus method call "{call}" '
+                "as it does not have a DBusAdapter."
             )
         return self._dbus_adapter.process(call)
 
