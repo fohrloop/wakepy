@@ -140,7 +140,7 @@ class TestMain:
             call.get_startup_text(mode=parse_arguments.return_value),
             call.print(get_startup_text.return_value),
             call.mode.__enter__(),
-            # Checking only the exception type here. The exception and the trackeback
+            # Checking only the exception type here. The exception and the traceback
             # instances are assumed to be correct. Too complicated to catch them
             # just for the test.
             call.mode.__exit__(ModeExit, *exit_call_args[1:]),
