@@ -1,5 +1,6 @@
 """Tests for the __main__ CLI"""
 
+import sys
 from typing import Optional
 from unittest.mock import MagicMock, Mock, call, patch
 
@@ -188,6 +189,10 @@ class TestMain:
 def test_handle_activation_error(print_mock):
     result = ActivationResult()
     handle_activation_error(result)
-    printed_text = "\n".join(print_mock.mock_calls[0].args)
+    if sys.version_info[:2] == (3, 7):
+        # on python 3.7, need to do other way.
+        printed_text = print_mock.mock_calls[0][1][0]
+    else:
+        printed_text = "\n".join(print_mock.mock_calls[0].args)
     # Some sensible text was printed to the user
     assert "Wakepy could not activate" in printed_text
