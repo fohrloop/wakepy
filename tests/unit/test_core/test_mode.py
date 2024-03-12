@@ -176,6 +176,18 @@ def test_mode_exits_with_other_exception():
     _assert_context_manager_used_correctly(mocks, mode)
 
 
+def test_exiting_before_enter():
+
+    mocks, TestMode = get_mocks_and_testmode()
+    mode = TestMode(
+        mocks.methods,
+        methods_priority=mocks.methods_priority,
+        dbus_adapter=mocks.dbus_adapter_cls,
+    )
+    with pytest.raises(RuntimeError, match="Must __enter__ before __exit__!"):
+        mode.__exit__(None, None, None)
+
+
 def _assert_context_manager_used_correctly(mocks, mode):
     assert mocks.mock_calls.copy() == [
         call.dbus_adapter_cls(),
