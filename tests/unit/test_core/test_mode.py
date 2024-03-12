@@ -5,7 +5,13 @@ from testmethods import get_test_method_class
 
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.mode import ActivationResult, Mode, ModeController, ModeExit
+from wakepy.core.mode import (
+    ActivationResult,
+    Mode,
+    ModeController,
+    ModeExit,
+    handle_activation_fail,
+)
 
 
 def mocks_for_test_mode():
@@ -197,6 +203,11 @@ def _assert_context_manager_used_correctly(mocks, mode):
         ),
         call.controller_class().deactivate(),
     ]
+
+
+def test_handle_activation_fail_bad_on_fail_value():
+    with pytest.raises(ValueError, match="on_fail must be one of"):
+        handle_activation_fail(on_fail="foo", result=Mock(spec_set=ActivationResult))
 
 
 def test_modecontroller(monkeypatch):
