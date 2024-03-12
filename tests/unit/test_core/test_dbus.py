@@ -2,7 +2,8 @@ import pytest
 
 from unittest.mock import patch
 
-from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
+from wakepy.core.platform import CURRENT_PLATFORM, PlatformName
+
 from wakepy.core.dbus import (
     BusType,
     DBusAddress,
@@ -100,5 +101,12 @@ def test_get_default_dbus_adapter_nonworking():
 
 
 def test_get_default_dbus_adapter_working():
-    # When jeepney is installed, we get the JeepneyDBusAdapter as default.
-    assert isinstance(get_default_dbus_adapter(), JeepneyDBusAdapter)
+    try:
+        import jeepney as jeepney  # noqa
+    except:
+        assert get_default_dbus_adapter() is None
+    else:
+        from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
+
+        # When jeepney is installed, we get the JeepneyDBusAdapter as default.
+        assert isinstance(get_default_dbus_adapter(), JeepneyDBusAdapter)
