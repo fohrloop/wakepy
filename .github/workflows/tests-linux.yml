@@ -89,7 +89,7 @@ jobs:
           ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }}
-      - name: Show test coverage
+      - name: Show lines not covered by tests
         if: failure()
         run: tox -e show-test-coverage
   test-linux-py310:
@@ -120,7 +120,7 @@ jobs:
           ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }}
-      - name: Show test coverage
+      - name: Show lines not covered by tests
         if: failure()
         run: tox -e show-test-coverage
   test-linux-py312:
@@ -151,7 +151,7 @@ jobs:
           ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }}
-      - name: Show test coverage
+      - name: Show lines not covered by tests
         if: failure()
         run: tox -e show-test-coverage
   test-linux-py313-alpha:
@@ -182,6 +182,6 @@ jobs:
           ${{ env.PYTHON_EXECUTABLE }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Run tests with tox
         run: tox -e ${{ env.PYTHON_TOX_ENVS }}
-      - name: Show test coverage
+      - name: Show lines not covered by tests
         if: failure()
         run: tox -e show-test-coverage

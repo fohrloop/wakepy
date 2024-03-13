@@ -56,6 +56,6 @@ jobs:
           python -m pip install tox~=4.6.0
       - name: Run tests with tox
         run: tox -e py310
-      - name: Show test coverage
+      - name: Show lines not covered by tests
         if: failure()
         run: tox -e show-test-coverage
