@@ -19,6 +19,6 @@ class TestGetCurrentPlatform:
         assert get_current_platform() == PlatformName.LINUX
 
     @patch("platform.system", lambda: "This does not exist")
-    def test_linux(self):
+    def test_other(self):
         with pytest.warns(UserWarning, match="Could not detect current platform!"):
             assert get_current_platform() == PlatformName.OTHER
