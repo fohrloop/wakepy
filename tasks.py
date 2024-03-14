@@ -16,7 +16,7 @@ from colorama import Fore
 
 def get_run_with_print(c):
     def run_with_print(cmd: str):
-        print("Running", Fore.YELLOW, cmd, Fore.RESET)
+        print("Running:", Fore.YELLOW, cmd, Fore.RESET)
         c.run(cmd, pty=platform.system() == "Linux")
 
     return run_with_print
