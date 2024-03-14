@@ -143,6 +143,12 @@ class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
         """
         return EnumMemberString(val)
 
+    def __eq__(self, other: object) -> bool:
+        # This was added just to make mypy happy. Without this mypy will
+        # assume SomeConst.FOO == 'somestr' always to be False.
+        # In reality, the EnumMemberString.__eq__ is called in this case.
+        return str(self) == other  # pragma: no cover
+
 
 __all__ = [
     "StrEnum",
