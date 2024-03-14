@@ -64,8 +64,8 @@ def test_get_methods(testutils, monkeypatch):
     assert get_methods({"A", "B"}) == {A, B}
     assert get_methods({"C", "B"}) == {C, B}
 
-    # Asking None, getting None
-    assert get_methods(None) is None
+    # Asking None, getting empty list
+    assert get_methods(None) == []
 
     # Asking something that does not exists will raise KeyError
     with pytest.raises(ValueError, match=re.escape('No Method with name "foo" found!')):
