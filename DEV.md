@@ -29,13 +29,9 @@ where `.` means the current directory (assuming cwd is at root of the repository
 - **Building locally** (for debugging / testing docs), with autobuild:
 
 ```
-sphinx-autobuild docs/source/ docs/build/ -a
+invoke docs
 ```
 
-The `-a` flag ensures that *all* files (not only edited files) will get rebuild. It is also possible to build just one time:
-```
-sphinx-build -b html docs/source/ docs/build
-```
 - **Deploying**: Just push to github, and it will be automatically built by readthedocs. The settings can be adjusted [here](https://readthedocs.org/dashboard).
 - Versions selected for documentation are selected in the readthedocs UI. Select one version per `major.minor` version (latest of them) from the git tags.
 - The `latest` version (default versio) in readthedocs follows the `latest-release` branch automatically.
@@ -52,13 +48,7 @@ sphinx-build -b html docs/source/ docs/build
 - Use pytest to run tests within a single environment:
 
 ```
-python -m pytest
-```
-
-- To run tests with coverage, use
-
-```
-python -m pytest --cov-branch --cov wakepy && coverage html && python -m webbrowser -t htmlcov/index.html
+invoke test
 ```
 
 ## Running tests with multiple environments
