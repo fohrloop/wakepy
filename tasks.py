@@ -41,5 +41,6 @@ def check(c):
 
 @task
 def docs(c):
+    """Starts sphinx build with live-reload on browser"""
     run = get_run_with_print(c)
     run("sphinx-autobuild docs/source/ docs/build/ -a")
