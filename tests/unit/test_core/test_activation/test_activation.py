@@ -20,7 +20,13 @@ from tests.unit.test_core.testmethods import (
     get_test_method_class,
     iterate_test_methods,
 )
-from wakepy.core import DBusAdapter, MethodActivationResult, get_methods
+from wakepy.core import (
+    DBusAdapter,
+    Method,
+    MethodActivationResult,
+    PlatformName,
+    get_methods,
+)
 from wakepy.core.activation import (
     StageName,
     WakepyFakeSuccess,
@@ -32,7 +38,7 @@ from wakepy.core.activation import (
     try_enter_and_heartbeat,
 )
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.method import Method, MethodError, PlatformName
+from wakepy.core.method import MethodError
 
 
 def test_activate_without_methods(monkeypatch):
