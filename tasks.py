@@ -6,6 +6,16 @@ invoke format
 invoke check
 * Check the formatting, type hints, etc.
 
+invoke docs
+* Start sphinx build for documentation
+
+invoke test
+* Runs tests and coverage (does not test build)
+
+In addition to these, tox is an important command. Running `tox` will
+run tests with multiple versions of python (if available on the system), run
+checks (same as in invoke check) and test building the docs.
+
 [1] https://docs.pyinvoke.org/
 """
 
