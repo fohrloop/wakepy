@@ -36,6 +36,7 @@ dev = [
     "wakepy[test,doc,check]",
     "sphinx-autobuild==2024.2.4",
     "IPython",
+    "invoke==2.2.0",
 ]
 # For building documentation
 doc = [

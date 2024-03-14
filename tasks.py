@@ -1,0 +1,37 @@
+"""Defines following commands which use Invoke[1].
+
+invoke format
+* Format the files automatically
+
+invoke check
+* Check the formatting, type hints, etc.
+
+[1] https://docs.pyinvoke.org/
+"""
+
+from invoke import task
+
+
+def get_run_with_print(c):
+    def run_with_print(cmd: str):
+        print(f"Running '{cmd}'")
+        c.run(cmd)
+
+    return run_with_print
+
+
+@task
+def format(c):
+    run = get_run_with_print(c)
+    run("python -m isort ./wakepy")
+    run("python -m black ./wakepy")
+    run("python -m ruff check --fix ./wakepy")
+
+
+@task
+def check(c):
+    run = get_run_with_print(c)
+    run("python -m isort --check ./wakepy")
+    run("python -m black --check ./wakepy")
+    run("python -m ruff check --no-fix ./wakepy")
+    run("python -m mypy ./wakepy")
