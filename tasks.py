@@ -44,3 +44,13 @@ def docs(c):
     """Starts sphinx build with live-reload on browser"""
     run = get_run_with_print(c)
     run("sphinx-autobuild docs/source/ docs/build/ -a")
+
+
+@task
+def test(c, pdb: bool = False):
+    run = get_run_with_print(c)
+    pdb_flag = " --pdb " if pdb else ""
+    run(
+        f"python -m pytest {pdb_flag}--cov-branch --cov wakepy && coverage html && "
+        "python -m webbrowser -t htmlcov/index.html"
+    )
