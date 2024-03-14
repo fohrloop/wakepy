@@ -10,12 +10,14 @@ invoke check
 """
 
 from invoke import task
+import platform
+from colorama import Fore
 
 
 def get_run_with_print(c):
     def run_with_print(cmd: str):
-        print(f"Running '{cmd}'")
-        c.run(cmd)
+        print("Running", Fore.YELLOW, cmd, Fore.RESET)
+        c.run(cmd, pty=platform.system() == "Linux")
 
     return run_with_print
 
@@ -35,3 +37,9 @@ def check(c):
     run("python -m black --check ./wakepy")
     run("python -m ruff check --no-fix ./wakepy")
     run("python -m mypy ./wakepy")
+
+
+@task
+def docs(c):
+    run = get_run_with_print(c)
+    run("sphinx-autobuild docs/source/ docs/build/ -a")

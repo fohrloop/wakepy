@@ -37,6 +37,8 @@ dev = [
     "sphinx-autobuild==2024.2.4",
     "IPython",
     "invoke==2.2.0",
+    # Colorama is used with the tasks.py (invoke commands)
+    "colorama==0.4.6"
 ]
 # For building documentation
 doc = [
