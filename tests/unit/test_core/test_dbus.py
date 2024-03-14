@@ -101,7 +101,7 @@ def test_get_default_dbus_adapter_nonworking():
 def test_get_default_dbus_adapter_working():
     try:
         import jeepney as jeepney  # noqa
-    except:
+    except Exception:
         assert get_default_dbus_adapter() is None
     else:
         from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter

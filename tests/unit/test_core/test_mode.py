@@ -93,8 +93,8 @@ def test_mode_contextmanager_protocol():
         # When activating, the .active is set to activation_result.success
         assert m.active is m.activation_result.success
 
-        # The m.activation_result contains the value from the ModeController.activate()
-        # call
+        # The m.activation_result contains the value from the
+        # ModeController.activate() call
         assert (
             m.activation_result
             == mocks.controller_class.return_value.activate.return_value

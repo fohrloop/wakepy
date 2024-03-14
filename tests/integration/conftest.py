@@ -157,7 +157,7 @@ def dbus_string_operation_service(
     private_bus: str,
 ):
     """Provides a DBus service called org.github.wakepy.TestStringOperationService
-    in the session bus"""
+    in the session bus"""  # noqa: W505
 
     class TestStringOperationService(DBusService):
         addr = string_operation_service_addr
