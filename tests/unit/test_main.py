@@ -13,7 +13,6 @@ from wakepy.__main__ import (
     main,
     parse_arguments,
     wait_until_keyboardinterrupt,
-    handle_activation_error,
 )
 from wakepy.core import Mode
 from wakepy.core.constants import ModeName

@@ -15,7 +15,7 @@ import jeepney
 import pytest
 
 from wakepy.core import DBusAddress, DBusMethod, DBusMethodCall
-from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter, DBusNotFoundError
+from wakepy.dbus_adapters.jeepney import DBusNotFoundError, JeepneyDBusAdapter
 
 # For some unknown reason, when using jeepney, one will get a warning like
 # this:

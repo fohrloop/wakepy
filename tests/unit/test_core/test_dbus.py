@@ -1,15 +1,13 @@
-import pytest
-
 from unittest.mock import patch
 
-from wakepy.core.platform import CURRENT_PLATFORM, PlatformName
+import pytest
 
 from wakepy.core.dbus import (
     BusType,
+    DBusAdapter,
     DBusAddress,
     DBusMethod,
     DBusMethodCall,
-    DBusAdapter,
     get_dbus_adapter,
     get_default_dbus_adapter,
 )

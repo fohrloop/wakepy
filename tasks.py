@@ -19,9 +19,10 @@ checks (same as in invoke check) and test building the docs.
 [1] https://docs.pyinvoke.org/
 """
 
-from invoke import task
 import platform
+
 from colorama import Fore
+from invoke import task
 
 
 def get_run_with_print(c):
