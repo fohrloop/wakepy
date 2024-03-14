@@ -12,8 +12,11 @@ import pytest
 if sys.platform.lower().startswith("linux"):
     from tests.integration.dbus_service import DBusService, start_dbus_service
 else:
-    DBusService = None
-    start_dbus_service = None
+
+    class DBusService: ...
+
+    def start_dbus_service(): ...
+
 
 from wakepy.core import DBusAddress, DBusMethod
 
