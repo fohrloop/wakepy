@@ -73,6 +73,12 @@ class EnumMemberString(str):
     it.
     """
 
+    def __eq__(self, other: object) -> bool:
+        return str(self) == other
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
 
 class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
     """A string constant / enumeration. For creating reusable, typed constants.
@@ -136,11 +142,6 @@ class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
         instead
         """
         return EnumMemberString(val)
-
-    def __eq__(cls, other: object) -> bool:
-        if not isinstance(other, str):
-            return False
-        return str(cls) == other
 
 
 __all__ = [
