@@ -19,16 +19,22 @@ checks (same as in invoke check) and test building the docs.
 [1] https://docs.pyinvoke.org/
 """
 
+from __future__ import annotations
+
 import platform
+import typing
 
 from colorama import Fore
 from invoke import task
 
+if typing.TYPE_CHECKING:
+    from invoke.runners import Result
+
 
 def get_run_with_print(c):
-    def run_with_print(cmd: str):
+    def run_with_print(cmd: str, ignore_errors: bool = False) -> Result:
         print("Running:", Fore.YELLOW, cmd, Fore.RESET)
-        c.run(cmd, pty=platform.system() == "Linux")
+        return c.run(cmd, pty=platform.system() == "Linux", warn=ignore_errors)
 
     return run_with_print
 
@@ -42,7 +48,7 @@ def format(c):
 
 
 @task
-def check(c):
+def check(c) -> int:
     run = get_run_with_print(c)
     run("python -m isort --check .")
     run("python -m black --check .")
@@ -65,7 +71,11 @@ def docs(c):
 def test(c, pdb: bool = False):
     run = get_run_with_print(c)
     pdb_flag = " --pdb " if pdb else ""
-    run(
-        f"python -m pytest {pdb_flag}--cov-branch --cov wakepy && coverage html && "
-        "python -m webbrowser -t htmlcov/index.html"
+    res = run(
+        f"python -m pytest {pdb_flag}--cov-branch --cov wakepy --cov-fail-under=100",
+        ignore_errors=True,
     )
+    if res.exited:
+        run("coverage html && python -m webbrowser -t htmlcov/index.html")
+
+    check(c)
