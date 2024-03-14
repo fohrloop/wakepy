@@ -41,8 +41,12 @@ def check(c):
 
 @task
 def docs(c):
-    """Starts sphinx build with live-reload on browser"""
+    """Starts sphinx build with live-reload on browser."""
+
     run = get_run_with_print(c)
+    # The `-a` flag ensures that *all* files (not only edited files) will get
+    # rebuild. You may also build just once with
+    #   sphinx-build -b html docs/source/ docs/build
     run("sphinx-autobuild docs/source/ docs/build/ -a")
 
 
