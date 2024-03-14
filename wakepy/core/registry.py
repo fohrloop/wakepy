@@ -127,7 +127,7 @@ def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
 
 def get_methods(
     names: Collection[str] | None = None, mode: Optional[ModeName] = None
-) -> Collection[MethodCls] | None:
+) -> Collection[MethodCls]:
     """Get a collection (list, tuple or set) of Method classes based on their
     names, and optionally the mode name.
 
@@ -151,7 +151,7 @@ def get_methods(
     """
 
     if names is None:
-        return None
+        return []
 
     if isinstance(names, list):
         return [get_method(name, mode) for name in names]
