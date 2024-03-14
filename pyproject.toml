@@ -87,6 +87,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.mypy]
+exclude = ['venv', '.venv']
 check_untyped_defs = true
 disallow_any_generics = true
 no_implicit_optional = true
