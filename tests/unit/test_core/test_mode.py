@@ -1,8 +1,8 @@
 from unittest.mock import Mock, call
 
 import pytest
-from testmethods import get_test_method_class
 
+from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import (

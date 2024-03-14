@@ -10,7 +10,7 @@ import sys
 import pytest
 
 if sys.platform.lower().startswith("linux"):
-    from dbus_service import DBusService, start_dbus_service
+    from tests.integration.dbus_service import DBusService, start_dbus_service
 else:
     DBusService = None
     start_dbus_service = None

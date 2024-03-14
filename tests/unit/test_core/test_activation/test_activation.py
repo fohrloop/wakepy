@@ -11,7 +11,8 @@ from unittest.mock import Mock
 
 import pytest
 import time_machine
-from testmethods import (
+
+from tests.unit.test_core.testmethods import (
     FAILURE_REASON,
     METHOD_MISSING,
     METHOD_OPTIONS,
@@ -19,7 +20,6 @@ from testmethods import (
     get_test_method_class,
     iterate_test_methods,
 )
-
 from wakepy.core import DBusAdapter, MethodActivationResult, get_methods
 from wakepy.core.activation import (
     StageName,
