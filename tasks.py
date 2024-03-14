@@ -10,7 +10,7 @@ invoke docs
 * Start sphinx build for documentation
 
 invoke test
-* Runs tests and coverage (does not test build)
+* Runs tests and coverage (does not test docs build)
 
 In addition to these, tox is an important command. Running `tox` will
 run tests with multiple versions of python (if available on the system), run
