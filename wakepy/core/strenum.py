@@ -113,7 +113,8 @@ class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
 
     """
 
-    def _generate_next_value_(name, *_):
+    @staticmethod
+    def _generate_next_value_(name: str, *_) -> str:
         """Turn auto() value to be a string corresponding to the enumeration
         member name
 
@@ -135,6 +136,11 @@ class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
         instead
         """
         return EnumMemberString(val)
+
+    def __eq__(cls, other: object) -> bool:
+        if not isinstance(other, str):
+            return False
+        return str(cls) == other
 
 
 __all__ = [
