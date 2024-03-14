@@ -56,6 +56,9 @@ def private_bus():
         env={"DBUS_VERBOSE": "1"},
     )
 
+    if p.stdout is None:
+        raise RuntimeError("Error when starting private bus")
+
     bus_address = p.stdout.readline().decode("utf-8").strip()
 
     logger.info("Initiated private bus: %s", bus_address)
