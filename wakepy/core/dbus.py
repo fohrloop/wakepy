@@ -317,4 +317,4 @@ def get_default_dbus_adapter() -> DBusAdapter | None:
         from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
     except ImportError:
         return None
-    return JeepneyDBusAdapter()
+    return JeepneyDBusAdapter()  # pragma: no-cover-if-no-dbus
