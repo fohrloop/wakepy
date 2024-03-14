@@ -99,9 +99,31 @@ no_implicit_reexport = true
 module = 'jeepney.*'
 ignore_missing_imports = true
 
-
 [tool.pytest.ini_options]
 filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy.*:DeprecationWarning"
+
+[tool.coverage.run]
+plugins = ["coverage_conditional_plugin"]
+omit = [
+    "*/site-packages/*",
+    "*/dist-packages/*",
+    "*/distutils/*",
+    "tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if typing.TYPE_CHECKING:",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.coverage_conditional_plugin.omit]
+# Dbus adapters are only available on linux
+"platform_system != 'Linux'" = "wakepy/dbus_adapters/*.py"
+
+[tool.coverage.coverage_conditional_plugin.rules]
+no-cover-if-no-dbus = "platform_system != 'Linux'"
 
 [tool.isort]
 profile = "black"
