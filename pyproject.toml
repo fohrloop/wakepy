@@ -55,6 +55,7 @@ test =[
     # Python 3.7 support dropped in pytest 8.0.0
     "pytest==7.4.4; python_version=='3.7'", 
     "pytest-cov==4.1.0",
+    "coverage-conditional-plugin==0.9.0",
     "time-machine==2.14.0; python_version>='3.8'",
     # Python 3.7 support dropped in time-machine 2.11.0
     "time-machine==2.10.0; python_version=='3.7'",
@@ -98,9 +99,31 @@ no_implicit_reexport = true
 module = 'jeepney.*'
 ignore_missing_imports = true
 
-
 [tool.pytest.ini_options]
 filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy.*:DeprecationWarning"
+
+[tool.coverage.run]
+plugins = ["coverage_conditional_plugin"]
+omit = [
+    "*/site-packages/*",
+    "*/dist-packages/*",
+    "*/distutils/*",
+    "tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if typing.TYPE_CHECKING:",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.coverage_conditional_plugin.omit]
+# Dbus adapters are only available on linux
+"platform_system != 'Linux'" = "wakepy/dbus_adapters/*.py"
+
+[tool.coverage.coverage_conditional_plugin.rules]
+no-cover-if-no-dbus = "platform_system != 'Linux'"
 
 [tool.isort]
 profile = "black"
