@@ -340,8 +340,9 @@ def test_try_enter_and_heartbeat_success_missing():
 def test_try_enter_and_heartbeat_success_failing():
     """Tests 6) SF from TABLE 1; enter_mode success, heartbeat failing
 
-    This should, in general Return Fail + heartbeat error message + call exit_mode()
-    This call of exit_mode might be failing, so we test that separately
+    This should, in general Return Fail + heartbeat error message + call
+    exit_mode() This call of exit_mode might be failing, so we test that
+    separately
     """
 
     # Case: Heartbeate fails by raising RuntimeError

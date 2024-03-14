@@ -19,9 +19,10 @@ checks (same as in invoke check) and test building the docs.
 [1] https://docs.pyinvoke.org/
 """
 
-from invoke import task
 import platform
+
 from colorama import Fore
+from invoke import task
 
 
 def get_run_with_print(c):
@@ -35,17 +36,17 @@ def get_run_with_print(c):
 @task
 def format(c):
     run = get_run_with_print(c)
-    run("python -m isort ./wakepy")
-    run("python -m black ./wakepy")
-    run("python -m ruff check --fix ./wakepy")
+    run("python -m isort .")
+    run("python -m black .")
+    run("python -m ruff check --fix .")
 
 
 @task
 def check(c):
     run = get_run_with_print(c)
-    run("python -m isort --check ./wakepy")
-    run("python -m black --check ./wakepy")
-    run("python -m ruff check --no-fix ./wakepy")
+    run("python -m isort --check .")
+    run("python -m black --check .")
+    run("python -m ruff check --no-fix .")
     run("python -m mypy ./wakepy")
 
 

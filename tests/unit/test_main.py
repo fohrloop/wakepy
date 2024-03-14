@@ -13,7 +13,6 @@ from wakepy.__main__ import (
     main,
     parse_arguments,
     wait_until_keyboardinterrupt,
-    handle_activation_error,
 )
 from wakepy.core import Mode
 from wakepy.core.constants import ModeName
@@ -86,8 +85,9 @@ class TestMain:
         wait_until_keyboardinterrupt,
     ):
         """This is just a smoke test for the main() function. It checks that
-        correct functions are called in the correct order and correct arguments,
-        but the functionality of each of the functions is tested elsewhere."""
+        correct functions are called in the correct order and correct
+        arguments, ut the functionality of each of the functions is tested
+        elsewhere."""
 
         mocks = self.get_mocks_for_main(
             parse_arguments,
@@ -140,9 +140,9 @@ class TestMain:
             call.get_startup_text(mode=parse_arguments.return_value),
             call.print(get_startup_text.return_value),
             call.mode.__enter__(),
-            # Checking only the exception type here. The exception and the traceback
-            # instances are assumed to be correct. Too complicated to catch them
-            # just for the test.
+            # Checking only the exception type here. The exception and the
+            # traceback instances are assumed to be correct. Too complicated to
+            # catch them just for the test.
             call.mode.__exit__(ModeExit, *exit_call_args[1:]),
         ]
 

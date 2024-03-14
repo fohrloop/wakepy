@@ -15,11 +15,11 @@ import jeepney
 import pytest
 
 from wakepy.core import DBusAddress, DBusMethod, DBusMethodCall
-from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter, DBusNotFoundError
+from wakepy.dbus_adapters.jeepney import DBusNotFoundError, JeepneyDBusAdapter
 
 # For some unknown reason, when using jeepney, one will get a warning like
 # this:
-# ResourceWarning: unclosed <socket.socket fd=14, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, raddr=b'\x00/tmp/dbus-cTfPKAeBWk'>
+# ResourceWarning: unclosed <socket.socket fd=14, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, raddr=b'\x00/tmp/dbus-cTfPKAeBWk'> # noqa: E501, W505
 # This is just ignored. It only triggers at *random* line, on random test when
 # python does garbage collection.
 #

@@ -20,7 +20,8 @@ def get_new_classname(prefix="TestMethod") -> str:
 
 
 _test_method_classes = dict()
-"""Container for all created method classes (caching for get_test_method_class)"""
+"""Container for all created method classes (caching for get_test_method_class)
+"""
 METHOD_MISSING = "__method_is_not_implemented__"
 """Magic constant for creating classes with some functions not implemented"""
 FAILURE_REASON = "failure_reason"

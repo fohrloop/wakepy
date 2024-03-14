@@ -1,15 +1,13 @@
-import pytest
-
 from unittest.mock import patch
 
-from wakepy.core.platform import CURRENT_PLATFORM, PlatformName
+import pytest
 
 from wakepy.core.dbus import (
     BusType,
+    DBusAdapter,
     DBusAddress,
     DBusMethod,
     DBusMethodCall,
-    DBusAdapter,
     get_dbus_adapter,
     get_default_dbus_adapter,
 )
@@ -103,7 +101,7 @@ def test_get_default_dbus_adapter_nonworking():
 def test_get_default_dbus_adapter_working():
     try:
         import jeepney as jeepney  # noqa
-    except:
+    except Exception:
         assert get_default_dbus_adapter() is None
     else:
         from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter

@@ -223,7 +223,8 @@ def test_get_prioritized_methods(monkeypatch):
         methods_priority=[{"WinA", "LinuxB"}, "*"],
     ) == [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
 
-    # No user-defined order -> Just alphabetical, but current platform (linux) first.
+    # No user-defined order -> Just alphabetical, but current platform (linux)
+    # first.
     assert get_prioritized_methods(
         [
             LinuxA,
@@ -236,7 +237,8 @@ def test_get_prioritized_methods(monkeypatch):
     ) == [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA, WindowsB]
 
     monkeypatch.setattr("wakepy.core.activation.CURRENT_PLATFORM", PlatformName.WINDOWS)
-    # No user-defined order -> Just alphabetical, but current platform (Windows) first.
+    # No user-defined order -> Just alphabetical, but current platform
+    # (Windows) first.
     assert get_prioritized_methods(
         [LinuxA, LinuxB, WindowsA, WindowsB, LinuxC, MultiPlatformA],
     ) == [MultiPlatformA, WindowsA, WindowsB, LinuxA, LinuxB, LinuxC]

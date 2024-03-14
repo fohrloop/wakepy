@@ -186,7 +186,10 @@ def test_activationresult_get_error_text_failure():
         [PLATFORM_SUPPORT_FAIL, REQUIREMENTS_FAIL], modename="SomeMode"
     )
     assert ar.get_error_text() == (
-        'Could not activate Mode "SomeMode"!\n\nMethod usage results, in order (highest priority first):\n[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3")]'
+        'Could not activate Mode "SomeMode"!\n\nMethod usage results, in order '
+        '(highest priority first):\n[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform '
+        'XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing '
+        'requirement: Some SW v.1.2.3")]'
     )
 
 
