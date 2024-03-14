@@ -30,6 +30,8 @@ def test_constant_auto():
     # Any auto() value is turned into a string which is same as
     # the enumeration member name
     assert MyConst.BAR == "BAR"
+    assert "BAR" == MyConst.BAR
+
     assert isinstance(MyConst.BAR, str)
 
 
