@@ -64,9 +64,6 @@ def test_get_methods(testutils, monkeypatch):
     assert get_methods({"A", "B"}) == {A, B}
     assert get_methods({"C", "B"}) == {C, B}
 
-    # Asking None, getting empty list
-    assert get_methods(None) == []
-
     # Asking something that does not exists will raise KeyError
     with pytest.raises(ValueError, match=re.escape('No Method with name "foo" found!')):
         get_methods(["A", "foo"])
@@ -74,6 +71,9 @@ def test_get_methods(testutils, monkeypatch):
     # Using unsupported type raises TypeError
     with pytest.raises(TypeError):
         get_methods(4123)
+
+    with pytest.raises(TypeError):
+        get_methods(None)
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

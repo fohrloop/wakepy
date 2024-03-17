@@ -126,7 +126,7 @@ def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
 
 
 def get_methods(
-    names: Collection[str] | None = None, mode: Optional[ModeName] = None
+    names: Collection[str], mode: Optional[ModeName] = None
 ) -> Collection[MethodCls]:
     """Get a collection (list, tuple or set) of Method classes based on their
     names, and optionally the mode name.
@@ -145,13 +145,10 @@ def get_methods(
     Raises
     ------
     ValueError
-        Raised if any of the  methods does not exist, or if any of the existing
+        Raised if any of the methods does not exist, or if any of the existing
         methods exists in multiple modes and the mode name (str) was not
         provided as argument to make the selection unambiguous.
     """
-
-    if names is None:
-        return []
 
     if isinstance(names, list):
         return [get_method(name, mode) for name in names]
