@@ -13,9 +13,9 @@ if sys.platform.lower().startswith("linux"):
     from tests.integration.dbus_service import DBusService, start_dbus_service
 else:
 
-    class DBusService: ...
+    class DBusService: ...  # type: ignore
 
-    def start_dbus_service(): ...
+    def start_dbus_service(): ...  # type: ignore
 
 
 from wakepy.core import DBusAddress, DBusMethod
