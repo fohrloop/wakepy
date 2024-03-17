@@ -78,7 +78,7 @@ def get_test_method_class(
 
         return m
 
-    def _create_class():
+    def _create_class() -> Type[Method]:
         clsname = get_new_classname()
         clskwargs = {
             "supported_platforms": supported_platforms,
