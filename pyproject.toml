@@ -120,6 +120,7 @@ exclude_lines = [
     "pragma: no cover",
     "if typing.TYPE_CHECKING:",
     "@(abc\\.)?abstractmethod",
+    "@(typing\\.)?overload",
 ]
 
 [tool.coverage.coverage_conditional_plugin.omit]
