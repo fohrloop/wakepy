@@ -148,7 +148,7 @@ class DBusMethod(NamedTuple):
     def of(
         self,
         addr: DBusAddress,
-    ):
+    ) -> DBusMethod:
         """Ties a DBusAddress to a DBusMethod, forming a completely defined
         DBusMethod. Returns a new DBusMethod object.
         """
