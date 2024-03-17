@@ -70,10 +70,10 @@ def test_get_methods(testutils, monkeypatch):
 
     # Using unsupported type raises TypeError
     with pytest.raises(TypeError):
-        get_methods(4123)
+        get_methods(4123)  # type: ignore
 
     with pytest.raises(TypeError):
-        get_methods(None)
+        get_methods(None)  # type: ignore
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
