@@ -17,18 +17,17 @@ get_methods_for_mode
 from __future__ import annotations
 
 import typing
-from typing import List, Set, Tuple, Type, TypeVar, Union
 
 from .constants import ModeName
 
 if typing.TYPE_CHECKING:
-    from typing import Optional
+    from typing import List, Optional, Set, Tuple, Type, TypeAlias, TypeVar, Union
 
     from wakepy.core.method import Method, MethodCls
 
     T = TypeVar("T")
 
-    Collection = Union[List[T], Tuple[T, ...], Set[T]]
+    Collection: TypeAlias = Union[List[T], Tuple[T, ...], Set[T]]
     MethodDict = dict[str, MethodCls]
     MethodRegistry = dict[str, MethodDict]
 
