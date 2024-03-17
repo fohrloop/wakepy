@@ -555,7 +555,7 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
         If the `method` has method.heartbeat() implemented, and activation
         succeeds, this is a Heartbeat object. Otherwise, this is None.
     """
-    if method.name is None:
+    if method._is_unnamed():
         raise ValueError("Methods without a name may not be used to activate modes!")
 
     result = MethodActivationResult(success=False, method_name=method.name)

@@ -65,6 +65,10 @@ class MethodOutcome(StrEnum):
     FAILURE = auto()
 
 
+unnamed = "__unnamed__"
+"""Constant for defining unnamed Method(s)"""
+
+
 class Method(ABC, metaclass=MethodMeta):
     """Methods are objects that are used to switch modes. The phases for
     changing and being in a Mode is:
@@ -95,10 +99,10 @@ class Method(ABC, metaclass=MethodMeta):
     create documentation.
     """
 
-    name: str | None = None
+    name: str = unnamed
     """Human-readable name for the method. Used by end-users to define
-    the Methods used for entering a Mode, for example. If not None, must be
-    unique across all Methods available in the python process. Set to None if
+    the Methods used for entering a Mode, for example. If given, must be
+    unique across all Methods available in the python process. Leave unset if
     the Method should not be listed anywhere (e.g. when Method is meant to be
     subclassed)."""
 
@@ -262,6 +266,10 @@ class Method(ABC, metaclass=MethodMeta):
 
     def __repr__(self):
         return f"<wakepy Method: {self.__class__.__name__} at {hex(id(self))}>"
+
+    @classmethod
+    def _is_unnamed(cls):
+        return cls.name == unnamed
 
 
 def select_methods(
