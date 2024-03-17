@@ -21,7 +21,17 @@ import typing
 from .constants import ModeName
 
 if typing.TYPE_CHECKING:
-    from typing import List, Optional, Set, Tuple, Type, TypeAlias, TypeVar, Union
+    from typing import (
+        List,
+        Optional,
+        Set,
+        Tuple,
+        Type,
+        TypeAlias,
+        TypeVar,
+        Union,
+        overload,
+    )
 
     from wakepy.core.method import Method, MethodCls
 
@@ -30,6 +40,7 @@ if typing.TYPE_CHECKING:
     Collection: TypeAlias = Union[List[T], Tuple[T, ...], Set[T]]
     MethodDict = dict[str, MethodCls]
     MethodRegistry = dict[str, MethodDict]
+
 
 _method_registry: MethodRegistry = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
@@ -122,6 +133,18 @@ def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
         )
 
     return methods_from_all_modes[0]
+
+
+@overload
+def get_methods(
+    names: List[str], mode: Optional[ModeName] = None
+) -> List[MethodCls]: ...
+@overload
+def get_methods(
+    names: Tuple[str, ...], mode: Optional[ModeName] = None
+) -> Tuple[MethodCls, ...]: ...
+@overload
+def get_methods(names: Set[str], mode: Optional[ModeName] = None) -> Set[MethodCls]: ...
 
 
 def get_methods(
