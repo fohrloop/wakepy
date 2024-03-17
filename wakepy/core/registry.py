@@ -156,8 +156,8 @@ def get_methods(
         return tuple(get_method(name, mode) for name in names)
     elif isinstance(names, set):
         return set(get_method(name, mode) for name in names)
-
-    raise TypeError("`names` must be a list, tuple or set")
+    else:
+        raise TypeError("`names` must be a list, tuple or set")
 
 
 def get_methods_for_mode(
