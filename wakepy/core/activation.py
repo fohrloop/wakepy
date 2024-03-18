@@ -54,6 +54,11 @@ class StageName(StrEnum):
     ACTIVATION = auto()
 
 
+StageNameValue = typing.Literal[
+    "NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"
+]
+
+
 class ActivationResult:
     """The ActivationResult is responsible of keeping track on the possibly
     successful (max 1), failed and unused methods and providing different views
@@ -184,7 +189,7 @@ class ActivationResult:
     def query(
         self,
         success: Sequence[bool | None] = (True, False, None),
-        fail_stages: Sequence[StageName] = (
+        fail_stages: Sequence[StageName | StageNameValue] = (
             StageName.PLATFORM_SUPPORT,
             StageName.REQUIREMENTS,
             StageName.ACTIVATION,

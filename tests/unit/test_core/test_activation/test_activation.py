@@ -6,6 +6,7 @@ Exception: ActivationResult is tested in it's own file
 import datetime as dt
 import os
 import re
+import typing
 from contextlib import contextmanager
 from unittest.mock import Mock
 
@@ -29,6 +30,7 @@ from wakepy.core import (
 )
 from wakepy.core.activation import (
     StageName,
+    StageNameValue,
     WakepyFakeSuccess,
     activate_method,
     activate_mode,
@@ -602,6 +604,9 @@ def test_stagename():
     assert StageName.PLATFORM_SUPPORT == "PLATFORM_SUPPORT"
     assert StageName.ACTIVATION == "ACTIVATION"
     assert StageName.REQUIREMENTS == "REQUIREMENTS"
+    assert set(typing.get_args(StageNameValue)) == {
+        member.value for member in StageName
+    }
 
 
 # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
