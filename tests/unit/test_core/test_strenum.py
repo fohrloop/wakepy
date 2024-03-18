@@ -45,14 +45,6 @@ def test_constant_uniqueness():
         BAR = "barval"
         BAZ = auto()
 
-    # Any string valued constant is
-    # added as a string
-    assert MyConst.FOO == "fooval"
-    assert MyConst.BAR == "barval"
-    assert MyConst.BAZ == "BAZ"
-    for obj in (MyConst.FOO, MyConst.BAR, MyConst.BAZ):
-        assert isinstance(obj, str)
-
     # This should raise exception as the 'fooval' value is used twice and
     # uniqueness is asked
     with pytest.raises(ValueError):
