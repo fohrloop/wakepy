@@ -202,7 +202,10 @@ def _assert_context_manager_used_correctly(mocks, mode):
 
 def test_handle_activation_fail_bad_on_fail_value():
     with pytest.raises(ValueError, match="on_fail must be one of"):
-        handle_activation_fail(on_fail="foo", result=Mock(spec_set=ActivationResult))
+        handle_activation_fail(
+            on_fail="foo",  # type: ignore
+            result=Mock(spec_set=ActivationResult),
+        )
 
 
 def test_modecontroller(monkeypatch):
