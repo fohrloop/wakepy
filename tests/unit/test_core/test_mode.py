@@ -3,15 +3,10 @@ from unittest.mock import Mock, call
 import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
+from wakepy.core import ActivationResult
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.mode import (
-    ActivationResult,
-    Mode,
-    ModeController,
-    ModeExit,
-    handle_activation_fail,
-)
+from wakepy.core.mode import Mode, ModeController, ModeExit, handle_activation_fail
 
 
 def mocks_for_test_mode():

@@ -2,7 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from wakepy.core.platform import PlatformName, get_current_platform
+from wakepy.core import PlatformName
+from wakepy.core.platform import get_current_platform
 
 
 class TestGetCurrentPlatform:
