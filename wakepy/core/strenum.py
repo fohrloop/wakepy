@@ -38,27 +38,27 @@ class ConstantEnumMeta(EnumMeta):
         if len(vals) > len(set(vals)):
             raise ValueError("The values must be unique!")
 
-    def __contains__(self, value: Any) -> bool:
+    def __contains__(cls, value: Any) -> bool:
         """Provides the `val in SomeConstClass` containment check
 
         Parameters
         ----------
-        self:
+        cls:
             This will be the (subclass) of the class using ConstantEnumMeta.
             If you use class Const(metaclass=ConstantEnumMeta): ... and
-            SomeConst(Const), self will be SomeConst; a class.
+            SomeConst(Const), cls will be SomeConst; a class.
         value:
             The `val` in the example
         """
-        return value in self.values()
+        return value in cls.values()
 
     @property
-    def keys(self):
-        return self.__members__.keys
+    def keys(cls):
+        return cls.__members__.keys
 
     @property
-    def values(self):
-        return self.__members__.values
+    def values(cls):
+        return cls.__members__.values
 
 
 class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
