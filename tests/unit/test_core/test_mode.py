@@ -1,3 +1,4 @@
+import typing
 from unittest.mock import Mock, call
 
 import pytest
@@ -7,6 +8,9 @@ from wakepy.core import ActivationResult
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import Mode, ModeController, ModeExit, handle_activation_fail
+
+if typing.TYPE_CHECKING:
+    from typing import Tuple, Type
 
 
 def mocks_for_test_mode():
@@ -30,7 +34,7 @@ def mocks_for_test_mode():
     return mocks
 
 
-def get_mocks_and_testmode():
+def get_mocks_and_testmode() -> Tuple[Mock, Type[Mode]]:
     # Setup mocks
     mocks = mocks_for_test_mode()
 
