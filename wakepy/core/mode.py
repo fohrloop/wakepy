@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 import warnings
-from abc import ABC
 
 from .activation import ActivationResult, activate_mode, deactivate_method
 from .dbus import get_dbus_adapter
@@ -98,7 +97,7 @@ class ModeController:
         return True
 
 
-class Mode(ABC):
+class Mode:
     """A mode is something that is activated (entered in) and deactivated
     (exited from). Each Mode instance is created with a set of Method classes,
     and each one of the Methods may be used to activate the Mode. There are
