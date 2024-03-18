@@ -93,14 +93,14 @@ def test_method_has_x_is_not_writeable():
 
     # The .has_enter, .has_exit or .has_heartbeat should be strictly read-only
     with pytest.raises(AttributeError):
-        method.has_enter = False
+        method.has_enter = False  # type: ignore
 
     with pytest.raises(AttributeError):
-        method.has_exit = True
+        method.has_exit = True  # type: ignore
 
     # Same holds for classes
     with pytest.raises(AttributeError):
-        MethodWithEnter.has_enter = False
+        MethodWithEnter.has_enter = False  # type: ignore
 
 
 @pytest.mark.usefixtures("empty_method_registry")
