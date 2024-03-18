@@ -7,7 +7,7 @@ supported."""
 from __future__ import annotations
 
 from enum import Enum, EnumMeta, auto
-from typing import Any
+from typing import Any, ValuesView
 
 
 class StrEnumMeta(EnumMeta):
@@ -33,7 +33,7 @@ class StrEnumMeta(EnumMeta):
             cls._check_uniqueness()
 
     def _check_uniqueness(cls):
-        vals = cls.__members__.values()
+        vals: ValuesView[Enum] = cls.__members__.values()
         if len(vals) > len(set(vals)):
             raise ValueError("The values must be unique!")
 
