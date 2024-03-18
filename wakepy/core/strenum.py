@@ -10,7 +10,7 @@ from enum import Enum, EnumMeta, auto
 from typing import Any
 
 
-class ConstantEnumMeta(EnumMeta):
+class StrEnumMeta(EnumMeta):
     """This metaclass is an extension of the basic Enum metaclass, and provides
     the following
 
@@ -44,8 +44,8 @@ class ConstantEnumMeta(EnumMeta):
         Parameters
         ----------
         cls:
-            This will be the (subclass) of the class using ConstantEnumMeta.
-            If you use class Const(metaclass=ConstantEnumMeta): ... and
+            This will be the (subclass) of the class using StrEnumMeta.
+            If you use class Const(metaclass=StrEnumMeta): ... and
             SomeConst(Const), cls will be SomeConst; a class.
         value:
             The `val` in the example
@@ -61,7 +61,7 @@ class ConstantEnumMeta(EnumMeta):
         return cls.__members__.values
 
 
-class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
+class StrEnum(str, Enum, metaclass=StrEnumMeta):
     """A string constant / enumeration. For creating reusable, typed constants.
 
     Properties
