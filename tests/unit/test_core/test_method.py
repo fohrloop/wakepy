@@ -64,7 +64,7 @@ def test_overridden_methods_autodiscovery():
     assert method3.has_heartbeat
 
     class SubWithEnterAndHeart(WithJustHeartBeat):
-        def enter_mode():
+        def enter_mode(self):
             return
 
     method4 = SubWithEnterAndHeart()
@@ -73,7 +73,7 @@ def test_overridden_methods_autodiscovery():
     assert not method4.has_exit
 
     class SubWithEnterAndExit(WithEnterAndExit):
-        def enter_mode():
+        def enter_mode(self):
             return 123
 
     method5 = SubWithEnterAndExit()
