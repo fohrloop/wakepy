@@ -250,15 +250,15 @@ class Method(ABC, metaclass=MethodMeta):
         return self._dbus_adapter.process(call)
 
     @property
-    def has_enter(self):
+    def has_enter(self) -> bool:
         return self._has_enter
 
     @property
-    def has_exit(self):
+    def has_exit(self) -> bool:
         return self._has_exit
 
     @property
-    def has_heartbeat(self):
+    def has_heartbeat(self) -> bool:
         return self._has_heartbeat
 
     def __str__(self):
