@@ -35,16 +35,14 @@ def test_constant_auto():
     assert isinstance(MyConst.BAR, str)
 
 
-def test_constant_uniqueness():
-    # It is possible to use the @unique decorator
-    # from the enum package
-
+def test_constant_uniqueness_with_unique_values():
     # This should cause no problems
     class MyConst(StrEnum, unique=True):
         FOO = "fooval"
         BAR = "barval"
-        BAZ = auto()
 
+
+def test_constant_uniqueness_with_non_unique_values():
     # This should raise exception as the 'fooval' value is used twice and
     # uniqueness is asked
     with pytest.raises(ValueError):
@@ -53,6 +51,8 @@ def test_constant_uniqueness():
             FOO = "fooval"
             BAR = "fooval"
 
+
+def test_constant_duplicates_non_unique_constraint():
     # It should be possible to define duplicate values if uniqueness is not
     # asked
     class MyConst(StrEnum):  # type: ignore
