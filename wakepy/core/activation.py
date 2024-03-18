@@ -23,7 +23,7 @@ from __future__ import annotations
 import datetime as dt
 import typing
 from dataclasses import dataclass
-from typing import List, Set, Union
+from typing import List, Sequence, Set, Union
 
 from .constants import PlatformName
 from .dbus import DBusAdapter
@@ -33,13 +33,13 @@ from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
-    from typing import Optional, Sequence, Tuple, Type
+    from typing import Optional, Tuple, Type
 
     from .method import MethodCls
 
 """The strings in MethodsPriorityOrder are names of wakepy.Methods or the
 asterisk ('*')."""
-MethodsPriorityOrder = List[Union[str, Set[str]]]
+MethodsPriorityOrder = Sequence[Union[str, Set[str]]]
 
 
 class StageName(StrEnum):
