@@ -1,6 +1,6 @@
 import pytest
 
-from wakepy.core.method import Method, PlatformName
+from wakepy.core import Method, PlatformName
 
 # B, D, E
 FIRST_MODE = "first_mode"

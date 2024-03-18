@@ -2,13 +2,13 @@ import re
 
 import pytest
 
+from wakepy.core import PlatformName
 from wakepy.core.activation import (
     check_methods_priority,
     get_prioritized_methods,
     get_prioritized_methods_groups,
     sort_methods_by_priority,
 )
-from wakepy.core.method import PlatformName
 from wakepy.core.registry import get_methods
 
 
