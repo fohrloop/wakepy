@@ -57,13 +57,13 @@ def test_constant_uniqueness():
     # uniqueness is asked
     with pytest.raises(ValueError):
 
-        class MyConst(StrEnum, unique=True):
+        class MyConst(StrEnum, unique=True):  # type: ignore
             FOO = "fooval"
             BAR = "fooval"
 
     # It should be possible to define duplicate values if uniqueness is not
     # asked
-    class MyConst(StrEnum):
+    class MyConst(StrEnum):  # type: ignore
         FOO = "fooval"
         ANOTHER_FOO = "fooval"
 
