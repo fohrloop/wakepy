@@ -7,7 +7,6 @@ supported."""
 from __future__ import annotations
 
 from enum import Enum, EnumMeta, auto
-from types import MappingProxyType
 from typing import Any
 
 
@@ -33,12 +32,6 @@ class ConstantEnumMeta(EnumMeta):
     def __init__(cls, *_, unique=False):
         if unique:
             cls._check_uniqueness()
-
-        cls.__members__: MappingProxyType[str, Any]
-        for member in cls.__members__.values():
-            # The .name is needed for the @unique decorator compatibility
-            # It is also part of enum member protocol, so let it be.
-            member.name = member._name_
 
     def _check_uniqueness(cls):
         vals = cls.__members__.values()
@@ -66,12 +59,6 @@ class ConstantEnumMeta(EnumMeta):
     @property
     def values(self):
         return self.__members__.values
-
-
-class EnumMemberString(str):
-    """dummy string subclass to make it possible to add custom attributes to
-    it.
-    """
 
 
 class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
@@ -122,26 +109,21 @@ class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
         """
         return name
 
-    def __new__(cls, val=None, *_):
-        """This is used to get rid of need for ".value" access:
+    def __str__(self) -> str:
+        return str.__str__(self)
 
-        >>> StrEnum.FOO.value
-        'foo'
-
-        It is possible to use
-
-        >>> StrEnum.FOO
-        'foo'
-
-        instead
-        """
-        return EnumMemberString(val)
+    def __hash__(self) -> int:
+        return super().__hash__()
 
     def __eq__(self, other: object) -> bool:
         # This was added just to make mypy happy. Without this mypy will
         # assume SomeConst.FOO == 'somestr' always to be False.
         # In reality, the EnumMemberString.__eq__ is called in this case.
         return str(self) == other  # pragma: no cover
+
+    @property
+    def name(self) -> str:
+        return self._name_
 
 
 __all__ = [
