@@ -5,7 +5,7 @@ import pytest
 from wakepy.core.strenum import StrEnum
 
 
-def test_constant_basic_functionality():
+def test_strenum_basic_functionality():
     class MyConst(StrEnum):
         FOO = "fooval"
 
@@ -23,7 +23,7 @@ def test_constant_basic_functionality():
     assert "FOO" in MyConst.__members__.keys()
 
 
-def test_constant_auto():
+def test_strenum_auto():
     class MyConst(StrEnum):
         BAR = auto()
 
@@ -35,14 +35,14 @@ def test_constant_auto():
     assert isinstance(MyConst.BAR, str)
 
 
-def test_constant_uniqueness_with_unique_values():
+def test_strenum_uniqueness_with_unique_values():
     # This should cause no problems
     class MyConst(StrEnum, unique=True):
         FOO = "fooval"
         BAR = "barval"
 
 
-def test_constant_uniqueness_with_non_unique_values():
+def test_strenum_uniqueness_with_non_unique_values():
     # This should raise exception as the 'fooval' value is used twice and
     # uniqueness is asked
     with pytest.raises(ValueError):
@@ -52,7 +52,7 @@ def test_constant_uniqueness_with_non_unique_values():
             BAR = "fooval"
 
 
-def test_constant_duplicates_non_unique_constraint():
+def test_strenum_duplicates_non_unique_constraint():
     # It should be possible to define duplicate values if uniqueness is not
     # asked
     class MyConst(StrEnum):  # type: ignore
