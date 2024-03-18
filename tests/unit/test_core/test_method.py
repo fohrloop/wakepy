@@ -1,9 +1,16 @@
+from __future__ import annotations
+
 import re
+import typing
 
 import pytest
 
+from wakepy.core import DBusMethodCall
 from wakepy.core.method import Method, select_methods
 from wakepy.core.registry import MethodRegistryError, get_method, get_methods
+
+if typing.TYPE_CHECKING:
+    from wakepy.core import DBusMethod
 
 
 class TestMethod(Method):
@@ -171,7 +178,7 @@ def test_method_string_representations():
     assert method.__repr__() == f"<wakepy Method: MethodB at {hex(id(method))}>"
 
 
-def test_process_dbus_call():
+def test_process_dbus_call(dbus_method: DBusMethod):
     method = Method()
     # when there is no dbus adapter..
     assert method._dbus_adapter is None
@@ -180,4 +187,4 @@ def test_process_dbus_call():
         RuntimeError,
         match=".*cannot process dbus method call.*as it does not have a DBusAdapter",
     ):
-        assert method.process_dbus_call(None)
+        assert method.process_dbus_call(DBusMethodCall(dbus_method))
