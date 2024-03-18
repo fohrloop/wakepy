@@ -38,7 +38,8 @@ dev = [
     "IPython",
     "invoke==2.2.0",
     # Colorama is used with the tasks.py (invoke commands)
-    "colorama==0.4.6"
+    "colorama==0.4.6",
+    "types-colorama", # for mypy 
 ]
 # For building documentation
 doc = [
