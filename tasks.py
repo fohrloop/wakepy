@@ -25,7 +25,7 @@ import platform
 import typing
 
 from colorama import Fore
-from invoke import task
+from invoke import task  # type: ignore
 
 if typing.TYPE_CHECKING:
     from invoke.runners import Result
