@@ -16,7 +16,6 @@ class StrEnumMeta(EnumMeta):
 
     1) Containment check for enumeration member values; `val in SomeClass`
     2) `unique` parameter when creating constants.
-    3) Support for (custom) string-type members in Enums
     """
 
     @classmethod
