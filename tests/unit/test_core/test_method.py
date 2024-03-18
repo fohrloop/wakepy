@@ -115,14 +115,14 @@ def test_not_possible_to_define_two_methods_with_same_name(testutils, monkeypatc
         MethodRegistryError, match=re.escape('Duplicate Method name "Some name"')
     ):
 
-        class SomeMethod(TestMethod):  # noqa:F811
+        class SomeMethod(TestMethod):  # type: ignore # noqa:F811
             name = somename
 
     testutils.empty_method_registry(monkeypatch)
 
     # Now as the registry is empty it is possible to define method with
     # the same name again
-    class SomeMethod(TestMethod):  # noqa:F811
+    class SomeMethod(TestMethod):  # type: ignore # noqa:F811
         name = somename
 
 
