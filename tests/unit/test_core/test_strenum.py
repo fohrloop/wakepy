@@ -47,7 +47,7 @@ def test_strenum_uniqueness_with_non_unique_values():
     # uniqueness is asked
     with pytest.raises(ValueError):
 
-        class MyConst(StrEnum, unique=True):  # type: ignore
+        class MyConst(StrEnum, unique=True):
             FOO = "fooval"
             BAR = "fooval"
 
@@ -55,7 +55,7 @@ def test_strenum_uniqueness_with_non_unique_values():
 def test_strenum_duplicates_non_unique_constraint():
     # It should be possible to define duplicate values if uniqueness is not
     # asked
-    class MyConst(StrEnum):  # type: ignore
+    class MyConst(StrEnum):
         FOO = "fooval"
         ANOTHER_FOO = "fooval"
 
