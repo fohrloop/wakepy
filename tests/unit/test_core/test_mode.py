@@ -131,7 +131,7 @@ def test_mode_exits_with_modeexit():
     ) as mode:
         testval = 2
         raise ModeExit
-        testval = 0  # never hit
+        testval = 0  # type: ignore # (never hit)
 
     assert testval == 2
 
@@ -149,7 +149,7 @@ def test_mode_exits_with_modeexit_with_args():
     ) as mode:
         testval = 3
         raise ModeExit("FOOO")
-        testval = 0  # never hit
+        testval = 0  # type: ignore # (never hit)
 
     assert testval == 3
 
@@ -170,7 +170,7 @@ def test_mode_exits_with_other_exception():
         ) as mode:
             testval = 4
             raise MyException
-            testval = 0
+            testval = 0  # type: ignore # (never hit)
 
     assert testval == 4
 
