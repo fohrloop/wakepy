@@ -19,7 +19,7 @@ from __future__ import annotations
 import typing
 from typing import overload
 
-from .constants import ModeName
+from .constants import ModeName, ModeNameValue
 
 if typing.TYPE_CHECKING:
     from typing import (
@@ -80,7 +80,9 @@ def register_method(method_class: Type[Method]):
     _method_registry.setdefault(method_class.mode, method_dict)
 
 
-def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
+def get_method(
+    method_name: str, mode: Optional[ModeNameValue | str] = None
+) -> MethodCls:
     """Get a Method class based on its name and optionally the mode.
 
     Parameters
@@ -89,7 +91,7 @@ def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
         The name of the wakepy.Method. The method must be registered which
         means that the module containing the subclass definition must have
         been imported.
-    mode: str | ModeName | None
+    mode: str | None
         If the method_name is registered to methods belonging to multiple
         Modes, you must provide the mode name, to make the selection
         unambiguous. Typical mode names are "keep.running" and
