@@ -6,7 +6,7 @@ import typing
 import pytest
 
 from wakepy.core import DBusMethodCall
-from wakepy.core.method import Method, select_methods
+from wakepy.core.method import Method, MethodOutcome, MethodOutcomeValue, select_methods
 from wakepy.core.registry import MethodRegistryError, get_method, get_methods
 
 if typing.TYPE_CHECKING:
@@ -188,3 +188,10 @@ def test_process_dbus_call(dbus_method: DBusMethod):
         match=".*cannot process dbus method call.*as it does not have a DBusAdapter",
     ):
         assert method.process_dbus_call(DBusMethodCall(dbus_method))
+
+
+def test_methodoutcome():
+    """Tests that MethodOutcomeValue is in synch with MethodOutcome"""
+    assert set(typing.get_args(MethodOutcomeValue)) == {
+        member.value for member in MethodOutcome
+    }

@@ -65,6 +65,9 @@ class MethodOutcome(StrEnum):
     FAILURE = auto()
 
 
+MethodOutcomeValue = typing.Literal["NOT_IMPLEMENTED", "SUCCESS", "FAILURE"]
+
+
 unnamed = "__unnamed__"
 """Constant for defining unnamed Method(s)"""
 

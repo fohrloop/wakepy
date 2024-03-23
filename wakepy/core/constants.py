@@ -1,5 +1,7 @@
 """Common terms and definitions used in many places"""
 
+import typing
+
 from .strenum import StrEnum, auto
 
 
@@ -8,6 +10,9 @@ class PlatformName(StrEnum):
     LINUX = auto()
     MACOS = auto()
     OTHER = auto()
+
+
+PlatformNameValue = typing.Literal["WINDOWS", "LINUX", "MACOS", "OTHER"]
 
 
 class ModeName(StrEnum):
@@ -20,8 +25,14 @@ class ModeName(StrEnum):
     KEEP_PRESENTING = "keep.presenting"
 
 
+ModeNameValue = typing.Literal["keep.running", "keep.presenting"]
+
+
 class BusType(StrEnum):
     """Type of D-Bus bus."""
 
     SESSION = auto()
     SYSTEM = auto()
+
+
+BusTypeValue = typing.Literal["SESSION", "SYSTEM"]
