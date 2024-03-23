@@ -41,7 +41,7 @@ class DBusService:
 
     addr: DBusAddress
 
-    def __init__(self, bus_address: str, queue_: queue.Queue, stop: Callable):
+    def __init__(self, bus_address: str, queue_: queue.Queue[str], stop: Callable):
         """
         Parameters
         ----------
@@ -158,7 +158,7 @@ def start_dbus_service(
         --print-address. If not given, uses the service_cls.addr.bus.
     """
 
-    queue_ = queue.Queue()
+    queue_: queue.Queue[str] = queue.Queue()
     should_stop = False
 
     def start_service(
