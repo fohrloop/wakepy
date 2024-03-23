@@ -4,9 +4,9 @@ import sys
 
 from .strenum import StrEnum, auto
 
-if sys.version_info < (3, 8):
+if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
     from typing_extensions import Literal
-else:
+else:  # pragma: no-cover-if-py-lt-38
     from typing import Literal
 
 

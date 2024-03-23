@@ -5,9 +5,9 @@ import pytest
 
 from wakepy.core.strenum import StrEnum
 
-if sys.version_info < (3, 8):
+if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
     import typing_extensions as typing
-else:
+else:  # pragma: no-cover-if-py-lt-38
     import typing
 
 

@@ -139,6 +139,8 @@ exclude_lines = [
 
 [tool.coverage.coverage_conditional_plugin.rules]
 no-cover-if-no-dbus = "platform_system != 'Linux'"
+no-cover-if-py-gte-38 = "sys_version_info >= (3, 8)"
+no-cover-if-py-lt-38 = "sys_version_info < (3, 8)"
 
 [tool.isort]
 profile = "black"
