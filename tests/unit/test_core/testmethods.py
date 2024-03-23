@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import itertools
+from collections import Counter
 from typing import Iterable, Type
 
 from wakepy.core import CURRENT_PLATFORM
@@ -10,13 +11,14 @@ from wakepy.core.method import Method
 class WakepyMethodTestError(Exception): ...
 
 
+_class_counter: Counter[str] = Counter()
+
+
 def get_new_classname(prefix="TestMethod") -> str:
     """Creates a new class name. Just to make it easier to generate lots of
     Methods."""
-    if not hasattr(get_new_classname, "counter"):
-        get_new_classname.counter = 0
-    get_new_classname.counter += 1
-    return f"{prefix}{get_new_classname.counter}"
+    _class_counter[prefix] += 1
+    return f"{prefix}{_class_counter[prefix]}"
 
 
 _test_method_classes = dict()
