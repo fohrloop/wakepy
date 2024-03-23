@@ -1,17 +1,18 @@
+from __future__ import annotations
+
+import typing
 from unittest.mock import Mock, call
 
 import pytest
-from testmethods import get_test_method_class
 
+from tests.unit.test_core.testmethods import get_test_method_class
+from wakepy.core import ActivationResult
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.mode import (
-    ActivationResult,
-    Mode,
-    ModeController,
-    ModeExit,
-    handle_activation_fail,
-)
+from wakepy.core.mode import Mode, ModeController, ModeExit, handle_activation_fail
+
+if typing.TYPE_CHECKING:
+    from typing import Tuple, Type
 
 
 def mocks_for_test_mode():
@@ -35,7 +36,7 @@ def mocks_for_test_mode():
     return mocks
 
 
-def get_mocks_and_testmode():
+def get_mocks_and_testmode() -> Tuple[Mock, Type[Mode]]:
     # Setup mocks
     mocks = mocks_for_test_mode()
 
@@ -136,7 +137,7 @@ def test_mode_exits_with_modeexit():
     ) as mode:
         testval = 2
         raise ModeExit
-        testval = 0  # never hit
+        testval = 0  # type: ignore # (never hit)
 
     assert testval == 2
 
@@ -154,7 +155,7 @@ def test_mode_exits_with_modeexit_with_args():
     ) as mode:
         testval = 3
         raise ModeExit("FOOO")
-        testval = 0  # never hit
+        testval = 0  # type: ignore # (never hit)
 
     assert testval == 3
 
@@ -175,7 +176,7 @@ def test_mode_exits_with_other_exception():
         ) as mode:
             testval = 4
             raise MyException
-            testval = 0
+            testval = 0  # type: ignore # (never hit)
 
     assert testval == 4
 
@@ -207,10 +208,13 @@ def _assert_context_manager_used_correctly(mocks, mode):
 
 def test_handle_activation_fail_bad_on_fail_value():
     with pytest.raises(ValueError, match="on_fail must be one of"):
-        handle_activation_fail(on_fail="foo", result=Mock(spec_set=ActivationResult))
+        handle_activation_fail(
+            on_fail="foo",  # type: ignore
+            result=Mock(spec_set=ActivationResult),
+        )
 
 
-def test_modecontroller(monkeypatch):
+def test_modecontroller(monkeypatch, do_assert):
     # Disable fake success here, because we want to use method_cls for the
     # activation (and not WakepyFakeSuccess)
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
@@ -219,12 +223,12 @@ def test_modecontroller(monkeypatch):
     controller = ModeController(Mock(spec_set=DBusAdapter))
 
     # When controller was created, it has not active method or heartbeat
-    assert controller.active_method is None
-    assert controller.heartbeat is None
+    do_assert(controller.active_method is None)
+    do_assert(controller.heartbeat is None)
 
     controller.activate([method_cls])
-    assert isinstance(controller.active_method, method_cls)
-    assert isinstance(controller.heartbeat, Heartbeat)
+    do_assert(isinstance(controller.active_method, method_cls))
+    do_assert(isinstance(controller.heartbeat, Heartbeat))
 
     retval = controller.deactivate()
     assert retval is True

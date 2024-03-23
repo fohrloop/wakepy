@@ -4,7 +4,7 @@ import logging
 import queue
 import threading
 import time
-from typing import Callable, Optional, Tuple, Type
+from typing import Any, Callable, Optional, Tuple, Type
 
 from jeepney import HeaderFields, MessageType, new_error, new_method_return
 from jeepney.bus_messages import message_bus
@@ -41,7 +41,9 @@ class DBusService:
 
     addr: DBusAddress
 
-    def __init__(self, bus_address: str, queue_: queue.Queue, stop: Callable):
+    def __init__(
+        self, bus_address: str, queue_: queue.Queue[str], stop: Callable[[], bool]
+    ):
         """
         Parameters
         ----------
@@ -139,7 +141,9 @@ class DBusService:
         """Create an error message for replying to a message"""
         return new_error(msg, self.bus_name + method)
 
-    def handle_method(self, method: str, args: Tuple) -> Optional[Tuple[str, Tuple]]:
+    def handle_method(
+        self, method: str, args: Tuple[Any, ...]
+    ) -> Optional[Tuple[str, Tuple[Any, ...]]]:
         """Should return either None (when method does not exist), or tuple of
         output signature (like "ii" or "sus", etc.), and output values which
         are of the type defined by the output signature
@@ -158,15 +162,17 @@ def start_dbus_service(
         --print-address. If not given, uses the service_cls.addr.bus.
     """
 
-    queue_ = queue.Queue()
+    queue_: queue.Queue[str] = queue.Queue()
     should_stop = False
 
     def start_service(
-        service: Type[DBusService], queue_: queue.Queue, should_stop: Callable
+        service: Type[DBusService],
+        queue_: queue.Queue[str],
+        should_stop: Callable[[], bool],
     ):
         logger.info(f"Launching dbus service: {service.addr.service}")
-
-        service_ = service(bus_address or service.addr.bus, queue_, stop=should_stop)
+        addr = bus_address or service.addr.bus or "SESSION"
+        service_ = service(addr, queue_, stop=should_stop)
         service_.start(
             server_name=service.addr.service,
             object_path=service.addr.path,

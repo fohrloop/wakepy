@@ -11,7 +11,8 @@ from unittest.mock import Mock
 
 import pytest
 import time_machine
-from testmethods import (
+
+from tests.unit.test_core.testmethods import (
     FAILURE_REASON,
     METHOD_MISSING,
     METHOD_OPTIONS,
@@ -19,10 +20,16 @@ from testmethods import (
     get_test_method_class,
     iterate_test_methods,
 )
-
-from wakepy.core import DBusAdapter, MethodActivationResult, get_methods
+from wakepy.core import (
+    DBusAdapter,
+    Method,
+    MethodActivationResult,
+    PlatformName,
+    get_methods,
+)
 from wakepy.core.activation import (
     StageName,
+    StageNameValue,
     WakepyFakeSuccess,
     activate_method,
     activate_mode,
@@ -32,7 +39,7 @@ from wakepy.core.activation import (
     try_enter_and_heartbeat,
 )
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.method import Method, MethodError, PlatformName
+from wakepy.core.method import MethodError
 
 
 def test_activate_without_methods(monkeypatch):
@@ -592,10 +599,11 @@ def test_deactivate_fail_heartbeat_not_stopping():
         deactivate_method(method, heartbeat)
 
 
-def test_stagename():
+def test_stagename(assert_strenum_values):
     assert StageName.PLATFORM_SUPPORT == "PLATFORM_SUPPORT"
     assert StageName.ACTIVATION == "ACTIVATION"
     assert StageName.REQUIREMENTS == "REQUIREMENTS"
+    assert_strenum_values(StageName, StageNameValue)
 
 
 # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS

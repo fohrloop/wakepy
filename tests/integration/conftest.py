@@ -10,10 +10,13 @@ import sys
 import pytest
 
 if sys.platform.lower().startswith("linux"):
-    from dbus_service import DBusService, start_dbus_service
+    from tests.integration.dbus_service import DBusService, start_dbus_service
 else:
-    DBusService = None
-    start_dbus_service = None
+
+    class DBusService: ...  # type: ignore
+
+    def start_dbus_service(): ...  # type: ignore
+
 
 from wakepy.core import DBusAddress, DBusMethod
 
@@ -55,6 +58,9 @@ def private_bus():
         shell=False,
         env={"DBUS_VERBOSE": "1"},
     )
+
+    if p.stdout is None:
+        raise RuntimeError("Error when starting private bus")
 
     bus_address = p.stdout.readline().decode("utf-8").strip()
 

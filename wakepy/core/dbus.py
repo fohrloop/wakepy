@@ -18,7 +18,7 @@ from __future__ import annotations
 import typing
 from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Type, Union
 
-from .constants import BusType
+from .constants import BusType as BusType
 
 CallArguments = Optional[Union[Dict[str, Any], Tuple[Any, ...], List[Any]]]
 
@@ -148,7 +148,7 @@ class DBusMethod(NamedTuple):
     def of(
         self,
         addr: DBusAddress,
-    ):
+    ) -> DBusMethod:
         """Ties a DBusAddress to a DBusMethod, forming a completely defined
         DBusMethod. Returns a new DBusMethod object.
         """

@@ -7,17 +7,15 @@ supported."""
 from __future__ import annotations
 
 from enum import Enum, EnumMeta, auto
-from types import MappingProxyType
-from typing import Any
+from typing import Any, ValuesView
 
 
-class ConstantEnumMeta(EnumMeta):
+class StrEnumMeta(EnumMeta):
     """This metaclass is an extension of the basic Enum metaclass, and provides
     the following
 
     1) Containment check for enumeration member values; `val in SomeClass`
     2) `unique` parameter when creating constants.
-    3) Support for (custom) string-type members in Enums
     """
 
     @classmethod
@@ -34,47 +32,35 @@ class ConstantEnumMeta(EnumMeta):
         if unique:
             cls._check_uniqueness()
 
-        cls.__members__: MappingProxyType[str, Any]
-        for member in cls.__members__.values():
-            # The .name is needed for the @unique decorator compatibility
-            # It is also part of enum member protocol, so let it be.
-            member.name = member._name_
-
     def _check_uniqueness(cls):
-        vals = cls.__members__.values()
+        vals: ValuesView[Enum] = cls.__members__.values()
         if len(vals) > len(set(vals)):
             raise ValueError("The values must be unique!")
 
-    def __contains__(self, value: Any) -> bool:
+    def __contains__(cls, value: Any) -> bool:
         """Provides the `val in SomeConstClass` containment check
 
         Parameters
         ----------
-        self:
-            This will be the (subclass) of the class using ConstantEnumMeta.
-            If you use class Const(metaclass=ConstantEnumMeta): ... and
-            SomeConst(Const), self will be SomeConst; a class.
+        cls:
+            This will be the (subclass) of the class using StrEnumMeta.
+            If you use class Const(metaclass=StrEnumMeta): ... and
+            SomeConst(Const), cls will be SomeConst; a class.
         value:
             The `val` in the example
         """
-        return value in self.values()
+        return value in cls.values()
 
     @property
-    def keys(self):
-        return self.__members__.keys
+    def keys(cls):
+        return cls.__members__.keys
 
     @property
-    def values(self):
-        return self.__members__.values
+    def values(cls):
+        return cls.__members__.values
 
 
-class EnumMemberString(str):
-    """dummy string subclass to make it possible to add custom attributes to
-    it.
-    """
-
-
-class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
+class StrEnum(str, Enum, metaclass=StrEnumMeta):
     """A string constant / enumeration. For creating reusable, typed constants.
 
     Properties
@@ -113,7 +99,8 @@ class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
 
     """
 
-    def _generate_next_value_(name, *_):
+    @staticmethod
+    def _generate_next_value_(name: str, *_) -> str:
         """Turn auto() value to be a string corresponding to the enumeration
         member name
 
@@ -121,20 +108,21 @@ class StrEnum(str, Enum, metaclass=ConstantEnumMeta):
         """
         return name
 
-    def __new__(cls, val=None, *_):
-        """This is used to get rid of need for ".value" access:
+    def __str__(self) -> str:
+        return str.__str__(self)
 
-        >>> StrEnum.FOO.value
-        'foo'
+    def __hash__(self) -> int:
+        return super().__hash__()
 
-        It is possible to use
+    def __eq__(self, other: object) -> bool:
+        # This was added just to make mypy happy. Without this mypy will
+        # assume SomeConst.FOO == 'somestr' always to be False.
+        # In reality, the EnumMemberString.__eq__ is called in this case.
+        return str(self) == other  # pragma: no cover
 
-        >>> StrEnum.FOO
-        'foo'
-
-        instead
-        """
-        return EnumMemberString(val)
+    @property
+    def name(self) -> str:
+        return self._name_
 
 
 __all__ = [

@@ -1,9 +1,21 @@
+from __future__ import annotations
+
 import re
+import sys
 
 import pytest
 
-from wakepy.core.method import Method, select_methods
+from wakepy.core import DBusMethodCall
+from wakepy.core.method import Method, MethodOutcome, MethodOutcomeValue, select_methods
 from wakepy.core.registry import MethodRegistryError, get_method, get_methods
+
+if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
+    import typing_extensions as typing
+else:  # pragma: no-cover-if-py-lt-38
+    import typing
+
+if typing.TYPE_CHECKING:
+    from wakepy.core import DBusMethod
 
 
 class TestMethod(Method):
@@ -57,7 +69,7 @@ def test_overridden_methods_autodiscovery():
     assert method3.has_heartbeat
 
     class SubWithEnterAndHeart(WithJustHeartBeat):
-        def enter_mode():
+        def enter_mode(self):
             return
 
     method4 = SubWithEnterAndHeart()
@@ -66,7 +78,7 @@ def test_overridden_methods_autodiscovery():
     assert not method4.has_exit
 
     class SubWithEnterAndExit(WithEnterAndExit):
-        def enter_mode():
+        def enter_mode(self):
             return 123
 
     method5 = SubWithEnterAndExit()
@@ -86,14 +98,14 @@ def test_method_has_x_is_not_writeable():
 
     # The .has_enter, .has_exit or .has_heartbeat should be strictly read-only
     with pytest.raises(AttributeError):
-        method.has_enter = False
+        method.has_enter = False  # type: ignore
 
     with pytest.raises(AttributeError):
-        method.has_exit = True
+        method.has_exit = True  # type: ignore
 
     # Same holds for classes
     with pytest.raises(AttributeError):
-        MethodWithEnter.has_enter = False
+        MethodWithEnter.has_enter = False  # type: ignore
 
 
 @pytest.mark.usefixtures("empty_method_registry")
@@ -108,14 +120,14 @@ def test_not_possible_to_define_two_methods_with_same_name(testutils, monkeypatc
         MethodRegistryError, match=re.escape('Duplicate Method name "Some name"')
     ):
 
-        class SomeMethod(TestMethod):  # noqa:F811
+        class SomeMethod(TestMethod):  # type: ignore # noqa:F811
             name = somename
 
     testutils.empty_method_registry(monkeypatch)
 
     # Now as the registry is empty it is possible to define method with
     # the same name again
-    class SomeMethod(TestMethod):  # noqa:F811
+    class SomeMethod(TestMethod):  # type: ignore # noqa:F811
         name = somename
 
 
@@ -171,7 +183,7 @@ def test_method_string_representations():
     assert method.__repr__() == f"<wakepy Method: MethodB at {hex(id(method))}>"
 
 
-def test_process_dbus_call():
+def test_process_dbus_call(dbus_method: DBusMethod):
     method = Method()
     # when there is no dbus adapter..
     assert method._dbus_adapter is None
@@ -180,4 +192,8 @@ def test_process_dbus_call():
         RuntimeError,
         match=".*cannot process dbus method call.*as it does not have a DBusAdapter",
     ):
-        assert method.process_dbus_call(None)
+        assert method.process_dbus_call(DBusMethodCall(dbus_method))
+
+
+def test_methodoutcome(assert_strenum_values):
+    assert_strenum_values(MethodOutcome, MethodOutcomeValue)

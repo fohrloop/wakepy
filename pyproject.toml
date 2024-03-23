@@ -7,7 +7,10 @@ authors = [
 ]
 dependencies = [
     # For using the D-Bus based methods
-    "jeepney >= 0.7.1;sys_platform=='linux'"
+    "jeepney >= 0.7.1;sys_platform=='linux'",
+    # The typing.Literal was introduced in Python 3.8. Need to install
+    # typing-extensions for Python 3.7 support.
+    'typing-extensions; python_version < "3.8.0"',
 ]
 
 # Python 3.7 introduces from __future__ import annotations
@@ -38,7 +41,8 @@ dev = [
     "IPython",
     "invoke==2.2.0",
     # Colorama is used with the tasks.py (invoke commands)
-    "colorama==0.4.6"
+    "colorama==0.4.6",
+
 ]
 # For building documentation
 doc = [
@@ -67,10 +71,16 @@ test =[
 ]
 # For linters, code analysis and formatting tools
 check = [
+    "invoke==2.2.0",
     "black==24.2.0",
     "mypy==1.9.0",
     "isort==5.13.2",
     "ruff==0.3.2",
+    # some version of pytest required for checking types. Perhaps any recent
+    # version of pytest will do.
+    "pytest",
+    "types-colorama", # for mypy
+    "time-machine==2.14.0" # for mypy
 ]
 
 
@@ -87,6 +97,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.mypy]
+exclude = ['venv', '.venv']
 check_untyped_defs = true
 disallow_any_generics = true
 no_implicit_optional = true
@@ -119,6 +130,7 @@ exclude_lines = [
     "pragma: no cover",
     "if typing.TYPE_CHECKING:",
     "@(abc\\.)?abstractmethod",
+    "@(typing\\.)?overload",
 ]
 
 [tool.coverage.coverage_conditional_plugin.omit]
@@ -127,6 +139,8 @@ exclude_lines = [
 
 [tool.coverage.coverage_conditional_plugin.rules]
 no-cover-if-no-dbus = "platform_system != 'Linux'"
+no-cover-if-py-gte-38 = "sys_version_info >= (3, 8)"
+no-cover-if-py-lt-38 = "sys_version_info < (3, 8)"
 
 [tool.isort]
 profile = "black"

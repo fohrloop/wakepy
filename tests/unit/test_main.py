@@ -1,7 +1,6 @@
 """Tests for the __main__ CLI"""
 
 import sys
-from typing import Optional
 from unittest.mock import MagicMock, Mock, call, patch
 
 import pytest
@@ -160,7 +159,7 @@ class TestMain:
 
         class TestMode(Mode):
             active = mode_works
-            activation_result: Optional[ActivationResult] = None
+            activation_result: ActivationResult = ActivationResult()
 
         mockresult = MagicMock(spec_set=ActivationResult)
         mockresult.success = mode_works

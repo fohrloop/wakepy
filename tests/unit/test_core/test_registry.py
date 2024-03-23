@@ -64,16 +64,16 @@ def test_get_methods(testutils, monkeypatch):
     assert get_methods({"A", "B"}) == {A, B}
     assert get_methods({"C", "B"}) == {C, B}
 
-    # Asking None, getting None
-    assert get_methods(None) is None
-
     # Asking something that does not exists will raise KeyError
     with pytest.raises(ValueError, match=re.escape('No Method with name "foo" found!')):
         get_methods(["A", "foo"])
 
     # Using unsupported type raises TypeError
     with pytest.raises(TypeError):
-        get_methods(4123)
+        get_methods(4123)  # type: ignore
+
+    with pytest.raises(TypeError):
+        get_methods(None)  # type: ignore
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

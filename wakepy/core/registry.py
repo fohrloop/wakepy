@@ -17,20 +17,31 @@ get_methods_for_mode
 from __future__ import annotations
 
 import typing
-from typing import List, Set, Tuple, Type, TypeVar, Union
+from typing import overload
 
-from .constants import ModeName
+from .constants import ModeName, ModeNameValue
 
 if typing.TYPE_CHECKING:
-    from typing import Optional
+    from typing import (
+        List,
+        Optional,
+        Set,
+        Tuple,
+        Type,
+        TypeAlias,
+        TypeVar,
+        Union,
+        overload,
+    )
 
     from wakepy.core.method import Method, MethodCls
 
     T = TypeVar("T")
 
-    Collection = Union[List[T], Tuple[T, ...], Set[T]]
+    Collection: TypeAlias = Union[List[T], Tuple[T, ...], Set[T]]
     MethodDict = dict[str, MethodCls]
     MethodRegistry = dict[str, MethodDict]
+
 
 _method_registry: MethodRegistry = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
@@ -45,7 +56,7 @@ class MethodRegistryError(RuntimeError):
 def register_method(method_class: Type[Method]):
     """Registers a subclass of Method to the method registry"""
 
-    if method_class.name is None:
+    if method_class._is_unnamed():
         # Methods without a name will not be registered
         return
 
@@ -69,7 +80,9 @@ def register_method(method_class: Type[Method]):
     _method_registry.setdefault(method_class.mode, method_dict)
 
 
-def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
+def get_method(
+    method_name: str, mode: Optional[ModeNameValue | str] = None
+) -> MethodCls:
     """Get a Method class based on its name and optionally the mode.
 
     Parameters
@@ -78,7 +91,7 @@ def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
         The name of the wakepy.Method. The method must be registered which
         means that the module containing the subclass definition must have
         been imported.
-    mode: str | ModeName | None
+    mode: str | None
         If the method_name is registered to methods belonging to multiple
         Modes, you must provide the mode name, to make the selection
         unambiguous. Typical mode names are "keep.running" and
@@ -125,9 +138,21 @@ def get_method(method_name: str, mode: Optional[ModeName] = None) -> MethodCls:
     return methods_from_all_modes[0]
 
 
+@overload
 def get_methods(
-    names: Collection[str] | None = None, mode: Optional[ModeName] = None
-) -> Collection[MethodCls] | None:
+    names: List[str], mode: Optional[ModeName] = None
+) -> List[MethodCls]: ...
+@overload
+def get_methods(
+    names: Tuple[str, ...], mode: Optional[ModeName] = None
+) -> Tuple[MethodCls, ...]: ...
+@overload
+def get_methods(names: Set[str], mode: Optional[ModeName] = None) -> Set[MethodCls]: ...
+
+
+def get_methods(
+    names: Collection[str], mode: Optional[ModeName] = None
+) -> Collection[MethodCls]:
     """Get a collection (list, tuple or set) of Method classes based on their
     names, and optionally the mode name.
 
@@ -145,13 +170,10 @@ def get_methods(
     Raises
     ------
     ValueError
-        Raised if any of the  methods does not exist, or if any of the existing
+        Raised if any of the methods does not exist, or if any of the existing
         methods exists in multiple modes and the mode name (str) was not
         provided as argument to make the selection unambiguous.
     """
-
-    if names is None:
-        return None
 
     if isinstance(names, list):
         return [get_method(name, mode) for name in names]
@@ -159,8 +181,8 @@ def get_methods(
         return tuple(get_method(name, mode) for name in names)
     elif isinstance(names, set):
         return set(get_method(name, mode) for name in names)
-
-    raise TypeError("`names` must be a list, tuple or set")
+    else:
+        raise TypeError("`names` must be a list, tuple or set")
 
 
 def get_methods_for_mode(

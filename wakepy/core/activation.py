@@ -21,9 +21,10 @@ MethodActivationResult
 from __future__ import annotations
 
 import datetime as dt
+import sys
 import typing
 from dataclasses import dataclass
-from typing import List, Set, Union
+from typing import List, Sequence, Set, Union
 
 from .constants import PlatformName
 from .dbus import DBusAdapter
@@ -32,14 +33,19 @@ from .method import Method, MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
 
+if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
+    from typing_extensions import Literal
+else:  # pragma: no-cover-if-py-lt-38
+    from typing import Literal
+
 if typing.TYPE_CHECKING:
-    from typing import Optional, Sequence, Tuple, Type
+    from typing import Optional, Tuple, Type
 
     from .method import MethodCls
 
 """The strings in MethodsPriorityOrder are names of wakepy.Methods or the
 asterisk ('*')."""
-MethodsPriorityOrder = List[Union[str, Set[str]]]
+MethodsPriorityOrder = Sequence[Union[str, Set[str]]]
 
 
 class StageName(StrEnum):
@@ -52,6 +58,9 @@ class StageName(StrEnum):
     PLATFORM_SUPPORT = auto()
     REQUIREMENTS = auto()
     ACTIVATION = auto()
+
+
+StageNameValue = Literal["NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"]
 
 
 class ActivationResult:
@@ -184,7 +193,7 @@ class ActivationResult:
     def query(
         self,
         success: Sequence[bool | None] = (True, False, None),
-        fail_stages: Sequence[StageName] = (
+        fail_stages: Sequence[StageName | StageNameValue] = (
             StageName.PLATFORM_SUPPORT,
             StageName.REQUIREMENTS,
             StageName.ACTIVATION,
@@ -555,7 +564,7 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
         If the `method` has method.heartbeat() implemented, and activation
         succeeds, this is a Heartbeat object. Otherwise, this is None.
     """
-    if method.name is None:
+    if method._is_unnamed():
         raise ValueError("Methods without a name may not be used to activate modes!")
 
     result = MethodActivationResult(success=False, method_name=method.name)

@@ -2,13 +2,13 @@ import re
 
 import pytest
 
+from wakepy.core import PlatformName
 from wakepy.core.activation import (
     check_methods_priority,
     get_prioritized_methods,
     get_prioritized_methods_groups,
     sort_methods_by_priority,
 )
-from wakepy.core.method import PlatformName
 from wakepy.core.registry import get_methods
 
 
@@ -70,7 +70,10 @@ def test_check_methods_priority():
         TypeError,
         match=re.escape("methods_priority must be a list[str | set[str]]!"),
     ):
-        check_methods_priority(methods_priority=[MethodA], methods=methods)
+        check_methods_priority(
+            methods_priority=[MethodA],  # type: ignore
+            methods=methods,
+        )
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

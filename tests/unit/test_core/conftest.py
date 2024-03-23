@@ -1,6 +1,6 @@
 import pytest
 
-from wakepy.core.method import Method, PlatformName
+from wakepy.core import DBusAddress, DBusMethod, Method, PlatformName
 
 # B, D, E
 FIRST_MODE = "first_mode"
@@ -76,3 +76,15 @@ def provide_methods_a_f(monkeypatch, testutils):
     class MethodF(TestMethod):
         name = "F"
         mode = SECOND_MODE
+
+
+@pytest.fixture
+def service():
+    return DBusAddress(path="/foo", service="wakepy.foo", interface="/foo")
+
+
+@pytest.fixture
+def dbus_method(service: DBusAddress):
+    return DBusMethod(
+        name="test-method", signature="isi", params=("first", "second", "third")
+    ).of(service)

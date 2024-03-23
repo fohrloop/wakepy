@@ -25,7 +25,7 @@ import platform
 import typing
 
 from colorama import Fore
-from invoke import task
+from invoke import task  # type: ignore
 
 if typing.TYPE_CHECKING:
     from invoke.runners import Result
@@ -34,13 +34,14 @@ if typing.TYPE_CHECKING:
 def get_run_with_print(c):
     def run_with_print(cmd: str, ignore_errors: bool = False) -> Result:
         print("Running:", Fore.YELLOW, cmd, Fore.RESET)
-        return c.run(cmd, pty=platform.system() == "Linux", warn=ignore_errors)
+        res: Result = c.run(cmd, pty=platform.system() == "Linux", warn=ignore_errors)
+        return res
 
     return run_with_print
 
 
 @task
-def format(c):
+def format(c) -> None:
     run = get_run_with_print(c)
     run("python -m isort .")
     run("python -m black .")
@@ -48,16 +49,16 @@ def format(c):
 
 
 @task
-def check(c) -> int:
+def check(c) -> None:
     run = get_run_with_print(c)
     run("python -m isort --check .")
     run("python -m black --check .")
     run("python -m ruff check --no-fix .")
-    run("python -m mypy ./wakepy")
+    run("python -m .")
 
 
 @task
-def docs(c):
+def docs(c) -> None:
     """Starts sphinx build with live-reload on browser."""
 
     run = get_run_with_print(c)
@@ -68,7 +69,7 @@ def docs(c):
 
 
 @task
-def test(c, pdb: bool = False):
+def test(c, pdb: bool = False) -> None:
     run = get_run_with_print(c)
     pdb_flag = " --pdb " if pdb else ""
     res = run(

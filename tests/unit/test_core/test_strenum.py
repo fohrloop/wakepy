@@ -5,7 +5,7 @@ import pytest
 from wakepy.core.strenum import StrEnum
 
 
-def test_constant_basic_functionality():
+def test_strenum_basic_functionality():
     class MyConst(StrEnum):
         FOO = "fooval"
 
@@ -13,7 +13,8 @@ def test_constant_basic_functionality():
     # added as a string
     assert MyConst.FOO == "fooval"
     assert isinstance(MyConst.FOO, str)
-
+    assert MyConst.FOO.name == "FOO"
+    assert MyConst.FOO.value == "fooval"
     # Test containement
     # Values can be querid with in operator
     assert "fooval" in MyConst
@@ -23,34 +24,26 @@ def test_constant_basic_functionality():
     assert "FOO" in MyConst.__members__.keys()
 
 
-def test_constant_auto():
+def test_strenum_auto():
     class MyConst(StrEnum):
         BAR = auto()
 
     # Any auto() value is turned into a string which is same as
     # the enumeration member name
     assert MyConst.BAR == "BAR"
+    assert "BAR" == MyConst.BAR
+
     assert isinstance(MyConst.BAR, str)
 
 
-def test_constant_uniqueness():
-    # It is possible to use the @unique decorator
-    # from the enum package
-
+def test_strenum_uniqueness_with_unique_values():
     # This should cause no problems
     class MyConst(StrEnum, unique=True):
         FOO = "fooval"
         BAR = "barval"
-        BAZ = auto()
 
-    # Any string valued constant is
-    # added as a string
-    assert MyConst.FOO == "fooval"
-    assert MyConst.BAR == "barval"
-    assert MyConst.BAZ == "BAZ"
-    for obj in (MyConst.FOO, MyConst.BAR, MyConst.BAZ):
-        assert isinstance(obj, str)
 
+def test_strenum_uniqueness_with_non_unique_values():
     # This should raise exception as the 'fooval' value is used twice and
     # uniqueness is asked
     with pytest.raises(ValueError):
@@ -59,6 +52,8 @@ def test_constant_uniqueness():
             FOO = "fooval"
             BAR = "fooval"
 
+
+def test_strenum_duplicates_non_unique_constraint():
     # It should be possible to define duplicate values if uniqueness is not
     # asked
     class MyConst(StrEnum):
