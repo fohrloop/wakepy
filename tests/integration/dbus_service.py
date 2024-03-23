@@ -41,7 +41,9 @@ class DBusService:
 
     addr: DBusAddress
 
-    def __init__(self, bus_address: str, queue_: queue.Queue[str], stop: Callable):
+    def __init__(
+        self, bus_address: str, queue_: queue.Queue[str], stop: Callable[[], bool]
+    ):
         """
         Parameters
         ----------
@@ -162,7 +164,7 @@ def start_dbus_service(
     should_stop = False
 
     def start_service(
-        service: Type[DBusService], queue_: queue.Queue, should_stop: Callable
+        service: Type[DBusService], queue_: queue.Queue, should_stop: Callable[[], bool]
     ):
         logger.info(f"Launching dbus service: {service.addr.service}")
 
