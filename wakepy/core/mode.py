@@ -160,9 +160,9 @@ class Mode:
     """True if the mode is active. Otherwise, False.
     """
 
-    activation_result: ActivationResult | None
+    activation_result: ActivationResult
     """The activation result which tells more about the activation process
-    outcome. None if Mode has not yet been activated.
+    outcome.
     """
 
     name: str | None
@@ -201,7 +201,7 @@ class Mode:
         self.method_classes = methods
         self.methods_priority = methods_priority
         self.controller: ModeController | None = None
-        self.activation_result: ActivationResult | None = None
+        self.activation_result = ActivationResult()
         self.active: bool = False
         self.on_fail = on_fail
         self._dbus_adapter_cls = dbus_adapter
