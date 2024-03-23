@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import re
-import typing
+import sys
 
 import pytest
 
 from wakepy.core import DBusMethodCall
 from wakepy.core.method import Method, MethodOutcome, MethodOutcomeValue, select_methods
 from wakepy.core.registry import MethodRegistryError, get_method, get_methods
+
+if sys.version_info < (3, 8):
+    import typing_extensions as typing
+else:
+    import typing
 
 if typing.TYPE_CHECKING:
     from wakepy.core import DBusMethod

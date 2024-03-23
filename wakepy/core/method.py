@@ -14,6 +14,7 @@ select_methods
 
 from __future__ import annotations
 
+import sys
 import typing
 from abc import ABC, ABCMeta
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
@@ -24,6 +25,11 @@ from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
     from wakepy.core import DBusAdapter, DBusMethodCall
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 MethodCls = Type["Method"]
 T = TypeVar("T")
@@ -65,7 +71,7 @@ class MethodOutcome(StrEnum):
     FAILURE = auto()
 
 
-MethodOutcomeValue = typing.Literal["NOT_IMPLEMENTED", "SUCCESS", "FAILURE"]
+MethodOutcomeValue = Literal["NOT_IMPLEMENTED", "SUCCESS", "FAILURE"]
 
 
 unnamed = "__unnamed__"

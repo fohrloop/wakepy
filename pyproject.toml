@@ -7,7 +7,10 @@ authors = [
 ]
 dependencies = [
     # For using the D-Bus based methods
-    "jeepney >= 0.7.1;sys_platform=='linux'"
+    "jeepney >= 0.7.1;sys_platform=='linux'",
+    # The typing.Literal was introduced in Python 3.8. Need to install
+    # typing-extensions for Python 3.7 support.
+    'typing-extensions; python_version < "3.8.0"',
 ]
 
 # Python 3.7 introduces from __future__ import annotations

@@ -6,7 +6,7 @@ Exception: ActivationResult is tested in it's own file
 import datetime as dt
 import os
 import re
-import typing
+import sys
 from contextlib import contextmanager
 from unittest.mock import Mock
 
@@ -41,6 +41,11 @@ from wakepy.core.activation import (
 )
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import MethodError
+
+if sys.version_info < (3, 8):
+    import typing_extensions as typing
+else:
+    import typing
 
 
 def test_activate_without_methods(monkeypatch):

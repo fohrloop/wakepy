@@ -1,7 +1,12 @@
-import typing
+import sys
 
 from wakepy.core import BusType, ModeName, PlatformName
 from wakepy.core.constants import BusTypeValue, ModeNameValue, PlatformNameValue
+
+if sys.version_info < (3, 8):
+    import typing_extensions as typing
+else:
+    import typing
 
 
 def test_platformname():

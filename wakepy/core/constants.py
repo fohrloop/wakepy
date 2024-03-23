@@ -1,8 +1,13 @@
 """Common terms and definitions used in many places"""
 
-import typing
+import sys
 
 from .strenum import StrEnum, auto
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 
 class PlatformName(StrEnum):
@@ -12,7 +17,7 @@ class PlatformName(StrEnum):
     OTHER = auto()
 
 
-PlatformNameValue = typing.Literal["WINDOWS", "LINUX", "MACOS", "OTHER"]
+PlatformNameValue = Literal["WINDOWS", "LINUX", "MACOS", "OTHER"]
 
 
 class ModeName(StrEnum):
@@ -25,7 +30,7 @@ class ModeName(StrEnum):
     KEEP_PRESENTING = "keep.presenting"
 
 
-ModeNameValue = typing.Literal["keep.running", "keep.presenting"]
+ModeNameValue = Literal["keep.running", "keep.presenting"]
 
 
 class BusType(StrEnum):
@@ -35,4 +40,4 @@ class BusType(StrEnum):
     SYSTEM = auto()
 
 
-BusTypeValue = typing.Literal["SESSION", "SYSTEM"]
+BusTypeValue = Literal["SESSION", "SYSTEM"]

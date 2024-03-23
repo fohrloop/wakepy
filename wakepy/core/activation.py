@@ -21,6 +21,7 @@ MethodActivationResult
 from __future__ import annotations
 
 import datetime as dt
+import sys
 import typing
 from dataclasses import dataclass
 from typing import List, Sequence, Set, Union
@@ -31,6 +32,11 @@ from .heartbeat import Heartbeat
 from .method import Method, MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .strenum import StrEnum, auto
+
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal
 
 if typing.TYPE_CHECKING:
     from typing import Optional, Tuple, Type
@@ -54,9 +60,7 @@ class StageName(StrEnum):
     ACTIVATION = auto()
 
 
-StageNameValue = typing.Literal[
-    "NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"
-]
+StageNameValue = Literal["NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"]
 
 
 class ActivationResult:
