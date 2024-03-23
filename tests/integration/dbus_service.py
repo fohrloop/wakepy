@@ -171,8 +171,8 @@ def start_dbus_service(
         should_stop: Callable[[], bool],
     ):
         logger.info(f"Launching dbus service: {service.addr.service}")
-
-        service_ = service(bus_address or service.addr.bus, queue_, stop=should_stop)
+        addr = bus_address or service.addr.bus or "SESSION"
+        service_ = service(addr, queue_, stop=should_stop)
         service_.start(
             server_name=service.addr.service,
             object_path=service.addr.path,
