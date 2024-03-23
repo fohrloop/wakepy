@@ -39,7 +39,7 @@ dev = [
     "invoke==2.2.0",
     # Colorama is used with the tasks.py (invoke commands)
     "colorama==0.4.6",
-    "types-colorama", # for mypy 
+
 ]
 # For building documentation
 doc = [
@@ -68,13 +68,16 @@ test =[
 ]
 # For linters, code analysis and formatting tools
 check = [
-    # some version of pytest required for checking types. Perhaps any recent
-    # version of pytest will do.
-    "pytest", 
+    "invoke==2.2.0",
     "black==24.2.0",
     "mypy==1.9.0",
     "isort==5.13.2",
     "ruff==0.3.2",
+    # some version of pytest required for checking types. Perhaps any recent
+    # version of pytest will do.
+    "pytest",
+    "types-colorama", # for mypy
+    "time-machine==2.14.0" # for mypy
 ]
 
 
