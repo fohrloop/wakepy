@@ -142,7 +142,7 @@ class DBusService:
         return new_error(msg, self.bus_name + method)
 
     def handle_method(
-        self, method: str, args: Tuple
+        self, method: str, args: Tuple[Any, ...]
     ) -> Optional[Tuple[str, Tuple[Any, ...]]]:
         """Should return either None (when method does not exist), or tuple of
         output signature (like "ii" or "sus", etc.), and output values which
