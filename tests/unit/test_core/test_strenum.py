@@ -13,7 +13,8 @@ def test_strenum_basic_functionality():
     # added as a string
     assert MyConst.FOO == "fooval"
     assert isinstance(MyConst.FOO, str)
-
+    assert MyConst.FOO.name == "FOO"
+    assert MyConst.FOO.value == "fooval"
     # Test containement
     # Values can be querid with in operator
     assert "fooval" in MyConst
