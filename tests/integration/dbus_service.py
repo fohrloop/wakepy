@@ -4,7 +4,7 @@ import logging
 import queue
 import threading
 import time
-from typing import Callable, Optional, Tuple, Type
+from typing import Any, Callable, Optional, Tuple, Type
 
 from jeepney import HeaderFields, MessageType, new_error, new_method_return
 from jeepney.bus_messages import message_bus
@@ -141,7 +141,9 @@ class DBusService:
         """Create an error message for replying to a message"""
         return new_error(msg, self.bus_name + method)
 
-    def handle_method(self, method: str, args: Tuple) -> Optional[Tuple[str, Tuple]]:
+    def handle_method(
+        self, method: str, args: Tuple
+    ) -> Optional[Tuple[str, Tuple[Any, ...]]]:
         """Should return either None (when method does not exist), or tuple of
         output signature (like "ii" or "sus", etc.), and output values which
         are of the type defined by the output signature
