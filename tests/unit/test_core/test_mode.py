@@ -214,7 +214,7 @@ def test_handle_activation_fail_bad_on_fail_value():
         )
 
 
-def test_modecontroller(monkeypatch):
+def test_modecontroller(monkeypatch, do_assert):
     # Disable fake success here, because we want to use method_cls for the
     # activation (and not WakepyFakeSuccess)
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
@@ -223,12 +223,12 @@ def test_modecontroller(monkeypatch):
     controller = ModeController(Mock(spec_set=DBusAdapter))
 
     # When controller was created, it has not active method or heartbeat
-    assert controller.active_method is None
-    assert controller.heartbeat is None
+    do_assert(controller.active_method is None)
+    do_assert(controller.heartbeat is None)
 
     controller.activate([method_cls])
-    assert isinstance(controller.active_method, method_cls)
-    assert isinstance(controller.heartbeat, Heartbeat)
+    do_assert(isinstance(controller.active_method, method_cls))
+    do_assert(isinstance(controller.heartbeat, Heartbeat))
 
     retval = controller.deactivate()
     assert retval is True
