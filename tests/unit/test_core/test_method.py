@@ -195,8 +195,5 @@ def test_process_dbus_call(dbus_method: DBusMethod):
         assert method.process_dbus_call(DBusMethodCall(dbus_method))
 
 
-def test_methodoutcome():
-    """Tests that MethodOutcomeValue is in synch with MethodOutcome"""
-    assert set(typing.get_args(MethodOutcomeValue)) == {
-        member.value for member in MethodOutcome
-    }
+def test_methodoutcome(assert_strenum_values):
+    assert_strenum_values(MethodOutcome, MethodOutcomeValue)

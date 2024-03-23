@@ -1,6 +1,14 @@
+import sys
 from typing import Optional
 
 import pytest
+
+from wakepy.core.strenum import StrEnum
+
+if sys.version_info < (3, 8):
+    import typing_extensions as typing
+else:
+    import typing
 
 
 @pytest.fixture
@@ -30,3 +38,14 @@ def do_assert():
             raise AssertionError
 
     return _do_assert
+
+
+@pytest.fixture
+def assert_strenum_values():
+
+    def _assert_strenum_values(strenum_cls: typing.Type[StrEnum], values: typing.Any):
+        """Note: `values` is a typing.Literal. Could not find a type annotation
+        for that"""
+        assert set(typing.get_args(values)) == {member.value for member in strenum_cls}
+
+    return _assert_strenum_values

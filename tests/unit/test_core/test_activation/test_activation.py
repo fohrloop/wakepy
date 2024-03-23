@@ -6,7 +6,6 @@ Exception: ActivationResult is tested in it's own file
 import datetime as dt
 import os
 import re
-import sys
 from contextlib import contextmanager
 from unittest.mock import Mock
 
@@ -41,11 +40,6 @@ from wakepy.core.activation import (
 )
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import MethodError
-
-if sys.version_info < (3, 8):
-    import typing_extensions as typing
-else:
-    import typing
 
 
 def test_activate_without_methods(monkeypatch):
@@ -605,13 +599,11 @@ def test_deactivate_fail_heartbeat_not_stopping():
         deactivate_method(method, heartbeat)
 
 
-def test_stagename():
+def test_stagename(assert_strenum_values):
     assert StageName.PLATFORM_SUPPORT == "PLATFORM_SUPPORT"
     assert StageName.ACTIVATION == "ACTIVATION"
     assert StageName.REQUIREMENTS == "REQUIREMENTS"
-    assert set(typing.get_args(StageNameValue)) == {
-        member.value for member in StageName
-    }
+    assert_strenum_values(StageName, StageNameValue)
 
 
 # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
