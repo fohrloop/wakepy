@@ -164,7 +164,9 @@ def start_dbus_service(
     should_stop = False
 
     def start_service(
-        service: Type[DBusService], queue_: queue.Queue, should_stop: Callable[[], bool]
+        service: Type[DBusService],
+        queue_: queue.Queue[str],
+        should_stop: Callable[[], bool],
     ):
         logger.info(f"Launching dbus service: {service.addr.service}")
 
