@@ -68,6 +68,9 @@ test =[
 ]
 # For linters, code analysis and formatting tools
 check = [
+    # some version of pytest required for checking types. Perhaps any recent
+    # version of pytest will do.
+    "pytest", 
     "black==24.2.0",
     "mypy==1.9.0",
     "isort==5.13.2",
