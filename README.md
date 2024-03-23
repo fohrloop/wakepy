@@ -34,6 +34,7 @@ Wakepy has two main modes:
 - Permissive MIT licence
 - Low amount of python dependencies
   - For using the D-Bus methods on Linux: [jeepney](https://jeepney.readthedocs.io/)
+  - On Python 3.7: [typing-extensions](https://pypi.org/project/typing-extensions/).
   - Otherwise: None
 
 

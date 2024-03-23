@@ -16,6 +16,8 @@ pip install wakepy
 
 ```{note}
 On Linux will install also **[`jeepney`](https://jeepney.readthedocs.io/)** for DBus communication (if not installed). On other systems there are no python requirements.
+
+On Python 3.7 installs [typing-extensions](https://pypi.org/project/typing-extensions/).
 ```
 
 ## Basic Usage
