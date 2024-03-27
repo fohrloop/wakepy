@@ -31,7 +31,7 @@ concurrency:
 
 # Common environment variables
 env:
-  TOX_REQUIREMENT: 'tox~=4.6.0'
+  TOX_REQUIREMENT: 'tox -c requirements/requirements-test.txt'
 
 jobs:
   test-building-docs:

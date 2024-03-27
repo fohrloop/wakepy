@@ -40,32 +40,38 @@ invoke docs
 
 # Testing
 
-- wakepy uses pytest for tests and tox for testing the library with multiple python versions.
+Wakepy uses pytest for testing the source tree with one python version and tox for testing the created wheel with multiple python versions.
 
 ## Running tests with single environment
 
-- Requirement: Any one python version `python -m pytest` within the range of supported versions (see README.md or tox.ini)
+- Requirement: Any one python version within the range of supported versions (see README.md or tox.ini)
 - Use pytest to run tests within a single environment:
 
 ```
 invoke test
 ```
+this will (1) run tests in your current python environment against the intalled version
+of wakepy (if editable install, uses the source tree), (2) Check code coverage, (3)
+run code formatting checks.
+
 
 ## Running tests with multiple environments
 
-- Requirement:  All the python versions mentioned in the envlist in tox.ini have to be installed and available for tox.
+- Requirement:  One or more of the python versions mentioned in the envlist in tox.ini have to be installed and available for tox. Missing python versions are going to be simply skipped. If running on UNIX/macOS,
+  you may use [pyenv](https://github.com/pyenv/pyenv) to install multiple versions of python.
 - To run the tests with multiple python versions, use tox:
 
 ```
-python -m tox
+tox
 ```
 
 - To start a debugger on error with a specific python version, select the tox environment with "-e <envname>" and add "-- --pdb" to start the python debugger on error. For example:
 
 ```
-python -m tox -e py310 -- --pdb
+tox -e py310 -- --pdb
 ```
 
+- When using tox within this project, what happens is (1) wakepy is built with `python -m build`. This creates sdist from source tree and then wheel from the sdist. (2) Tests are ran against the created *wheel* (if not `skip_install=True` for that environment).
 
 # Deployment
 

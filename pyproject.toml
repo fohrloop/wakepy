@@ -63,6 +63,11 @@ no_implicit_reexport = true
 module = 'jeepney.*'
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = 'tox.*'
+ignore_missing_imports = true
+
+
 [tool.pytest.ini_options]
 filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy.*:DeprecationWarning"
 

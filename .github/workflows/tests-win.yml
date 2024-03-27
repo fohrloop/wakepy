@@ -53,7 +53,7 @@ jobs:
       - name: install tox
         run: |
           python -m pip install -U pip wheel &&`
-          python -m pip install tox~=4.6.0
+          python -m pip install tox -c requirements/requirements-test.txt
       - name: Run tests with tox
         run: tox -e py310
       - name: Show lines not covered by tests
