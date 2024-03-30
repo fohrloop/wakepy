@@ -3,7 +3,7 @@
 # requirement. The other requirements files are used for automation.
 -r requirements-test.txt
 -r requirements-docs.txt
--r requirements-style.txt
+-r requirements-check.txt
 
 sphinx-autobuild==2024.2.4
 IPython
