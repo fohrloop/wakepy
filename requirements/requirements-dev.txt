@@ -1,0 +1,12 @@
+# These are the requirements for development. If you're installing wakepy
+# source tree for development (pip install -e .), add this file as a
+# requirement. The other requirements files are used for automation.
+-r requirements-test.txt
+-r requirements-docs.txt
+-r requirements-check.txt
+
+sphinx-autobuild==2024.2.4
+IPython
+invoke==2.2.0
+# Colorama is used with the tasks.py (invoke commands)
+colorama==0.4.6
