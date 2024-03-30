@@ -17,7 +17,7 @@ Requirements:
 
 Install in editable state with the `dev` extras:
 ```
-python -m pip install -r requirements/requirements-dev.txt .
+python -m pip install -r requirements/requirements-dev.txt -e .
 ```
 
 where `.` means the current directory (assuming cwd is at root of the repository).
