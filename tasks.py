@@ -54,7 +54,7 @@ def check(c) -> None:
     run("python -m isort --check .")
     run("python -m black --check .")
     run("python -m ruff check --no-fix .")
-    run("python -m .")
+    run("python -m mypy .")
 
 
 @task
