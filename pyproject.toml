@@ -46,6 +46,10 @@ wakepy = "wakepy.__main__:main"
 requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+# Disable auto-discovery. See: https://github.com/pypa/setuptools/issues/3197#issuecomment-1078770109
+py-modules = []
+
 [tool.setuptools_scm]
 # Empty section just to silent warnings
 

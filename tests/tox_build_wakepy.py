@@ -4,6 +4,7 @@ environment. See tox.ini for more details.
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 dist_dir = Path(__file__).resolve().parent.parent / "dist"
@@ -25,12 +26,17 @@ def build():
     # This creates first sdist from the source tree and then wheel from the
     # sdist. By running tests agains the wheel we test all, the source tree,
     # the sdist and the wheel.
+
     out = subprocess.run(
-        f"python -m build --no-isolation -o {dist_dir}", capture_output=True, shell=True
+        f"python -m build --no-isolation -o {dist_dir}",
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        shell=True,
     )
-    if out.stderr:
-        raise RuntimeError(out.stderr.decode("utf-8"))
-    print(out.stdout.decode("utf-8"))
+
+    if out.returncode != 0:
+        print("\n", end="")
+        raise subprocess.CalledProcessError(out.returncode, out.args)
 
 
 if __name__ == "__main__":
