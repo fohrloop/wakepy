@@ -46,6 +46,9 @@ wakepy = "wakepy.__main__:main"
 requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools_scm]
+# Empty section just to silent warnings
+
 [tool.mypy]
 exclude = ['venv', '.venv']
 check_untyped_defs = true
