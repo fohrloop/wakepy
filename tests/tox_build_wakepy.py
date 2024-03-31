@@ -26,7 +26,7 @@ def build():
     # sdist. By running tests agains the wheel we test all, the source tree,
     # the sdist and the wheel.
     out = subprocess.run(
-        f"python -m build -o {dist_dir}", capture_output=True, shell=True
+        f"python -m build --no-isolation -o {dist_dir}", capture_output=True, shell=True
     )
     if out.stderr:
         raise RuntimeError(out.stderr.decode("utf-8"))
