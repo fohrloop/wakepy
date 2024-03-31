@@ -10,6 +10,13 @@ from pathlib import Path
 dist_dir = Path(__file__).resolve().parent.parent / "dist"
 tox_asks_rebuild = dist_dir / ".TOX-ASKS-REBUILD"
 
+# A list of errors to skip.
+skip_errors = [
+    # This occurs every time sdist is used to create wheel as git files are not
+    # included in the sdist (on every build.)
+    "ERROR setuptools_scm._file_finders.git listing git files failed - pretending there aren't any"  # noqa: E501
+]
+
 
 def build():
     print(f"Checking {tox_asks_rebuild}")
@@ -18,6 +25,7 @@ def build():
         return
 
     print(f"Removing {dist_dir} and building sdist and wheel into {dist_dir}")
+
     # Cleanup. Remove all older builds; the /dist folder and its contents.
     # Note that tox would crash if there were two files with .whl extension.
     # This also resets the TOX-ASKS-REBUILD so we build only once.
@@ -30,9 +38,16 @@ def build():
     out = subprocess.run(
         f"python -m build --no-isolation -o {dist_dir}",
         stdout=sys.stdout,
-        stderr=sys.stderr,
+        stderr=subprocess.PIPE,
         shell=True,
+        universal_newlines=True,
     )
+
+    errors = [err for err in out.stderr.split("\n") if err and err not in skip_errors]
+    if errors:
+        sys.stderr.write("Captured errors:\n")
+        for line in errors:
+            sys.stderr.write(line)
 
     if out.returncode != 0:
         print("\n", end="")
