@@ -94,7 +94,7 @@ exclude_lines = [
 
 [tool.coverage.coverage_conditional_plugin.omit]
 # Dbus adapters are only available on linux
-"platform_system != 'Linux'" = "src/wakepy/dbus_adapters/*.py"
+"platform_system != 'Linux'" = "**/wakepy/dbus_adapters/*.py"
 
 [tool.coverage.coverage_conditional_plugin.rules]
 no-cover-if-no-dbus = "platform_system != 'Linux'"
