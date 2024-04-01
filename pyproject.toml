@@ -47,7 +47,7 @@ requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
-# Empty section just to silent warnings
+version_file = "src/wakepy/_version.py"
 
 [tool.mypy]
 exclude = ['venv', '.venv']
@@ -90,7 +90,7 @@ source = [
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
-    "if typing.TYPE_CHECKING:",
+    "if (?:typing\\.)?TYPE_CHECKING:",
     "@(abc\\.)?abstractmethod",
     "@(typing\\.)?overload",
 ]
