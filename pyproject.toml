@@ -74,9 +74,6 @@ filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in 
 [tool.coverage.run]
 plugins = ["coverage_conditional_plugin"]
 omit = [
-    "*/site-packages/*",
-    "*/dist-packages/*",
-    "*/distutils/*",
     "tests/*",
 ]
 
