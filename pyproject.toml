@@ -74,10 +74,14 @@ filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in 
 [tool.coverage.run]
 plugins = ["coverage_conditional_plugin"]
 omit = [
-    "*/site-packages/*",
-    "*/dist-packages/*",
-    "*/distutils/*",
     "tests/*",
+]
+[tool.coverage.paths]
+source = [
+    # This makes the coverage report paths shorter for the tox results, which
+    # otherwise are of the format: .tox/py311/lib/python3.11/site-packages/wakepy/somefile.py
+    "src/wakepy",
+    "**/site-packages/wakepy"
 ]
 
 [tool.coverage.report]
@@ -90,7 +94,7 @@ exclude_lines = [
 
 [tool.coverage.coverage_conditional_plugin.omit]
 # Dbus adapters are only available on linux
-"platform_system != 'Linux'" = "wakepy/dbus_adapters/*.py"
+"platform_system != 'Linux'" = "**/wakepy/dbus_adapters/*.py"
 
 [tool.coverage.coverage_conditional_plugin.rules]
 no-cover-if-no-dbus = "platform_system != 'Linux'"
