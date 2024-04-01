@@ -76,13 +76,13 @@ plugins = ["coverage_conditional_plugin"]
 omit = [
     "tests/*",
 ]
-# [tool.coverage.paths]
-# source = [
-#     # This makes the coverage report paths shorter for the tox results, which
-#     # otherwise are of the format: .tox/py311/lib/python3.11/site-packages/wakepy/somefile.py
-#     "src/wakepy",
-#     "**/site-packages/wakepy"
-# ]
+[tool.coverage.paths]
+source = [
+    # This makes the coverage report paths shorter for the tox results, which
+    # otherwise are of the format: .tox/py311/lib/python3.11/site-packages/wakepy/somefile.py
+    "src/wakepy",
+    "**/site-packages/wakepy"
+]
 
 [tool.coverage.report]
 exclude_lines = [
