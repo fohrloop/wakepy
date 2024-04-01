@@ -43,8 +43,11 @@ Homepage = "https://github.com/fohrloop/wakepy"
 wakepy = "wakepy.__main__:main"
 
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_file = "src/wakepy/_version.py"
 
 [tool.mypy]
 exclude = ['venv', '.venv']
@@ -87,7 +90,7 @@ source = [
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
-    "if typing.TYPE_CHECKING:",
+    "if (?:typing\\.)?TYPE_CHECKING:",
     "@(abc\\.)?abstractmethod",
     "@(typing\\.)?overload",
 ]

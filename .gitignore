@@ -1,7 +1,8 @@
 ## Manual additions
 
 .ruff_cache
-
+# Created automatically by setuptools-scm
+src/wakepy/_version.py
 #-----------------------------------------------
 # Copied from somewhere?
 #
