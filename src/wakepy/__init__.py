@@ -2,8 +2,8 @@
 from . import methods as methods
 
 try:
-    from ._version import __version__ as __version__
-    from ._version import version_tuple as version_tuple
+    from ._version import __version__ as __version__  # type:ignore
+    from ._version import version_tuple as version_tuple  # type:ignore
 except ImportError:  # pragma: no cover
     # Likely an editable install. Should ever happen if installed from a
     # distribution package (sdist or wheel)

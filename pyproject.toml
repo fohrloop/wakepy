@@ -43,7 +43,7 @@ Homepage = "https://github.com/fohrloop/wakepy"
 wakepy = "wakepy.__main__:main"
 
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8"]
+requires = ["setuptools==69.1.0", "setuptools_scm==8.0.4"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
