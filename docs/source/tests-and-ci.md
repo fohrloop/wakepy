@@ -11,8 +11,17 @@ To force wakepy to fake a successful mode activation, you may set an environment
 Only `0`, `no` and `false` are considered as falsy values (case ignored). Any other value is considered truthy.
 ```
 
+### pytest
 
-### tox configuration
+To set `WAKEPY_FAKE_SUCCESS` in a single test, you may use the [monkeypatch](https://docs.pytest.org/en/latest/how-to/monkeypatch.html) fixture:
+
+```python
+def test_foo(monkeypatch):
+    monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "yes")
+    # ... the test code
+```
+
+### tox
 
 If using [tox](https://tox.wiki/), use [`setenv`](https://tox.wiki/en/4.14.2/config.html#set_env) (aka. `set_env`) in your tox.ini:
 
@@ -23,7 +32,7 @@ setenv =
     WAKEPY_FAKE_SUCCESS = "yes"
 ```
 
-### nox configuration
+### nox
 
 If using [nox](https://nox.thea.codes/), set the `WAKEPY_FAKE_SUCCESS` environment variable by adding the key-value pair to `session.env` in your noxfile.py. For example:
 
