@@ -1,0 +1,88 @@
+name: Publish a wakepy release 📦
+
+'on':
+  workflow_dispatch:
+  push:
+    branches:
+      - latest-release
+
+jobs:
+
+  build-and-test:
+    uses: ./.github/workflows/build-and-run-tests.yml
+
+  sign-artifacts:
+    name: Sign artifacts ✍️🔒
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC. See: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#adding-permissions-settings
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: wakepy-python-packages
+          path: ./dist/
+      - uses: sigstore/gh-action-sigstore-python@61f6a500bbfdd9a2a339cf033e5421951fbc1cd2 #v2.1.1
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-wakepy-python-packages
+          path: ./dist/*.*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish-to-pypi:
+    name: Publish wakepy to PyPI
+    # only publish to PyPI on tag pushes
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: sign-artifacts
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/wakepy
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: signed-wakepy-python-packages
+          path: ./dist/
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@81e9d935c883d0b210363ab89cf05f3894778450 #v1.8.14
+        with:
+          print-hash: true
+
+  publish-to-github-releases:
+    name: Publish wakepy to GitHub
+    # only publish to GitHub Releases on tag pushes
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: sign-artifacts
+    runs-on: ubuntu-latest
+    environment:
+      name: github-release
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: signed-wakepy-python-packages
+          path: ./dist/
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create
+          '${{ github.ref_name }}'
+          --repo '${{ github.repository }}'
+          --notes ""
+      - name: Publish distribution & signatures 📦 to GitHub Releases
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Upload to GitHub Release using the `gh` CLI.
+        # `dist/` contains the built packages, and the
+        # sigstore-produced signatures and certificates.
+        run: >-
+          gh release upload
+          '${{ github.ref_name }}' dist/**
+          --repo '${{ github.repository }}'
