@@ -28,7 +28,6 @@ def tests(session):
 ```
 
 
-
 ```{admonition} Truthy and falsy values
 :class: info
 Only `0`, `no` and `false` are considered as falsy values (case ignored). Any other value is considered truthy.
