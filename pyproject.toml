@@ -65,12 +65,12 @@ warn_unused_configs = true
 no_implicit_reexport = true
 
 [[tool.mypy.overrides]]
-module = 'jeepney.*'
+module = [
+    'jeepney.*',
+    'tox.*'
+]
 ignore_missing_imports = true
 
-[[tool.mypy.overrides]]
-module = 'tox.*'
-ignore_missing_imports = true
 
 
 [tool.pytest.ini_options]
