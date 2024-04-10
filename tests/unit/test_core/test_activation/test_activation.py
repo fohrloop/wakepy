@@ -622,7 +622,7 @@ def test_wakepy_fake_success_truthy_values(val, monkeypatch):
     method = WakepyFakeSuccess()
 
     with wakepy_fake_value_set(monkeypatch, val):
-        assert method.enter_mode() is None
+        assert method.enter_mode() is None  # type: ignore
 
 
 def test_wakepy_fake_success_without_the_env_var_set(monkeypatch):

@@ -170,9 +170,9 @@ def test_select_methods():
 def test_method_defaults():
     """tests the Method enter_mode, exit_mode and heartbeat defaults"""
     m = Method()
-    assert m.enter_mode() is None
-    assert m.heartbeat() is None
-    assert m.exit_mode() is None
+    assert m.enter_mode() is None  # type: ignore
+    assert m.heartbeat() is None  # type: ignore
+    assert m.exit_mode() is None  # type: ignore
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

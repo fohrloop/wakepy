@@ -1,6 +1,8 @@
 """The Freedesktop.org related methods"""
 
-from typing import Optional
+from __future__ import annotations
+
+import typing
 
 from wakepy.core import (
     BusType,
@@ -11,6 +13,9 @@ from wakepy.core import (
     ModeName,
     PlatformName,
 )
+
+if typing.TYPE_CHECKING:
+    from typing import Optional
 
 
 class FreedesktopScreenSaverInhibit(Method):
@@ -45,11 +50,11 @@ class FreedesktopScreenSaverInhibit(Method):
 
     supported_platforms = (PlatformName.LINUX,)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         self.inhibit_cookie: Optional[int] = None
 
-    def enter_mode(self):
+    def enter_mode(self) -> None:
         call = DBusMethodCall(
             method=self.method_inhibit,
             args=dict(
@@ -65,7 +70,7 @@ class FreedesktopScreenSaverInhibit(Method):
             )
         self.inhibit_cookie = retval[0]
 
-    def exit_mode(self):
+    def exit_mode(self) -> None:
         if self.inhibit_cookie is None:
             # Nothing to exit from.
             return

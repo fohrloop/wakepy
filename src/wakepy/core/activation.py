@@ -807,7 +807,7 @@ def _try_method_call(method: Method, mthdname: str) -> Tuple[MethodOutcome, str]
     return outcome, err_message
 
 
-def _rollback_with_exit(method):
+def _rollback_with_exit(method) -> None:
     """Roll back entering a mode by exiting it.
 
     Raises
@@ -853,7 +853,7 @@ class WakepyFakeSuccess(Method):
 
     supported_platforms = (CURRENT_PLATFORM,)
 
-    def enter_mode(self):
+    def enter_mode(self) -> None:
         """Function which says if fake success should be enabled
 
         Fake success is controlled via WAKEPY_FAKE_SUCCESS environment

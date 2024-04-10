@@ -46,7 +46,7 @@ def test_screensaver_enter_mode():
     assert method.inhibit_cookie is None
 
     # Act
-    enter_retval = method.enter_mode()
+    enter_retval = method.enter_mode()  # type: ignore
 
     # Assert
     assert enter_retval is None
@@ -71,7 +71,7 @@ def test_screensaver_exit_mode():
     method.inhibit_cookie = fake_cookie
 
     # Act
-    exit_retval = method.exit_mode()
+    exit_retval = method.exit_mode()  # type: ignore
 
     # Assert
     assert exit_retval is None
@@ -82,7 +82,7 @@ def test_screensaver_exit_mode():
 def test_screensaver_exit_before_enter():
     method = FreedesktopScreenSaverInhibit(dbus_adapter=DBusAdapter())
     assert method.inhibit_cookie is None
-    assert method.exit_mode() is None
+    assert method.exit_mode() is None  # type: ignore
 
 
 def test_with_dbus_adapter_which_returns_none():
@@ -98,4 +98,4 @@ def test_with_dbus_adapter_which_returns_none():
             "Could not get inhibit cookie from org.freedesktop.ScreenSaver"
         ),
     ):
-        assert method.enter_mode() is False
+        assert method.enter_mode() is False  # type: ignore

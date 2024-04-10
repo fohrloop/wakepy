@@ -32,7 +32,7 @@ class StrEnumMeta(EnumMeta):
         if unique:
             cls._check_uniqueness()
 
-    def _check_uniqueness(cls):
+    def _check_uniqueness(cls) -> None:
         vals: ValuesView[Enum] = cls.__members__.values()
         if len(vals) > len(set(vals)):
             raise ValueError("The values must be unique!")

@@ -28,15 +28,15 @@ class WindowsSetThreadExecutionState(Method, ABC):
     # Server 2003 and above (server)
     supported_platforms = (PlatformName.WINDOWS,)
 
-    def enter_mode(self):
+    def enter_mode(self) -> None:
         # Sets the flags until Flags.RELEASE is used or until the thread
         # which called this dies.
         self._call_set_thread_execution_state(self.flags.value)
 
-    def exit_mode(self):
+    def exit_mode(self) -> None:
         self._call_set_thread_execution_state(Flags.RELEASE.value)
 
-    def _call_set_thread_execution_state(self, flags: int):
+    def _call_set_thread_execution_state(self, flags: int) -> None:
         try:
             ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type:ignore
         except AttributeError as exc:

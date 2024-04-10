@@ -57,11 +57,11 @@ class _GnomeSessionManager(Method, ABC):
     @abstractmethod
     def flags(self) -> GnomeFlag: ...
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.inhibit_cookie: Optional[int] = None
 
-    def enter_mode(self):
+    def enter_mode(self) -> None:
         call = DBusMethodCall(
             method=self.method_inhibit,
             args=dict(
@@ -79,7 +79,7 @@ class _GnomeSessionManager(Method, ABC):
             )
         self.inhibit_cookie = retval[0]
 
-    def exit_mode(self):
+    def exit_mode(self) -> None:
         if self.inhibit_cookie is None:
             # Nothing to exit from.
             return

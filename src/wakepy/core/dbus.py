@@ -277,7 +277,7 @@ class DBusAdapter:
     Exception will be omitted if using the high-level API of wakepy.
     """
 
-    def process(self, call: DBusMethodCall):
+    def process(self, call: DBusMethodCall) -> object:
         """Processes a :class:`~wakepy.core.DBusMethodCall`.
 
         Parameters

@@ -306,7 +306,7 @@ def create_mode(
     return Mode(name=modename, methods=selected_methods, **kwargs)
 
 
-def handle_activation_fail(on_fail: OnFail, result: ActivationResult):
+def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:
     if on_fail == "pass":
         return
     elif on_fail == "warn" or on_fail == "error":

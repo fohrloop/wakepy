@@ -20,16 +20,16 @@ class _MacCaffeinate(Method, ABC):
 
     supported_platforms = (PlatformName.MACOS,)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.logger = logging.getLogger(__name__)
         self._process: Optional[Popen[bytes]] = None
 
-    def enter_mode(self):
+    def enter_mode(self) -> None:
         self.logger.debug('Running "%s"', self.command)
         self._process = Popen(self.command.split(), stdin=PIPE, stdout=PIPE)
 
-    def exit_mode(self):
+    def exit_mode(self) -> None:
         if self._process is None:
             self.logger.debug("No need to terminate process (not started)")
             return
