@@ -11,7 +11,7 @@ from enum import Enum, EnumMeta, auto
 
 if typing.TYPE_CHECKING:
     from enum import _EnumDict
-    from typing import Any, Dict, Tuple, Type, ValuesView
+    from typing import Any, Callable, Dict, KeysView, Tuple, Type, ValuesView
 
 
 class StrEnumMeta(EnumMeta):
@@ -49,7 +49,7 @@ class StrEnumMeta(EnumMeta):
 
         return super().__new__(metacls, clsname, bases, classdict)
 
-    def __init__(cls, *_, unique=False):
+    def __init__(cls, *_: Tuple[object, ...], unique: bool = False) -> None:
         if unique:
             cls._check_uniqueness()
 
@@ -73,11 +73,11 @@ class StrEnumMeta(EnumMeta):
         return value in cls.values()
 
     @property
-    def keys(cls):
+    def keys(cls) -> Callable[[], KeysView[str]]:
         return cls.__members__.keys
 
     @property
-    def values(cls):
+    def values(cls) -> Callable[[], ValuesView[str]]:
         return cls.__members__.values
 
 
@@ -121,7 +121,9 @@ class StrEnum(str, Enum, metaclass=StrEnumMeta):
     """
 
     @staticmethod
-    def _generate_next_value_(name: str, *_) -> str:
+    def _generate_next_value_(
+        name: str, start: int, count: int, last_values: list[Any]
+    ) -> str:
         """Turn auto() value to be a string corresponding to the enumeration
         member name
 
