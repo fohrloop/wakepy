@@ -6,8 +6,12 @@ supported."""
 
 from __future__ import annotations
 
+import typing
 from enum import Enum, EnumMeta, auto
-from typing import Any, ValuesView
+
+if typing.TYPE_CHECKING:
+    from enum import _EnumDict
+    from typing import Any, Dict, Tuple, Type, ValuesView
 
 
 class StrEnumMeta(EnumMeta):
@@ -22,10 +26,18 @@ class StrEnumMeta(EnumMeta):
     def __prepare__(metacls, clsname, bases, **_):
         # This is needed since we have to allow passing kwargs to __init__
         # Needed on 3.7.x, not needed on 3.10. (not tested 3.8 & 3.9)
+
         return super().__prepare__(clsname, bases)
 
-    def __new__(metacls, clsname, bases, classdict, **_):
+    def __new__(
+        metacls: Type[StrEnumMeta],
+        clsname: str,
+        bases: Tuple[Type[object], ...],
+        classdict: _EnumDict,
+        **_: Dict[str, object],
+    ) -> StrEnumMeta:
         # This is needed since we have to allow passing kwargs to __init__
+
         return super().__new__(metacls, clsname, bases, classdict)
 
     def __init__(cls, *_, unique=False):
