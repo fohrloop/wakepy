@@ -22,11 +22,20 @@ class StrEnumMeta(EnumMeta):
     2) `unique` parameter when creating constants.
     """
 
+    # The __prepare__ function signature has some problems in mypy 1.9.0
+    # CPython 3.10.12. It says that `Signature of "__prepare__" incompatible
+    # with supertype X` where X is "EnumMeta" or "type". Could not find a
+    # function signature which would be okay with both the EnumMeta and type
+    # superclasses so just ignoring the error.
     @classmethod
-    def __prepare__(metacls, clsname, bases, **_):
+    def __prepare__(  # type: ignore[override]
+        metacls: Type[StrEnumMeta],
+        clsname: str,
+        bases: Tuple[type, ...],
+        **_: Any,
+    ) -> _EnumDict:
         # This is needed since we have to allow passing kwargs to __init__
         # Needed on 3.7.x, not needed on 3.10. (not tested 3.8 & 3.9)
-
         return super().__prepare__(clsname, bases)
 
     def __new__(
