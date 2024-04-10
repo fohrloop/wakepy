@@ -617,7 +617,7 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
             f"a bug report and rebooting for clearing the mode. "
         )
         try:
-            retval = method.exit_mode()
+            retval = method.exit_mode()  # type: ignore
             if retval is not None:
                 raise ValueError("exit_mode returned a value other than None!")
         except Exception as e:

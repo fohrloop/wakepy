@@ -231,7 +231,7 @@ class DBusMethodCall:
         assert isinstance(args, dict), "args may only be tuple, list or dict"
         return self.__dict_args_as_tuple(args, method)
 
-    def __check_args_length(self, args: Tuple[Any, ...], method: DBusMethod):
+    def __check_args_length(self, args: Tuple[Any, ...], method: DBusMethod) -> None:
         if method.params is None:
             # not possible to check.
             return
