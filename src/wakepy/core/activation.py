@@ -265,7 +265,7 @@ class MethodActivationResult:
 
     failure_reason: str = ""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         error_at = " @" + self.failure_stage if self.failure_stage else ""
         failure_reason = f', "{self.failure_reason}"' if self.success is False else ""
         success_str = (
@@ -807,7 +807,7 @@ def _try_method_call(method: Method, mthdname: str) -> Tuple[MethodOutcome, str]
     return outcome, err_message
 
 
-def _rollback_with_exit(method) -> None:
+def _rollback_with_exit(method: Method) -> None:
     """Roll back entering a mode by exiting it.
 
     Raises
@@ -824,7 +824,7 @@ def _rollback_with_exit(method) -> None:
         return
 
     try:
-        exit_outcome = method.exit_mode()
+        exit_outcome = method.exit_mode()  # type: ignore[func-returns-value]
         if exit_outcome is not None:
             raise ValueError("exit_method did not return None")
     except Exception as exc:
