@@ -6,7 +6,12 @@
 #
 # -- Project information -----------------------------------------------------
 
+import typing
+
 from wakepy import __version__
+
+if typing.TYPE_CHECKING:
+    from sphinx.application import Sphinx
 
 project = "wakepy"
 copyright = "2023–2024, Niko Föhr"
@@ -98,5 +103,5 @@ html_theme_options = {
 numpydoc_class_members_toctree = False
 
 
-def setup(app):
+def setup(app: Sphinx) -> None:
     app.add_js_file("wakepy.js", loading_method="defer")

@@ -53,7 +53,7 @@ class MethodRegistryError(RuntimeError):
     """Any error which is related to the method registry"""
 
 
-def register_method(method_class: Type[Method]):
+def register_method(method_class: Type[Method]) -> None:
     """Registers a subclass of Method to the method registry"""
 
     if method_class._is_unnamed():

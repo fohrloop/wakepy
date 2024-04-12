@@ -17,7 +17,7 @@ class JeepneyDBusAdapter(DBusAdapter):
     # timeout for dbus calls, in seconds
     timeout = 2
 
-    def process(self, call: DBusMethodCall):
+    def process(self, call: DBusMethodCall) -> object:
         addr = DBusAddress(
             object_path=call.method.path,
             bus_name=call.method.service,

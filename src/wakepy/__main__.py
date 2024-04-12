@@ -42,7 +42,7 @@ WAKEPY_TICKBOXES_TEMPLATE = """
 """
 
 
-def main():
+def main() -> None:
     modename = parse_arguments(sys.argv[1:])
     mode = create_mode(modename=modename, on_fail=handle_activation_error)
     print(get_startup_text(mode=modename))
@@ -56,7 +56,7 @@ def main():
         print("\n\nExited.")
 
 
-def handle_activation_error(result: ActivationResult):
+def handle_activation_error(result: ActivationResult) -> None:
     from wakepy import __version__
 
     error_text = f"""
@@ -152,7 +152,7 @@ def get_startup_text(mode: ModeName) -> str:
     return "\n".join((wakepy_text, options_txt)) + "\n"
 
 
-def wait_until_keyboardinterrupt():
+def wait_until_keyboardinterrupt() -> None:
     spinning_chars = ["|", "/", "-", "\\"]
     try:
         for char in itertools.cycle(spinning_chars):  # pragma: no branch

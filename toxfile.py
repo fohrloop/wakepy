@@ -18,7 +18,7 @@ tox_asks_rebuild = dist_dir / ".TOX-ASKS-REBUILD"
 
 
 @impl
-def tox_on_install(tox_env: ToxEnv, arguments: Any, section: str, of_type: str):
+def tox_on_install(tox_env: ToxEnv, arguments: Any, section: str, of_type: str) -> None:
     """Make it possible to have tox packaging environment for setting
     "package=external" (.pkg_external) which builds the wheel *only once*, or
     zero times if --skip-build command line argument is given.
@@ -60,7 +60,7 @@ def tox_on_install(tox_env: ToxEnv, arguments: Any, section: str, of_type: str):
 
 
 @impl
-def tox_add_option(parser: ToxParser):
+def tox_add_option(parser: ToxParser) -> None:
     """Adds custom option, --skip-build to the tox command."""
     parser.add_argument(
         "--skip-build",

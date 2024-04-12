@@ -126,7 +126,7 @@ class Method(ABC, metaclass=MethodMeta):
         # only on methods using D-Bus.
         self._dbus_adapter = dbus_adapter
 
-    def __init_subclass__(cls, **kwargs) -> None:
+    def __init_subclass__(cls, **kwargs: object) -> None:
         """These are automatically added. They tell if the `enter_mode`,
         `exit_mode` and `heartbeat` methods are implemented in the Method
         subclass. (should not to touch these manually)"""
@@ -172,7 +172,7 @@ class Method(ABC, metaclass=MethodMeta):
         #   could test that it exist on PATH. (and that the version is
         #   suitable)
 
-    def enter_mode(self):
+    def enter_mode(self) -> None:
         """Enter to a Mode using this Method. Pair with a `exit_mode`.
 
         Returns
@@ -202,7 +202,7 @@ class Method(ABC, metaclass=MethodMeta):
         #
         return
 
-    def exit_mode(self):
+    def exit_mode(self) -> None:
         """Exit from a Mode using this Method. Paired with `enter_mode`
 
         Returns
@@ -232,7 +232,7 @@ class Method(ABC, metaclass=MethodMeta):
     `heartbeat()`.
     """
 
-    def heartbeat(self):
+    def heartbeat(self) -> None:
         """Called periodically, every `heartbeat_period` seconds.
 
         Returns
@@ -270,14 +270,14 @@ class Method(ABC, metaclass=MethodMeta):
     def has_heartbeat(self) -> bool:
         return self._has_heartbeat
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<wakepy Method: {self.__class__.__name__}>"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<wakepy Method: {self.__class__.__name__} at {hex(id(self))}>"
 
     @classmethod
-    def _is_unnamed(cls):
+    def _is_unnamed(cls) -> bool:
         return cls.name == unnamed
 
 

@@ -6,8 +6,12 @@ supported."""
 
 from __future__ import annotations
 
+import typing
 from enum import Enum, EnumMeta, auto
-from typing import Any, ValuesView
+
+if typing.TYPE_CHECKING:
+    from enum import _EnumDict
+    from typing import Any, Callable, Dict, KeysView, Tuple, Type, ValuesView
 
 
 class StrEnumMeta(EnumMeta):
@@ -18,21 +22,38 @@ class StrEnumMeta(EnumMeta):
     2) `unique` parameter when creating constants.
     """
 
+    # The __prepare__ function signature has some problems in mypy 1.9.0
+    # CPython 3.10.12. It says that `Signature of "__prepare__" incompatible
+    # with supertype X` where X is "EnumMeta" or "type". Could not find a
+    # function signature which would be okay with both the EnumMeta and type
+    # superclasses so just ignoring the error.
     @classmethod
-    def __prepare__(metacls, clsname, bases, **_):
+    def __prepare__(  # type: ignore[override]
+        metacls: Type[StrEnumMeta],
+        clsname: str,
+        bases: Tuple[type, ...],
+        **_: Any,
+    ) -> _EnumDict:
         # This is needed since we have to allow passing kwargs to __init__
         # Needed on 3.7.x, not needed on 3.10. (not tested 3.8 & 3.9)
         return super().__prepare__(clsname, bases)
 
-    def __new__(metacls, clsname, bases, classdict, **_):
+    def __new__(
+        metacls: Type[StrEnumMeta],
+        clsname: str,
+        bases: Tuple[Type[object], ...],
+        classdict: _EnumDict,
+        **_: Dict[str, object],
+    ) -> StrEnumMeta:
         # This is needed since we have to allow passing kwargs to __init__
+
         return super().__new__(metacls, clsname, bases, classdict)
 
-    def __init__(cls, *_, unique=False):
+    def __init__(cls, *_: Tuple[object, ...], unique: bool = False) -> None:
         if unique:
             cls._check_uniqueness()
 
-    def _check_uniqueness(cls):
+    def _check_uniqueness(cls) -> None:
         vals: ValuesView[Enum] = cls.__members__.values()
         if len(vals) > len(set(vals)):
             raise ValueError("The values must be unique!")
@@ -52,11 +73,11 @@ class StrEnumMeta(EnumMeta):
         return value in cls.values()
 
     @property
-    def keys(cls):
+    def keys(cls) -> Callable[[], KeysView[str]]:
         return cls.__members__.keys
 
     @property
-    def values(cls):
+    def values(cls) -> Callable[[], ValuesView[str]]:
         return cls.__members__.values
 
 
@@ -100,7 +121,9 @@ class StrEnum(str, Enum, metaclass=StrEnumMeta):
     """
 
     @staticmethod
-    def _generate_next_value_(name: str, *_) -> str:
+    def _generate_next_value_(
+        name: str, start: int, count: int, last_values: list[Any]
+    ) -> str:
         """Turn auto() value to be a string corresponding to the enumeration
         member name
 

@@ -265,7 +265,7 @@ class MethodActivationResult:
 
     failure_reason: str = ""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         error_at = " @" + self.failure_stage if self.failure_stage else ""
         failure_reason = f', "{self.failure_reason}"' if self.success is False else ""
         success_str = (
@@ -617,7 +617,11 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
             f"a bug report and rebooting for clearing the mode. "
         )
         try:
-            retval = method.exit_mode()
+            # The Method.exit_mode() *should* always return None. However, it
+            # is not possible to control user created Methods implementation,
+            # so this is a safety net for users not having strict static type
+            # checking.
+            retval = method.exit_mode()  # type: ignore[func-returns-value]
             if retval is not None:
                 raise ValueError("exit_mode returned a value other than None!")
         except Exception as e:
@@ -807,7 +811,7 @@ def _try_method_call(method: Method, mthdname: str) -> Tuple[MethodOutcome, str]
     return outcome, err_message
 
 
-def _rollback_with_exit(method):
+def _rollback_with_exit(method: Method) -> None:
     """Roll back entering a mode by exiting it.
 
     Raises
@@ -824,7 +828,11 @@ def _rollback_with_exit(method):
         return
 
     try:
-        exit_outcome = method.exit_mode()
+        # The Method.exit_mode() *should* always return None. However, it
+        # is not possible to control user created Methods implementation,
+        # so this is a safety net for users not having strict static type
+        # checking.
+        exit_outcome = method.exit_mode()  # type: ignore[func-returns-value]
         if exit_outcome is not None:
             raise ValueError("exit_method did not return None")
     except Exception as exc:
@@ -853,7 +861,7 @@ class WakepyFakeSuccess(Method):
 
     supported_platforms = (CURRENT_PLATFORM,)
 
-    def enter_mode(self):
+    def enter_mode(self) -> None:
         """Function which says if fake success should be enabled
 
         Fake success is controlled via WAKEPY_FAKE_SUCCESS environment
