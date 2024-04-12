@@ -52,7 +52,7 @@ build-backend = "setuptools.build_meta"
 version_file = "src/wakepy/_version.py"
 
 [tool.mypy]
-exclude = ['venv', '.venv', 'docs', '.tox']
+exclude = ['venv/*', '.venv/*', 'docs/*', '.tox/*']
 check_untyped_defs = true
 disallow_any_generics = true
 no_implicit_optional = true
