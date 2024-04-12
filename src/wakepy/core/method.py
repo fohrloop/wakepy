@@ -126,7 +126,7 @@ class Method(ABC, metaclass=MethodMeta):
         # only on methods using D-Bus.
         self._dbus_adapter = dbus_adapter
 
-    def __init_subclass__(cls, **kwargs) -> None:
+    def __init_subclass__(cls, **kwargs: object) -> None:
         """These are automatically added. They tell if the `enter_mode`,
         `exit_mode` and `heartbeat` methods are implemented in the Method
         subclass. (should not to touch these manually)"""
