@@ -62,6 +62,7 @@ warn_redundant_casts = true
 warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
+warn_unused_ignores = true
 no_implicit_reexport = true
 disallow_untyped_defs = true
 disallow_any_unimported = true
