@@ -77,7 +77,9 @@ ignore_missing_imports = true
 module = ['tests.*', 'tasks']
 disallow_untyped_defs = false
 
-
+[[tool.mypy.overrides]]
+module = ['toxfile']
+disallow_any_unimported = false
 
 [tool.pytest.ini_options]
 filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy.*:DeprecationWarning"
