@@ -10,6 +10,8 @@ from wakepy.core import Method, ModeName, PlatformName
 if typing.TYPE_CHECKING:
     from typing import Optional
 
+    from wakepy.core import DBusAdapter
+
 
 class _MacCaffeinate(Method, ABC):
     """This is a method which calls the `caffeinate` command.
@@ -20,8 +22,8 @@ class _MacCaffeinate(Method, ABC):
 
     supported_platforms = (PlatformName.MACOS,)
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None) -> None:
+        super().__init__(dbus_adapter=dbus_adapter)
         self.logger = logging.getLogger(__name__)
         self._process: Optional[Popen[bytes]] = None
 

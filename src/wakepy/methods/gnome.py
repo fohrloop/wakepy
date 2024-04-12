@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import enum
+import typing
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from wakepy.core import (
     BusType,
@@ -11,6 +13,11 @@ from wakepy.core import (
     ModeName,
     PlatformName,
 )
+
+if typing.TYPE_CHECKING:
+    from typing import Optional
+
+    from wakepy.core import DBusAdapter
 
 
 class GnomeFlag(enum.IntFlag):
@@ -57,8 +64,8 @@ class _GnomeSessionManager(Method, ABC):
     @abstractmethod
     def flags(self) -> GnomeFlag: ...
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None) -> None:
+        super().__init__(dbus_adapter=dbus_adapter)
         self.inhibit_cookie: Optional[int] = None
 
     def enter_mode(self) -> None:

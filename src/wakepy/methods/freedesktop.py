@@ -17,6 +17,8 @@ from wakepy.core import (
 if typing.TYPE_CHECKING:
     from typing import Optional
 
+    from wakepy.core import DBusAdapter
+
 
 class FreedesktopScreenSaverInhibit(Method):
     """Method using org.freedesktop.ScreenSaver D-Bus API
@@ -50,8 +52,8 @@ class FreedesktopScreenSaverInhibit(Method):
 
     supported_platforms = (PlatformName.LINUX,)
 
-    def __init__(self, *args: object, **kwargs: object) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None) -> None:
+        super().__init__(dbus_adapter=dbus_adapter)
         self.inhibit_cookie: Optional[int] = None
 
     def enter_mode(self) -> None:
