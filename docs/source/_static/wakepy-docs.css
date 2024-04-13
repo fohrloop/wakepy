@@ -28,3 +28,24 @@ a:link, a:visited {
 a:hover, a:active {
     text-decoration: underline !important;
 }
+
+
+a:link > code > span.pre,
+a:visited > code > span.pre {
+    /* Use the same link color in code links as in "normal links" */
+    color: var(--pst-color-link) !important;
+}
+
+a:active  > code > span.pre,
+a:hover > code > span.pre {
+    /* Use the same link color in code links as in "normal links" */
+    color:var(--pst-color-link-hover) !important;
+}
+
+/* inline code */
+code.literal  {
+    /* Remove the gray box around inline code */
+    background-color: rgba(255, 255, 255, 0) !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
