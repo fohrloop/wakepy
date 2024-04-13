@@ -19,3 +19,9 @@ nav.contents  {
     box-shadow: none !important;
 }
 
+a:link, a:visited {
+    text-decoration: none !important;
+}
+a:hover, a:active {
+    text-decoration: underline !important;
+}
