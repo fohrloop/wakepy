@@ -5,7 +5,7 @@
 **What are wakepy Methods?**
 Methods are different ways of entering/keeping in a Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) D-Bus service is one way of entering  the [`keep.running`](#keep-running-section) mode, and it required D-Bus and (a certain version of) GNOME. The following methods exist:
 
-
+<!-- using the contents directive https://myst-parser.readthedocs.io/en/latest/syntax/organising_content.html -->
 ```{contents}
 :local: True
 :depth: 2
