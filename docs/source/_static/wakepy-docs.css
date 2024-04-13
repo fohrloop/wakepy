@@ -1,3 +1,6 @@
+/* Some variables available from the Pydata Sphinx Theme.
+See: https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/styling.html */
+
 
 html[data-theme=light] {
     /* the contents directive */
