@@ -9,16 +9,15 @@ python:
     - method: pip
       path: .
     - requirements: requirements/requirements-docs.txt
-  jobs:
-    build_wakepy:
-      #  Need to create the wakepy._version module (setuptools-scm)
-      - python -m build
-
 
 build:
   os: ubuntu-22.04
   tools:
     python: "3.10"
+  jobs:
+    pre_build:
+      #  Need to create the wakepy._version module (setuptools-scm)
+      - python -m build
 
 
 sphinx:
