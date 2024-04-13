@@ -1,0 +1,73 @@
+/* Some variables available from the Pydata Sphinx Theme.
+See: https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/styling.html */
+
+
+html[data-theme=light] {
+    /* the contents directive */
+    --wakepy-color-contents-bg: #f9f9fb;
+    --wakepy-color-contents-border: #eff0f0;
+    --wakepy-color-inline-code: #d1157f;
+    --wakepy-color-code-block-bg: #fcfcfd;
+    --wakepy-color-code-block-border: #d1d5da;
+}
+
+
+html[data-theme=dark] {
+    /* for explanations, refer to the light theme definitions */
+    --wakepy-color-contents-bg: #191825;
+    --wakepy-color-contents-border: #293342;
+    --wakepy-color-inline-code:#f35eaa;
+    --wakepy-color-code-block-bg: #272822;
+    --wakepy-color-code-block-border: #3c3d2e;
+}
+
+nav.contents  {
+    /* For the "contents" directive block */
+    background: var(--wakepy-color-contents-bg) !important;
+    border-color: var(--wakepy-color-contents-border) !important;
+    box-shadow: none !important;
+}
+
+a:link, a:visited {
+    text-decoration: none !important;
+}
+a:hover, a:active {
+    text-decoration: underline !important;
+}
+
+
+/* inline code (both, the links and normal text)*/
+code > span.pre,
+span.sig-name > span.pre {
+    color: var(--wakepy-color-inline-code) !important;
+}
+
+/* inline code, but just the links*/
+a:link > code > span.pre,
+a:visited > code > span.pre {
+    /* Use the same link color in code links as in "normal links" */
+    color: var(--pst-color-link) !important;
+}
+a:active  > code > span.pre,
+a:hover > code > span.pre {
+    /* Use the same link color in code links as in "normal links" */
+    color:var(--pst-color-link-hover) !important;
+}
+
+
+/* inline code */
+code.literal {
+    /* Remove the gray box around inline code */
+    background-color: rgba(255, 255, 255, 0) !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+
+/* code blocks */
+div.highlight > pre {
+    background-color: var(--wakepy-color-code-block-bg) !important;
+    border-color: var(--wakepy-color-code-block-border) !important;
+    /* Add bit more air to the code blocks */
+    line-height: 155% !important;
+}
