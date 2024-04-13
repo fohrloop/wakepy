@@ -1,5 +1,5 @@
 <!-- NOTE: If you change the title (API Reference), you must update the code
-in wakepy.js! -->
+in wakepy-docs.js! -->
 # API Reference
 ```{eval-rst}
 

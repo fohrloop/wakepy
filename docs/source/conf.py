@@ -105,4 +105,4 @@ numpydoc_class_members_toctree = False
 
 
 def setup(app: Sphinx) -> None:
-    app.add_js_file("wakepy.js", loading_method="defer")
+    app.add_js_file("wakepy-docs.js", loading_method="defer")
