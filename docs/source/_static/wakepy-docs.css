@@ -1,0 +1,21 @@
+
+html[data-theme=light] {
+    /* the contents directive */
+    --wakepy-color-contents-bg: #f9f9fb;
+    --wakepy-color-contents-border: #eff0f0;
+}
+
+
+html[data-theme=dark] {
+    /* for explanations, refer to the light theme definitions */
+    --wakepy-color-contents-bg: #191825;
+    --wakepy-color-contents-border: #293342;
+}
+
+nav.contents  {
+    /* For the "contents" directive block */
+    background: var(--wakepy-color-contents-bg) !important;
+    border-color: var(--wakepy-color-contents-border) !important;
+    box-shadow: none !important;
+}
+
