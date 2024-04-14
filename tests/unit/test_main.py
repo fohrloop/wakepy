@@ -157,7 +157,10 @@ class TestMain:
         parse_arguments,
         wait_until_keyboardinterrupt,
         method2_broken,
+        monkeypatch,
     ):
+        # need to turn off WAKEPY_FAKE_SUCCESS as we want to get a failure.
+        monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
 
         with patch("sys.argv", self.sys_argv), patch("builtins.print") as print_mock:
             manager = self.setup_mock_manager(
