@@ -56,7 +56,7 @@ class MethodRegistryError(RuntimeError):
 def register_method(method_class: Type[Method]) -> None:
     """Registers a subclass of Method to the method registry"""
 
-    if method_class._is_unnamed():
+    if method_class.is_unnamed():
         # Methods without a name will not be registered
         return
 
