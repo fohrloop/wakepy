@@ -334,12 +334,11 @@ class Mode:
 def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:
     if on_fail == "pass":
         return
-    elif on_fail == "warn" or on_fail == "error":
-        if on_fail == "warn":
-            warnings.warn(result.get_error_text())
-            return
-        else:
-            raise ActivationError(result.get_error_text())
+    elif on_fail == "warn":
+        warnings.warn(result.get_error_text())
+        return
+    elif on_fail == "error":
+        raise ActivationError(result.get_error_text())
     elif not callable(on_fail):
         raise ValueError(
             'on_fail must be one of "error", "warn", pass" or a callable which takes '
