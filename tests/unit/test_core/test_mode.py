@@ -211,13 +211,13 @@ def _assert_context_manager_used_correctly(mocks, mode):
 class TestHandleActivationFail:
     """Tests for handle_activation_fail"""
 
-    @pytest.fixture
     @staticmethod
+    @pytest.fixture
     def result1():
         return ActivationResult(modename="testmode")
 
-    @pytest.fixture
     @staticmethod
+    @pytest.fixture
     def error_text_match(result1):
         return re.escape(result1.get_error_text())
 
