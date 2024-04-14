@@ -20,7 +20,7 @@ from textwrap import dedent, fill
 
 from wakepy import ModeExit
 from wakepy.core.constants import ModeName
-from wakepy.core.mode import create_mode
+from wakepy.core.mode import Mode
 
 if typing.TYPE_CHECKING:
     from typing import List
@@ -44,7 +44,7 @@ WAKEPY_TICKBOXES_TEMPLATE = """
 
 def main() -> None:
     modename = parse_arguments(sys.argv[1:])
-    mode = create_mode(modename=modename, on_fail=handle_activation_error)
+    mode = Mode.from_name(modename, on_fail=handle_activation_error)
     print(get_startup_text(mode=modename))
     with mode:
         if not mode.active:

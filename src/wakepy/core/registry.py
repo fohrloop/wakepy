@@ -188,8 +188,8 @@ def get_methods(
 def get_methods_for_mode(
     mode: ModeName | str,
 ) -> List[MethodCls]:
-    """Get the Method classes belonging to a Mode; Methods with
-    Method.mode = `mode`.
+    """Get the Method classes belonging to a Mode; Methods with Method.mode =
+    `mode`.
 
     Parameters
     ----------
