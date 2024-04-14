@@ -4,7 +4,7 @@ name: Publish a wakepy release 📦
   workflow_dispatch:
   push:
     branches:
-      - latest-release
+      - main
 
 jobs:
 

@@ -4,8 +4,8 @@ This document serves as documentation for the package developers.
 
 ## Branches and tags
 
-- **`dev`** branch: for development. All PRs should be against it.
-- **`latest-release`** branch: The latest wakepy release. This is used to select the where [wakepy.readthedocs.io](https://wakepy.readthedocs.io/) redirects to (the "latest" version).
+- **`dev`** branch: for development. All PRs should be against it. Documented at [wakepy.readthedocs.io/en/dev/](https://wakepy.readthedocs.io/en/dev/)
+- **`main`** branch: The stable/released version(s) of wakepy. Documented at [wakepy.readthedocs.io](https://wakepy.readthedocs.io/), which is the same as the [wakepy.readthedocs.io/en/latest/](https://wakepy.readthedocs.io/en/latest/).
 - Use a local short-lived feature branch for development.
 - Release versions use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the dev branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
 
@@ -34,7 +34,7 @@ invoke docs
 
 - **Deploying**: Just push to github, and it will be automatically built by readthedocs. The settings can be adjusted [here](https://readthedocs.org/dashboard).
 - Versions selected for documentation are selected in the readthedocs UI. Select one version per `major.minor` version (latest of them) from the git tags.
-- The `latest` version (default versio) in readthedocs follows the `latest-release` branch automatically.
+- The `latest` version (default versio) in readthedocs follows the `main` branch automatically.
 
 
 
@@ -84,7 +84,7 @@ python -m pip wheel --no-deps .
 ```
 python -m twine  upload wakepy-<version>-py3-none-any.whl --repository wakepy
 ```
-- If made a new version, remember to update the `latest-release` branch so ReadTheDocs may update the documentation.
+- If made a new version, remember to update the `main` branch so ReadTheDocs may update the documentation.
 - Also, check that readthedocs has included all the correct versions (git tags)
 
 
