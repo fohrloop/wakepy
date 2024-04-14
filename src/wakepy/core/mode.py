@@ -267,65 +267,68 @@ class Mode:
 
         return False
 
+    @classmethod
+    def from_name(
+        cls,
+        modename: ModeName,
+        methods: Optional[StrCollection] = None,
+        omit: Optional[StrCollection] = None,
+        methods_priority: Optional[MethodsPriorityOrder] = None,
+        on_fail: OnFail = "error",
+        dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
+    ) -> Mode:
+        """
+        Creates and returns a Mode based on a mode name.
 
-def create_mode(
-    modename: ModeName,
-    methods: Optional[StrCollection] = None,
-    omit: Optional[StrCollection] = None,
-    methods_priority: Optional[MethodsPriorityOrder] = None,
-    on_fail: OnFail = "error",
-    dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
-) -> Mode:
-    """
-    Creates and returns a Mode (a context manager).
+        Parameters
+        ----------
+        modename:
+            The name of the mode to create. Used for debugging, logging,
+            warning and error messages. Could be basically any string.
+        methods: list, tuple or set of str
+            The names of Methods to select from the mode defined with
+            `modename`; a "whitelist" filter. Means "use these and only these
+            Methods". Any Methods in `methods` but not in the selected mode
+            will raise a ValueError. Cannot be used same time with `omit`.
+            Optional.
+        omit: list, tuple or set of str or None
+            The names of Methods to remove from the mode defined with
+            `modename`; a "blacklist" filter. Any Method in `omit` but not in
+            the selected mode will be silently ignored. Cannot be used same
+            time with `methods`. Optional.
+        on_fail: "error" | "warn" | "pass" | Callable
+            Determines what to do in case mode activation fails. Valid options
+            are: "error", "warn", "pass" and a callable. If the option is
+            "error", raises wakepy.ActivationError. Is selected "warn", issues
+            warning. If "pass", does nothing. If `on_fail` is a callable, it
+            must take one positional argument: result, which is an instance of
+            ActivationResult. The ActivationResult contains more detailed
+            information about the activation process.
+        methods_priority: list[str | set[str]]
+            The priority order, which is a list of method names or asterisk
+            ('*'). The asterisk means "all rest methods" and may occur only
+            once in the priority order, and cannot be part of a set. All method
+            names must be unique and must be part of the `methods`.
+        dbus_adapter:
+            For using a custom dbus-adapter. Optional. If not given, the
+            default dbus adapter is used, which is :class:`~wakepy.\\
+            dbus_adapters.jeepney.JeepneyDBusAdapter`
 
-    Parameters
-    ----------
-    modename:
-        The name of the mode to create. Used for debugging, logging, warning
-        and error messaged. Could be basically any string.
-    methods: list, tuple or set of str
-        The names of Methods to select from the mode defined with `modename`;
-        a "whitelist" filter. Means "use these and only these Methods". Any
-        Methods in `methods` but not in the selected mode will raise a
-        ValueError. Cannot be used same time with `omit`. Optional.
-    omit: list, tuple or set of str or None
-        The names of Methods to remove from the mode defined with `modename`;
-        a "blacklist" filter. Any Method in `omit` but not in the selected mode
-        will be silently ignored. Cannot be used same time with `methods`.
-        Optional.
-    on_fail: "error" | "warn" | "pass" | Callable
-        Determines what to do in case mode activation fails. Valid options
-        are: "error", "warn", "pass" and a callable. If the option is
-        "error", raises wakepy.ActivationError. Is selected "warn", issues
-        warning. If "pass", does nothing. If `on_fail` is a callable, it
-        must take one positional argument: result, which is an instance of
-        ActivationResult. The ActivationResult contains more detailed
-        information about the activation process.
-    methods_priority: list[str | set[str]]
-        The priority order, which is a list of method names or asterisk
-        ('*'). The asterisk means "all rest methods" and may occur only
-        once in the priority order, and cannot be part of a set. All method
-        names must be unique and must be part of the `methods`.
-    dbus_adapter:
-        For using a custom dbus-adapter. Optional. If not given, the
-        default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.\\
-        jeepney.JeepneyDBusAdapter`
+        Returns
+        -------
+        mode: Mode
+            The context manager for the selected mode.
 
-    Returns
-    -------
-    mode: Mode
-        The context manager for the selected mode.
-    """
-    methods_for_mode = get_methods_for_mode(modename)
-    selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
-    return Mode(
-        name=modename,
-        methods=selected_methods,
-        methods_priority=methods_priority,
-        on_fail=on_fail,
-        dbus_adapter=dbus_adapter,
-    )
+        """
+        methods_for_mode = get_methods_for_mode(modename)
+        selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
+        return cls(
+            name=modename,
+            methods=selected_methods,
+            methods_priority=methods_priority,
+            on_fail=on_fail,
+            dbus_adapter=dbus_adapter,
+        )
 
 
 def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:

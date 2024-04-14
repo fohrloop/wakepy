@@ -20,7 +20,7 @@ from textwrap import dedent, fill
 
 from wakepy import ModeExit
 from wakepy.core.constants import ModeName
-from wakepy.core.mode import create_mode
+from wakepy.core.mode import Mode
 
 if typing.TYPE_CHECKING:
     from typing import List
@@ -33,7 +33,7 @@ WAKEPY_TEXT_TEMPLATE = r"""                  _
  \ \ /\ / // _` || |/ // _ \| '_ \ | | | |
   \ V  V /| (_| ||   <|  __/| |_) || |_| |
    \_/\_/  \__,_||_|\_\\___|| .__/  \__, |
-{VERSION_STRING}        | |      __/ |
+{VERSION_STRING}| |      __/ |
                             |_|     |___/ """
 
 WAKEPY_TICKBOXES_TEMPLATE = """
@@ -44,7 +44,7 @@ WAKEPY_TICKBOXES_TEMPLATE = """
 
 def main() -> None:
     modename = parse_arguments(sys.argv[1:])
-    mode = create_mode(modename=modename, on_fail=handle_activation_error)
+    mode = Mode.from_name(modename, on_fail=handle_activation_error)
     print(get_startup_text(mode=modename))
     with mode:
         if not mode.active:
@@ -57,6 +57,10 @@ def main() -> None:
 
 
 def handle_activation_error(result: ActivationResult) -> None:
+    print(_get_activation_error_text(result))
+
+
+def _get_activation_error_text(result: ActivationResult) -> str:
     from wakepy import __version__
 
     error_text = f"""
@@ -74,8 +78,12 @@ def handle_activation_error(result: ActivationResult) -> None:
 
     Thank you!
     """  # noqa 501
+
+    out = []
     for block in dedent(error_text.strip("\n")).split("\n"):
-        print(fill(block, 80))
+        out.append(fill(block, 80))
+
+    return "\n".join(out)
 
 
 def parse_arguments(
@@ -143,7 +151,7 @@ def get_startup_text(mode: ModeName) -> str:
     from wakepy import __version__
 
     wakepy_text = WAKEPY_TEXT_TEMPLATE.format(
-        VERSION_STRING=f"{'  v.'+__version__: <20}"
+        VERSION_STRING=f"{'  v.'+__version__: <28}"
     )
     options_txt = WAKEPY_TICKBOXES_TEMPLATE.strip("\n").format(
         no_auto_suspend="x",

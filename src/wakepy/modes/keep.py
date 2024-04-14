@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 from ..core.constants import ModeName
-from ..core.mode import create_mode
+from ..core.mode import Mode
 
 if typing.TYPE_CHECKING:
     from typing import Optional, Type
@@ -77,8 +77,8 @@ def running(
     >>> with keep.running() as k:
     >>>     # do something that takes a long time.
     """
-    return create_mode(
-        modename=ModeName.KEEP_RUNNING,
+    return Mode.from_name(
+        ModeName.KEEP_RUNNING,
         omit=omit,
         methods=methods,
         methods_priority=methods_priority,
@@ -151,8 +151,8 @@ def presenting(
     >>>     # do something that takes a long time.
 
     """
-    return create_mode(
-        modename=ModeName.KEEP_PRESENTING,
+    return Mode.from_name(
+        ModeName.KEEP_PRESENTING,
         methods=methods,
         omit=omit,
         methods_priority=methods_priority,

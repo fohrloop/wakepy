@@ -1,20 +1,63 @@
-"""Tests for the __main__ CLI"""
+"""Unit tests for the __main__ module"""
 
 import sys
-from unittest.mock import MagicMock, Mock, call, patch
+from unittest.mock import Mock, call, patch
 
 import pytest
 
-from wakepy import ActivationResult, ModeExit
+from wakepy import ActivationResult, Method
 from wakepy.__main__ import (
+    _get_activation_error_text,
     get_startup_text,
     handle_activation_error,
     main,
     parse_arguments,
     wait_until_keyboardinterrupt,
 )
-from wakepy.core import Mode
+from wakepy.core import CURRENT_PLATFORM
 from wakepy.core.constants import ModeName
+
+
+@pytest.fixture
+def modename_working():
+    return "testmode_working"
+
+
+@pytest.fixture
+def modename_broken():
+    return "testmode_broken"
+
+
+@pytest.fixture
+def method1(modename_working):
+    class WorkingMethod(Method):
+        """This is a succesful method as it implements enter_mode which returns
+        None"""
+
+        name = "method1"
+        mode = modename_working
+        supported_platforms = (CURRENT_PLATFORM,)
+
+        def enter_mode(self) -> None:
+            return
+
+    return WorkingMethod
+
+
+@pytest.fixture
+def method2_broken(modename_broken):
+    class BrokenMethod(Method):
+        """This is a unsuccesful method as it implements enter_mode which
+        raises an Exception"""
+
+        name = "method2_broken"
+        mode = modename_broken
+        supported_platforms = (CURRENT_PLATFORM,)
+
+        def enter_mode(self) -> None:
+            raise RuntimeError("foo")
+
+    return BrokenMethod
 
 
 @pytest.mark.parametrize(
@@ -69,121 +112,6 @@ def test_wait_until_keyboardinterrupt():
         wait_until_keyboardinterrupt()
 
 
-@patch("wakepy.__main__.wait_until_keyboardinterrupt")
-@patch("wakepy.__main__.get_startup_text")
-@patch("wakepy.__main__.create_mode")
-@patch("wakepy.__main__.parse_arguments")
-class TestMain:
-    """Tests the main() function from the __main__.py"""
-
-    def test_main(
-        self,
-        parse_arguments,
-        create_mode,
-        get_startup_text,
-        wait_until_keyboardinterrupt,
-    ):
-        """This is just a smoke test for the main() function. It checks that
-        correct functions are called in the correct order and correct
-        arguments, ut the functionality of each of the functions is tested
-        elsewhere."""
-
-        mocks = self.get_mocks_for_main(
-            parse_arguments,
-            create_mode,
-            get_startup_text,
-            wait_until_keyboardinterrupt,
-            mode_works=True,
-        )
-
-        with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
-            main()
-
-        assert mocks.mock_calls == [
-            call.parse_arguments(mocks.sysarg[1:]),
-            call.create_mode(
-                modename=parse_arguments.return_value, on_fail=handle_activation_error
-            ),
-            call.get_startup_text(mode=parse_arguments.return_value),
-            call.print(get_startup_text.return_value),
-            call.mode.__enter__(),
-            call.wait_until_keyboardinterrupt(),
-            call.mode.__exit__(None, None, None),
-            call.print("\n\nExited."),
-        ]
-
-    def test_main_with_non_working_mode(
-        self,
-        parse_arguments,
-        create_mode,
-        get_startup_text,
-        wait_until_keyboardinterrupt,
-    ):
-        mocks = self.get_mocks_for_main(
-            parse_arguments,
-            create_mode,
-            get_startup_text,
-            wait_until_keyboardinterrupt,
-            mode_works=False,
-        )
-
-        with patch("sys.argv", mocks.sysarg), patch("builtins.print", mocks.print):
-            main()
-
-        exit_call_args = mocks.mock_calls[-1][1]
-        assert mocks.mock_calls == [
-            call.parse_arguments(mocks.sysarg[1:]),
-            call.create_mode(
-                modename=parse_arguments.return_value, on_fail=handle_activation_error
-            ),
-            call.get_startup_text(mode=parse_arguments.return_value),
-            call.print(get_startup_text.return_value),
-            call.mode.__enter__(),
-            # Checking only the exception type here. The exception and the
-            # traceback instances are assumed to be correct. Too complicated to
-            # catch them just for the test.
-            call.mode.__exit__(ModeExit, *exit_call_args[1:]),
-        ]
-
-    @staticmethod
-    def get_mocks_for_main(
-        parse_arguments,
-        create_mode,
-        get_startup_text,
-        wait_until_keyboardinterrupt,
-        mode_works: bool,
-    ):
-        cli_arg = Mock()
-        mockmodename = Mock(spec_set=ModeName.KEEP_PRESENTING)
-        mockprint = Mock()
-
-        class TestMode(Mode):
-            active = mode_works
-            activation_result: ActivationResult = ActivationResult()
-
-        mockresult = MagicMock(spec_set=ActivationResult)
-        mockresult.success = mode_works
-        mockmode = MagicMock(spec_set=TestMode)
-        mockmode.__enter__.return_value = mockmode
-        mockmode.__exit__.return_value = True
-        mockmode.activation_result = mockresult
-        mockmode.active = mode_works
-        sysarg = ["programname", cli_arg]
-        parse_arguments.return_value = mockmodename
-        get_startup_text.return_value = "startuptext"
-        create_mode.return_value = mockmode
-
-        mocks = Mock()
-        mocks.sysarg = sysarg
-        mocks.attach_mock(mockprint, "print")
-        mocks.attach_mock(mockmode, "mode")
-        mocks.attach_mock(parse_arguments, "parse_arguments")
-        mocks.attach_mock(create_mode, "create_mode")
-        mocks.attach_mock(get_startup_text, "get_startup_text")
-        mocks.attach_mock(wait_until_keyboardinterrupt, "wait_until_keyboardinterrupt")
-        return mocks
-
-
 @patch("builtins.print")
 def test_handle_activation_error(print_mock):
     result = ActivationResult()
@@ -195,3 +123,78 @@ def test_handle_activation_error(print_mock):
         printed_text = "\n".join(print_mock.mock_calls[0].args)
     # Some sensible text was printed to the user
     assert "Wakepy could not activate" in printed_text
+
+
+@patch("wakepy.__main__.wait_until_keyboardinterrupt")
+@patch("wakepy.__main__.parse_arguments")
+class TestMain:
+    """Tests the main() function from the __main__.py in a simple way. This
+    is more of a smoke test. The functionality of the different parts is
+    already tested in other unit tests."""
+
+    def test_working_mode(
+        self,
+        parse_arguments,
+        wait_until_keyboardinterrupt,
+        method1,
+    ):
+
+        with patch("sys.argv", self.sys_argv), patch("builtins.print") as print_mock:
+            manager = self.setup_mock_manager(
+                method1, print_mock, parse_arguments, wait_until_keyboardinterrupt
+            )
+            main()
+
+        assert manager.mock_calls == [
+            call.print(get_startup_text(method1.mode)),
+            call.wait_until_keyboardinterrupt(),
+            call.print("\n\nExited."),
+        ]
+
+    @pytest.mark.usefixtures("method2_broken")
+    def test_non_working_mode(
+        self,
+        parse_arguments,
+        wait_until_keyboardinterrupt,
+        method2_broken,
+        monkeypatch,
+    ):
+        # need to turn off WAKEPY_FAKE_SUCCESS as we want to get a failure.
+        monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
+
+        with patch("sys.argv", self.sys_argv), patch("builtins.print") as print_mock:
+            manager = self.setup_mock_manager(
+                method2_broken,
+                print_mock,
+                parse_arguments,
+                wait_until_keyboardinterrupt,
+            )
+            main()
+
+        expected_result = ActivationResult(results=[], modename=method2_broken.mode)
+        assert manager.mock_calls == [
+            call.print(get_startup_text(method2_broken.mode)),
+            call.print(_get_activation_error_text(expected_result)),
+        ]
+
+    @staticmethod
+    def setup_mock_manager(
+        method: Method,
+        print_mock,
+        parse_arguments,
+        wait_until_keyboardinterrupt,
+    ):
+        # Assume that user has specified some mode in the commandline which
+        # resolves to `method.mode`
+        parse_arguments.return_value = method.mode
+
+        mocks = Mock()
+        mocks.attach_mock(print_mock, "print")
+        mocks.attach_mock(wait_until_keyboardinterrupt, "wait_until_keyboardinterrupt")
+        return mocks
+
+    @property
+    def sys_argv(self):
+        # The patched value for sys.argv. Does not matter here otherwise, but
+        # should be a list of at least two items.
+        return ["", ""]
