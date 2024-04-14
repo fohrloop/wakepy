@@ -533,7 +533,7 @@ class TestCanIUseFails:
         ),
     ],
 )
-def test_method_usage_result(
+def test_method_activation_result(
     success,
     failure_stage,
     method_name,
@@ -555,66 +555,65 @@ def test_method_usage_result(
     assert str(mur) == expected_string_representation
 
 
-def test_deactivate_success_no_heartbeat():
-    method = get_test_method_class(enter_mode=None, exit_mode=None)()
-    deactivate_method(method)
+class TestDeactivateMethod:
 
-
-def test_deactivate_success_with_heartbeat():
-    heartbeat = Mock(spec_set=Heartbeat)
-    heartbeat.stop.return_value = True
-    method = get_test_method_class(enter_mode=None, exit_mode=None)()
-    deactivate_method(method, heartbeat=heartbeat)
-
-
-def test_deactivate_success_with_heartbeat_and_no_exit():
-    heartbeat = Mock(spec_set=Heartbeat)
-    heartbeat.stop.return_value = True
-    method = get_test_method_class(enter_mode=None)()
-    deactivate_method(method, heartbeat=heartbeat)
-
-
-def test_deactivate_fail_exit_mode_returning_bad_value():
-    method = get_test_method_class(enter_mode=None, exit_mode=123)()
-    with pytest.raises(
-        MethodError,
-        match=re.escape(
-            f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
-            "unsuccessful!"
-        )
-        + " .* "
-        + re.escape("Original error: exit_mode returned a value other than None!"),
-    ):
+    def test_success_no_heartbeat(self):
+        method = get_test_method_class(enter_mode=None, exit_mode=None)()
         deactivate_method(method)
 
+    def test_success_with_heartbeat(self):
+        heartbeat = Mock(spec_set=Heartbeat)
+        heartbeat.stop.return_value = True
+        method = get_test_method_class(
+            enter_mode=None, heartbeat=None, exit_mode=None
+        )()
+        deactivate_method(method, heartbeat=heartbeat)
 
-def test_deactivate_failing_exit_mode():
-    method = get_test_method_class(enter_mode=None, exit_mode=Exception("oh no"))()
-    with pytest.raises(
-        MethodError,
-        match=re.escape(
-            f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
-            "unsuccessful"
-        )
-        + ".*"
-        + re.escape("Original error: oh no"),
-    ):
-        deactivate_method(method)
+    def test_success_with_heartbeat_and_no_exit(self):
+        heartbeat = Mock(spec_set=Heartbeat)
+        heartbeat.stop.return_value = True
+        method = get_test_method_class(enter_mode=None, heartbeat=None)()
+        deactivate_method(method, heartbeat=heartbeat)
 
+    def test_fail_deactivation_at_exit_mode_bad_value(self):
+        method = get_test_method_class(enter_mode=None, exit_mode=123)()
+        with pytest.raises(
+            MethodError,
+            match=re.escape(
+                f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+                "unsuccessful!"
+            )
+            + " .* "
+            + re.escape("Original error: exit_mode returned a value other than None!"),
+        ):
+            deactivate_method(method)
 
-def test_deactivate_fail_heartbeat_not_stopping():
-    heartbeat = Mock(spec_set=Heartbeat)
-    heartbeat.stop.return_value = "Bad value"
-    method = get_test_method_class(enter_mode=None, exit_mode=None)()
-    with pytest.raises(
-        MethodError,
-        match=re.escape(
-            f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
-            "be stopped! Suggesting submitting a bug report and rebooting for clearing "
-            "the mode."
-        ),
-    ):
-        deactivate_method(method, heartbeat)
+    def test_fail_deactivation_at_exit_mode_raises_exception(self):
+        method = get_test_method_class(enter_mode=None, exit_mode=Exception("oh no"))()
+        with pytest.raises(
+            MethodError,
+            match=re.escape(
+                f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+                "unsuccessful"
+            )
+            + ".*"
+            + re.escape("Original error: oh no"),
+        ):
+            deactivate_method(method)
+
+    def test_fail_deactivation_heartbeat_not_stopping(self):
+        heartbeat = Mock(spec_set=Heartbeat)
+        heartbeat.stop.return_value = "Bad value"
+        method = get_test_method_class(enter_mode=None, exit_mode=None)()
+        with pytest.raises(
+            MethodError,
+            match=re.escape(
+                f"The heartbeat of {method.__class__.__name__} ({method.name}) could "
+                "not be stopped! Suggesting submitting a bug report and rebooting for "
+                "clearing the mode."
+            ),
+        ):
+            deactivate_method(method, heartbeat)
 
 
 def test_stagename(assert_strenum_values):
