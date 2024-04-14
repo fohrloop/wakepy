@@ -6,6 +6,7 @@ import sys
 import pytest
 
 from wakepy.core import DBusMethodCall
+from wakepy.core.activation import has_enter, has_exit, has_heartbeat
 from wakepy.core.method import Method, MethodOutcome, MethodOutcomeValue, select_methods
 from wakepy.core.registry import MethodRegistryError, get_method, get_methods
 
@@ -38,9 +39,9 @@ def test_overridden_methods_autodiscovery():
 
     method1 = WithEnterAndExit()
 
-    assert method1.has_enter
-    assert method1.has_exit
-    assert not method1.has_heartbeat
+    assert has_enter(method1)
+    assert has_exit(method1)
+    assert not has_heartbeat(method1)
 
     class WithJustHeartBeat(TestMethod):
         def heartbeat(self):
@@ -48,9 +49,9 @@ def test_overridden_methods_autodiscovery():
 
     method2 = WithJustHeartBeat()
 
-    assert not method2.has_enter
-    assert not method2.has_exit
-    assert method2.has_heartbeat
+    assert not has_enter(method2)
+    assert not has_exit(method2)
+    assert has_heartbeat(method2)
 
     class WithEnterExitAndHeartBeat(TestMethod):
         def heartbeat(self):
@@ -64,48 +65,27 @@ def test_overridden_methods_autodiscovery():
 
     method3 = WithEnterExitAndHeartBeat()
 
-    assert method3.has_enter
-    assert method3.has_exit
-    assert method3.has_heartbeat
+    assert has_enter(method3)
+    assert has_exit(method3)
+    assert has_heartbeat(method3)
 
     class SubWithEnterAndHeart(WithJustHeartBeat):
         def enter_mode(self):
             return
 
     method4 = SubWithEnterAndHeart()
-    assert method4.has_enter
-    assert method4.has_heartbeat
-    assert not method4.has_exit
+    assert has_enter(method4)
+    assert has_heartbeat(method4)
+    assert not has_exit(method4)
 
     class SubWithEnterAndExit(WithEnterAndExit):
         def enter_mode(self):
             return 123
 
     method5 = SubWithEnterAndExit()
-    assert method5.has_enter
-    assert method5.has_exit
-    assert not method5.has_heartbeat
-
-
-def test_method_has_x_is_not_writeable():
-    class MethodWithEnter(TestMethod):
-        def enter_mode(self):
-            return
-
-    method = MethodWithEnter()
-    assert method.has_enter
-    assert not method.has_exit
-
-    # The .has_enter, .has_exit or .has_heartbeat should be strictly read-only
-    with pytest.raises(AttributeError):
-        method.has_enter = False  # type: ignore
-
-    with pytest.raises(AttributeError):
-        method.has_exit = True  # type: ignore
-
-    # Same holds for classes
-    with pytest.raises(AttributeError):
-        MethodWithEnter.has_enter = False  # type: ignore
+    assert has_enter(method5)
+    assert has_exit(method5)
+    assert not has_heartbeat(method5)
 
 
 @pytest.mark.usefixtures("empty_method_registry")
