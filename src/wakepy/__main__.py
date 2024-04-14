@@ -57,6 +57,10 @@ def main() -> None:
 
 
 def handle_activation_error(result: ActivationResult) -> None:
+    print(_get_activation_error_text(result))
+
+
+def _get_activation_error_text(result: ActivationResult) -> str:
     from wakepy import __version__
 
     error_text = f"""
@@ -74,8 +78,12 @@ def handle_activation_error(result: ActivationResult) -> None:
 
     Thank you!
     """  # noqa 501
+
+    out = []
     for block in dedent(error_text.strip("\n")).split("\n"):
-        print(fill(block, 80))
+        out.append(fill(block, 80))
+
+    return "\n".join(out)
 
 
 def parse_arguments(
