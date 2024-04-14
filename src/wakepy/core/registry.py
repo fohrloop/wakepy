@@ -16,6 +16,7 @@ get_methods_for_mode
 
 from __future__ import annotations
 
+import logging
 import typing
 from typing import overload
 
@@ -47,6 +48,7 @@ _method_registry: MethodRegistry = dict()
 """A name -> Method class mapping. Updated automatically; when python loads
 a module with a subclass of Method, the Method class is added to this registry.
 """
+logger = logging.getLogger(__name__)
 
 
 class MethodRegistryError(RuntimeError):
@@ -58,7 +60,12 @@ def register_method(method_class: Type[Method]) -> None:
 
     if method_class.is_unnamed():
         # Methods without a name will not be registered
+        logging.debug(
+            "Not registering Method %s as it does not have a name set.", method_class
+        )
         return
+
+    logging.debug("Registering Method %s (name: %s)", method_class, method_class.name)
 
     method_dict: MethodDict = _method_registry.get(method_class.mode, dict())
 
