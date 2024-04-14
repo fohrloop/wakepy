@@ -461,39 +461,41 @@ class TestPlatformSupported:
         assert get_platform_supported(MultiPlatformA(), PlatformName.MACOS)
 
 
-@pytest.mark.parametrize(
-    "params",
-    [
-        # True and None -> The check does not fail
-        dict(caniuse=True, expected=(False, "")),
-        dict(caniuse=None, expected=(False, "")),
-        # If returning False, the check fails
-        dict(caniuse=False, expected=(True, "")),
-        # If returning a string, the check fails with a reason
-        dict(caniuse="reason", expected=(True, "reason")),
-        # If .caniuse() returns anything else than a string, that is silently
-        # converted to a string, and the check fails.
-        dict(caniuse=123, expected=(True, "123")),
-    ],
-)
-def test_caniuse_fails(params):
-    class SomeMethod(Method):
-        def caniuse(self):
-            return params["caniuse"]
+class TestCanIUseFails:
+    """test caniuse_fails"""
 
-    assert caniuse_fails(SomeMethod()) == params["expected"]
+    @pytest.mark.parametrize(
+        "params",
+        [
+            # True and None -> The check does not fail
+            dict(caniuse=True, expected=(False, "")),
+            dict(caniuse=None, expected=(False, "")),
+            # If returning False, the check fails
+            dict(caniuse=False, expected=(True, "")),
+            # If returning a string, the check fails with a reason
+            dict(caniuse="reason", expected=(True, "reason")),
+            # If .caniuse() returns anything else than a string, that is
+            # silently converted to a string, and the check fails.
+            dict(caniuse=123, expected=(True, "123")),
+        ],
+    )
+    def test_normal_cases(self, params):
+        class SomeMethod(Method):
+            def caniuse(self):
+                return params["caniuse"]
 
+        assert caniuse_fails(SomeMethod()) == params["expected"]
 
-def test_caniuse_fails_special_case():
-    """Tests the case when Method.caniuse raises an exception"""
-    err = ValueError("Cannot use")
+    def test_special_case(self):
+        """Tests the case when Method.caniuse raises an exception"""
+        err = ValueError("Cannot use")
 
-    class SomeMethod(Method):
-        def caniuse(self):
-            raise err
+        class SomeMethod(Method):
+            def caniuse(self):
+                raise err
 
-    method = SomeMethod()
-    assert caniuse_fails(method) == (True, str(err))
+        method = SomeMethod()
+        assert caniuse_fails(method) == (True, str(err))
 
 
 @pytest.mark.parametrize(
