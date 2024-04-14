@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import re
 import typing
+import warnings
 from unittest.mock import Mock, call
 
 import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
-from wakepy.core import ActivationResult
+from wakepy import ActivationError, ActivationResult
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import Mode, ModeController, ModeExit, handle_activation_fail
@@ -206,12 +208,45 @@ def _assert_context_manager_used_correctly(mocks, mode):
     ]
 
 
-def test_handle_activation_fail_bad_on_fail_value():
-    with pytest.raises(ValueError, match="on_fail must be one of"):
-        handle_activation_fail(
-            on_fail="foo",  # type: ignore
-            result=Mock(spec_set=ActivationResult),
-        )
+class TestHandleActivationFail:
+    """Tests for handle_activation_fail"""
+
+    @pytest.fixture
+    @staticmethod
+    def result1():
+        return ActivationResult(modename="testmode")
+
+    @pytest.fixture
+    @staticmethod
+    def error_text_match(result1):
+        return re.escape(result1.get_error_text())
+
+    def test_pass(self, result1):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            handle_activation_fail(on_fail="pass", result=result1)
+
+    def test_warn(self, result1, error_text_match):
+        with pytest.warns(UserWarning, match=error_text_match):
+            handle_activation_fail(on_fail="warn", result=result1)
+
+    def test_error(self, result1, error_text_match):
+        with pytest.raises(ActivationError, match=error_text_match):
+            handle_activation_fail(on_fail="error", result=result1)
+
+    def test_callable(self, result1):
+        mock = Mock()
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            handle_activation_fail(on_fail=mock, result=result1)
+        mock.assert_called_once_with(result1)
+
+    def test_bad_on_fail_value(self, result1):
+        with pytest.raises(ValueError, match="on_fail must be one of"):
+            handle_activation_fail(
+                on_fail="foo",  # type: ignore
+                result=result1,
+            )
 
 
 def test_modecontroller(monkeypatch, do_assert):
