@@ -319,10 +319,6 @@ class Mode:
         mode: Mode
             The context manager for the selected mode.
 
-        Raises
-        ------
-        ValueError, if the mode name is not associated with any registered
-        (imported) Methods.
         """
         methods_for_mode = get_methods_for_mode(modename)
         selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
