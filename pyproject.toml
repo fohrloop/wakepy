@@ -39,7 +39,7 @@ Homepage = "https://github.com/fohrloop/wakepy"
 "Source Code" = "https://github.com/fohrloop/wakepy"
 "Issue Tracker" = "https://github.com/fohrloop/wakepy/issues"
 Documentation = "https://wakepy.readthedocs.io/"
-Changelog = "https://wakepy.readthedocs.io/en/latest/changelog.html"
+Changelog = "https://wakepy.readthedocs.io/stable/changelog.html"
 
 [project.scripts]
 wakepy = "wakepy.__main__:main"
