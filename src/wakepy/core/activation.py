@@ -607,7 +607,7 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
 
     heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
 
-    if method.has_exit:
+    if has_exit(method):
         errortxt = (
             f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
             "unsuccessful! This should never happen, and could mean that the "
@@ -767,7 +767,7 @@ def _try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
     """Calls the method.enter_mode(). This function catches any possible
     Exceptions during the call."""
 
-    if not method.has_enter:
+    if not has_enter(method):
         return MethodOutcome.NOT_IMPLEMENTED, ""
 
     outcome, err_message = _try_method_call(method, "enter_mode")
@@ -784,7 +784,7 @@ def _try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.date
     heartbeat_call_time: dt.datetime
         The UTC time just before the method.heartbeat() was called.
     """
-    if not method.has_heartbeat:
+    if not has_heartbeat(method):
         return MethodOutcome.NOT_IMPLEMENTED, "", None
 
     heartbeat_call_time = dt.datetime.now(dt.timezone.utc)
@@ -823,7 +823,7 @@ def _rollback_with_exit(method: Method) -> None:
     This function has the side effect of executing the calls in the
     method.exit_mode.
     """
-    if not method.has_exit:
+    if not has_exit(method):
         # Nothing to exit from.
         return
 
@@ -891,3 +891,15 @@ class WakepyFakeSuccess(Method):
             raise RuntimeError(
                 f"{self.environment_variable} set to falsy value: {val}."
             )
+
+
+def has_enter(method: Method) -> bool:
+    return type(method).enter_mode is not Method.enter_mode
+
+
+def has_exit(method: Method) -> bool:
+    return type(method).exit_mode is not Method.exit_mode
+
+
+def has_heartbeat(method: Method) -> bool:
+    return type(method).heartbeat is not Method.heartbeat

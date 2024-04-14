@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import sys
 import typing
-from abc import ABC, ABCMeta
+from abc import ABC
 from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from .constants import ModeName, PlatformName
@@ -58,13 +58,6 @@ class MethodDefinitionError(RuntimeError):
     """Any error which is part of the Method (subclass) definition."""
 
 
-class MethodMeta(ABCMeta):
-    def __setattr__(self, name: str, value: Any) -> None:
-        if name in ("has_enter", "has_exit", "has_heartbeat"):
-            raise AttributeError(f'Cannot set read-only attribute "{name}"!')
-        return super().__setattr__(name, value)
-
-
 class MethodOutcome(StrEnum):
     NOT_IMPLEMENTED = auto()
     SUCCESS = auto()
@@ -78,7 +71,7 @@ unnamed = "__unnamed__"
 """Constant for defining unnamed Method(s)"""
 
 
-class Method(ABC, metaclass=MethodMeta):
+class Method(ABC):
     """Methods are objects that are used to switch modes. The phases for
     changing and being in a Mode is:
 
@@ -115,27 +108,13 @@ class Method(ABC, metaclass=MethodMeta):
     the Method should not be listed anywhere (e.g. when Method is meant to be
     subclassed)."""
 
-    # Set automatically. See __init_subclass__ and the properties named
-    # similarly but without underscores.
-    _has_enter: bool
-    _has_exit: bool
-    _has_heartbeat: bool
-
     def __init__(self, dbus_adapter: Optional[DBusAdapter] = None):
         # The dbus-adapter may be used to process dbus calls. This is relevant
         # only on methods using D-Bus.
         self._dbus_adapter = dbus_adapter
 
     def __init_subclass__(cls, **kwargs: object) -> None:
-        """These are automatically added. They tell if the `enter_mode`,
-        `exit_mode` and `heartbeat` methods are implemented in the Method
-        subclass. (should not to touch these manually)"""
-
-        cls._has_enter = cls.enter_mode is not Method.enter_mode
-        cls._has_exit = cls.exit_mode is not Method.exit_mode
-        cls._has_heartbeat = cls.heartbeat is not Method.heartbeat
         register_method(cls)
-
         return super().__init_subclass__(**kwargs)
 
     def caniuse(
@@ -257,18 +236,6 @@ class Method(ABC, metaclass=MethodMeta):
                 "as it does not have a DBusAdapter."
             )
         return self._dbus_adapter.process(call)
-
-    @property
-    def has_enter(self) -> bool:
-        return self._has_enter
-
-    @property
-    def has_exit(self) -> bool:
-        return self._has_exit
-
-    @property
-    def has_heartbeat(self) -> bool:
-        return self._has_heartbeat
 
     def __str__(self) -> str:
         return f"<wakepy Method: {self.__class__.__name__}>"
