@@ -144,83 +144,89 @@ class TestActivateMode:
         return mocks
 
 
-def test_activate_method_method_without_name():
-    """Methods used for activation must have a name. If not, there should be
-    a ValueError raised"""
+class TestActivateMethod:
+    """tests for activate_method"""
 
-    method = type("MyMethod", (Method,), {})()
-    with pytest.raises(
-        ValueError,
-        match=re.escape("Methods without a name may not be used to activate modes!"),
-    ):
-        activate_method(method)
+    def test_activate_method_method_without_name(self):
+        """Methods used for activation must have a name. If not, there should
+        be a ValueError raised"""
 
+        method = type("MyMethod", (Method,), {})()
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "Methods without a name may not be used to activate modes!"
+            ),
+        ):
+            activate_method(method)
 
-def test_activate_method_method_without_platform_support(monkeypatch):
-    WindowsMethod = get_test_method_class(
-        supported_platforms=(PlatformName.WINDOWS,),
-    )
+    def test_activate_method_method_without_platform_support(self, monkeypatch):
+        WindowsMethod = get_test_method_class(
+            supported_platforms=(PlatformName.WINDOWS,),
+        )
 
-    winmethod = WindowsMethod()
-    monkeypatch.setattr("wakepy.core.activation.CURRENT_PLATFORM", PlatformName.LINUX)
+        winmethod = WindowsMethod()
+        monkeypatch.setattr(
+            "wakepy.core.activation.CURRENT_PLATFORM", PlatformName.LINUX
+        )
 
-    # The current platform is set to linux, so method supporting only linux
-    # should fail.
-    res, heartbeat = activate_method(winmethod)
-    assert res.failure_stage == StageName.PLATFORM_SUPPORT
-    assert res.success is False
-    assert heartbeat is None
+        # The current platform is set to linux, so method supporting only linux
+        # should fail.
+        res, heartbeat = activate_method(winmethod)
+        assert res.failure_stage == StageName.PLATFORM_SUPPORT
+        assert res.success is False
+        assert heartbeat is None
 
+    def test_activate_method_method_caniuse_fails(self):
+        # Case 1: Fail by returning False from caniuse
+        method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
+        res, heartbeat = activate_method(method)
+        assert res.success is False
+        assert res.failure_stage == StageName.REQUIREMENTS
+        assert res.failure_reason == ""
+        assert heartbeat is None
 
-def test_activate_method_method_caniuse_fails():
-    # Case 1: Fail by returning False from caniuse
-    method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
-    res, heartbeat = activate_method(method)
-    assert res.success is False
-    assert res.failure_stage == StageName.REQUIREMENTS
-    assert res.failure_reason == ""
-    assert heartbeat is None
+        # Case 2: Fail by returning some error reason from caniuse
+        method = get_test_method_class(
+            caniuse="SomeSW version <2.1.5 not supported",
+            enter_mode=True,
+            exit_mode=True,
+        )()
+        res, heartbeat = activate_method(method)
+        assert res.success is False
+        assert res.failure_stage == StageName.REQUIREMENTS
+        assert res.failure_reason == "SomeSW version <2.1.5 not supported"
+        assert heartbeat is None
 
-    # Case 2: Fail by returning some error reason from caniuse
-    method = get_test_method_class(
-        caniuse="SomeSW version <2.1.5 not supported", enter_mode=True, exit_mode=True
-    )()
-    res, heartbeat = activate_method(method)
-    assert res.success is False
-    assert res.failure_stage == StageName.REQUIREMENTS
-    assert res.failure_reason == "SomeSW version <2.1.5 not supported"
-    assert heartbeat is None
+    def test_activate_method_method_enter_mode_fails(self):
+        # Case: Fail by returning False from enter_mode
+        method = get_test_method_class(
+            caniuse=True, enter_mode=RuntimeError("failed")
+        )()
+        res, heartbeat = activate_method(method)
+        assert res.success is False
+        assert res.failure_stage == StageName.ACTIVATION
+        assert "RuntimeError('failed')" in res.failure_reason
+        assert heartbeat is None
 
+    def test_activate_method_enter_mode_success(self):
+        method = get_test_method_class(caniuse=True, enter_mode=None)()
+        res, heartbeat = activate_method(method)
+        assert res.success is True
+        assert res.failure_stage is None
+        assert res.failure_reason == ""
+        # No heartbeat on success, as the used Method does not have heartbeat()
+        assert heartbeat is None
 
-def test_activate_method_method_enter_mode_fails():
-    # Case: Fail by returning False from enter_mode
-    method = get_test_method_class(caniuse=True, enter_mode=RuntimeError("failed"))()
-    res, heartbeat = activate_method(method)
-    assert res.success is False
-    assert res.failure_stage == StageName.ACTIVATION
-    assert "RuntimeError('failed')" in res.failure_reason
-    assert heartbeat is None
-
-
-def test_activate_method_enter_mode_success():
-    method = get_test_method_class(caniuse=True, enter_mode=None)()
-    res, heartbeat = activate_method(method)
-    assert res.success is True
-    assert res.failure_stage is None
-    assert res.failure_reason == ""
-    # No heartbeat on success, as the used Method does not have heartbeat()
-    assert heartbeat is None
-
-
-def test_activate_method_heartbeat_success():
-    method = get_test_method_class(heartbeat=None)()
-    res, heartbeat = activate_method(method)
-    assert res.success is True
-    assert res.failure_stage is None
-    assert res.failure_reason == ""
-    # We get a Heartbeat instance on success, as the used Method does has a
-    # heartbeat()
-    assert isinstance(heartbeat, Heartbeat)
+    def test_activate_method_heartbeat_success(self):
+        method = get_test_method_class(heartbeat=None)()
+        res, heartbeat = activate_method(method)
+        assert res.success is True
+        assert res.failure_stage is None
+        assert res.failure_reason == ""
+        # We get a Heartbeat instance on success, as the used Method does has a
+        # heartbeat()
+        assert isinstance(heartbeat, Heartbeat)
 
 
 """
