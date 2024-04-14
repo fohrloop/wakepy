@@ -438,24 +438,27 @@ class TestTryEnterAndHeartbeat:
         assert heartbeat_call_time is None
 
 
-@pytest.mark.usefixtures("provide_methods_different_platforms")
-def test_get_platform_supported():
-    WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
+class TestPlatformSupported:
+    """tests for get_platform_supported"""
 
-    # The windows method is only supported on windows
-    assert get_platform_supported(WindowsA(), PlatformName.WINDOWS)
-    assert not get_platform_supported(WindowsA(), PlatformName.LINUX)
-    assert not get_platform_supported(WindowsA(), PlatformName.MACOS)
+    @pytest.mark.usefixtures("provide_methods_different_platforms")
+    def test_get_platform_supported(self):
+        WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
 
-    # The linux method is only supported on linux
-    assert get_platform_supported(LinuxA(), PlatformName.LINUX)
-    assert not get_platform_supported(LinuxA(), PlatformName.WINDOWS)
-    assert not get_platform_supported(LinuxA(), PlatformName.MACOS)
+        # The windows method is only supported on windows
+        assert get_platform_supported(WindowsA(), PlatformName.WINDOWS)
+        assert not get_platform_supported(WindowsA(), PlatformName.LINUX)
+        assert not get_platform_supported(WindowsA(), PlatformName.MACOS)
 
-    # Case: Method that supports linux, windows and macOS
-    assert get_platform_supported(MultiPlatformA(), PlatformName.LINUX)
-    assert get_platform_supported(MultiPlatformA(), PlatformName.WINDOWS)
-    assert get_platform_supported(MultiPlatformA(), PlatformName.MACOS)
+        # The linux method is only supported on linux
+        assert get_platform_supported(LinuxA(), PlatformName.LINUX)
+        assert not get_platform_supported(LinuxA(), PlatformName.WINDOWS)
+        assert not get_platform_supported(LinuxA(), PlatformName.MACOS)
+
+        # Case: Method that supports linux, windows and macOS
+        assert get_platform_supported(MultiPlatformA(), PlatformName.LINUX)
+        assert get_platform_supported(MultiPlatformA(), PlatformName.WINDOWS)
+        assert get_platform_supported(MultiPlatformA(), PlatformName.MACOS)
 
 
 @pytest.mark.parametrize(
