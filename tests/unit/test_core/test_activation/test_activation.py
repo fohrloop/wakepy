@@ -42,24 +42,40 @@ from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import MethodError
 
 
+@pytest.fixture
+def heartbeat1():
+    """Well behaving Heartbeat instance"""
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = True
+    return heartbeat
+
+
+@pytest.fixture
+def heartbeat2_bad():
+    """Bad Heartbeat instance. Returns a bad value."""
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = "Bad value"
+    return heartbeat
+
+
 class TestActivateMode:
     """tests for activate_mode"""
 
-    def test_activate_without_methods(self, monkeypatch):
-        self._arrange_for_test_activate(monkeypatch)
+    @pytest.mark.usefixtures("mocks_for_test_activate_mode")
+    def test_activate_without_methods(self):
         res, active_method, heartbeat = activate_mode([], None)
         assert res.list_methods() == []
         assert res.success is False
         assert active_method is None
         assert heartbeat is None
 
-    def test_activate_function_success(self, monkeypatch):
+    def test_activate_function_success(self, mocks_for_test_activate_mode):
         """Here we test the activate_mode() function. It calls some
         other functions which we do not care about as they're tested elsewhere.
         That is we why monkeypatch those functions with fakes"""
 
         # Arrange
-        mocks = self._arrange_for_test_activate(monkeypatch)
+        mocks = mocks_for_test_activate_mode
         methodcls_fail = get_test_method_class(enter_mode=False)
         methodcls_success = get_test_method_class(enter_mode=None)
 
@@ -91,9 +107,9 @@ class TestActivateMode:
         assert isinstance(active_method, methodcls_success)
         assert heartbeat is mocks.heartbeat
 
-    def test_activate_function_failure(self, monkeypatch):
+    def test_activate_function_failure(self, mocks_for_test_activate_mode):
         # Arrange
-        mocks = self._arrange_for_test_activate(monkeypatch)
+        mocks = mocks_for_test_activate_mode
         methodcls_fail = get_test_method_class(enter_mode=False)
 
         # Act
@@ -109,12 +125,13 @@ class TestActivateMode:
         assert heartbeat is None
 
     @staticmethod
-    def _arrange_for_test_activate(monkeypatch):
+    @pytest.fixture
+    def mocks_for_test_activate_mode(monkeypatch, heartbeat1):
         """This is the test arrangement step for tests for the
         `activate_mode` function"""
 
         mocks = Mock()
-        mocks.heartbeat = Mock(spec_set=Heartbeat)
+        mocks.heartbeat = heartbeat1
         mocks.dbus_adapter = Mock(spec_set=DBusAdapter)
 
         def fake_activate_method(method):
@@ -561,19 +578,15 @@ class TestDeactivateMethod:
         method = get_test_method_class(enter_mode=None, exit_mode=None)()
         deactivate_method(method)
 
-    def test_success_with_heartbeat(self):
-        heartbeat = Mock(spec_set=Heartbeat)
-        heartbeat.stop.return_value = True
+    def test_success_with_heartbeat(self, heartbeat1):
         method = get_test_method_class(
             enter_mode=None, heartbeat=None, exit_mode=None
         )()
-        deactivate_method(method, heartbeat=heartbeat)
+        deactivate_method(method, heartbeat=heartbeat1)
 
-    def test_success_with_heartbeat_and_no_exit(self):
-        heartbeat = Mock(spec_set=Heartbeat)
-        heartbeat.stop.return_value = True
+    def test_success_with_heartbeat_and_no_exit(self, heartbeat1):
         method = get_test_method_class(enter_mode=None, heartbeat=None)()
-        deactivate_method(method, heartbeat=heartbeat)
+        deactivate_method(method, heartbeat=heartbeat1)
 
     def test_fail_deactivation_at_exit_mode_bad_value(self):
         method = get_test_method_class(enter_mode=None, exit_mode=123)()
@@ -601,9 +614,8 @@ class TestDeactivateMethod:
         ):
             deactivate_method(method)
 
-    def test_fail_deactivation_heartbeat_not_stopping(self):
-        heartbeat = Mock(spec_set=Heartbeat)
-        heartbeat.stop.return_value = "Bad value"
+    def test_fail_deactivation_heartbeat_not_stopping(self, heartbeat2_bad):
+
         method = get_test_method_class(enter_mode=None, exit_mode=None)()
         with pytest.raises(
             MethodError,
@@ -613,7 +625,7 @@ class TestDeactivateMethod:
                 "clearing the mode."
             ),
         ):
-            deactivate_method(method, heartbeat)
+            deactivate_method(method, heartbeat2_bad)
 
 
 def test_stagename(assert_strenum_values):
