@@ -635,38 +635,37 @@ def test_stagename(assert_strenum_values):
     assert_strenum_values(StageName, StageNameValue)
 
 
-# These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
-@pytest.mark.parametrize("val", ("0", "no", "NO", "False", "false", "FALSE"))
-def test_wakepy_fake_success_falsy_values(val, monkeypatch):
-    method = WakepyFakeSuccess()
+class TestWakepyFakeSuccess:
 
-    with wakepy_fake_value_set(monkeypatch, val), pytest.raises(
-        RuntimeError, match=f"WAKEPY_FAKE_SUCCESS set to falsy value: {val}"
-    ):
-        method.enter_mode()
+    @contextmanager
+    def wakepy_fake_value_set(self, monkeypatch, val):
+        with monkeypatch.context() as mp:
+            mp.setenv("WAKEPY_FAKE_SUCCESS", val)
+            val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
+            assert val_from_env == str(val)
+            yield
 
+    # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
+    @pytest.mark.parametrize("val", ("0", "no", "NO", "False", "false", "FALSE"))
+    def test_falsy_values(self, val, monkeypatch):
+        method = WakepyFakeSuccess()
 
-@pytest.mark.parametrize("val", ("1", "yes", "True", "anystring"))
-def test_wakepy_fake_success_truthy_values(val, monkeypatch):
-    method = WakepyFakeSuccess()
+        with self.wakepy_fake_value_set(monkeypatch, val), pytest.raises(
+            RuntimeError, match=f"WAKEPY_FAKE_SUCCESS set to falsy value: {val}"
+        ):
+            method.enter_mode()
 
-    with wakepy_fake_value_set(monkeypatch, val):
-        assert method.enter_mode() is None  # type: ignore[func-returns-value]
+    @pytest.mark.parametrize("val", ("1", "yes", "True", "anystring"))
+    def test_truthy_values(self, val, monkeypatch):
+        method = WakepyFakeSuccess()
 
+        with self.wakepy_fake_value_set(monkeypatch, val):
+            assert method.enter_mode() is None  # type: ignore[func-returns-value]
 
-def test_wakepy_fake_success_without_the_env_var_set(monkeypatch):
-    method = WakepyFakeSuccess()
-    if "WAKEPY_FAKE_SUCCESS" in os.environ:
-        monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
+    def test_without_the_env_var_set(self, monkeypatch):
+        method = WakepyFakeSuccess()
+        if "WAKEPY_FAKE_SUCCESS" in os.environ:
+            monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
 
-    with pytest.raises(RuntimeError, match="WAKEPY_FAKE_SUCCESS not set"):
-        method.enter_mode()
-
-
-@contextmanager
-def wakepy_fake_value_set(monkeypatch, val):
-    with monkeypatch.context() as mp:
-        mp.setenv("WAKEPY_FAKE_SUCCESS", val)
-        val_from_env = os.environ.get("WAKEPY_FAKE_SUCCESS")
-        assert val_from_env == str(val)
-        yield
+        with pytest.raises(RuntimeError, match="WAKEPY_FAKE_SUCCESS not set"):
+            method.enter_mode()
