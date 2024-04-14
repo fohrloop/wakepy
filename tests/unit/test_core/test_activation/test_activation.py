@@ -229,205 +229,208 @@ class TestActivateMethod:
         assert isinstance(heartbeat, Heartbeat)
 
 
-"""
-TABLE 1
-Test table for try_enter_and_heartbeat. Methods are {enter_mode}{heartbeat}
-where {enter_mode} and {heartbeat} are
+class TestTryEnterAndHeartbeat:
+    """tests for try_enter_and_heartbeat
 
-M: Missing implementation
-F: Failed attempt (with or without message)
-S: Succesful attempt
+    TABLE 1
+    Test table for try_enter_and_heartbeat. Methods are {enter_mode}{heartbeat}
+    where {enter_mode} and {heartbeat} are
 
-Methods   Expected result
--------   ---------------------------------------------------------
-1)  F*    Return Fail + enter_mode error message
+    M: Missing implementation
+    F: Failed attempt (with or without message)
+    S: Succesful attempt
 
-2)  MM    Raise Exception -- the Method is faulty.
-3)  MF    Return Fail + heartbeat error message
-4)  MS    Return Success + heartbeat time
+    Methods   Expected result
+    -------   ---------------------------------------------------------
+    1)  F*    Return Fail + enter_mode error message
 
-5)  SM    Return Success
-6)  SF    Return Fail + heartbeat error message + call exit_mode()
-7)  SS    Return Success + heartbeat time
-"""
+    2)  MM    Raise Exception -- the Method is faulty.
+    3)  MF    Return Fail + heartbeat error message
+    4)  MS    Return Success + heartbeat time
 
-
-def test_try_enter_and_heartbeat_failing_enter_mode():
-    """Tests 1) F* from TABLE 1; enter_mode failing"""
-
-    # Case: enter_mode raises exception
-    for method in iterate_test_methods(
-        enter_mode=[RuntimeError(FAILURE_REASON)],
-        heartbeat=METHOD_OPTIONS,
-        exit_mode=METHOD_OPTIONS,
-    ):
-        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
-        # Expecting
-        # * entering to FAIL
-        # * error message (FAILURE_REASON)
-        # * No heartbeat_call_time (None)
-        assert success is False
-        assert FAILURE_REASON in err_message
-        assert heartbeat_call_time is None
-
-
-def test_try_enter_and_heartbeat_missing_missing():
-    """Tests 2) MM from TABLE 1; missing both enter_mode and heartbeat"""
-    for method in iterate_test_methods(
-        enter_mode=[METHOD_MISSING],
-        heartbeat=[METHOD_MISSING],
-        exit_mode=METHOD_OPTIONS,
-    ):
-        expected_errmsg = (
-            f"Method {method.__class__.__name__} ({method.name}) is not properly "
-            "defined! Missing implementation for both, enter_mode() "
-            "and heartbeat()!"
-        )
-
-        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
-
-        # Expecting an error as missing enter_mode and heartbeat
-        assert success is False
-        assert err_message == expected_errmsg
-        assert heartbeat_call_time is None
-
-
-def test_try_enter_and_heartbeat_missing_failing():
-    """Tests 3) MF from TABLE 1; enter_mode missing and heartbeat failing"""
-    for method in iterate_test_methods(
-        enter_mode=[METHOD_MISSING],
-        heartbeat=[False],
-        exit_mode=METHOD_OPTIONS,
-    ):
-        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
-        # Expecting
-        # * heartbeat to FAIL (-> success is False)
-        # * Error message saying that can only return None
-        # * No heartbeat_call_time (None)
-        assert success is False
-        assert "returned an unsupported value False." in err_message
-        assert "The only accepted return value is None" in err_message
-        assert heartbeat_call_time is None
-
-    for method in iterate_test_methods(
-        enter_mode=[METHOD_MISSING],
-        heartbeat=[FAILURE_REASON],
-        exit_mode=METHOD_OPTIONS,
-    ):
-        success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
-        # Expecting same as above, but with failing message
-        assert success is False
-        assert f"returned an unsupported value {FAILURE_REASON}." in err_message
-        assert "The only accepted return value is None" in err_message
-        assert heartbeat_call_time is None
-
-
-@time_machine.travel(
-    dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
-)
-def test_try_enter_and_heartbeat_missing_success():
-    """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
-
-    expected_time = dt.datetime.strptime(
-        "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
-    ).replace(tzinfo=dt.timezone.utc)
-    for method in iterate_test_methods(
-        enter_mode=[METHOD_MISSING],
-        heartbeat=[None],
-        exit_mode=METHOD_OPTIONS,
-    ):
-        res = try_enter_and_heartbeat(method)
-        # Expecting: Return Success + '' +  heartbeat time
-        assert res == (True, "", expected_time)
-
-
-def test_try_enter_and_heartbeat_success_missing():
-    """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
-
-    for method in iterate_test_methods(
-        enter_mode=[None],
-        heartbeat=[METHOD_MISSING],
-        exit_mode=METHOD_OPTIONS,
-    ):
-        res = try_enter_and_heartbeat(method)
-        # Expecting: Return Success + '' + None (no heartbeat)
-        assert res == (True, "", None)
-
-
-def test_try_enter_and_heartbeat_success_failing():
-    """Tests 6) SF from TABLE 1; enter_mode success, heartbeat failing
-
-    This should, in general Return Fail + heartbeat error message + call
-    exit_mode() This call of exit_mode might be failing, so we test that
-    separately
+    5)  SM    Return Success
+    6)  SF    Return Fail + heartbeat error message + call exit_mode()
+    7)  SS    Return Success + heartbeat time
     """
 
-    # Case: Heartbeate fails by raising RuntimeError
-    for method in iterate_test_methods(
-        enter_mode=[None],
-        heartbeat=[RuntimeError(FAILURE_REASON)],
-        exit_mode=[None, METHOD_MISSING],
-    ):
+    def test_enter_mode_failing(self):
+        """Tests 1) F* from TABLE 1; enter_mode failing"""
+
+        # Case: enter_mode raises exception
+        for method in iterate_test_methods(
+            enter_mode=[RuntimeError(FAILURE_REASON)],
+            heartbeat=METHOD_OPTIONS,
+            exit_mode=METHOD_OPTIONS,
+        ):
+            success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+            # Expecting
+            # * entering to FAIL
+            # * error message (FAILURE_REASON)
+            # * No heartbeat_call_time (None)
+            assert success is False
+            assert FAILURE_REASON in err_message
+            assert heartbeat_call_time is None
+
+    def test_enter_mode_missing_and_heartbeat(self):
+        """Tests 2) MM from TABLE 1; missing both enter_mode and heartbeat"""
+        for method in iterate_test_methods(
+            enter_mode=[METHOD_MISSING],
+            heartbeat=[METHOD_MISSING],
+            exit_mode=METHOD_OPTIONS,
+        ):
+            expected_errmsg = (
+                f"Method {method.__class__.__name__} ({method.name}) is not properly "
+                "defined! Missing implementation for both, enter_mode() "
+                "and heartbeat()!"
+            )
+
+            success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+
+            # Expecting an error as missing enter_mode and heartbeat
+            assert success is False
+            assert err_message == expected_errmsg
+            assert heartbeat_call_time is None
+
+    def test_enter_mode_missing_heartbeat_failing(self):
+        """Tests 3) MF from TABLE 1; enter_mode missing and heartbeat
+        failing"""
+        for method in iterate_test_methods(
+            enter_mode=[METHOD_MISSING],
+            heartbeat=[False],
+            exit_mode=METHOD_OPTIONS,
+        ):
+            success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+            # Expecting
+            # * heartbeat to FAIL (-> success is False)
+            # * Error message saying that can only return None
+            # * No heartbeat_call_time (None)
+            assert success is False
+            assert "returned an unsupported value False." in err_message
+            assert "The only accepted return value is None" in err_message
+            assert heartbeat_call_time is None
+
+        for method in iterate_test_methods(
+            enter_mode=[METHOD_MISSING],
+            heartbeat=[FAILURE_REASON],
+            exit_mode=METHOD_OPTIONS,
+        ):
+            success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+            # Expecting same as above, but with failing message
+            assert success is False
+            assert f"returned an unsupported value {FAILURE_REASON}." in err_message
+            assert "The only accepted return value is None" in err_message
+            assert heartbeat_call_time is None
+
+    @time_machine.travel(
+        dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
+    )
+    def test_enter_mode_missing_heartbeat_success(self):
+        """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
+
+        expected_time = dt.datetime.strptime(
+            "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=dt.timezone.utc)
+        for method in iterate_test_methods(
+            enter_mode=[METHOD_MISSING],
+            heartbeat=[None],
+            exit_mode=METHOD_OPTIONS,
+        ):
+            res = try_enter_and_heartbeat(method)
+            # Expecting: Return Success + '' +  heartbeat time
+            assert res == (True, "", expected_time)
+
+    def test_enter_mode_success_hearbeat_missing(self):
+        """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
+
+        for method in iterate_test_methods(
+            enter_mode=[None],
+            heartbeat=[METHOD_MISSING],
+            exit_mode=METHOD_OPTIONS,
+        ):
+            res = try_enter_and_heartbeat(method)
+            # Expecting: Return Success + '' + None (no heartbeat)
+            assert res == (True, "", None)
+
+    def test_enter_mode_success_heartbeat_failing(self):
+        """Tests 6) SF from TABLE 1; enter_mode success, heartbeat failing
+
+        This should, in general Return Fail + heartbeat error message + call
+        exit_mode() This call of exit_mode might be failing, so we test that
+        separately
+        """
+
+        # Case: Heartbeate fails by raising RuntimeError
+        for method in iterate_test_methods(
+            enter_mode=[None],
+            heartbeat=[RuntimeError(FAILURE_REASON)],
+            exit_mode=[None, METHOD_MISSING],
+        ):
+            success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+            assert success is False
+            assert f"{FAILURE_REASON}" in err_message
+            assert heartbeat_call_time is None
+
+        # Case: The heartbeat fails, and because enter_mode() has succeed,
+        # wakepy tries to call exit_mode(). If that fails, the program must
+        # crash, as we are in an unknown state and this is clearly an error.
+        for method in iterate_test_methods(
+            enter_mode=[None],
+            heartbeat=[False, FAILURE_REASON],
+            exit_mode=[False, FAILURE_REASON],
+        ):
+            with pytest.raises(
+                RuntimeError,
+                match=re.escape(
+                    f"Entered {method.__class__.__name__} ({method.name}) but could not"
+                    " exit!"
+                ),
+            ):
+                try_enter_and_heartbeat(method)
+
+        # Case: Same as the one above, but this time exit_mode() raises a
+        # WakepyMethodTestError. That is re-raised as RuntimeError, instead.
+        # If this happens, the Method.exit_mode() has a bug.
+        for method in iterate_test_methods(
+            enter_mode=[None],
+            heartbeat=[False, FAILURE_REASON],
+            exit_mode=[WakepyMethodTestError("foo")],
+        ):
+            with pytest.raises(
+                RuntimeError,
+                match="foo",
+            ):
+                try_enter_and_heartbeat(method)
+
+    @time_machine.travel(
+        dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
+    )
+    def test_enter_mode_success_heartbeat_success(self):
+        """Tests 7) SS from TABLE 1; enter_mode success & heartbeat success"""
+        expected_time = dt.datetime.strptime(
+            "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
+        ).replace(tzinfo=dt.timezone.utc)
+
+        for method in iterate_test_methods(
+            enter_mode=[None],
+            heartbeat=[None],
+            exit_mode=METHOD_OPTIONS,
+        ):
+            res = try_enter_and_heartbeat(method)
+            # Expecting Return Success + '' + heartbeat time
+            assert res == (True, "", expected_time)
+
+    def test_enter_mode_returns_bad_balue(self):
+        # Case: returning bad value (None return value accepted)
+        method = get_test_method_class(**{"enter_mode": 132})()
         success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+
         assert success is False
-        assert f"{FAILURE_REASON}" in err_message
+        assert "The only accepted return value is None" in err_message
         assert heartbeat_call_time is None
 
-    # Case: The heartbeat fails, and because enter_mode() has succeed, wakepy
-    # tries to call exit_mode(). If that fails, the program must crash, as we
-    # are in an unknown state and this is clearly an error.
-    for method in iterate_test_methods(
-        enter_mode=[None],
-        heartbeat=[False, FAILURE_REASON],
-        exit_mode=[False, FAILURE_REASON],
-    ):
-        with pytest.raises(
-            RuntimeError,
-            match=re.escape(
-                f"Entered {method.__class__.__name__} ({method.name}) but could not "
-                "exit!"
-            ),
-        ):
-            try_enter_and_heartbeat(method)
-
-    # Case: Same as the one above, but this time exit_mode() raises a
-    # WakepyMethodTestError. That is re-raised as RuntimeError, instead.
-    # If this happens, the Method.exit_mode() has a bug.
-    for method in iterate_test_methods(
-        enter_mode=[None],
-        heartbeat=[False, FAILURE_REASON],
-        exit_mode=[WakepyMethodTestError("foo")],
-    ):
-        with pytest.raises(
-            RuntimeError,
-            match="foo",
-        ):
-            try_enter_and_heartbeat(method)
-
-
-@time_machine.travel(
-    dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
-)
-def test_try_enter_and_heartbeat_success_success():
-    """Tests 7) SS from TABLE 1; enter_mode success & heartbeat success"""
-    expected_time = dt.datetime.strptime(
-        "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
-    ).replace(tzinfo=dt.timezone.utc)
-
-    for method in iterate_test_methods(
-        enter_mode=[None],
-        heartbeat=[None],
-        exit_mode=METHOD_OPTIONS,
-    ):
-        res = try_enter_and_heartbeat(method)
-        # Expecting Return Success + '' + heartbeat time
-        assert res == (True, "", expected_time)
-
-
-def test_try_enter_and_heartbeat_special_cases():
-    # Case: returning bad value (only bool and str accepted)
-    for method_name in ("enter_mode", "heartbeat"):
-        method = get_test_method_class(**{method_name: 132})()
+    def test_heartbeat_returns_bad_balue(self):
+        # Case: returning bad value (None return value accepted)
+        method = get_test_method_class(**{"heartbeat": 132})()
         success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
 
         assert success is False
