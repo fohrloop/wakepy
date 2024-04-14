@@ -244,7 +244,14 @@ class Method(ABC):
         return f"<wakepy Method: {self.__class__.__name__} at {hex(id(self))}>"
 
     @classmethod
-    def _is_unnamed(cls) -> bool:
+    def is_unnamed(cls) -> bool:
+        """Tells if the Method has a name or not. See also docs for
+        `Method.name`.
+
+        Returns
+        -------
+        True if the method is without a name. Otherwise False.
+        """
         return cls.name == unnamed
 
 
