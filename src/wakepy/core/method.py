@@ -24,6 +24,8 @@ from .registry import register_method
 from .strenum import StrEnum, auto
 
 if typing.TYPE_CHECKING:
+    from typing import Dict
+
     from wakepy.core import DBusAdapter, DBusMethodCall
 
 if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
@@ -87,7 +89,6 @@ class Method(ABC):
     """
 
     mode: ModeName | str
-
     """The mode for the method. Each method may be connected to single mode.
     Use None for methods which do not implement any mode."""
 
@@ -108,10 +109,23 @@ class Method(ABC):
     the Method should not be listed anywhere (e.g. when Method is meant to be
     subclassed)."""
 
-    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None):
+    method_kwargs: Dict[str, object]
+    """The method arguments. This is created from two parts
+
+    1) The common_method_kwargs (if any)
+    2) The method_kwargs[Method.name] (if any)
+
+    These two dictionaries are merged. If the method_kwargs[Method.name]
+    has same keys as common_method_kwargs, the values in
+    method_kwargs[Method.name] have higher precedence, and they override
+    the ones in common_method_kwargs for that particular Method.
+    """
+
+    def __init__(self, **kwargs: object) -> None:
         # The dbus-adapter may be used to process dbus calls. This is relevant
         # only on methods using D-Bus.
-        self._dbus_adapter = dbus_adapter
+        self.dbus_adapter: DBusAdapter | None = kwargs.pop("dbus_adapter", None)
+        self.method_kwargs = kwargs
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         register_method(cls)
@@ -230,12 +244,12 @@ class Method(ABC):
         # as it is available automatically (if there is one). Any Exceptions
         # raised by this method does not need to be handled in the Method
         # subclass, either. Typically one would *not* override this method.
-        if self._dbus_adapter is None:
+        if self.dbus_adapter is None:
             raise RuntimeError(
                 f'{self.__class__.__name__ } cannot process dbus method call "{call}" '
                 "as it does not have a DBusAdapter."
             )
-        return self._dbus_adapter.process(call)
+        return self.dbus_adapter.process(call)
 
     def __str__(self) -> str:
         return f"<wakepy Method: {self.__class__.__name__}>"
