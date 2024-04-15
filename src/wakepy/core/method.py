@@ -29,7 +29,7 @@ else:  # pragma: no-cover-if-py-lt-38
 
 
 if typing.TYPE_CHECKING:
-    from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
+    from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
 
     from wakepy.core import DBusAdapter, DBusMethodCall
 
@@ -111,7 +111,8 @@ class Method(ABC):
     the Method should not be listed anywhere (e.g. when Method is meant to be
     subclassed)."""
 
-    method_kwargs: Dict[str, object]
+    # waits for https://github.com/fohrloop/wakepy/issues/256
+    # method_kwargs: Dict[str, object]
     """The method arguments. This is created from two parts
 
     1) The common_method_kwargs (if any)
@@ -127,7 +128,9 @@ class Method(ABC):
         # The dbus-adapter may be used to process dbus calls. This is relevant
         # only on methods using D-Bus.
         self.dbus_adapter = cast("DBusAdapter | None", kwargs.pop("dbus_adapter", None))
-        self.method_kwargs = kwargs
+
+        # waits for https://github.com/fohrloop/wakepy/issues/256
+        # self.method_kwargs = kwargs
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         register_method(cls)
