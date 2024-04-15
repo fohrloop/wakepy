@@ -166,7 +166,7 @@ def test_method_string_representations():
 def test_process_dbus_call(dbus_method: DBusMethod):
     method = Method()
     # when there is no dbus adapter..
-    assert method._dbus_adapter is None
+    assert method.dbus_adapter is None
     # we get RuntimeError
     with pytest.raises(
         RuntimeError,
