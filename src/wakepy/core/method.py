@@ -17,7 +17,7 @@ from __future__ import annotations
 import sys
 import typing
 from abc import ABC
-from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
+from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union, cast
 
 from .constants import ModeName, PlatformName
 from .registry import register_method
@@ -124,7 +124,7 @@ class Method(ABC):
     def __init__(self, **kwargs: object) -> None:
         # The dbus-adapter may be used to process dbus calls. This is relevant
         # only on methods using D-Bus.
-        self.dbus_adapter: DBusAdapter | None = kwargs.pop("dbus_adapter", None)
+        self.dbus_adapter = cast("DBusAdapter | None", kwargs.pop("dbus_adapter", None))
         self.method_kwargs = kwargs
 
     def __init_subclass__(cls, **kwargs: object) -> None:
