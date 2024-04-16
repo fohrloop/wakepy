@@ -214,13 +214,13 @@ class Mode:
         dbus adapter to be used, are defined.
         """
 
-        self.name = name
         self.method_classes = methods
-        self.methods_priority = methods_priority
-        self.controller: ModeController | None = None
-        self.activation_result = ActivationResult()
         self.active: bool = False
+        self.activation_result = ActivationResult()
+        self.name = name
+        self.methods_priority = methods_priority
         self.on_fail = on_fail
+        self.controller: ModeController | None = None
         self._dbus_adapter_cls = dbus_adapter
 
     def __enter__(self) -> Mode:
