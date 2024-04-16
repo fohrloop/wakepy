@@ -45,9 +45,17 @@ if typing.TYPE_CHECKING:
 
 
 _method_registry: MethodRegistry = dict()
-"""A name -> Method class mapping. Updated automatically; when python loads
-a module with a subclass of Method, the Method class is added to this registry.
+"""A registry of Methods and Modes. This is used for searching a Method base on
+the name of the Method and optionally the name of the Mode the Method
+implements.
+
+Updated automatically; when python loads a module with a subclass of Method,
+the Method class is added to this registry.
+
+Data structure: The keys are names of Modes and values are MethodDicts. In
+MethodDict, keys are names of methods, and values are Method classes.
 """
+
 logger = logging.getLogger(__name__)
 
 
