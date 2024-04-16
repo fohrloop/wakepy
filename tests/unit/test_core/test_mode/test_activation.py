@@ -27,7 +27,10 @@ from wakepy.core import (
     PlatformName,
     get_methods,
 )
-from wakepy.core.activation import (
+from wakepy.core.constants import StageName, StageNameValue
+from wakepy.core.heartbeat import Heartbeat
+from wakepy.core.method import MethodError
+from wakepy.core.mode import (
     activate_method,
     activate_mode,
     caniuse_fails,
@@ -35,9 +38,6 @@ from wakepy.core.activation import (
     get_platform_supported,
     try_enter_and_heartbeat,
 )
-from wakepy.core.constants import StageName, StageNameValue
-from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.method import MethodError
 from wakepy.core.registry import get_method
 
 
@@ -149,11 +149,9 @@ class TestActivateMode:
                 mocks.heartbeat,
             )
 
+        monkeypatch.setattr("wakepy.core.mode.activate_method", fake_activate_method)
         monkeypatch.setattr(
-            "wakepy.core.activation.activate_method", fake_activate_method
-        )
-        monkeypatch.setattr(
-            "wakepy.core.activation.check_methods_priority",
+            "wakepy.core.mode.check_methods_priority",
             mocks.check_methods_priority,
         )
         monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
@@ -182,9 +180,7 @@ class TestActivateMethod:
         )
 
         winmethod = WindowsMethod()
-        monkeypatch.setattr(
-            "wakepy.core.activation.CURRENT_PLATFORM", PlatformName.LINUX
-        )
+        monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.LINUX)
 
         # The current platform is set to linux, so method supporting only linux
         # should fail.

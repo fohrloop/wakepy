@@ -6,8 +6,8 @@ import sys
 import pytest
 
 from wakepy.core import DBusMethodCall
-from wakepy.core.activation import has_enter, has_exit, has_heartbeat
 from wakepy.core.method import Method, MethodOutcome, MethodOutcomeValue, select_methods
+from wakepy.core.mode import has_enter, has_exit, has_heartbeat
 from wakepy.core.registry import MethodRegistryError, get_method, get_methods
 
 if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
