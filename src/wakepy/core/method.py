@@ -91,8 +91,8 @@ class Method(ABC):
     """
 
     mode: ModeName | str
-    """The mode for the method. Each method may be connected to single mode.
-    Use None for methods which do not implement any mode."""
+    """The mode for the method. Each Method subclass may be registered to a
+    single mode."""
 
     supported_platforms: Tuple[PlatformName, ...] = tuple()
     """All the supported platforms. If a platform is not listed here, this
