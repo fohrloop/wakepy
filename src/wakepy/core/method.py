@@ -35,22 +35,6 @@ class MethodError(RuntimeError):
     """Occurred inside wakepy.core.method.Method"""
 
 
-class EnterModeError(MethodError):
-    """Occurred during method.enter_mode()"""
-
-
-class ExitModeError(MethodError):
-    """Occurred during method.exit_mode()"""
-
-
-class HeartbeatCallError(MethodError):
-    """Occurred during method.heartbeat()"""
-
-
-class MethodDefinitionError(RuntimeError):
-    """Any error which is part of the Method (subclass) definition."""
-
-
 class MethodOutcome(StrEnum):
     NOT_IMPLEMENTED = auto()
     SUCCESS = auto()
