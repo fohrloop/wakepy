@@ -282,36 +282,51 @@ def test_modecontroller(monkeypatch, do_assert):
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
-def test_select_methods():
-    (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
+class TestSelectMethods:
 
-    methods = [MethodB, MethodD, MethodE]
+    def test_filter_with_blacklist(self):
 
-    # These can also be filtered with a blacklist
-    assert select_methods(methods, omit=["B"]) == [MethodD, MethodE]
-    assert select_methods(methods, omit=["B", "E"]) == [MethodD]
-    # Extra 'omit' methods do not matter
-    assert select_methods(methods, omit=["B", "E", "foo", "bar"]) == [
-        MethodD,
-    ]
+        (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
+        methods = [MethodB, MethodD, MethodE]
+        assert select_methods(methods, omit=["B"]) == [MethodD, MethodE]
+        assert select_methods(methods, omit=["B", "E"]) == [MethodD]
 
-    # These can be filtered with a whitelist
-    assert select_methods(methods, use_only=["B", "E"]) == [MethodB, MethodE]
+    def test_extra_omit_does_not_matter(self):
+        (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
+        methods = [MethodB, MethodD, MethodE]
+        # Extra 'omit' methods do not matter
+        assert select_methods(methods, omit=["B", "E", "foo", "bar"]) == [
+            MethodD,
+        ]
 
-    # If a whitelist contains extra methods, raise exception
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Methods ['bar', 'foo'] in `use_only` are not part of `methods`!"
-        ),
-    ):
-        select_methods(methods, use_only=["foo", "bar"])
+    def test_filter_with_a_whitelist(self):
+        (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
+        methods = [MethodB, MethodD, MethodE]
+        assert select_methods(methods, use_only=["B", "E"]) == [MethodB, MethodE]
 
-    # Cannot provide both: omit and use_only
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Can only define omit (blacklist) or use_only (whitelist), not both!"
-        ),
-    ):
-        select_methods(methods, use_only=["B"], omit=["E"])
+    def test_whitelist_extras_causes_exception(self):
+
+        (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
+        methods = [MethodB, MethodD, MethodE]
+
+        # If a whitelist contains extra methods, raise exception
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "Methods ['bar', 'foo'] in `use_only` are not part of `methods`!"
+            ),
+        ):
+            select_methods(methods, use_only=["foo", "bar"])
+
+    def test_cannot_provide_omit_and_use_only(self):
+
+        (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
+        methods = [MethodB, MethodD, MethodE]
+        # Cannot provide both: omit and use_only
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "Can only define omit (blacklist) or use_only (whitelist), not both!"
+            ),
+        ):
+            select_methods(methods, use_only=["B"], omit=["E"])
