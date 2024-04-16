@@ -11,7 +11,14 @@ from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy import ActivationError, ActivationResult
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.mode import Mode, ModeController, ModeExit, handle_activation_fail
+from wakepy.core.mode import (
+    Mode,
+    ModeController,
+    ModeExit,
+    handle_activation_fail,
+    select_methods,
+)
+from wakepy.core.registry import get_methods
 
 if typing.TYPE_CHECKING:
     from typing import Tuple, Type
@@ -272,3 +279,39 @@ def test_modecontroller(monkeypatch, do_assert):
 
     # Calling a deactivate for mode which is not activated will return False
     assert controller.deactivate() is False
+
+
+@pytest.mark.usefixtures("provide_methods_a_f")
+def test_select_methods():
+    (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
+
+    methods = [MethodB, MethodD, MethodE]
+
+    # These can also be filtered with a blacklist
+    assert select_methods(methods, omit=["B"]) == [MethodD, MethodE]
+    assert select_methods(methods, omit=["B", "E"]) == [MethodD]
+    # Extra 'omit' methods do not matter
+    assert select_methods(methods, omit=["B", "E", "foo", "bar"]) == [
+        MethodD,
+    ]
+
+    # These can be filtered with a whitelist
+    assert select_methods(methods, use_only=["B", "E"]) == [MethodB, MethodE]
+
+    # If a whitelist contains extra methods, raise exception
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Methods ['bar', 'foo'] in `use_only` are not part of `methods`!"
+        ),
+    ):
+        select_methods(methods, use_only=["foo", "bar"])
+
+    # Cannot provide both: omit and use_only
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Can only define omit (blacklist) or use_only (whitelist), not both!"
+        ),
+    ):
+        select_methods(methods, use_only=["B"], omit=["E"])

@@ -1,6 +1,7 @@
 """Common terms and definitions used in many places"""
 
 import sys
+from typing import List, Literal, Set, Tuple, TypeVar, Union
 
 from .strenum import StrEnum, auto
 
@@ -56,3 +57,8 @@ class StageName(StrEnum):
 
 
 StageNameValue = Literal["NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"]
+
+# Type annotations
+T = TypeVar("T")
+Collection = Union[List[T], Tuple[T, ...], Set[T]]
+StrCollection = Collection[str]

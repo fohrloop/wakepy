@@ -20,19 +20,22 @@ from .activationresult import ActivationResult, MethodActivationResult
 from .constants import PlatformName, StageName
 from .dbus import DBusAdapter, get_dbus_adapter
 from .heartbeat import Heartbeat
-from .method import Method, MethodError, MethodOutcome, select_methods
+from .method import Method, MethodError, MethodOutcome
 from .platform import CURRENT_PLATFORM
 from .registry import get_method, get_methods_for_mode
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Callable, Literal, Optional, Tuple, Type
+    from typing import Callable, List, Literal, Optional, Set, Tuple, Type, Union
 
-    from .constants import ModeName
+    from .constants import Collection, ModeName, StrCollection
     from .dbus import DBusAdapter, DBusAdapterTypeSeq
-    from .method import Method, MethodCls, StrCollection
+    from .method import Method, MethodCls
 
     OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
+
+    MethodClsCollection = Collection[MethodCls]
+
 
 """The strings in MethodsPriorityOrder are names of wakepy.Methods or the
 asterisk ('*')."""
@@ -347,6 +350,59 @@ class Mode:
             on_fail=on_fail,
             dbus_adapter=dbus_adapter,
         )
+
+
+def select_methods(
+    methods: MethodClsCollection,
+    omit: Optional[StrCollection] = None,
+    use_only: Optional[StrCollection] = None,
+) -> List[MethodCls]:
+    """Selects Methods from from `methods` using a blacklist (omit) or
+    whitelist (use_only). If `omit` and `use_only` are both None, will return
+    all the original methods.
+
+    Parameters
+    ----------
+    methods: collection of Method classes
+        The collection of methods from which to make the selection.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the `methods`; a "blacklist"
+        filter. Any Method in `omit` but not in `methods` will be silently
+        ignored. Cannot be used same time with `use_only`. Optional.
+    use_only: list, tuple or set of str
+        The names of Methods to select from the `methods`; a "whitelist"
+        filter. Means "use these and only these Methods". Any Methods in
+        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
+        be used same time with `omit`. Optional.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The selected method classes.
+
+    Raises
+    ------
+    ValueError if the input arguments (omit or use_only) are invalid.
+    """
+
+    if omit and use_only:
+        raise ValueError(
+            "Can only define omit (blacklist) or use_only (whitelist), not both!"
+        )
+    elif omit is None and use_only is None:
+        selected_methods = list(methods)
+    elif omit is not None:
+        selected_methods = [m for m in methods if m.name not in omit]
+    elif use_only is not None:
+        selected_methods = [m for m in methods if m.name in use_only]
+        if not set(use_only).issubset(m.name for m in selected_methods):
+            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
+            raise ValueError(
+                f"Methods {missing} in `use_only` are not part of `methods`!"
+            )
+    else:  # pragma: no cover
+        raise ValueError("Invalid `omit` and/or `use_only`!")
+    return selected_methods
 
 
 def activate_mode(

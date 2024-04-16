@@ -8,8 +8,8 @@ from ..core.mode import Mode
 if typing.TYPE_CHECKING:
     from typing import Optional, Type
 
+    from ..core.constants import StrCollection
     from ..core.dbus import DBusAdapter, DBusAdapterTypeSeq
-    from ..core.method import StrCollection
     from ..core.mode import MethodsPriorityOrder, Mode, OnFail
 
 

@@ -1,15 +1,8 @@
-"""This module defines the Method class and few functions for working with
-methods
+"""This module defines the Method class which is meant to be subclassed.
 
 Method
 * A class which is intended to be subclassed
 * The Methods are ways of entering wakepy Modes.
-
-General functions
------------------
-select_methods
-    Select Methods from a collection based on a white- or blacklist.
-
 """
 
 from __future__ import annotations
@@ -17,7 +10,7 @@ from __future__ import annotations
 import sys
 import typing
 from abc import ABC
-from typing import cast
+from typing import Type, cast
 
 from .registry import register_method
 from .strenum import StrEnum, auto
@@ -29,17 +22,13 @@ else:  # pragma: no-cover-if-py-lt-38
 
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
+    from typing import Any, Optional, Tuple
 
     from wakepy.core import DBusAdapter, DBusMethodCall
 
     from .constants import ModeName, PlatformName
 
-    MethodCls = Type["Method"]
-    T = TypeVar("T")
-    Collection = Union[List[T], Tuple[T, ...], Set[T]]
-    MethodClsCollection = Collection[MethodCls]
-    StrCollection = Collection[str]
+MethodCls = Type["Method"]
 
 
 class MethodError(RuntimeError):
@@ -272,56 +261,3 @@ class Method(ABC):
         True if the method is without a name. Otherwise False.
         """
         return cls.name == unnamed
-
-
-def select_methods(
-    methods: MethodClsCollection,
-    omit: Optional[StrCollection] = None,
-    use_only: Optional[StrCollection] = None,
-) -> List[MethodCls]:
-    """Selects Methods from from `methods` using a blacklist (omit) or
-    whitelist (use_only). If `omit` and `use_only` are both None, will return
-    all the original methods.
-
-    Parameters
-    ----------
-    methods: collection of Method classes
-        The collection of methods from which to make the selection.
-    omit: list, tuple or set of str or None
-        The names of Methods to remove from the `methods`; a "blacklist"
-        filter. Any Method in `omit` but not in `methods` will be silently
-        ignored. Cannot be used same time with `use_only`. Optional.
-    use_only: list, tuple or set of str
-        The names of Methods to select from the `methods`; a "whitelist"
-        filter. Means "use these and only these Methods". Any Methods in
-        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
-        be used same time with `omit`. Optional.
-
-    Returns
-    -------
-    methods: list[MethodCls]
-        The selected method classes.
-
-    Raises
-    ------
-    ValueError if the input arguments (omit or use_only) are invalid.
-    """
-
-    if omit and use_only:
-        raise ValueError(
-            "Can only define omit (blacklist) or use_only (whitelist), not both!"
-        )
-    elif omit is None and use_only is None:
-        selected_methods = list(methods)
-    elif omit is not None:
-        selected_methods = [m for m in methods if m.name not in omit]
-    elif use_only is not None:
-        selected_methods = [m for m in methods if m.name in use_only]
-        if not set(use_only).issubset(m.name for m in selected_methods):
-            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
-            raise ValueError(
-                f"Methods {missing} in `use_only` are not part of `methods`!"
-            )
-    else:  # pragma: no cover
-        raise ValueError("Invalid `omit` and/or `use_only`!")
-    return selected_methods
