@@ -7,7 +7,7 @@ Functions for getting Methods
 get_method
     Get a single method by name
 get_methods
-    Get multiple methods be name
+    Get multiple methods by name
 method_names_to_classes
     Convert multiple method names to Method classes
 get_methods_for_mode
