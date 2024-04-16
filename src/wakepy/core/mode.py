@@ -299,9 +299,11 @@ class Mode:
 
         Parameters
         ----------
-        modename:
-            The name of the mode to create. Used for debugging, logging,
-            warning and error messages. Could be basically any string.
+        modename: str
+            The name of the mode to create. Must be an existing Mode name;
+            something that has used as Method.name attribute in a
+            :class:`~wakepy.core.method.Method` subclass. Examples:
+            "keep.running", "keep.presenting".
         methods: list, tuple or set of str
             The names of Methods to select from the mode defined with
             `modename`; a "whitelist" filter. Means "use these and only these
