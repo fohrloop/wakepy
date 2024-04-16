@@ -198,10 +198,6 @@ class Mode:
     """The ``on_fail`` given when creating the :class:`Mode`.
     """
 
-    dbus_adapter: DBusAdapter | None
-    r"""The DBus adapter used with ``Method``\ s which require DBus (if any).
-    """
-
     _controller_class: Type[ModeController] = ModeController
 
     def __init__(
