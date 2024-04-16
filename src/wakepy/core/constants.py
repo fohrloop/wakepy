@@ -41,3 +41,18 @@ class BusType(StrEnum):
 
 
 BusTypeValue = Literal["SESSION", "SYSTEM"]
+
+
+class StageName(StrEnum):
+    # These are stages which occur in order for each of the methods
+    # when using a Method for activation.
+
+    NONE = auto()  # No stage at all.
+
+    # The stages in the activation process in order
+    PLATFORM_SUPPORT = auto()
+    REQUIREMENTS = auto()
+    ACTIVATION = auto()
+
+
+StageNameValue = Literal["NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"]

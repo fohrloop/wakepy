@@ -28,9 +28,6 @@ from wakepy.core import (
     get_methods,
 )
 from wakepy.core.activation import (
-    StageName,
-    StageNameValue,
-    WakepyFakeSuccess,
     activate_method,
     activate_mode,
     caniuse_fails,
@@ -38,8 +35,10 @@ from wakepy.core.activation import (
     get_platform_supported,
     try_enter_and_heartbeat,
 )
+from wakepy.core.constants import StageName, StageNameValue
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import MethodError
+from wakepy.core.registry import get_method
 
 
 @pytest.fixture
@@ -637,6 +636,8 @@ def test_stagename(assert_strenum_values):
 
 class TestWakepyFakeSuccess:
 
+    wakepy_fake_success_cls = get_method("WAKEPY_FAKE_SUCCESS")
+
     @contextmanager
     def wakepy_fake_value_set(self, monkeypatch, val):
         with monkeypatch.context() as mp:
@@ -648,7 +649,7 @@ class TestWakepyFakeSuccess:
     # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
     @pytest.mark.parametrize("val", ("0", "no", "NO", "False", "false", "FALSE"))
     def test_falsy_values(self, val, monkeypatch):
-        method = WakepyFakeSuccess()
+        method = self.wakepy_fake_success_cls()
 
         with self.wakepy_fake_value_set(monkeypatch, val), pytest.raises(
             RuntimeError, match=f"WAKEPY_FAKE_SUCCESS set to falsy value: {val}"
@@ -657,13 +658,13 @@ class TestWakepyFakeSuccess:
 
     @pytest.mark.parametrize("val", ("1", "yes", "True", "anystring"))
     def test_truthy_values(self, val, monkeypatch):
-        method = WakepyFakeSuccess()
+        method = self.wakepy_fake_success_cls()
 
         with self.wakepy_fake_value_set(monkeypatch, val):
             assert method.enter_mode() is None  # type: ignore[func-returns-value]
 
     def test_without_the_env_var_set(self, monkeypatch):
-        method = WakepyFakeSuccess()
+        method = self.wakepy_fake_success_cls()
         if "WAKEPY_FAKE_SUCCESS" in os.environ:
             monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
 

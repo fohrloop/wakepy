@@ -3,7 +3,8 @@ from __future__ import annotations
 import typing
 import warnings
 
-from .activation import ActivationResult, activate_mode, deactivate_method
+from .activation import activate_mode, deactivate_method
+from .activationresult import ActivationResult
 from .dbus import get_dbus_adapter
 from .heartbeat import Heartbeat
 from .method import select_methods
