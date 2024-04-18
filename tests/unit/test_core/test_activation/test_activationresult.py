@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import re
 import typing
 
@@ -335,6 +336,33 @@ class TestActivationResult:
             ),
         ):
             ar.active_method
+
+    @pytest.mark.parametrize(
+        "method_activation_results",
+        [
+            ("method_activation_results1"),
+            ("method_activation_results2"),
+            ("method_activation_results3_fail"),
+            ("method_activation_results4a"),
+            ("method_activation_results4b"),
+        ],
+    )
+    def test__eq__(
+        self, method_activation_results: List[MethodActivationResult], request
+    ):
+        method_activation_results = request.getfixturevalue(method_activation_results)
+        ar1 = ActivationResult(method_activation_results, modename="foo")
+        ar2 = ActivationResult(method_activation_results, modename="foo")
+
+        assert ar1 is not ar2
+        assert ar1 == ar2
+
+    def test__repr__(self, method_activation_results1: MethodActivationResult):
+        ar1 = ActivationResult(method_activation_results1, modename="foo")
+        assert (
+            ar1.__repr__()
+            == """ActivationResult(_method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)], modename='foo')"""
+        )
 
 
 class TestMethodActivationResult:

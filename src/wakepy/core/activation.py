@@ -23,7 +23,7 @@ from __future__ import annotations
 import datetime as dt
 import sys
 import typing
-from dataclasses import dataclass
+from dataclasses import InitVar, dataclass, field
 from typing import List, Sequence, Set, Union
 
 from .constants import PlatformName
@@ -63,10 +63,18 @@ class StageName(StrEnum):
 StageNameValue = Literal["NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"]
 
 
+@dataclass
 class ActivationResult:
     """The ActivationResult is responsible of keeping track on the possibly
     successful (max 1), failed and unused methods and providing different views
     on the results of the activation process.
+
+    Parameters
+    ---------
+    results:
+        The MethodActivationResults to be used to fill the ActivationResult
+    modename:
+        Name of the Mode. Optional.
 
     Attributes
     ----------
@@ -97,25 +105,20 @@ class ActivationResult:
         easier access, use .list_methods().
     """
 
-    def __init__(
+    results: InitVar[Optional[List[MethodActivationResult]]] = None
+    # These are the retuls for each of the used wakepy.Methods, in the
+    # order the methods were tried (first = highest priority, last =
+    # lowest priority)
+
+    _method_results: List[MethodActivationResult] = field(init=False)
+
+    modename: Optional[str] = None
+
+    def __post_init__(
         self,
         results: Optional[List[MethodActivationResult]] = None,
-        modename: Optional[str] = None,
     ):
-        """
-        Parameters
-        ---------
-        results:
-            The MethodActivationResults to be used to fill the ActivationResult
-        modename:
-            Name of the Mode. Optional.
-        """
-
-        # These are the retuls for each of the used wakepy.Methods, in the
-        # order the methods were tried (first = highest priority, last =
-        # lowest priority)
-        self._method_results: list[MethodActivationResult] = results or []
-        self.modename = modename
+        self._method_results = results or []
 
     @property
     def real_success(self) -> bool:
