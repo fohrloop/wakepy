@@ -1,6 +1,8 @@
 import pytest
 
 from wakepy import DBusAdapter
+from wakepy.core.registry import register_method
+from wakepy.methods._fakesuccess import WakepyFakeSuccess
 
 
 class TestDBusAdapter(DBusAdapter):
@@ -18,9 +20,15 @@ class TestUtils:
     """
 
     @staticmethod
-    def empty_method_registry(monkeypatch):
-        # Make the method registry empty for duration of a test
-        monkeypatch.setattr("wakepy.core.registry._method_registry", dict())
+    def empty_method_registry(monkeypatch, fake_success=False):
+        """
+        Make the method registry empty for duration of a test. Optionally, keep
+        the WakepyFakeSuccess method in the registry.
+        """
+        monkeypatch.setattr("wakepy.core.registry._method_registry", (dict()))
+        if fake_success:
+            register_method(WakepyFakeSuccess)
+            monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "yes")
 
 
 @pytest.fixture(scope="session")
