@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import re
 import typing
 import warnings
@@ -8,14 +9,14 @@ from unittest.mock import Mock, call
 import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
-from wakepy import ActivationError, ActivationResult
+from wakepy import ActivationError, ActivationResult, Method, Mode
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.mode import Mode, ModeExit, handle_activation_fail, select_methods
+from wakepy.core.mode import ModeExit, handle_activation_fail, select_methods
 from wakepy.core.registry import get_methods
 
 if typing.TYPE_CHECKING:
-    from typing import Tuple, Type
+    from typing import List, Tuple, Type
 
 
 def mocks_for_test_mode():
@@ -36,17 +37,51 @@ def mocks_for_test_mode():
     return mocks
 
 
-def get_mocks_and_testmode() -> Tuple[Mock, Type[Mode]]:
-    # Setup mocks
-    mocks = mocks_for_test_mode()
+@pytest.fixture
+def dbus_adapter_cls():
+    class TestDbusAdapter(DBusAdapter): ...
 
-    class TestMode(Mode):
-        _controller_class = mocks.controller_class
-
-    return mocks, TestMode
+    return TestDbusAdapter
 
 
-def test_mode_contextmanager_protocol():
+@pytest.fixture
+def testmode_cls():
+    class TestMode(Mode): ...
+
+    return TestMode
+
+
+@pytest.fixture
+def methods_abc(monkeypatch, testutils) -> List[Type[Method]]:
+    """This fixture creates three methods, which belong to a given mode."""
+    testutils.empty_method_registry(monkeypatch, fake_success=True)
+
+    class MethodA(Method):
+        name = "MethodA"
+        mode = "foo"
+
+    class MethodB(Method):
+        name = "MethodB"
+        mode = "foo"
+
+    class MethodC(Method):
+        name = "MethodC"
+        mode = "foo"
+
+    return [MethodA, MethodB, MethodC]
+
+
+@pytest.fixture
+def methods_priority0():
+    return ["*"]
+
+
+def test_mode_contextmanager_protocol(
+    methods_abc: List[Type[Method]],
+    testmode_cls: Type[Mode],
+    methods_priority0: List[str],
+    dbus_adapter_cls: Type[DBusAdapter],
+):
     """Test that the Mode fulfills the context manager protocol; i.e. it is
     possible to use instances of Mode in a with statement like this:
 
@@ -58,56 +93,33 @@ def test_mode_contextmanager_protocol():
     manager.activate()
     """
 
-    # Setup mocks
-    mocks, TestMode = get_mocks_and_testmode()
-
-    # starting point: No mock calls
-    assert mocks.mock_calls == []
-
-    mode = TestMode(
-        mocks.methods,
-        methods_priority=mocks.methods_priority,
-        dbus_adapter=mocks.dbus_adapter_cls,
+    mode = testmode_cls(
+        methods_abc,
+        methods_priority=methods_priority0,
+        dbus_adapter=dbus_adapter_cls,
         name="TestMode",
     )
 
-    # No calls during init
-    assert len(mocks.mock_calls) == 0
-
     # Test that the context manager protocol works
     with mode as m:
-        # The second call
-        # We have also called activate
-        assert len(mocks.mock_calls) == 3
 
-        # We have also created a ModeController instance
-        assert mocks.mock_calls[1] == call.controller_class(
-            dbus_adapter=mocks.dbus_adapter_cls.return_value
-        )
-        # And called ModeController.activate
-        assert mocks.mock_calls[2] == call.controller_class().activate(
-            mocks.methods, methods_priority=mocks.methods_priority, modename="TestMode"
-        )
         # The __enter__ returns the Mode
         assert m is mode
+        # We have activated the Mode
+        assert mode.active
+        # There is an ActivationResult available in .activation_result
+        assert isinstance(m.activation_result, ActivationResult)
+        # The active method is also available
+        assert isinstance(mode.active_method, Method)
 
-        # When activating, the .active is set to activation_result.success
-        assert m.active is m.activation_result.success
-
-        # The m.activation_result contains the value from the
-        # ModeController.activate() call
-        assert (
-            m.activation_result
-            == mocks.controller_class.return_value.activate.return_value
-        )
+        activation_result = copy.deepcopy(m.activation_result)
 
     # After exiting the mode, Mode.active is set to False
     assert m.active is False
-
-    # If we get here, the __exit__ works without errors
-    # ModeController.deactivate() is called during __exit__
-    assert len(mocks.mock_calls) == 4
-    assert mocks.mock_calls[3] == call.controller_class().deactivate()
+    # The active_method is set to None
+    assert m.active_method is None
+    # The activation result is still there (not removed during deactivation)
+    assert activation_result == m.activation_result
 
 
 def test_mode_exits():
