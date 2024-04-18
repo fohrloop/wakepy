@@ -11,13 +11,7 @@ from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy import ActivationError, ActivationResult
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.mode import (
-    Mode,
-    ModeController,
-    ModeExit,
-    handle_activation_fail,
-    select_methods,
-)
+from wakepy.core.mode import Mode, ModeExit, handle_activation_fail, select_methods
 from wakepy.core.registry import get_methods
 
 if typing.TYPE_CHECKING:
@@ -30,9 +24,6 @@ def mocks_for_test_mode():
 
     mocks.dbus_adapter_cls = Mock(spec_set=type(DBusAdapter))
     mocks.dbus_adapter_cls.return_value = Mock(spec_set=DBusAdapter)
-
-    mocks.mode_controller_cls = Mock()
-    mocks.mode_controller_cls.return_value = Mock(spec_set=ModeController)
 
     mocks.methods_priority = Mock()
 

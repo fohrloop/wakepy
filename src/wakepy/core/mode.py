@@ -12,6 +12,7 @@ get_prioritized_methods
 from __future__ import annotations
 
 import datetime as dt
+import logging
 import typing
 import warnings
 from typing import List, Sequence, Set, Union
@@ -66,56 +67,6 @@ class ModeExit(Exception):
     This will print just "failure" in case entering a Mode did not succeed and
     just "success" in case it did succeed (never both).
     """
-
-
-class ModeController:
-    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None):
-        self.dbus_adapter = dbus_adapter
-        self.active_method: Method | None = None
-        self.heartbeat: Heartbeat | None = None
-
-    def activate(
-        self,
-        method_classes: list[Type[Method]],
-        methods_priority: Optional[MethodsPriorityOrder] = None,
-        modename: Optional[str] = None,
-    ) -> ActivationResult:
-        """Activates the mode with one of the methods in the input method
-        classes. The methods are used with descending priority; highest
-        priority first.
-        """
-        result, active_method, heartbeat = activate_mode(
-            methods=method_classes,
-            methods_priority=methods_priority,
-            dbus_adapter=self.dbus_adapter,
-            modename=modename,
-        )
-        self.active_method = active_method
-        self.heartbeat = heartbeat
-        return result
-
-    def deactivate(self) -> bool:
-        """Deactivates the active mode, defined by the active Method, if any.
-        If there was no active method, does nothing.
-
-        Returns
-        -------
-        deactivated:
-            If there was no active method, returns False (nothing was done).
-            If there was an active method, and it was deactivated, returns True
-
-        Raises
-        ------
-        MethodError (RuntimeError) if there was active method but an error
-        occurred when trying to deactivate it."""
-
-        if not self.active_method:
-            return False
-
-        deactivate_method(self.active_method, self.heartbeat)
-        self.active_method = None
-        self.heartbeat = None
-        return True
 
 
 class Mode:
@@ -198,8 +149,6 @@ class Mode:
     """The ``on_fail`` given when creating the :class:`Mode`.
     """
 
-    _controller_class: Type[ModeController] = ModeController
-
     def __init__(
         self,
         methods: list[Type[Method]],
@@ -213,76 +162,19 @@ class Mode:
         This is also where the activation process related settings, such as the
         dbus adapter to be used, are defined.
         """
-
         self.method_classes = methods
         self.active: bool = False
         self.activation_result = ActivationResult()
         self.name = name
         self.methods_priority = methods_priority
         self.on_fail = on_fail
-        self.controller: ModeController | None = None
+        self.active_method: Method | None = None
+        self.heartbeat: Heartbeat | None = None
+
         self._dbus_adapter_cls = dbus_adapter
+        self._dbus_adapter: DBusAdapter | None = None
 
-    def __enter__(self) -> Mode:
-        """Called automatically when entering a with block and a instance of
-        Mode is used as the context expression. This tries to activate the
-        Mode using :attr:`~wakepy.Mode.method_classes`.
-        """
-
-        self.controller = self.controller or self._controller_class(
-            dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
-        )
-        self.activation_result = self.controller.activate(
-            self.method_classes,
-            methods_priority=self.methods_priority,
-            modename=self.name,
-        )
-        self.active = self.activation_result.success
-
-        if not self.active:
-            handle_activation_fail(self.on_fail, self.activation_result)
-
-        return self
-
-    def __exit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exception: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> bool:
-        """Called when exiting the with block.
-
-        If with block completed normally, called with `(None, None, None)`
-        If with block had an exception, called with `(exc_type, exc_value,
-        traceback)`, which is the same as `*sys.exc_info`.
-
-        Will swallow any ModeExit exception. Other exceptions will be
-        re-raised.
-        """
-
-        # These are not used but are part of context manager protocol.
-        #  make linters happy
-        _ = exc_type
-        _ = traceback
-
-        if self.controller is None:
-            raise RuntimeError("Must __enter__ before __exit__!")
-
-        self.controller.deactivate()
-        self.active = False
-
-        if exception is None or isinstance(exception, ModeExit):
-            # Returning True means that the exception within the with block is
-            # swallowed. We skip only ModeExit which should simply exit the
-            # with block.
-            return True
-
-        # Other types of exceptions are not handled; ignoring them here and
-        # returning False will tell python to re-raise the exception. Can't
-        # return None as type-checkers will mark code after with block
-        # unreachable
-
-        return False
+        self._logger = logging.getLogger(__name__)
 
     @classmethod
     def from_name(
@@ -348,6 +240,109 @@ class Mode:
             on_fail=on_fail,
             dbus_adapter=dbus_adapter,
         )
+
+    def __enter__(self) -> Mode:
+        """Called automatically when entering a with block and a instance of
+        Mode is used as the context expression. This tries to activate the
+        Mode using :attr:`~wakepy.Mode.method_classes`.
+        """
+
+        self._activate(
+            self.method_classes,
+            methods_priority=self.methods_priority,
+            modename=self.name,
+        )
+
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exception: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> bool:
+        """Called when exiting the with block.
+
+        If with block completed normally, called with `(None, None, None)`
+        If with block had an exception, called with `(exc_type, exc_value,
+        traceback)`, which is the same as `*sys.exc_info`.
+
+        Will swallow any ModeExit exception. Other exceptions will be
+        re-raised.
+        """
+
+        # These are not used but are part of context manager protocol.
+        #  make linters happy
+        _ = exc_type
+        _ = traceback
+
+        self._deactivate()
+
+        if exception is None or isinstance(exception, ModeExit):
+            # Returning True means that the exception within the with block is
+            # swallowed. We skip only ModeExit which should simply exit the
+            # with block.
+            return True
+
+        # Other types of exceptions are not handled; ignoring them here and
+        # returning False will tell python to re-raise the exception. Can't
+        # return None as type-checkers will mark code after with block
+        # unreachable
+
+        return False
+
+    def _activate(
+        self,
+        method_classes: list[Type[Method]],
+        methods_priority: Optional[MethodsPriorityOrder] = None,
+        modename: Optional[str] = None,
+    ) -> ActivationResult:
+        """Activates the mode with one of the methods in the input method
+        classes. The methods are used with descending priority; highest
+        priority first.
+        """
+        if not self._dbus_adapter:
+            self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
+
+        self.activation_result, self.active_method, self.heartbeat = activate_mode(
+            methods=method_classes,
+            methods_priority=methods_priority,
+            dbus_adapter=self._dbus_adapter,
+            modename=modename,
+        )
+        self.active = self.activation_result.success
+
+        if not self.active:
+            handle_activation_fail(self.on_fail, self.activation_result)
+
+        return self.activation_result
+
+    def _deactivate(self) -> bool:
+        """Deactivates the active mode, defined by the active Method, if any.
+        If there was no active method, does nothing.
+
+        Returns
+        -------
+        deactivated:
+            If there was no active method, returns False (nothing was done).
+            If there was an active method, and it was deactivated, returns True
+
+        Raises
+        ------
+        MethodError (RuntimeError) if there was active method but an error
+        occurred when trying to deactivate it."""
+
+        if self.active:
+            deactivate_method(self.active_method, self.heartbeat)
+            deactivated = True
+        else:
+            deactivated = False
+
+        self.active_method = None
+        self.heartbeat = None
+        self.active = False
+
+        return deactivated
 
 
 def select_methods(
@@ -435,7 +430,6 @@ def activate_mode(
         Optional.
     """
     check_methods_priority(methods_priority, methods)
-
     if not methods:
         # Cannot activate anything as there are no methods.
         return ActivationResult(modename=modename), None, None
