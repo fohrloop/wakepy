@@ -335,3 +335,91 @@ class TestActivationResult:
             ),
         ):
             ar.active_method
+
+
+class TestMethodActivationResult:
+    """Tests for MethodActivationResult"""
+
+    @pytest.fixture
+    def a(self) -> MethodActivationResult:
+        return MethodActivationResult(
+            method_name="foo",
+            success=False,
+            failure_stage=StageName.REQUIREMENTS,
+            failure_reason="some-text",
+        )
+
+    @pytest.fixture
+    def b(self) -> MethodActivationResult:
+        return MethodActivationResult(
+            method_name="foo",
+            success=False,
+            failure_stage=StageName.REQUIREMENTS,
+            failure_reason="some-text",
+        )
+
+    def test_equality_check_similar(
+        self, a: MethodActivationResult, b: MethodActivationResult
+    ):
+        # MethodActivationResult implements __eq__
+        assert a is not b
+        assert a == b
+
+    @pytest.fixture
+    def c_different_method_name(self) -> MethodActivationResult:
+        return MethodActivationResult(
+            method_name="bar",
+            success=False,
+            failure_stage=StageName.REQUIREMENTS,
+            failure_reason="some-text",
+        )
+
+    @pytest.fixture
+    def c_different_success(self) -> MethodActivationResult:
+        return MethodActivationResult(
+            method_name="foo",
+            success=True,
+            failure_stage=StageName.REQUIREMENTS,
+            failure_reason="some-text",
+        )
+
+    @pytest.fixture
+    def c_different_failure_stage(self) -> MethodActivationResult:
+        return MethodActivationResult(
+            method_name="foo",
+            success=False,
+            failure_stage=StageName.PLATFORM_SUPPORT,
+            failure_reason="some-text",
+        )
+
+    @pytest.fixture
+    def c_different_failure_reason(self) -> MethodActivationResult:
+        return MethodActivationResult(
+            method_name="foo",
+            success=False,
+            failure_stage=StageName.REQUIREMENTS,
+            failure_reason="some-other-text",
+        )
+
+    def test_equality_check_different(
+        self,
+        a: MethodActivationResult,
+        c_different_method_name: MethodActivationResult,
+        c_different_success: MethodActivationResult,
+        c_different_failure_stage: MethodActivationResult,
+        c_different_failure_reason: MethodActivationResult,
+    ):
+
+        c_list = [
+            c_different_method_name,
+            c_different_success,
+            c_different_failure_stage,
+            c_different_failure_reason,
+        ]
+        # MethodActivationResult implements __eq__
+        assert all(isinstance(x, MethodActivationResult) for x in [a] + c_list)
+        for c in c_list:
+            assert a != c
+
+    def test_repr(self, a: MethodActivationResult):
+        assert a.__repr__() == '(FAIL @REQUIREMENTS, foo, "some-text")'
