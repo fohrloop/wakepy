@@ -246,13 +246,7 @@ class Mode:
         Mode is used as the context expression. This tries to activate the
         Mode using :attr:`~wakepy.Mode.method_classes`.
         """
-
-        self._activate(
-            self.method_classes,
-            methods_priority=self.methods_priority,
-            modename=self.name,
-        )
-
+        self._activate()
         return self
 
     def __exit__(
@@ -291,24 +285,19 @@ class Mode:
 
         return False
 
-    def _activate(
-        self,
-        method_classes: list[Type[Method]],
-        methods_priority: Optional[MethodsPriorityOrder] = None,
-        modename: Optional[str] = None,
-    ) -> ActivationResult:
-        """Activates the mode with one of the methods in the input method
-        classes. The methods are used with descending priority; highest
-        priority first.
+    def _activate(self) -> ActivationResult:
+        """Activates the mode with one of the methods which belong to the mode.
+        The methods are used with descending priority; highest priority first,
+        and the priority is determined with the mode.methods_priority.
         """
         if not self._dbus_adapter:
             self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
 
         self.activation_result, self.active_method, self.heartbeat = activate_mode(
-            methods=method_classes,
-            methods_priority=methods_priority,
+            methods=self.method_classes,
+            methods_priority=self.methods_priority,
             dbus_adapter=self._dbus_adapter,
-            modename=modename,
+            modename=self.name,
         )
         self.active = self.activation_result.success
 
