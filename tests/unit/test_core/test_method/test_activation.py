@@ -30,6 +30,7 @@ from wakepy.core.method import (
     get_platform_supported,
     try_enter_and_heartbeat,
 )
+from wakepy.core.platform import CURRENT_PLATFORM
 from wakepy.core.registry import get_method
 
 
@@ -49,17 +50,20 @@ class TestActivateMethod:
         ):
             activate_method(method)
 
-    def test_activate_method_method_without_platform_support(self, monkeypatch):
-        WindowsMethod = get_test_method_class(
-            supported_platforms=(PlatformName.WINDOWS,),
+    def test_activate_method_method_without_platform_support(self):
+        UnsupportedMethod = get_test_method_class(
+            supported_platforms=(
+                PlatformName.WINDOWS
+                if CURRENT_PLATFORM != PlatformName.WINDOWS
+                else PlatformName.LINUX
+            ),
         )
 
-        winmethod = WindowsMethod()
-        monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.LINUX)
+        unsupported_method = UnsupportedMethod()
 
         # The current platform is set to linux, so method supporting only linux
         # should fail.
-        res, heartbeat = activate_method(winmethod)
+        res, heartbeat = activate_method(unsupported_method)
         assert res.failure_stage == StageName.PLATFORM_SUPPORT
         assert res.success is False
         assert heartbeat is None
