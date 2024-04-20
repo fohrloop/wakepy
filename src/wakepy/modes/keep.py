@@ -10,7 +10,8 @@ if typing.TYPE_CHECKING:
 
     from ..core.constants import StrCollection
     from ..core.dbus import DBusAdapter, DBusAdapterTypeSeq
-    from ..core.mode import MethodsPriorityOrder, Mode, OnFail
+    from ..core.mode import Mode, OnFail
+    from ..core.prioritization import MethodsPriorityOrder
 
 
 def running(
