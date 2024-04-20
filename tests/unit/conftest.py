@@ -2,7 +2,7 @@ import pytest
 
 from wakepy import DBusAdapter
 from wakepy.core.registry import register_method
-from wakepy.methods._fake import WakepyFakeSuccess
+from wakepy.methods._testing import WakepyFakeSuccess
 
 
 class TestDBusAdapter(DBusAdapter):
