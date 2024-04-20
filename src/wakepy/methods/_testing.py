@@ -1,6 +1,6 @@
 """This module defines the WakepyFakeSuccess method, which can be used to fake
 activation success. It is controlled with the WAKEPY_FAKE_SUCCESS environment
-variable"""
+variable and meant to be used in CI pipelines / tests."""
 
 from wakepy.core import CURRENT_PLATFORM, Method
 from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
