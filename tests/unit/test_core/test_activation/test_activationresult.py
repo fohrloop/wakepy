@@ -354,13 +354,12 @@ class TestActivationResult:
         assert ar1 is not ar2
         assert ar1 == ar2
 
-    # TODO: Add __repr__ test
-    # def test__repr__(self, method_activation_results1: MethodActivationResult):
-    #     ar1 = ActivationResult(method_activation_results1, modename="foo")
-    #     assert (
-    #         ar1.__repr__()
-    #         == """ActivationResult(_method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)], modename='foo')"""
-    #     )
+    def test__repr__(self, method_activation_results1: MethodActivationResult):
+        ar1 = ActivationResult(method_activation_results1, modename="foo")
+        assert (
+            ar1.__repr__()
+            == """ActivationResult(modename='foo', active_method='a-successful-method', success=True, real_success=True, failure=False, _method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)])"""
+        )
 
 
 class TestMethodActivationResult:

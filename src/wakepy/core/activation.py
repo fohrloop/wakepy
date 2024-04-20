@@ -110,10 +110,12 @@ class ActivationResult:
     # order the methods were tried (first = highest priority, last =
     # lowest priority)
 
-    _method_results: List[MethodActivationResult] = field(init=False)
-
     modename: Optional[str] = None
     """Name of the mode, if any."""
+
+    active_method: str | None = field(init=False)
+    """The name of the active (successful) method. If no methods are active,
+    this is None."""
 
     success: bool = field(init=False)
     """Tells is entering into a mode was successful.
@@ -130,9 +132,7 @@ class ActivationResult:
     failure: bool = field(init=False)
     """Always opposite of `success`. Included for convenience."""
 
-    active_method: str | None = field(init=False)
-    """The name of the active (successful) method. If no methods are active,
-    this is None."""
+    _method_results: List[MethodActivationResult] = field(init=False)
 
     def __post_init__(
         self,
