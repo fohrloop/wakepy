@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import re
 import typing
 
@@ -303,9 +302,9 @@ class TestActivationResult:
         )
         assert ar.get_error_text() == (
             'Could not activate Mode "SomeMode"!\n\nMethod usage results, in order '
-            '(highest priority first):\n[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform '
-            'XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing '
-            'requirement: Some SW v.1.2.3")]'
+            "(highest priority first):\n[(FAIL @PLATFORM_SUPPORT, fail-platform, "
+            '"Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, '
+            '"Missing requirement: Some SW v.1.2.3")]'
         )
 
     def test_active_method(
@@ -333,7 +332,7 @@ class TestActivationResult:
                 "'last-successful-method']"
             ),
         ):
-            ar = ActivationResult(method_activation_results2_manysuccess)
+            ActivationResult(method_activation_results2_manysuccess)
 
     @pytest.mark.parametrize(
         "method_activation_results",
@@ -358,7 +357,7 @@ class TestActivationResult:
         ar1 = ActivationResult(method_activation_results1, modename="foo")
         assert (
             ar1.__repr__()
-            == """ActivationResult(modename='foo', active_method='a-successful-method', success=True, real_success=True, failure=False, _method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)])"""
+            == """ActivationResult(modename='foo', active_method='a-successful-method', success=True, real_success=True, failure=False, _method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)])"""  # noqa: E501
         )
 
 

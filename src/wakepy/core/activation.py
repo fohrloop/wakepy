@@ -137,7 +137,7 @@ class ActivationResult:
     def __post_init__(
         self,
         results: Optional[List[MethodActivationResult]] = None,
-    ):
+    ) -> None:
         self._method_results = results or []
         self.success = self._get_success()
         self.failure = not self.success
