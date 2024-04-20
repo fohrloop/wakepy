@@ -1,5 +1,3 @@
-from unittest.mock import Mock
-
 import pytest
 
 from wakepy.core import DBusAddress, DBusMethod, Method, PlatformName
@@ -17,19 +15,20 @@ class TestMethod(Method):
 
 
 @pytest.fixture
-def heartbeat1():
+def heartbeat1(method1: Method):
     """Well behaving Heartbeat instance"""
-    heartbeat = Mock(spec_set=Heartbeat)
-    heartbeat.stop.return_value = True
-    return heartbeat
+    return Heartbeat(method1)
 
 
 @pytest.fixture
-def heartbeat2_bad():
+def heartbeat2_bad(method1: Method):
     """Bad Heartbeat instance. Returns a bad value."""
-    heartbeat = Mock(spec_set=Heartbeat)
-    heartbeat.stop.return_value = "Bad value"
-    return heartbeat
+
+    class BadHeartbeat(Heartbeat):
+        def stop(self):
+            return "Bad value"
+
+    return BadHeartbeat(method1)
 
 
 @pytest.fixture(scope="function")

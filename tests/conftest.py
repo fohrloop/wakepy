@@ -3,12 +3,23 @@ from typing import Optional
 
 import pytest
 
+from wakepy import Method
 from wakepy.core.strenum import StrEnum
 
 if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
     import typing_extensions as typing
 else:  # pragma: no-cover-if-py-lt-38
     import typing
+
+
+class TestMethod(Method):
+    __test__ = False  # for pytest
+    mode = "_test"
+
+
+@pytest.fixture
+def method1():
+    return TestMethod()
 
 
 @pytest.fixture
