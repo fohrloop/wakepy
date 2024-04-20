@@ -26,7 +26,7 @@ Examples
 # is that the Methods are registered into the method registry only if the class
 # definition is executed (if the module containing the Method class definition
 # is imported)
-from . import _fake as _fake
+from . import _testing as _testing
 from . import freedesktop as freedesktop
 from . import gnome as gnome
 from . import macos as macos
