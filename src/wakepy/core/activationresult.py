@@ -14,10 +14,11 @@ MethodActivationResult
 from __future__ import annotations
 
 import typing
-from dataclasses import dataclass
+from dataclasses import InitVar, dataclass, field
 from typing import List, Sequence
 
 from .constants import StageName, StageNameValue
+from .registry import get_method
 
 if typing.TYPE_CHECKING:
     from typing import Optional
@@ -169,7 +170,7 @@ class ActivationResult:
                 continue
             elif res.success is False and res.failure_stage not in fail_stages:
                 continue
-            elif res.success is False and res.method_name == WakepyFakeSuccess.name:
+            elif res.success is False and res.method_name == "WAKEPY_FAKE_SUCCESS":
                 # The fake method is only listed if it was requested to be,
                 # used, and when it is not requested to be used, the
                 # res.success is False.
@@ -201,7 +202,7 @@ class ActivationResult:
     def _get_real_success(self) -> bool:
 
         for res in self._method_results:
-            if res.success and res.method_name != WakepyFakeSuccess.name:
+            if res.success and res.method_name != "WAKEPY_FAKE_SUCCESS":
                 return True
         return False
 
