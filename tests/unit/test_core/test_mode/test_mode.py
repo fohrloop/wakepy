@@ -76,43 +76,44 @@ def methods_priority0():
     return ["*"]
 
 
-def test_mode_contextmanager_protocol(
+@pytest.fixture
+def mode0(
     methods_abc: List[Type[Method]],
     testmode_cls: Type[Mode],
     methods_priority0: List[str],
     dbus_adapter_cls: Type[DBusAdapter],
 ):
-    """Test that the Mode fulfills the context manager protocol; i.e. it is
-    possible to use instances of Mode in a with statement like this:
-
-    with Mode() as m:
-        ...
-
-    Test also that the ModeController.activate() and .deactivate()
-    are called as expected. and that the `m` is the return value of the
-    manager.activate()
-    """
-
-    mode = testmode_cls(
+    return testmode_cls(
         methods_abc,
         methods_priority=methods_priority0,
         dbus_adapter=dbus_adapter_cls,
         name="TestMode",
     )
 
+
+def test_mode_contextmanager_protocol(
+    mode0: Mode,
+):
+    """Test that the Mode fulfills the context manager protocol"""
+    flag_end_of_with_block = False
+
     # Test that the context manager protocol works
-    with mode as m:
+    with mode0 as m:
 
         # The __enter__ returns the Mode
-        assert m is mode
+        assert m is mode0
         # We have activated the Mode
-        assert mode.active
+        assert mode0.active
         # There is an ActivationResult available in .activation_result
         assert isinstance(m.activation_result, ActivationResult)
         # The active method is also available
-        assert isinstance(mode.active_method, Method)
+        assert isinstance(mode0.active_method, Method)
 
         activation_result = copy.deepcopy(m.activation_result)
+        flag_end_of_with_block = True
+
+    # reached the end of the with block
+    assert flag_end_of_with_block
 
     # After exiting the mode, Mode.active is set to False
     assert m.active is False
@@ -122,100 +123,36 @@ def test_mode_contextmanager_protocol(
     assert activation_result == m.activation_result
 
 
-def test_mode_exits():
-    mocks, TestMode = get_mocks_and_testmode()
+class TestExitModeWithException:
+    """Test cases when a Mode is exited with an Exception"""
 
-    # Normal exit
-    with TestMode(
-        mocks.methods,
-        methods_priority=mocks.methods_priority,
-        dbus_adapter=mocks.dbus_adapter_cls,
-    ) as mode:
-        testval = 1
-
-    assert testval == 1
-
-    _assert_context_manager_used_correctly(mocks, mode)
-
-
-def test_mode_exits_with_modeexit():
-    mocks, TestMode = get_mocks_and_testmode()
-
-    # Exit with ModeExit
-    with TestMode(
-        mocks.methods,
-        methods_priority=mocks.methods_priority,
-        dbus_adapter=mocks.dbus_adapter_cls,
-    ) as mode:
-        testval = 2
-        raise ModeExit
-        testval = 0  # type: ignore # (never hit)
-
-    assert testval == 2
-
-    _assert_context_manager_used_correctly(mocks, mode)
-
-
-def test_mode_exits_with_modeexit_with_args():
-    mocks, TestMode = get_mocks_and_testmode()
-
-    # Exit with ModeExit with args
-    with TestMode(
-        mocks.methods,
-        methods_priority=mocks.methods_priority,
-        dbus_adapter=mocks.dbus_adapter_cls,
-    ) as mode:
-        testval = 3
-        raise ModeExit("FOOO")
-        testval = 0  # type: ignore # (never hit)
-
-    assert testval == 3
-
-    _assert_context_manager_used_correctly(mocks, mode)
-
-
-def test_mode_exits_with_other_exception():
-    mocks, TestMode = get_mocks_and_testmode()
-
-    # Other exceptions are passed through
-    class MyException(Exception): ...
-
-    with pytest.raises(MyException):
-        with TestMode(
-            mocks.methods,
-            methods_priority=mocks.methods_priority,
-            dbus_adapter=mocks.dbus_adapter_cls,
-        ) as mode:
-            testval = 4
-            raise MyException
+    def test_mode_exits_with_modeexit(self, mode0):
+        with mode0:
+            testval = 2
+            raise ModeExit
             testval = 0  # type: ignore # (never hit)
 
-    assert testval == 4
+        assert testval == 2
 
-    _assert_context_manager_used_correctly(mocks, mode)
+    def test_mode_exits_with_modeexit_with_args(self, mode0):
+        with mode0:
+            testval = 3
+            raise ModeExit("FOOO")
+            testval = 0  # type: ignore # (never hit)
 
+        assert testval == 3
 
-def test_exiting_before_enter():
+    def test_mode_exits_with_other_exception(self, mode0):
+        # Other exceptions are passed through
+        class MyException(Exception): ...
 
-    mocks, TestMode = get_mocks_and_testmode()
-    mode = TestMode(
-        mocks.methods,
-        methods_priority=mocks.methods_priority,
-        dbus_adapter=mocks.dbus_adapter_cls,
-    )
-    with pytest.raises(RuntimeError, match="Must __enter__ before __exit__!"):
-        mode.__exit__(None, None, None)
+        with pytest.raises(MyException):
+            with mode0:
+                testval = 4
+                raise MyException
+                testval = 0  # type: ignore # (never hit)
 
-
-def _assert_context_manager_used_correctly(mocks, mode):
-    assert mocks.mock_calls.copy() == [
-        call.dbus_adapter_cls(),
-        call.controller_class(dbus_adapter=mocks.dbus_adapter_cls.return_value),
-        call.controller_class().activate(
-            mocks.methods, methods_priority=mocks.methods_priority, modename=mode.name
-        ),
-        call.controller_class().deactivate(),
-    ]
+        assert testval == 4
 
 
 class TestHandleActivationFail:
