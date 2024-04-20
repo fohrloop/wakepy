@@ -3,6 +3,7 @@ activation success. It is controlled with the WAKEPY_FAKE_SUCCESS environment
 variable"""
 
 from wakepy.core import CURRENT_PLATFORM, Method
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
 
 
 class WakepyFakeSuccess(Method):
@@ -13,7 +14,7 @@ class WakepyFakeSuccess(Method):
     to a truthy value (e.g. "1", or "True").
     """
 
-    name = "WAKEPY_FAKE_SUCCESS"
+    name = WAKEPY_FAKE_SUCCESS
     mode = "_fake"
 
     environment_variable = name

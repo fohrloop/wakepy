@@ -17,6 +17,8 @@ import typing
 import warnings
 from typing import List, Sequence, Set, Union
 
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
+
 from .activationresult import ActivationResult, MethodActivationResult
 from .constants import PlatformName, StageName
 from .dbus import DBusAdapter, get_dbus_adapter
@@ -440,7 +442,7 @@ def activate_mode(
 
     prioritized_methods = get_prioritized_methods(methods, methods_priority)
     # The fake method is always checked first (WAKEPY_FAKE_SUCCESS)
-    prioritized_methods.insert(0, get_method("WAKEPY_FAKE_SUCCESS"))
+    prioritized_methods.insert(0, get_method(WAKEPY_FAKE_SUCCESS))
 
     results = []
 

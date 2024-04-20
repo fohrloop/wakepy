@@ -27,7 +27,7 @@ from wakepy.core import (
     PlatformName,
     get_methods,
 )
-from wakepy.core.constants import StageName, StageNameValue
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName, StageNameValue
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import MethodError
 from wakepy.core.mode import (
@@ -632,7 +632,7 @@ def test_stagename(assert_strenum_values):
 
 class TestWakepyFakeSuccess:
 
-    wakepy_fake_success_cls = get_method("WAKEPY_FAKE_SUCCESS")
+    wakepy_fake_success_cls = get_method(WAKEPY_FAKE_SUCCESS)
 
     @contextmanager
     def wakepy_fake_value_set(self, monkeypatch, val):

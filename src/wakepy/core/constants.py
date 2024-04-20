@@ -10,6 +10,10 @@ if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
 else:  # pragma: no-cover-if-py-lt-38
     from typing import Literal
 
+WAKEPY_FAKE_SUCCESS = "WAKEPY_FAKE_SUCCESS"
+"""Name of the Wakepy fake success method and the environment variable used
+to set it"""
+
 
 class PlatformName(StrEnum):
     WINDOWS = auto()
