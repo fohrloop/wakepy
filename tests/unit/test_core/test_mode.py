@@ -372,7 +372,7 @@ class TestActivateMode:
 
         monkeypatch.setattr("wakepy.core.mode.activate_method", fake_activate_method)
         monkeypatch.setattr(
-            "wakepy.core.mode.check_methods_priority",
+            "wakepy.core.prioritization.check_methods_priority",
             mocks.check_methods_priority,
         )
         monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")

@@ -108,8 +108,8 @@ class TestOrderMethodsByPriority:
             ["WinA", "WinB", "LinuxA", "LinuxB", "LinuxC", "multiA"]
         )
 
-        # No user-defined order -> Just alphabetical, but current platform (linux)
-        # first.
+        # No user-defined order -> Just alphabetical, but current platform
+        # (linux) first.
         assert order_methods_by_priority(
             [
                 LinuxA,
@@ -219,7 +219,8 @@ class TestSortMethodsToPriorityGroups:
         ]
 
     def test_none(self):
-        # Case: methods_priority is None -> Should return all methods as one set
+        # Case: methods_priority is None -> Should return all methods as one
+        # et
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
         assert sort_methods_to_priority_groups(methods, methods_priority=None) == [
@@ -227,7 +228,8 @@ class TestSortMethodsToPriorityGroups:
         ]
 
     def test_sort_methods_to_priority_groups_does_not_edit_args(self):
-        """Test that the prioriry_order argument is not modified by the function"""
+        """Test that the prioriry_order argument is not modified by the
+        function"""
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         methods_priority = ["A", "F"]
 
