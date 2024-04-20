@@ -79,13 +79,27 @@ def mode0(
     methods_abc: List[Type[Method]],
     testmode_cls: Type[Mode],
     methods_priority0: List[str],
+):
+    return testmode_cls(
+        methods_abc,
+        dbus_adapter=None,
+        methods_priority=methods_priority0,
+        name="TestMode",
+    )
+
+
+@pytest.fixture
+def mode1_with_dbus(
+    methods_abc: List[Type[Method]],
+    testmode_cls: Type[Mode],
+    methods_priority0: List[str],
     dbus_adapter_cls: Type[DBusAdapter],
 ):
     return testmode_cls(
         methods_abc,
         methods_priority=methods_priority0,
         dbus_adapter=dbus_adapter_cls,
-        name="TestMode",
+        name="TestMode1",
     )
 
 
@@ -119,6 +133,35 @@ def test_mode_contextmanager_protocol(
     assert m.active_method is None
     # The activation result is still there (not removed during deactivation)
     assert activation_result == m.activation_result
+
+
+class TestModeActivateDeactivate:
+    """Tests for Mode._activate and Mode._deactivate"""
+
+    def test_activate_twice(
+        self,
+        mode1_with_dbus: Mode,
+    ):
+        # Run twice. The dbus adapter instance is created on the first time
+        # and reused the second time.
+        with mode1_with_dbus:
+            ...
+        with mode1_with_dbus:
+            ...
+
+    def test_runtime_error_if_deactivating_without_active_mode(
+        self,
+        mode0: Mode,
+    ):
+        # Try to deactivate a mode when there's no active_method. Needed for
+        # test coverage. A situation like this is unlikely to happen ever.
+        with pytest.raises(
+            RuntimeError,
+            match="Cannot deactivate mode: TestMode. The active_method is None! This should never happen",  # noqa: E501
+        ):
+            with mode0:
+                # Setting active method
+                mode0.active_method = None
 
 
 class TestExitModeWithException:
