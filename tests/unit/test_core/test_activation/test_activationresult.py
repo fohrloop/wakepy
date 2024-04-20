@@ -353,7 +353,7 @@ class TestActivationResult:
         assert ar1 is not ar2
         assert ar1 == ar2
 
-    def test__repr__(self, method_activation_results1: MethodActivationResult):
+    def test__repr__(self, method_activation_results1: List[MethodActivationResult]):
         ar1 = ActivationResult(method_activation_results1, modename="foo")
         assert (
             ar1.__repr__()
