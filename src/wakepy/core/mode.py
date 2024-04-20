@@ -422,7 +422,7 @@ def activate_mode(
         error messages (can be "any string" which makes sense to you).
         Optional.
     """
-    check_methods_priority(methods_priority, methods)
+
     if not methods:
         # Cannot activate anything as there are no methods.
         return ActivationResult(modename=modename), None, None
@@ -658,6 +658,9 @@ def get_prioritized_methods(
     optional; it is added to the end of `methods_priority` if missing.
 
     """
+
+    check_methods_priority(methods_priority, methods)
+
     unordered_groups: List[Set[MethodCls]] = get_prioritized_methods_groups(
         methods, methods_priority=methods_priority
     )
