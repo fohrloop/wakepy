@@ -18,7 +18,6 @@ from dataclasses import InitVar, dataclass, field
 from typing import List, Sequence
 
 from .constants import StageName, StageNameValue
-from .registry import get_method
 
 if typing.TYPE_CHECKING:
     from typing import Optional

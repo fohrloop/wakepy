@@ -4,19 +4,17 @@ import copy
 import re
 import typing
 import warnings
-from unittest.mock import Mock, call
+from unittest.mock import Mock
 
 import pytest
 
-from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy import ActivationError, ActivationResult, Method, Mode
 from wakepy.core.dbus import DBusAdapter
-from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import ModeExit, handle_activation_fail, select_methods
 from wakepy.core.registry import get_methods
 
 if typing.TYPE_CHECKING:
-    from typing import List, Tuple, Type
+    from typing import List, Type
 
 
 def mocks_for_test_mode():
@@ -126,7 +124,7 @@ def test_mode_contextmanager_protocol(
 class TestExitModeWithException:
     """Test cases when a Mode is exited with an Exception"""
 
-    def test_mode_exits_with_modeexit(self, mode0):
+    def test_mode_exits_with_modeexit(self, mode0: Mode):
         with mode0:
             testval = 2
             raise ModeExit
@@ -134,7 +132,7 @@ class TestExitModeWithException:
 
         assert testval == 2
 
-    def test_mode_exits_with_modeexit_with_args(self, mode0):
+    def test_mode_exits_with_modeexit_with_args(self, mode0: Mode):
         with mode0:
             testval = 3
             raise ModeExit("FOOO")
@@ -142,7 +140,7 @@ class TestExitModeWithException:
 
         assert testval == 3
 
-    def test_mode_exits_with_other_exception(self, mode0):
+    def test_mode_exits_with_other_exception(self, mode0: Mode):
         # Other exceptions are passed through
         class MyException(Exception): ...
 

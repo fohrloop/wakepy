@@ -333,6 +333,10 @@ class Mode:
         occurred when trying to deactivate it."""
 
         if self.active:
+            if self.active_method is None:
+                raise RuntimeError(
+                    f"Cannot deactivate mode: {str(self.name)}. The active_method is None! This should never happen."  # noqa E501
+                )
             deactivate_method(self.active_method, self.heartbeat)
             deactivated = True
         else:

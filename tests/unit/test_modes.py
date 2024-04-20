@@ -53,8 +53,8 @@ class TestKeepRunninAndPresenting:
         )
 
     def test_all_modes_are_selected_automatically(self, function_under_test, methods):
-        """Simple test for keep.running and keep.presenting. Tests that all input
-        arguments for the functions are passed to the Mode.__init__
+        """Simple test for keep.running and keep.presenting. Tests that all
+        input arguments for the functions are passed to the Mode.__init__
         """
 
         mode = function_under_test()
