@@ -25,24 +25,6 @@ if typing.TYPE_CHECKING:
     from typing import List, Type
 
 
-def mocks_for_test_mode():
-    # Setup test
-    mocks = Mock()
-
-    mocks.dbus_adapter_cls = Mock(spec_set=type(DBusAdapter))
-    mocks.dbus_adapter_cls.return_value = Mock(spec_set=DBusAdapter)
-
-    mocks.methods_priority = Mock()
-
-    result = Mock(spec_set=ActivationResult)
-    methods = [Mock() for _ in range(3)]
-
-    # Record calls in a "mock manager"
-    mocks.activation_result = result
-    mocks.methods = methods
-    return mocks
-
-
 @pytest.fixture
 def dbus_adapter_cls():
     class TestDbusAdapter(DBusAdapter): ...
