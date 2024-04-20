@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import re
+import typing
 
 import pytest
 
@@ -11,69 +14,97 @@ from wakepy.core.prioritization import (
 )
 from wakepy.core.registry import get_methods
 
+if typing.TYPE_CHECKING:
+    from typing import List, Type
+
+    from wakepy import Method
+
 
 @pytest.mark.usefixtures("provide_methods_a_f")
-def test_check_methods_priority():
-    methods = get_methods(["A", "B", "C", "D", "E", "F"])
-    (MethodA, *_) = methods
+class TestCheckMethodsPriority:
 
-    # These should be fine
-    check_methods_priority(methods_priority=None, methods=methods)
-    # methods_priority is empty list. Does not crash.
-    check_methods_priority(methods_priority=[], methods=methods)
-    # Does not make sense but should not crash.
-    check_methods_priority(methods_priority=["*"], methods=methods)
-    # Simple list of methods
-    check_methods_priority(methods_priority=["A", "B", "F"], methods=methods)
-    # Simple list of methods with asterisk
-    check_methods_priority(methods_priority=["A", "B", "*", "F"], methods=methods)
-    # Simple set + strings
-    check_methods_priority(methods_priority=[{"A", "B"}, "*", "F"], methods=methods)
-    # Simple set + strings
-    check_methods_priority(
-        methods_priority=[{"A", "B"}, "*", "E", {"F"}], methods=methods
-    )
+    @staticmethod
+    @pytest.fixture
+    def methods() -> List[Type[Method]]:
+        return get_methods(["A", "B", "C", "D", "E", "F"])
 
-    # These are not fine
-    # There is no Method with name "X" in methods
-    with pytest.raises(
-        ValueError,
-        match=re.escape('Method "X" in methods_priority not in selected methods!'),
-    ):
-        check_methods_priority(methods_priority=["X"], methods=methods)
+    def test_none(self, methods: List[Type[Method]]):
+        check_methods_priority(methods_priority=None, methods=methods)
 
-    # two asterisks
-    with pytest.raises(
-        ValueError,
-        match=re.escape("The asterisk (*) can only occur once in methods_priority!"),
-    ):
-        check_methods_priority(methods_priority=["A", "*", "B", "*"], methods=methods)
+    def test_empty_list(self, methods: List[Type[Method]]):
+        # methods_priority is empty list. Does not crash.
+        check_methods_priority(methods_priority=[], methods=methods)
 
-    # duplicate method names
-    with pytest.raises(
-        ValueError,
-        match=re.escape('Duplicate method name "A" in methods_priority'),
-    ):
+    def test_list_with_just_asterisk(self, methods: List[Type[Method]]):
+        # Does not make sense but should not crash.
+        check_methods_priority(methods_priority=["*"], methods=methods)
+
+    def test_list_of_few_method_names(self, methods: List[Type[Method]]):
+        # Simple list of methods
+        check_methods_priority(methods_priority=["A", "B", "F"], methods=methods)
+
+    def test_list_of_few_method_names_and_asterisk(self, methods: List[Type[Method]]):
+        # Simple list of methods with asterisk
+        check_methods_priority(methods_priority=["A", "B", "*", "F"], methods=methods)
+
+    def test_set_asterisk_methodname(self, methods: List[Type[Method]]):
+        # Simple set + strings
+        check_methods_priority(methods_priority=[{"A", "B"}, "*", "F"], methods=methods)
+
+    def test_set_asterisk_methodname_set(self, methods: List[Type[Method]]):
+        # Simple set + strings
         check_methods_priority(
-            methods_priority=["A", "*", "B", {"A", "C"}], methods=methods
+            methods_priority=[{"A", "B"}, "*", "E", {"F"}], methods=methods
         )
 
-    # Asterisk inside a set
-    with pytest.raises(
-        ValueError,
-        match=re.escape("Asterisk (*) may not be a part of a set in methods_priority!"),
-    ):
-        check_methods_priority(methods_priority=[{"*"}], methods=methods)
+    def test_method_name_which_does_not_exist(self, methods: List[Type[Method]]):
+        # There is no Method with name "X" in methods
+        with pytest.raises(
+            ValueError,
+            match=re.escape('Method "X" in methods_priority not in selected methods!'),
+        ):
+            check_methods_priority(methods_priority=["X"], methods=methods)
 
-    # Unsupported type
-    with pytest.raises(
-        TypeError,
-        match=re.escape("methods_priority must be a list[str | set[str]]!"),
-    ):
-        check_methods_priority(
-            methods_priority=[MethodA],  # type: ignore
-            methods=methods,
-        )
+    def test_two_asterisks(self, methods: List[Type[Method]]):
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "The asterisk (*) can only occur once in methods_priority!"
+            ),
+        ):
+            check_methods_priority(
+                methods_priority=["A", "*", "B", "*"], methods=methods
+            )
+
+    def test_duplicate_method_names(self, methods: List[Type[Method]]):
+        with pytest.raises(
+            ValueError,
+            match=re.escape('Duplicate method name "A" in methods_priority'),
+        ):
+            check_methods_priority(
+                methods_priority=["A", "*", "B", {"A", "C"}], methods=methods
+            )
+
+    def test_asterisk_inside_a_set(self, methods: List[Type[Method]]):
+        # Asterisk inside a set
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "Asterisk (*) may not be a part of a set in methods_priority!"
+            ),
+        ):
+            check_methods_priority(methods_priority=[{"*"}], methods=methods)
+
+    def test_list_of_methods_as_methods_priority(self, methods: List[Type[Method]]):
+        (MethodA, *_) = methods
+        with pytest.raises(
+            TypeError,
+            match=re.escape("methods_priority must be a list[str | set[str]]!"),
+        ):
+            check_methods_priority(
+                methods_priority=[MethodA],  # type: ignore
+                methods=methods,
+            )
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
