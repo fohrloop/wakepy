@@ -1,12 +1,11 @@
-"""This module defines the Mode class and functions which may be used in the
-activation and deactivation of Modes (using Methods).
+"""This module functions which may be used in the prioritization of wakepy
+Methods.
 
 Most important functions
 ------------------------
-activate_method(method:Method) -> MethodActivationResult
-    Activate a mode using a single Method
 order_methods_by_priority
-    Prioritize of collection of Methods
+    Order a list of Methods by priority, using an optional `methods_priority`
+    order.
 """
 
 from __future__ import annotations

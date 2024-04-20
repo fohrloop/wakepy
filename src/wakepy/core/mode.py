@@ -1,12 +1,12 @@
 """This module defines the Mode class and functions which may be used in the
 activation and deactivation of Modes (using Methods).
 
-Most important functions
-------------------------
-activate_method(method:Method) -> MethodActivationResult
-    Activate a mode using a single Method
-order_methods_by_priority
-    Prioritize of collection of Methods
+Classes
+-------
+Mode:
+    The main class of wakepy. Provides the entry point to any wakepy mode. A
+    context manager, which enters the mode defined with one of the Methods
+    given to it upon initialization.
 """
 
 from __future__ import annotations
