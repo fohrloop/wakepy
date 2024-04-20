@@ -134,24 +134,6 @@ class TestOrderMethodsByPriority:
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
-def test_sort_methods_to_priority_groups_does_not_edit_args():
-    """Test that the prioriry_order argument is not modified by the function"""
-    methods = get_methods(["A", "B", "C", "D", "E", "F"])
-
-    methods_priority = ["A", "F"]
-
-    _ = sort_methods_to_priority_groups(
-        methods,
-        methods_priority=methods_priority,
-    )
-
-    assert methods_priority == [
-        "A",
-        "F",
-    ], "The methods_priority argument should not be modified by the function"
-
-
-@pytest.mark.usefixtures("provide_methods_a_f")
 class TestSortMethodsToPriorityGroups:
 
     def test_two_names_and_asterisk(self):
@@ -244,6 +226,21 @@ class TestSortMethodsToPriorityGroups:
             {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
         ]
 
+    def test_sort_methods_to_priority_groups_does_not_edit_args(self):
+        """Test that the prioriry_order argument is not modified by the function"""
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        methods_priority = ["A", "F"]
+
+        _ = sort_methods_to_priority_groups(
+            methods,
+            methods_priority=methods_priority,
+        )
+
+        assert methods_priority == [
+            "A",
+            "F",
+        ], "The methods_priority argument should not be modified by the function"
+
 
 @pytest.mark.usefixtures("provide_methods_a_f")
 class TestCheckMethodsPriority:
@@ -333,19 +330,29 @@ class TestCheckMethodsPriority:
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
-def test__order_set_of_methods_by_priority(monkeypatch):
-    WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA = get_methods(
-        ["WinA", "WinB", "WinC", "LinuxA", "LinuxB", "LinuxC", "multiA"]
-    )
+class TestOrderSetOfMethodsByPriority:
 
-    monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.LINUX)
-    # Expecting to see Linux methods prioritized, and then by method name
-    assert _order_set_of_methods_by_priority(
-        {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
-    ) == [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA, WindowsB, WindowsC]
+    @pytest.mark.usefixtures("set_current_platform_to_linux")
+    def test_on_linux(self):
+        WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA = (
+            get_methods(
+                ["WinA", "WinB", "WinC", "LinuxA", "LinuxB", "LinuxC", "multiA"]
+            )
+        )
 
-    monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.WINDOWS)
-    # Expecting to see windows methods prioritized, and then by method name
-    assert _order_set_of_methods_by_priority(
-        {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
-    ) == [MultiPlatformA, WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC]
+        # Expecting to see Linux methods prioritized, and then by method name
+        assert _order_set_of_methods_by_priority(
+            {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
+        ) == [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA, WindowsB, WindowsC]
+
+    @pytest.mark.usefixtures("set_current_platform_to_windows")
+    def test_on_windows(self):
+        WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA = (
+            get_methods(
+                ["WinA", "WinB", "WinC", "LinuxA", "LinuxB", "LinuxC", "multiA"]
+            )
+        )
+        # Expecting to see windows methods prioritized, and then by method name
+        assert _order_set_of_methods_by_priority(
+            {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
+        ) == [MultiPlatformA, WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC]
