@@ -134,6 +134,118 @@ class TestOrderMethodsByPriority:
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
+def test_sort_methods_to_priority_groups_does_not_edit_args():
+    """Test that the prioriry_order argument is not modified by the function"""
+    methods = get_methods(["A", "B", "C", "D", "E", "F"])
+
+    methods_priority = ["A", "F"]
+
+    _ = sort_methods_to_priority_groups(
+        methods,
+        methods_priority=methods_priority,
+    )
+
+    assert methods_priority == [
+        "A",
+        "F",
+    ], "The methods_priority argument should not be modified by the function"
+
+
+@pytest.mark.usefixtures("provide_methods_a_f")
+class TestSortMethodsToPriorityGroups:
+
+    def test_two_names_and_asterisk(self):
+        # Case: Select some methods as more important, with '*'
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+
+        assert sort_methods_to_priority_groups(
+            methods, methods_priority=["A", "F", "*"]
+        ) == [
+            {MethodA},
+            {MethodF},
+            {MethodB, MethodC, MethodD, MethodE},
+        ]
+
+    def test_two_names(self):
+        # Case: Select some methods as more important, without '*'
+        # The results should be exactly the same as with asterisk in the end
+
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+
+        assert sort_methods_to_priority_groups(
+            methods,
+            methods_priority=["A", "F"],
+        ) == [
+            {MethodA},
+            {MethodF},
+            {MethodB, MethodC, MethodD, MethodE},
+        ]
+
+    def test_asterisk_in_the_middle(self):
+        # Case: asterisk in the middle
+
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+
+        assert sort_methods_to_priority_groups(
+            methods, methods_priority=["A", "*", "B"]
+        ) == [
+            {MethodA},
+            {MethodC, MethodD, MethodE, MethodF},
+            {MethodB},
+        ]
+
+    def test_asterisk_at_the_start(self):
+        # Case: asterisk at the start
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+
+        assert sort_methods_to_priority_groups(
+            methods, methods_priority=["*", "A", "B"]
+        ) == [
+            {MethodC, MethodD, MethodE, MethodF},
+            {MethodA},
+            {MethodB},
+        ]
+
+    def test_asterisk_at_middle_with_sets(self):
+        # Case: Using sets
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+
+        assert sort_methods_to_priority_groups(
+            methods, methods_priority=[{"A", "B"}, "*", {"E", "F"}]
+        ) == [
+            {MethodA, MethodB},
+            {MethodC, MethodD},
+            {MethodE, MethodF},
+        ]
+
+    def test_sets_and_no_asterisk_is_implicit_asterisk_at_end(self):
+        # Case: Using sets, no asterisk -> implicit asterisk at the end
+
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+
+        assert sort_methods_to_priority_groups(
+            methods, methods_priority=[{"A", "B"}]
+        ) == [
+            {MethodA, MethodB},
+            {MethodC, MethodD, MethodE, MethodF},
+        ]
+
+    def test_none(self):
+        # Case: methods_priority is None -> Should return all methods as one set
+        methods = get_methods(["A", "B", "C", "D", "E", "F"])
+        (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
+        assert sort_methods_to_priority_groups(methods, methods_priority=None) == [
+            {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
+        ]
+
+
+@pytest.mark.usefixtures("provide_methods_a_f")
 class TestCheckMethodsPriority:
 
     @staticmethod
@@ -218,88 +330,6 @@ class TestCheckMethodsPriority:
                 methods_priority=[MethodA],  # type: ignore
                 methods=methods,
             )
-
-
-@pytest.mark.usefixtures("provide_methods_a_f")
-def test_sort_methods_to_priority_groups_does_not_edit_args():
-    """Test that the prioriry_order argument is not modified by the function"""
-    methods = get_methods(["A", "B", "C", "D", "E", "F"])
-
-    methods_priority = ["A", "F"]
-
-    _ = sort_methods_to_priority_groups(
-        methods,
-        methods_priority=methods_priority,
-    )
-
-    assert methods_priority == [
-        "A",
-        "F",
-    ], "The methods_priority argument should not be modified by the function"
-
-
-@pytest.mark.usefixtures("provide_methods_a_f")
-def test_sort_methods_to_priority_groups():
-    methods = get_methods(["A", "B", "C", "D", "E", "F"])
-    (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
-
-    # Case: Select some methods as more important, with '*'
-    assert sort_methods_to_priority_groups(
-        methods, methods_priority=["A", "F", "*"]
-    ) == [
-        {MethodA},
-        {MethodF},
-        {MethodB, MethodC, MethodD, MethodE},
-    ]
-
-    # Case: Select some methods as more important, without '*'
-    # The results should be exactly the same as with asterisk in the end
-    assert sort_methods_to_priority_groups(
-        methods,
-        methods_priority=["A", "F"],
-    ) == [
-        {MethodA},
-        {MethodF},
-        {MethodB, MethodC, MethodD, MethodE},
-    ]
-
-    # Case: asterisk in the middle
-    assert sort_methods_to_priority_groups(
-        methods, methods_priority=["A", "*", "B"]
-    ) == [
-        {MethodA},
-        {MethodC, MethodD, MethodE, MethodF},
-        {MethodB},
-    ]
-
-    # Case: asterisk at the start
-    assert sort_methods_to_priority_groups(
-        methods, methods_priority=["*", "A", "B"]
-    ) == [
-        {MethodC, MethodD, MethodE, MethodF},
-        {MethodA},
-        {MethodB},
-    ]
-
-    # Case: Using sets
-    assert sort_methods_to_priority_groups(
-        methods, methods_priority=[{"A", "B"}, "*", {"E", "F"}]
-    ) == [
-        {MethodA, MethodB},
-        {MethodC, MethodD},
-        {MethodE, MethodF},
-    ]
-
-    # Case: Using sets, no asterisk -> implicit asterisk at the end
-    assert sort_methods_to_priority_groups(methods, methods_priority=[{"A", "B"}]) == [
-        {MethodA, MethodB},
-        {MethodC, MethodD, MethodE, MethodF},
-    ]
-
-    # Case: methods_priority is None -> Should return all methods as one set
-    assert sort_methods_to_priority_groups(methods, methods_priority=None) == [
-        {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
-    ]
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
