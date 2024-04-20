@@ -3,7 +3,7 @@ import re
 import pytest
 
 from wakepy.core import PlatformName
-from wakepy.core.mode import (
+from wakepy.core.prioritization import (
     _order_set_of_methods_by_priority,
     check_methods_priority,
     order_methods_by_priority,
