@@ -4,10 +4,10 @@ import pytest
 
 from wakepy.core import PlatformName
 from wakepy.core.mode import (
+    _order_set_of_methods_by_priority,
     check_methods_priority,
-    get_prioritized_methods,
-    get_prioritized_methods_groups,
-    sort_methods_by_priority,
+    order_methods_by_priority,
+    sort_methods_to_priority_groups,
 )
 from wakepy.core.registry import get_methods
 
@@ -77,13 +77,13 @@ def test_check_methods_priority():
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
-def test_get_prioritized_methods_groups_does_not_edit_args():
+def test_sort_methods_to_priority_groups_does_not_edit_args():
     """Test that the prioriry_order argument is not modified by the function"""
     methods = get_methods(["A", "B", "C", "D", "E", "F"])
 
     methods_priority = ["A", "F"]
 
-    _ = get_prioritized_methods_groups(
+    _ = sort_methods_to_priority_groups(
         methods,
         methods_priority=methods_priority,
     )
@@ -95,12 +95,12 @@ def test_get_prioritized_methods_groups_does_not_edit_args():
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
-def test_get_prioritized_methods_groups():
+def test_sort_methods_to_priority_groups():
     methods = get_methods(["A", "B", "C", "D", "E", "F"])
     (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
     # Case: Select some methods as more important, with '*'
-    assert get_prioritized_methods_groups(
+    assert sort_methods_to_priority_groups(
         methods, methods_priority=["A", "F", "*"]
     ) == [
         {MethodA},
@@ -110,7 +110,7 @@ def test_get_prioritized_methods_groups():
 
     # Case: Select some methods as more important, without '*'
     # The results should be exactly the same as with asterisk in the end
-    assert get_prioritized_methods_groups(
+    assert sort_methods_to_priority_groups(
         methods,
         methods_priority=["A", "F"],
     ) == [
@@ -120,7 +120,7 @@ def test_get_prioritized_methods_groups():
     ]
 
     # Case: asterisk in the middle
-    assert get_prioritized_methods_groups(
+    assert sort_methods_to_priority_groups(
         methods, methods_priority=["A", "*", "B"]
     ) == [
         {MethodA},
@@ -129,7 +129,7 @@ def test_get_prioritized_methods_groups():
     ]
 
     # Case: asterisk at the start
-    assert get_prioritized_methods_groups(
+    assert sort_methods_to_priority_groups(
         methods, methods_priority=["*", "A", "B"]
     ) == [
         {MethodC, MethodD, MethodE, MethodF},
@@ -138,7 +138,7 @@ def test_get_prioritized_methods_groups():
     ]
 
     # Case: Using sets
-    assert get_prioritized_methods_groups(
+    assert sort_methods_to_priority_groups(
         methods, methods_priority=[{"A", "B"}, "*", {"E", "F"}]
     ) == [
         {MethodA, MethodB},
@@ -147,45 +147,45 @@ def test_get_prioritized_methods_groups():
     ]
 
     # Case: Using sets, no asterisk -> implicit asterisk at the end
-    assert get_prioritized_methods_groups(methods, methods_priority=[{"A", "B"}]) == [
+    assert sort_methods_to_priority_groups(methods, methods_priority=[{"A", "B"}]) == [
         {MethodA, MethodB},
         {MethodC, MethodD, MethodE, MethodF},
     ]
 
     # Case: methods_priority is None -> Should return all methods as one set
-    assert get_prioritized_methods_groups(methods, methods_priority=None) == [
+    assert sort_methods_to_priority_groups(methods, methods_priority=None) == [
         {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
     ]
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
-def test_sort_methods_by_priority(monkeypatch):
+def test__order_set_of_methods_by_priority(monkeypatch):
     WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA = get_methods(
         ["WinA", "WinB", "WinC", "LinuxA", "LinuxB", "LinuxC", "multiA"]
     )
 
     monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.LINUX)
     # Expecting to see Linux methods prioritized, and then by method name
-    assert sort_methods_by_priority(
+    assert _order_set_of_methods_by_priority(
         {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
     ) == [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA, WindowsB, WindowsC]
 
     monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.WINDOWS)
     # Expecting to see windows methods prioritized, and then by method name
-    assert sort_methods_by_priority(
+    assert _order_set_of_methods_by_priority(
         {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
     ) == [MultiPlatformA, WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC]
 
 
 @pytest.mark.usefixtures("provide_methods_different_platforms")
-def test_get_prioritized_methods(monkeypatch):
+def test_order_methods_by_priority(monkeypatch):
     WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA = get_methods(
         ["WinA", "WinB", "WinC", "LinuxA", "LinuxB", "LinuxC", "multiA"]
     )
 
     monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.LINUX)
 
-    assert get_prioritized_methods(
+    assert order_methods_by_priority(
         [
             LinuxA,
             LinuxB,
@@ -196,7 +196,7 @@ def test_get_prioritized_methods(monkeypatch):
         methods_priority=["*", {"LinuxC"}],
     ) == [LinuxA, LinuxB, MultiPlatformA, LinuxC]
 
-    assert get_prioritized_methods(
+    assert order_methods_by_priority(
         [
             LinuxA,
             LinuxB,
@@ -207,7 +207,7 @@ def test_get_prioritized_methods(monkeypatch):
         methods_priority=[{"LinuxC"}],
     ) == [LinuxC, LinuxA, LinuxB, MultiPlatformA]
 
-    assert get_prioritized_methods(
+    assert order_methods_by_priority(
         [
             LinuxA,
             LinuxB,
@@ -219,7 +219,7 @@ def test_get_prioritized_methods(monkeypatch):
         methods_priority=[{"LinuxB"}, "*", {"LinuxA", "LinuxC"}],
     ) == [LinuxB, MultiPlatformA, LinuxA, LinuxC]
 
-    assert get_prioritized_methods(
+    assert order_methods_by_priority(
         [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA],
         # Means "LinuxB & WinA" first, ordered with automatic ordering, and
         # then all the rest, also automatically ordered
@@ -228,7 +228,7 @@ def test_get_prioritized_methods(monkeypatch):
 
     # No user-defined order -> Just alphabetical, but current platform (linux)
     # first.
-    assert get_prioritized_methods(
+    assert order_methods_by_priority(
         [
             LinuxA,
             LinuxB,
@@ -242,6 +242,6 @@ def test_get_prioritized_methods(monkeypatch):
     monkeypatch.setattr("wakepy.core.mode.CURRENT_PLATFORM", PlatformName.WINDOWS)
     # No user-defined order -> Just alphabetical, but current platform
     # (Windows) first.
-    assert get_prioritized_methods(
+    assert order_methods_by_priority(
         [LinuxA, LinuxB, WindowsA, WindowsB, LinuxC, MultiPlatformA],
     ) == [MultiPlatformA, WindowsA, WindowsB, LinuxA, LinuxB, LinuxC]

@@ -5,7 +5,7 @@ Most important functions
 ------------------------
 activate_method(method:Method) -> MethodActivationResult
     Activate a mode using a single Method
-get_prioritized_methods
+order_methods_by_priority
     Prioritize of collection of Methods
 """
 
@@ -427,7 +427,7 @@ def activate_mode(
         # Cannot activate anything as there are no methods.
         return ActivationResult(modename=modename), None, None
 
-    prioritized_methods = get_prioritized_methods(methods, methods_priority)
+    prioritized_methods = order_methods_by_priority(methods, methods_priority)
     # The fake method is always checked first (WAKEPY_FAKE_SUCCESS)
     prioritized_methods.insert(0, get_method(WAKEPY_FAKE_SUCCESS))
 
@@ -517,12 +517,11 @@ def _iterate_methods_priority(
             yield item, False
 
 
-def get_prioritized_methods_groups(
+def sort_methods_to_priority_groups(
     methods: List[MethodCls], methods_priority: Optional[MethodsPriorityOrder]
 ) -> List[Set[MethodCls]]:
-    """Prioritizes Methods in `methods` based on priority order defined by
-    `methods_priority`. This function does not validate the methods_priority in
-    any way; use `check_methods_priority` for validation of needed.
+    """Sorts Methods in `methods` to groups based on priority order defined by
+    the given `methods_priority`.
 
     Parameters
     ----------
@@ -549,7 +548,7 @@ def get_prioritized_methods_groups(
     with names "A", "B", "C", "D", "E", "F":
 
     >>> methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
-    >>> get_prioritized_methods_groups(
+    >>> sort_methods_to_priority_groups(
             methods,
             methods_priority=["A", "F", "*"]
         )
@@ -560,6 +559,7 @@ def get_prioritized_methods_groups(
     ]
 
     """
+    check_methods_priority(methods_priority, methods)
 
     # Make this a list of sets just to make things simpler
     methods_priority_sets: List[Set[str]] = [
@@ -591,26 +591,7 @@ def get_prioritized_methods_groups(
     return out
 
 
-def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
-    """Sorts Method classes by priority and returns a new sorted list with
-    Methods with highest priority first.
-
-    The logic is:
-    (1) Any Methods supporting the CURRENT_PLATFORM are placed before any other
-        Methods (the others are not expected to work at all)
-    (2) Sort alphabetically by Method name, ignoring the case
-    """
-    return sorted(
-        methods,
-        key=lambda m: (
-            # Prioritize methods supporting CURRENT_PLATFORM over any others
-            0 if CURRENT_PLATFORM in m.supported_platforms else 1,
-            m.name.lower() if m.name else "",
-        ),
-    )
-
-
-def get_prioritized_methods(
+def order_methods_by_priority(
     methods: List[MethodCls],
     methods_priority: Optional[MethodsPriorityOrder] = None,
 ) -> List[MethodCls]:
@@ -640,7 +621,7 @@ def get_prioritized_methods(
     Assuming: Current platform is Linux.
 
     >>> methods = [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA]
-    >>> get_prioritized_methods(
+    >>> order_methods_by_priority(
     >>>    methods,
     >>>    methods_priority=[{"WinA", "LinuxB"}, "*"],
     >>> )
@@ -658,18 +639,34 @@ def get_prioritized_methods(
     optional; it is added to the end of `methods_priority` if missing.
 
     """
-
-    check_methods_priority(methods_priority, methods)
-
-    unordered_groups: List[Set[MethodCls]] = get_prioritized_methods_groups(
+    unordered_priority_groups: List[Set[MethodCls]] = sort_methods_to_priority_groups(
         methods, methods_priority=methods_priority
     )
 
     ordered_groups: List[List[MethodCls]] = [
-        sort_methods_by_priority(group) for group in unordered_groups
+        _order_set_of_methods_by_priority(group) for group in unordered_priority_groups
     ]
 
     return [method for group in ordered_groups for method in group]
+
+
+def _order_set_of_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
+    """Sorts Method classes by priority and returns a new sorted list with
+    Methods with highest priority first.
+
+    The logic is:
+    (1) Any Methods supporting the CURRENT_PLATFORM are placed before any other
+        Methods (the others are not expected to work at all)
+    (2) Sort alphabetically by Method name, ignoring the case
+    """
+    return sorted(
+        methods,
+        key=lambda m: (
+            # Prioritize methods supporting CURRENT_PLATFORM over any others
+            0 if CURRENT_PLATFORM in m.supported_platforms else 1,
+            m.name.lower() if m.name else "",
+        ),
+    )
 
 
 def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:
