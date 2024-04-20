@@ -1,6 +1,9 @@
+from unittest.mock import Mock
+
 import pytest
 
 from wakepy.core import DBusAddress, DBusMethod, Method, PlatformName
+from wakepy.core.heartbeat import Heartbeat
 
 # B, D, E
 FIRST_MODE = "first_mode"
@@ -11,6 +14,22 @@ SECOND_MODE = "second_mode"
 class TestMethod(Method):
     __test__ = False  # for pytest
     mode = "_test"
+
+
+@pytest.fixture
+def heartbeat1():
+    """Well behaving Heartbeat instance"""
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = True
+    return heartbeat
+
+
+@pytest.fixture
+def heartbeat2_bad():
+    """Bad Heartbeat instance. Returns a bad value."""
+    heartbeat = Mock(spec_set=Heartbeat)
+    heartbeat.stop.return_value = "Bad value"
+    return heartbeat
 
 
 @pytest.fixture(scope="function")
