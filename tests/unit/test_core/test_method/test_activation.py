@@ -7,7 +7,6 @@ import datetime as dt
 import os
 import re
 from contextlib import contextmanager
-from unittest.mock import Mock
 
 import pytest
 import time_machine
@@ -20,145 +19,19 @@ from tests.unit.test_core.testmethods import (
     get_test_method_class,
     iterate_test_methods,
 )
-from wakepy.core import (
-    DBusAdapter,
-    Method,
-    MethodActivationResult,
-    PlatformName,
-    get_methods,
-)
-from wakepy.core.activation import (
-    StageName,
-    StageNameValue,
-    WakepyFakeSuccess,
+from wakepy.core import Method, MethodActivationResult, PlatformName, get_methods
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName, StageNameValue
+from wakepy.core.heartbeat import Heartbeat
+from wakepy.core.method import (
+    MethodError,
     activate_method,
-    activate_mode,
     caniuse_fails,
     deactivate_method,
     get_platform_supported,
     try_enter_and_heartbeat,
 )
-from wakepy.core.heartbeat import Heartbeat
-from wakepy.core.method import MethodError
-
-
-@pytest.fixture
-def heartbeat1():
-    """Well behaving Heartbeat instance"""
-    heartbeat = Mock(spec_set=Heartbeat)
-    heartbeat.stop.return_value = True
-    return heartbeat
-
-
-@pytest.fixture
-def heartbeat2_bad():
-    """Bad Heartbeat instance. Returns a bad value."""
-    heartbeat = Mock(spec_set=Heartbeat)
-    heartbeat.stop.return_value = "Bad value"
-    return heartbeat
-
-
-class TestActivateMode:
-    """tests for activate_mode"""
-
-    @pytest.mark.usefixtures("mocks_for_test_activate_mode")
-    def test_activate_without_methods(self):
-        res, active_method, heartbeat = activate_mode([], None)
-        assert res.list_methods() == []
-        assert res.success is False
-        assert active_method is None
-        assert heartbeat is None
-
-    def test_activate_function_success(self, mocks_for_test_activate_mode):
-        """Here we test the activate_mode() function. It calls some
-        other functions which we do not care about as they're tested elsewhere.
-        That is we why monkeypatch those functions with fakes"""
-
-        # Arrange
-        mocks = mocks_for_test_activate_mode
-        methodcls_fail = get_test_method_class(enter_mode=False)
-        methodcls_success = get_test_method_class(enter_mode=None)
-
-        # Act
-        # Note: prioritize the failing first, so that the failing one will also
-        # be used. This also tests at that the prioritization is used at least
-        # somehow
-        result, active_method, heartbeat = activate_mode(
-            [methodcls_success, methodcls_fail],
-            dbus_adapter=mocks.dbus_adapter,
-            methods_priority=[
-                methodcls_fail.name,
-                methodcls_success.name,
-            ],
-        )
-
-        # Assert
-
-        # There is a successful method, so the activation succeeds.
-        assert result.success is True
-
-        # The failing method is tried first because there is prioritization
-        # step which honors the `methods_priority`
-        assert [x.method_name for x in result.list_methods()] == [
-            methodcls_fail.name,
-            methodcls_success.name,
-        ]
-
-        assert isinstance(active_method, methodcls_success)
-        assert heartbeat is mocks.heartbeat
-
-    def test_activate_function_failure(self, mocks_for_test_activate_mode):
-        # Arrange
-        mocks = mocks_for_test_activate_mode
-        methodcls_fail = get_test_method_class(enter_mode=False)
-
-        # Act
-        result, active_method, heartbeat = activate_mode(
-            [methodcls_fail],
-            dbus_adapter=mocks.dbus_adapter,
-        )
-
-        # Assert
-        # The activation failed, so active_method and heartbeat is None
-        assert result.success is False
-        assert active_method is None
-        assert heartbeat is None
-
-    @staticmethod
-    @pytest.fixture
-    def mocks_for_test_activate_mode(monkeypatch, heartbeat1):
-        """This is the test arrangement step for tests for the
-        `activate_mode` function"""
-
-        mocks = Mock()
-        mocks.heartbeat = heartbeat1
-        mocks.dbus_adapter = Mock(spec_set=DBusAdapter)
-
-        def fake_activate_method(method):
-            try:
-                assert method.enter_mode() is None
-                success = True
-            except Exception:
-                success = False
-
-            return (
-                MethodActivationResult(
-                    method_name=method.name,
-                    success=True if success else False,
-                    failure_stage=None if success else StageName.ACTIVATION,
-                ),
-                mocks.heartbeat,
-            )
-
-        monkeypatch.setattr(
-            "wakepy.core.activation.activate_method", fake_activate_method
-        )
-        monkeypatch.setattr(
-            "wakepy.core.activation.check_methods_priority",
-            mocks.check_methods_priority,
-        )
-        monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
-        return mocks
+from wakepy.core.platform import CURRENT_PLATFORM
+from wakepy.core.registry import get_method
 
 
 class TestActivateMethod:
@@ -177,19 +50,20 @@ class TestActivateMethod:
         ):
             activate_method(method)
 
-    def test_activate_method_method_without_platform_support(self, monkeypatch):
-        WindowsMethod = get_test_method_class(
-            supported_platforms=(PlatformName.WINDOWS,),
+    def test_activate_method_method_without_platform_support(self):
+        UnsupportedMethod = get_test_method_class(
+            supported_platforms=(
+                PlatformName.WINDOWS
+                if CURRENT_PLATFORM != PlatformName.WINDOWS
+                else PlatformName.LINUX
+            ),
         )
 
-        winmethod = WindowsMethod()
-        monkeypatch.setattr(
-            "wakepy.core.activation.CURRENT_PLATFORM", PlatformName.LINUX
-        )
+        unsupported_method = UnsupportedMethod()
 
         # The current platform is set to linux, so method supporting only linux
         # should fail.
-        res, heartbeat = activate_method(winmethod)
+        res, heartbeat = activate_method(unsupported_method)
         assert res.failure_stage == StageName.PLATFORM_SUPPORT
         assert res.success is False
         assert heartbeat is None
@@ -637,6 +511,8 @@ def test_stagename(assert_strenum_values):
 
 class TestWakepyFakeSuccess:
 
+    wakepy_fake_success_cls = get_method(WAKEPY_FAKE_SUCCESS)
+
     @contextmanager
     def wakepy_fake_value_set(self, monkeypatch, val):
         with monkeypatch.context() as mp:
@@ -648,7 +524,7 @@ class TestWakepyFakeSuccess:
     # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
     @pytest.mark.parametrize("val", ("0", "no", "NO", "False", "false", "FALSE"))
     def test_falsy_values(self, val, monkeypatch):
-        method = WakepyFakeSuccess()
+        method = self.wakepy_fake_success_cls()
 
         with self.wakepy_fake_value_set(monkeypatch, val), pytest.raises(
             RuntimeError, match=f"WAKEPY_FAKE_SUCCESS set to falsy value: {val}"
@@ -657,13 +533,13 @@ class TestWakepyFakeSuccess:
 
     @pytest.mark.parametrize("val", ("1", "yes", "True", "anystring"))
     def test_truthy_values(self, val, monkeypatch):
-        method = WakepyFakeSuccess()
+        method = self.wakepy_fake_success_cls()
 
         with self.wakepy_fake_value_set(monkeypatch, val):
             assert method.enter_mode() is None  # type: ignore[func-returns-value]
 
     def test_without_the_env_var_set(self, monkeypatch):
-        method = WakepyFakeSuccess()
+        method = self.wakepy_fake_success_cls()
         if "WAKEPY_FAKE_SUCCESS" in os.environ:
             monkeypatch.delenv("WAKEPY_FAKE_SUCCESS")
 

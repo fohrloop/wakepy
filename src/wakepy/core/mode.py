@@ -1,24 +1,46 @@
+"""This module defines the Mode class and functions which may be used in the
+activation and deactivation of Modes (using Methods).
+
+Most important functions
+------------------------
+activate_method(method:Method) -> MethodActivationResult
+    Activate a mode using a single Method
+get_prioritized_methods
+    Prioritize of collection of Methods
+"""
+
 from __future__ import annotations
 
+import logging
 import typing
 import warnings
+from typing import List, Sequence, Set, Union
 
-from .activation import ActivationResult, activate_mode, deactivate_method
-from .dbus import get_dbus_adapter
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
+
+from .activationresult import ActivationResult
+from .dbus import DBusAdapter, get_dbus_adapter
 from .heartbeat import Heartbeat
-from .method import select_methods
-from .registry import get_methods_for_mode
+from .method import Method, activate_method, deactivate_method
+from .platform import CURRENT_PLATFORM
+from .registry import get_method, get_methods_for_mode
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Callable, Literal, Optional, Type
+    from typing import Callable, List, Literal, Optional, Set, Tuple, Type, Union
 
-    from .activation import MethodsPriorityOrder
-    from .constants import ModeName
+    from .constants import Collection, ModeName, StrCollection
     from .dbus import DBusAdapter, DBusAdapterTypeSeq
-    from .method import Method, StrCollection
+    from .method import Method, MethodCls
 
     OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
+
+    MethodClsCollection = Collection[MethodCls]
+
+
+"""The strings in MethodsPriorityOrder are names of wakepy.Methods or the
+asterisk ('*')."""
+MethodsPriorityOrder = Sequence[Union[str, Set[str]]]
 
 
 class ActivationError(RuntimeError):
@@ -45,56 +67,6 @@ class ModeExit(Exception):
     This will print just "failure" in case entering a Mode did not succeed and
     just "success" in case it did succeed (never both).
     """
-
-
-class ModeController:
-    def __init__(self, dbus_adapter: Optional[DBusAdapter] = None):
-        self.dbus_adapter = dbus_adapter
-        self.active_method: Method | None = None
-        self.heartbeat: Heartbeat | None = None
-
-    def activate(
-        self,
-        method_classes: list[Type[Method]],
-        methods_priority: Optional[MethodsPriorityOrder] = None,
-        modename: Optional[str] = None,
-    ) -> ActivationResult:
-        """Activates the mode with one of the methods in the input method
-        classes. The methods are used with descending priority; highest
-        priority first.
-        """
-        result, active_method, heartbeat = activate_mode(
-            methods=method_classes,
-            methods_priority=methods_priority,
-            dbus_adapter=self.dbus_adapter,
-            modename=modename,
-        )
-        self.active_method = active_method
-        self.heartbeat = heartbeat
-        return result
-
-    def deactivate(self) -> bool:
-        """Deactivates the active mode, defined by the active Method, if any.
-        If there was no active method, does nothing.
-
-        Returns
-        -------
-        deactivated:
-            If there was no active method, returns False (nothing was done).
-            If there was an active method, and it was deactivated, returns True
-
-        Raises
-        ------
-        MethodError (RuntimeError) if there was active method but an error
-        occurred when trying to deactivate it."""
-
-        if not self.active_method:
-            return False
-
-        deactivate_method(self.active_method, self.heartbeat)
-        self.active_method = None
-        self.heartbeat = None
-        return True
 
 
 class Mode:
@@ -177,12 +149,6 @@ class Mode:
     """The ``on_fail`` given when creating the :class:`Mode`.
     """
 
-    dbus_adapter: DBusAdapter | None
-    r"""The DBus adapter used with ``Method``\ s which require DBus (if any).
-    """
-
-    _controller_class: Type[ModeController] = ModeController
-
     def __init__(
         self,
         methods: list[Type[Method]],
@@ -196,76 +162,19 @@ class Mode:
         This is also where the activation process related settings, such as the
         dbus adapter to be used, are defined.
         """
-
-        self.name = name
         self.method_classes = methods
-        self.methods_priority = methods_priority
-        self.controller: ModeController | None = None
-        self.activation_result = ActivationResult()
         self.active: bool = False
+        self.activation_result = ActivationResult()
+        self.name = name
+        self.methods_priority = methods_priority
         self.on_fail = on_fail
+        self.active_method: Method | None = None
+        self.heartbeat: Heartbeat | None = None
+
         self._dbus_adapter_cls = dbus_adapter
+        self._dbus_adapter: DBusAdapter | None = None
 
-    def __enter__(self) -> Mode:
-        """Called automatically when entering a with block and a instance of
-        Mode is used as the context expression. This tries to activate the
-        Mode using :attr:`~wakepy.Mode.method_classes`.
-        """
-
-        self.controller = self.controller or self._controller_class(
-            dbus_adapter=get_dbus_adapter(self._dbus_adapter_cls)
-        )
-        self.activation_result = self.controller.activate(
-            self.method_classes,
-            methods_priority=self.methods_priority,
-            modename=self.name,
-        )
-        self.active = self.activation_result.success
-
-        if not self.active:
-            handle_activation_fail(self.on_fail, self.activation_result)
-
-        return self
-
-    def __exit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exception: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> bool:
-        """Called when exiting the with block.
-
-        If with block completed normally, called with `(None, None, None)`
-        If with block had an exception, called with `(exc_type, exc_value,
-        traceback)`, which is the same as `*sys.exc_info`.
-
-        Will swallow any ModeExit exception. Other exceptions will be
-        re-raised.
-        """
-
-        # These are not used but are part of context manager protocol.
-        #  make linters happy
-        _ = exc_type
-        _ = traceback
-
-        if self.controller is None:
-            raise RuntimeError("Must __enter__ before __exit__!")
-
-        self.controller.deactivate()
-        self.active = False
-
-        if exception is None or isinstance(exception, ModeExit):
-            # Returning True means that the exception within the with block is
-            # swallowed. We skip only ModeExit which should simply exit the
-            # with block.
-            return True
-
-        # Other types of exceptions are not handled; ignoring them here and
-        # returning False will tell python to re-raise the exception. Can't
-        # return None as type-checkers will mark code after with block
-        # unreachable
-
-        return False
+        self._logger = logging.getLogger(__name__)
 
     @classmethod
     def from_name(
@@ -282,9 +191,11 @@ class Mode:
 
         Parameters
         ----------
-        modename:
-            The name of the mode to create. Used for debugging, logging,
-            warning and error messages. Could be basically any string.
+        modename: str
+            The name of the mode to create. Must be an existing Mode name;
+            something that has used as Method.name attribute in a
+            :class:`~wakepy.core.method.Method` subclass. Examples:
+            "keep.running", "keep.presenting".
         methods: list, tuple or set of str
             The names of Methods to select from the mode defined with
             `modename`; a "whitelist" filter. Means "use these and only these
@@ -329,6 +240,444 @@ class Mode:
             on_fail=on_fail,
             dbus_adapter=dbus_adapter,
         )
+
+    def __enter__(self) -> Mode:
+        """Called automatically when entering a with block and a instance of
+        Mode is used as the context expression. This tries to activate the
+        Mode using :attr:`~wakepy.Mode.method_classes`.
+        """
+
+        self._activate(
+            self.method_classes,
+            methods_priority=self.methods_priority,
+            modename=self.name,
+        )
+
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exception: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> bool:
+        """Called when exiting the with block.
+
+        If with block completed normally, called with `(None, None, None)`
+        If with block had an exception, called with `(exc_type, exc_value,
+        traceback)`, which is the same as `*sys.exc_info`.
+
+        Will swallow any ModeExit exception. Other exceptions will be
+        re-raised.
+        """
+
+        # These are not used but are part of context manager protocol.
+        #  make linters happy
+        _ = exc_type
+        _ = traceback
+
+        self._deactivate()
+
+        if exception is None or isinstance(exception, ModeExit):
+            # Returning True means that the exception within the with block is
+            # swallowed. We skip only ModeExit which should simply exit the
+            # with block.
+            return True
+
+        # Other types of exceptions are not handled; ignoring them here and
+        # returning False will tell python to re-raise the exception. Can't
+        # return None as type-checkers will mark code after with block
+        # unreachable
+
+        return False
+
+    def _activate(
+        self,
+        method_classes: list[Type[Method]],
+        methods_priority: Optional[MethodsPriorityOrder] = None,
+        modename: Optional[str] = None,
+    ) -> ActivationResult:
+        """Activates the mode with one of the methods in the input method
+        classes. The methods are used with descending priority; highest
+        priority first.
+        """
+        if not self._dbus_adapter:
+            self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
+
+        self.activation_result, self.active_method, self.heartbeat = activate_mode(
+            methods=method_classes,
+            methods_priority=methods_priority,
+            dbus_adapter=self._dbus_adapter,
+            modename=modename,
+        )
+        self.active = self.activation_result.success
+
+        if not self.active:
+            handle_activation_fail(self.on_fail, self.activation_result)
+
+        return self.activation_result
+
+    def _deactivate(self) -> bool:
+        """Deactivates the active mode, defined by the active Method, if any.
+        If there was no active method, does nothing.
+
+        Returns
+        -------
+        deactivated:
+            If there was no active method, returns False (nothing was done).
+            If there was an active method, and it was deactivated, returns True
+
+        Raises
+        ------
+        MethodError (RuntimeError) if there was active method but an error
+        occurred when trying to deactivate it."""
+
+        if self.active:
+            if self.active_method is None:
+                raise RuntimeError(
+                    f"Cannot deactivate mode: {str(self.name)}. The active_method is None! This should never happen."  # noqa E501
+                )
+            deactivate_method(self.active_method, self.heartbeat)
+            deactivated = True
+        else:
+            deactivated = False
+
+        self.active_method = None
+        self.heartbeat = None
+        self.active = False
+
+        return deactivated
+
+
+def select_methods(
+    methods: MethodClsCollection,
+    omit: Optional[StrCollection] = None,
+    use_only: Optional[StrCollection] = None,
+) -> List[MethodCls]:
+    """Selects Methods from from `methods` using a blacklist (omit) or
+    whitelist (use_only). If `omit` and `use_only` are both None, will return
+    all the original methods.
+
+    Parameters
+    ----------
+    methods: collection of Method classes
+        The collection of methods from which to make the selection.
+    omit: list, tuple or set of str or None
+        The names of Methods to remove from the `methods`; a "blacklist"
+        filter. Any Method in `omit` but not in `methods` will be silently
+        ignored. Cannot be used same time with `use_only`. Optional.
+    use_only: list, tuple or set of str
+        The names of Methods to select from the `methods`; a "whitelist"
+        filter. Means "use these and only these Methods". Any Methods in
+        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
+        be used same time with `omit`. Optional.
+
+    Returns
+    -------
+    methods: list[MethodCls]
+        The selected method classes.
+
+    Raises
+    ------
+    ValueError if the input arguments (omit or use_only) are invalid.
+    """
+
+    if omit and use_only:
+        raise ValueError(
+            "Can only define omit (blacklist) or use_only (whitelist), not both!"
+        )
+    elif omit is None and use_only is None:
+        selected_methods = list(methods)
+    elif omit is not None:
+        selected_methods = [m for m in methods if m.name not in omit]
+    elif use_only is not None:
+        selected_methods = [m for m in methods if m.name in use_only]
+        if not set(use_only).issubset(m.name for m in selected_methods):
+            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
+            raise ValueError(
+                f"Methods {missing} in `use_only` are not part of `methods`!"
+            )
+    else:  # pragma: no cover
+        raise ValueError("Invalid `omit` and/or `use_only`!")
+    return selected_methods
+
+
+def activate_mode(
+    methods: list[Type[Method]],
+    dbus_adapter: Optional[DBusAdapter] = None,
+    methods_priority: Optional[MethodsPriorityOrder] = None,
+    modename: Optional[str] = None,
+) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
+    """Activates a mode defined by a collection of Methods. Only the first
+    Method which succeeds activation will be used, in order from highest
+    priority to lowest priority.
+
+    The activation may be faked as to be successful by using the
+    WAKEPY_FAKE_SUCCESS environment variable.
+
+    Parameters
+    ----------
+    methods:
+        The list of Methods to be used for activating this Mode.
+    dbus_adapter:
+        Can be used to define a custom DBus adapter for processing DBus calls
+        in the .caniuse(), .enter_mode(), .heartbeat() and .exit_mode() of the
+        Method. Optional.
+    methods_priority: list[str | set[str]]
+        The priority order, which is a list of method names or asterisk
+        ('*'). The asterisk means "all rest methods" and may occur only
+        once in the priority order, and cannot be part of a set. All method
+        names must be unique and must be part of the `methods`.
+    modename:
+        Name of the Mode. Used for communication to user, logging and in
+        error messages (can be "any string" which makes sense to you).
+        Optional.
+    """
+    check_methods_priority(methods_priority, methods)
+    if not methods:
+        # Cannot activate anything as there are no methods.
+        return ActivationResult(modename=modename), None, None
+
+    prioritized_methods = get_prioritized_methods(methods, methods_priority)
+    # The fake method is always checked first (WAKEPY_FAKE_SUCCESS)
+    prioritized_methods.insert(0, get_method(WAKEPY_FAKE_SUCCESS))
+
+    results = []
+
+    for methodcls in prioritized_methods:
+        method = methodcls(dbus_adapter=dbus_adapter)
+        methodresult, heartbeat = activate_method(method)
+        results.append(methodresult)
+        if methodresult.success:
+            break
+    else:
+        # Tried activate with all methods, but none of them succeed
+        return ActivationResult(results, modename=modename), None, None
+
+    # Activation was succesful.
+    return ActivationResult(results, modename=modename), method, heartbeat
+
+
+def check_methods_priority(
+    methods_priority: Optional[MethodsPriorityOrder], methods: List[MethodCls]
+) -> None:
+    """Checks against `methods` that the `methods_priority` is valid.
+
+    Parameters
+    ----------
+    methods_priority: list[str | set[str]]
+        The priority order, which is a list of where items are method names,
+        sets of methods names or the asterisk ('*'). The asterisk means "all
+        rest methods" and may occur only once in the priority order, and cannot
+        be part of a set. All method names must be unique and must be part of
+        the `methods`.
+    methods: list[MethodCls]
+        The methods which the `methods_priority` is validated against.
+
+    Raises
+    ------
+    ValueError or TypeError if the `methods_priority` is not valid.
+    """
+    if methods_priority is None:
+        return
+
+    known_method_names = {m.name for m in methods}
+    known_method_names.add("*")
+    seen_method_names = set()
+
+    for method_name, in_set in _iterate_methods_priority(methods_priority):
+        if not isinstance(method_name, str):
+            raise TypeError("methods_priority must be a list[str | set[str]]!")
+
+        if in_set and method_name == "*":
+            raise ValueError(
+                "Asterisk (*) may not be a part of a set in methods_priority!"
+            )
+        if method_name not in known_method_names:
+            raise ValueError(
+                f'Method "{method_name}" in methods_priority not in selected methods!'
+            )
+        if method_name in seen_method_names:
+            if method_name != "*":
+                raise ValueError(
+                    f'Duplicate method name "{method_name}" in methods_priority'
+                )
+            else:
+                raise ValueError(
+                    "The asterisk (*) can only occur once in methods_priority!"
+                )
+        seen_method_names.add(method_name)
+
+
+def _iterate_methods_priority(
+    methods_priority: Optional[MethodsPriorityOrder],
+) -> typing.Iterator[Tuple[str, bool]]:
+    """Provides an iterator over the items in methods_priority. The items in
+    the iterator are (method_name, in_set) 2-tuples, where the method_name is
+    the method name (str) and the in_set is a boolean which is True if the
+    returned method_name is part of a set and False otherwise."""
+
+    if not methods_priority:
+        return
+
+    for item in methods_priority:
+        if isinstance(item, set):
+            for method_name in item:
+                yield method_name, True
+        else:
+            yield item, False
+
+
+def get_prioritized_methods_groups(
+    methods: List[MethodCls], methods_priority: Optional[MethodsPriorityOrder]
+) -> List[Set[MethodCls]]:
+    """Prioritizes Methods in `methods` based on priority order defined by
+    `methods_priority`. This function does not validate the methods_priority in
+    any way; use `check_methods_priority` for validation of needed.
+
+    Parameters
+    ----------
+    methods: list[MethodCls]
+        The source list of methods. These methods are returned as prioritized
+        groups.
+    methods_priority: list[str | set[str]]
+        The names of the methods in `methods`. This specifies the priority
+        order; the order of method classes in the returned list. An asterisk
+        ('*') can be used to denote "all other methods".
+
+
+    Returns
+    -------
+    method_groups: list[set[MethodCls]]
+        The prioritized methods. Each set in the output represents a group of
+        equal priority. All Methods from the input `methods` are always
+        included in the output
+
+
+    Example
+    -------
+    Say there are methods MethodA, MethodB, MethodC, MethodD, MethodE, MethodF
+    with names "A", "B", "C", "D", "E", "F":
+
+    >>> methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
+    >>> get_prioritized_methods_groups(
+            methods,
+            methods_priority=["A", "F", "*"]
+        )
+    [
+        {MethodA},
+        {MethodF},
+        {MethodB, MethodC, MethodD, MethodE},
+    ]
+
+    """
+
+    # Make this a list of sets just to make things simpler
+    methods_priority_sets: List[Set[str]] = [
+        {item} if isinstance(item, str) else item for item in methods_priority or []
+    ]
+
+    method_dct = {m.name: m for m in methods}
+
+    asterisk = {"*"}
+    asterisk_index = None
+    out: List[Set[MethodCls]] = []
+
+    for item in methods_priority_sets:
+        if item == asterisk:
+            # Save the location where to add the rest of the methods ('*')
+            asterisk_index = len(out)
+        else:  # Item is a set but not `asterisk`
+            out.append({method_dct[name] for name in item})
+
+    out_flattened = {m for group in out for m in group}
+    rest_of_the_methods = {m for m in methods if m not in out_flattened}
+
+    if rest_of_the_methods:
+        if asterisk_index is not None:
+            out.insert(asterisk_index, rest_of_the_methods)
+        else:
+            out.append(rest_of_the_methods)
+
+    return out
+
+
+def sort_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls]:
+    """Sorts Method classes by priority and returns a new sorted list with
+    Methods with highest priority first.
+
+    The logic is:
+    (1) Any Methods supporting the CURRENT_PLATFORM are placed before any other
+        Methods (the others are not expected to work at all)
+    (2) Sort alphabetically by Method name, ignoring the case
+    """
+    return sorted(
+        methods,
+        key=lambda m: (
+            # Prioritize methods supporting CURRENT_PLATFORM over any others
+            0 if CURRENT_PLATFORM in m.supported_platforms else 1,
+            m.name.lower() if m.name else "",
+        ),
+    )
+
+
+def get_prioritized_methods(
+    methods: List[MethodCls],
+    methods_priority: Optional[MethodsPriorityOrder] = None,
+) -> List[MethodCls]:
+    """Take an unordered list of Methods and sort them by priority using the
+    methods_priority and automatic ordering. The methods_priority is used to
+    define groups of priority (sets of methods). The automatic ordering part is
+    used to order the methods *within* each priority group. In particular, all
+    methods supported by the current platform are placed first, and all
+    supported methods are then ordered alphabetically (ignoring case).
+
+    Parameters
+    ----------
+    methods:
+        The list of Methods to sort.
+    methods_priority:
+        Optional priority order, which is a list of method names (strings) or
+        sets of method names (sets of strings). An asterisk ('*') may be used
+        for "all the rest methods". None is same as ['*'].
+
+    Returns
+    -------
+    sorted_methods:
+        The input `methods` sorted with priority, highest priority first.
+
+    Example
+    -------
+    Assuming: Current platform is Linux.
+
+    >>> methods = [LinuxA, LinuxB, LinuxC, MultiPlatformA, WindowsA]
+    >>> get_prioritized_methods(
+    >>>    methods,
+    >>>    methods_priority=[{"WinA", "LinuxB"}, "*"],
+    >>> )
+    [LinuxB, WindowsA, LinuxA, LinuxC, MultiPlatformA]
+
+    Explanation:
+
+    WindowsA and LinuxB were given high priority, but since the current
+    platform is Linux, LinuxB was prioritized to be before WindowsA.
+
+    The asterisk ('*') is converted to a set of rest of the methods:
+    {"LinuxA", "LinuxC", "MultiPlatformA"}, and those are then
+    automatically ordered. As all of them support Linux, the result is
+    just the methods sorted alphabetically. The asterisk in the end is
+    optional; it is added to the end of `methods_priority` if missing.
+
+    """
+    unordered_groups: List[Set[MethodCls]] = get_prioritized_methods_groups(
+        methods, methods_priority=methods_priority
+    )
+
+    ordered_groups: List[List[MethodCls]] = [
+        sort_methods_by_priority(group) for group in unordered_groups
+    ]
+
+    return [method for group in ordered_groups for method in group]
 
 
 def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:

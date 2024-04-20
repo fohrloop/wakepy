@@ -1,24 +1,22 @@
-"""This module defines the Method class and few functions for working with
-methods
+"""This module defines the Method class which is meant to be subclassed.
 
 Method
 * A class which is intended to be subclassed
 * The Methods are ways of entering wakepy Modes.
-
-General functions
------------------
-select_methods
-    Select Methods from a collection based on a white- or blacklist.
-
 """
 
 from __future__ import annotations
 
+import datetime as dt
 import sys
 import typing
 from abc import ABC
-from typing import cast
+from typing import Type, cast
 
+from .activationresult import MethodActivationResult
+from .constants import PlatformName, StageName
+from .heartbeat import Heartbeat
+from .platform import CURRENT_PLATFORM
 from .registry import register_method
 from .strenum import StrEnum, auto
 
@@ -29,37 +27,17 @@ else:  # pragma: no-cover-if-py-lt-38
 
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Optional, Set, Tuple, Type, TypeVar, Union
+    from typing import Any, Optional, Tuple
 
     from wakepy.core import DBusAdapter, DBusMethodCall
 
     from .constants import ModeName, PlatformName
 
-    MethodCls = Type["Method"]
-    T = TypeVar("T")
-    Collection = Union[List[T], Tuple[T, ...], Set[T]]
-    MethodClsCollection = Collection[MethodCls]
-    StrCollection = Collection[str]
+MethodCls = Type["Method"]
 
 
 class MethodError(RuntimeError):
     """Occurred inside wakepy.core.method.Method"""
-
-
-class EnterModeError(MethodError):
-    """Occurred during method.enter_mode()"""
-
-
-class ExitModeError(MethodError):
-    """Occurred during method.exit_mode()"""
-
-
-class HeartbeatCallError(MethodError):
-    """Occurred during method.heartbeat()"""
-
-
-class MethodDefinitionError(RuntimeError):
-    """Any error which is part of the Method (subclass) definition."""
 
 
 class MethodOutcome(StrEnum):
@@ -91,8 +69,8 @@ class Method(ABC):
     """
 
     mode: ModeName | str
-    """The mode for the method. Each method may be connected to single mode.
-    Use None for methods which do not implement any mode."""
+    """The mode for the method. Each Method subclass may be registered to a
+    single mode."""
 
     supported_platforms: Tuple[PlatformName, ...] = tuple()
     """All the supported platforms. If a platform is not listed here, this
@@ -274,54 +252,302 @@ class Method(ABC):
         return cls.name == unnamed
 
 
-def select_methods(
-    methods: MethodClsCollection,
-    omit: Optional[StrCollection] = None,
-    use_only: Optional[StrCollection] = None,
-) -> List[MethodCls]:
-    """Selects Methods from from `methods` using a blacklist (omit) or
-    whitelist (use_only). If `omit` and `use_only` are both None, will return
-    all the original methods.
-
-    Parameters
-    ----------
-    methods: collection of Method classes
-        The collection of methods from which to make the selection.
-    omit: list, tuple or set of str or None
-        The names of Methods to remove from the `methods`; a "blacklist"
-        filter. Any Method in `omit` but not in `methods` will be silently
-        ignored. Cannot be used same time with `use_only`. Optional.
-    use_only: list, tuple or set of str
-        The names of Methods to select from the `methods`; a "whitelist"
-        filter. Means "use these and only these Methods". Any Methods in
-        `use_only` but not in `methods` will raise a ValueErrosr. Cannot
-        be used same time with `omit`. Optional.
+def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
+    """Activates a mode defined by a single Method.
 
     Returns
     -------
-    methods: list[MethodCls]
-        The selected method classes.
+    result:
+        The result of the activation process.
+    heartbeat:
+        If the `method` has method.heartbeat() implemented, and activation
+        succeeds, this is a Heartbeat object. Otherwise, this is None.
+    """
+    if method.is_unnamed():
+        raise ValueError("Methods without a name may not be used to activate modes!")
+
+    result = MethodActivationResult(success=False, method_name=method.name)
+
+    if not get_platform_supported(method, platform=CURRENT_PLATFORM):
+        result.failure_stage = StageName.PLATFORM_SUPPORT
+        return result, None
+
+    requirements_fail, err_message = caniuse_fails(method)
+    if requirements_fail:
+        result.failure_stage = StageName.REQUIREMENTS
+        result.failure_reason = err_message
+        return result, None
+
+    success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
+    if not success:
+        result.failure_stage = StageName.ACTIVATION
+        result.failure_reason = err_message
+        return result, None
+
+    result.success = True
+
+    if not heartbeat_call_time:
+        # Success, using just enter_mode(); no heartbeat()
+        return result, None
+
+    heartbeat = Heartbeat(method, heartbeat_call_time)
+    heartbeat.start()
+
+    return result, heartbeat
+
+
+def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> None:
+    """Deactivates a mode defined by method
 
     Raises
     ------
-    ValueError if the input arguments (omit or use_only) are invalid.
+    MethodError (RuntimeError), if the deactivation was not successful.
     """
 
-    if omit and use_only:
-        raise ValueError(
-            "Can only define omit (blacklist) or use_only (whitelist), not both!"
+    heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
+
+    if has_exit(method):
+        errortxt = (
+            f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
+            "unsuccessful! This should never happen, and could mean that the "
+            "implementation has a bug. Entering the mode has been successful, and "
+            "since exiting was not, your system might still be in the mode defined "
+            f"by the '{method.__class__.__name__}', or not.  Suggesting submitting "
+            f"a bug report and rebooting for clearing the mode. "
         )
-    elif omit is None and use_only is None:
-        selected_methods = list(methods)
-    elif omit is not None:
-        selected_methods = [m for m in methods if m.name not in omit]
-    elif use_only is not None:
-        selected_methods = [m for m in methods if m.name in use_only]
-        if not set(use_only).issubset(m.name for m in selected_methods):
-            missing = sorted(set(use_only) - set(m.name for m in selected_methods))
-            raise ValueError(
-                f"Methods {missing} in `use_only` are not part of `methods`!"
+        try:
+            # The Method.exit_mode() *should* always return None. However, it
+            # is not possible to control user created Methods implementation,
+            # so this is a safety net for users not having strict static type
+            # checking.
+            retval = method.exit_mode()  # type: ignore[func-returns-value]
+            if retval is not None:
+                raise ValueError("exit_mode returned a value other than None!")
+        except Exception as e:
+            raise MethodError(errortxt + "Original error: " + str(e))
+
+    if heartbeat_stopped is not True:
+        raise MethodError(
+            f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
+            "be stopped! Suggesting submitting a bug report and rebooting for "
+            "clearing the mode. "
+        )
+
+
+def get_platform_supported(method: Method, platform: PlatformName) -> bool:
+    """Checks if method is supported by the platform
+
+    Parameters
+    ----------
+    method: Method
+        The method which platform support to check.
+    platform:
+        The platform to check against.
+
+    Returns
+    -------
+    is_supported: bool
+        If True, the platform is supported. Otherwise, False.
+    """
+    return platform in method.supported_platforms
+
+
+def caniuse_fails(method: Method) -> tuple[bool, str]:
+    """Check if the requirements of a Method are met or not.
+
+    Returns
+    -------
+    (fail, message): (bool, str)
+        If Method.caniuse() return True or None, the requirements check does
+        not fail. In this case, return(False, '')
+
+        If Method.caniuse() return False, or a string, the requirements check
+        fails, and this function returns (True, message), where message is
+        either the string returned by .caniuse() or emptry string.
+    """
+
+    try:
+        canuse = method.caniuse()
+    except Exception as exc:
+        return True, str(exc)
+
+    fail = False if (canuse is True or canuse is None) else True
+    message = "" if canuse in {True, False, None} else str(canuse)
+
+    return fail, message
+
+
+def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.datetime]]:
+    """Try to use a Method to to activate a mode. First, with
+    method.enter_mode(), and then with the method.heartbeat()
+
+    Returns
+    -------
+    success, err_message, heartbeat_call_time
+        A three-tuple, where success is boolean and True if activating the mode
+        with the method was successful, otherwise False. The err_message is a
+        string which may be non-empty only when success is False. The
+        heartbeat_call_time is the datetime (in UTC) just before calling the
+        method.hearbeat().
+
+    Raises
+    ------
+    RunTimeError: In the rare edge case where the `method` has both,
+    enter_mode() and heartbeat() defined, and the enter_mode() succeeds but the
+    heartbeat() fails, which causes exit_mode() to be called, and if this
+    exit_mode() also fails (as this leaves system uncertain state). All other
+    Exceptions are handled (returning success=False).
+
+    Detailed explanation
+    --------------------
+    These are the three possible statuses from attempts to use either
+    enter_mode() or heartbeat():
+
+    M: Missing implementation
+    F: Failed attempt
+    S: Succesful attempt
+
+    There are total of 7 different outcomes (3*3 possibilities, minus two from
+    not checking heartbeat if enter_mode fails), marked as
+    {enter_mode_outcome}{heartbeat_outcome}; MS means enter_mode() was missing
+    implementation and using heartbeat() was successful.
+
+    All the possible combinations which may occur are
+
+    outcome    What to do
+    -------    ---------------------------------------------------------
+     1)  F*    Return Fail + enter_mode error message
+
+     2)  MM    Raise Exception -- the Method is faulty.
+     3)  MF    Return Fail + heartbeat error message
+     4)  MS    Return Success + heartbeat time
+
+     5)  SM    Return Success
+     6)  SF    Return Fail + heartbeat error message + call exit_mode()
+     7)  SS    Return Success + heartbeat time
+
+    """
+    enter_outcome, enter_errmessage = _try_enter_mode(method)
+
+    if enter_outcome == MethodOutcome.FAILURE:  # 1) F*
+        return False, enter_errmessage, None
+
+    hb_outcome, hb_errmessage, hb_calltime = _try_heartbeat(method)
+
+    method_name = f"Method {method.__class__.__name__} ({method.name})"
+    if enter_outcome == MethodOutcome.NOT_IMPLEMENTED:
+        if hb_outcome == MethodOutcome.NOT_IMPLEMENTED:
+            errmsg = (
+                f"{method_name} is not properly defined! Missing implementation for "
+                "both, enter_mode() and heartbeat()!"
             )
-    else:  # pragma: no cover
-        raise ValueError("Invalid `omit` and/or `use_only`!")
-    return selected_methods
+            return False, errmsg, None  # 2) MM
+        elif hb_outcome == MethodOutcome.FAILURE:
+            return False, hb_errmessage, None  # 3) MF
+        elif hb_outcome == MethodOutcome.SUCCESS:
+            return True, "", hb_calltime  # 4) MS
+
+    elif enter_outcome == MethodOutcome.SUCCESS:
+        if hb_outcome == MethodOutcome.NOT_IMPLEMENTED:  # 5) SM
+            return True, "", None
+        elif hb_outcome == MethodOutcome.FAILURE:  # 6) SF
+            _rollback_with_exit(method)
+            return False, hb_errmessage, None
+        elif hb_outcome == MethodOutcome.SUCCESS:  # 7) SS
+            return True, "", hb_calltime
+
+    raise RuntimeError(  # pragma: no cover
+        "Should never end up here. Check the return values for the enter_mode() and "
+        f"heartbeat() of the {method_name}"
+    )
+
+
+def _try_enter_mode(method: Method) -> Tuple[MethodOutcome, str]:
+    """Calls the method.enter_mode(). This function catches any possible
+    Exceptions during the call."""
+
+    if not has_enter(method):
+        return MethodOutcome.NOT_IMPLEMENTED, ""
+
+    outcome, err_message = _try_method_call(method, "enter_mode")
+
+    return outcome, err_message
+
+
+def _try_heartbeat(method: Method) -> Tuple[MethodOutcome, str, Optional[dt.datetime]]:
+    """Calls the method.heartbeat(). This function catches any possible
+    Exceptions during the call.
+
+    Returns
+    -------
+    heartbeat_call_time: dt.datetime
+        The UTC time just before the method.heartbeat() was called.
+    """
+    if not has_heartbeat(method):
+        return MethodOutcome.NOT_IMPLEMENTED, "", None
+
+    heartbeat_call_time = dt.datetime.now(dt.timezone.utc)
+    outcome, err_message = _try_method_call(method, "heartbeat")
+
+    return outcome, err_message, heartbeat_call_time
+
+
+def _try_method_call(method: Method, mthdname: str) -> Tuple[MethodOutcome, str]:
+    try:
+        method_to_call = getattr(method, mthdname)
+        retval = method_to_call()
+        if retval is not None:
+            raise ValueError(
+                f"The {mthdname} of {method.__class__.__name__} ({method.name}) "
+                f"returned an unsupported value {retval}. The only accepted return "
+                "value is None"
+            )
+        outcome = MethodOutcome.SUCCESS
+        err_message = ""
+    except Exception as exc:
+        err_message = repr(exc)
+        outcome = MethodOutcome.FAILURE
+    return outcome, err_message
+
+
+def _rollback_with_exit(method: Method) -> None:
+    """Roll back entering a mode by exiting it.
+
+    Raises
+    ------
+    RuntimeError, if exit_mode fails (returns something else than None)
+
+    Notes
+    -----
+    This function has the side effect of executing the calls in the
+    method.exit_mode.
+    """
+    if not has_exit(method):
+        # Nothing to exit from.
+        return
+
+    try:
+        # The Method.exit_mode() *should* always return None. However, it
+        # is not possible to control user created Methods implementation,
+        # so this is a safety net for users not having strict static type
+        # checking.
+        exit_outcome = method.exit_mode()  # type: ignore[func-returns-value]
+        if exit_outcome is not None:
+            raise ValueError("exit_method did not return None")
+    except Exception as exc:
+        raise RuntimeError(
+            f"Entered {method.__class__.__name__} ({method.name}) but could not exit!"
+            + f" Original error: {str(exc)}"
+        ) from exc
+
+
+def has_enter(method: Method) -> bool:
+    return type(method).enter_mode is not Method.enter_mode
+
+
+def has_exit(method: Method) -> bool:
+    return type(method).exit_mode is not Method.exit_mode
+
+
+def has_heartbeat(method: Method) -> bool:
+    return type(method).heartbeat is not Method.heartbeat

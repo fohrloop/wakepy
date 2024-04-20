@@ -1,6 +1,7 @@
 import pytest
 
 from wakepy.core import DBusAddress, DBusMethod, Method, PlatformName
+from wakepy.core.heartbeat import Heartbeat
 
 # B, D, E
 FIRST_MODE = "first_mode"
@@ -11,6 +12,23 @@ SECOND_MODE = "second_mode"
 class TestMethod(Method):
     __test__ = False  # for pytest
     mode = "_test"
+
+
+@pytest.fixture
+def heartbeat1(method1: Method):
+    """Well behaving Heartbeat instance"""
+    return Heartbeat(method1)
+
+
+@pytest.fixture
+def heartbeat2_bad(method1: Method):
+    """Bad Heartbeat instance. Returns a bad value."""
+
+    class BadHeartbeat(Heartbeat):
+        def stop(self):
+            return "Bad value"
+
+    return BadHeartbeat(method1)
 
 
 @pytest.fixture(scope="function")

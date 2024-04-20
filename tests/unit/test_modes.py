@@ -8,66 +8,94 @@ from wakepy.modes import keep
 
 
 @pytest.mark.parametrize(
-    "input_args",
+    "name_prefix, function_under_test, modename",
     [
-        dict(
-            name_prefix="running",
-            function_under_test=keep.running,
-            modename=ModeName.KEEP_RUNNING,
+        (
+            "running",
+            keep.running,
+            ModeName.KEEP_RUNNING,
         ),
-        dict(
-            name_prefix="presenting",
-            function_under_test=keep.presenting,
-            modename=ModeName.KEEP_PRESENTING,
+        (
+            "presenting",
+            keep.presenting,
+            ModeName.KEEP_PRESENTING,
         ),
     ],
 )
-def test_keep_running_mode_creation(input_args, monkeypatch, testutils):
-    """Simple test for keep.running and keep.presenting. Tests that all input
-    arguments for the functions are passed to the Mode.__init__
-    """
+class TestKeepRunninAndPresenting:
+    """Tests common for keep.running and keep.presenting functions. The
+    `function_under_test` is either the keep.running or keep.presenting
+    function"""
 
-    testutils.empty_method_registry(monkeypatch)
+    @staticmethod
+    @pytest.fixture
+    def methods(name_prefix, modename, monkeypatch, testutils):
+        """This fixture creates three methods, which belong to a given mode."""
 
-    name_prefix = input_args["name_prefix"]
-    function_under_test = input_args["function_under_test"]
-    modename = input_args["modename"]
+        testutils.empty_method_registry(monkeypatch)
 
-    class MethodA(Method):
-        name = f"{name_prefix}A"
-        mode = modename
+        class MethodA(Method):
+            name = f"{name_prefix}A"
+            mode = modename
 
-    class MethodB(Method):
-        name = f"{name_prefix}B"
-        mode = modename
+        class MethodB(Method):
+            name = f"{name_prefix}B"
+            mode = modename
 
-    class MethodC(Method):
-        name = f"{name_prefix}C"
-        mode = modename
+        class MethodC(Method):
+            name = f"{name_prefix}C"
+            mode = modename
 
-    mode = function_under_test()
-    # All the methods for the mode are selected automatically
-    assert set(mode.method_classes) == {MethodA, MethodB, MethodC}
+        return dict(
+            MethodA=MethodA,
+            MethodB=MethodB,
+            MethodC=MethodC,
+        )
 
-    # Case: Test "omit" parameter
-    mode = function_under_test(omit=[f"{name_prefix}A"])
-    assert set(mode.method_classes) == {MethodB, MethodC}
+    def test_all_modes_are_selected_automatically(self, function_under_test, methods):
+        """Simple test for keep.running and keep.presenting. Tests that all
+        input arguments for the functions are passed to the Mode.__init__
+        """
 
-    # Case: Test "methods" parameter
-    mode = function_under_test(methods=[f"{name_prefix}A", f"{name_prefix}B"])
-    assert set(mode.method_classes) == {MethodB, MethodA}
+        mode = function_under_test()
+        # All the methods for the mode are selected automatically
+        assert set(mode.method_classes) == {
+            methods["MethodA"],
+            methods["MethodB"],
+            methods["MethodC"],
+        }
 
-    # Case: Test "methods_priority" parameter
-    methods_priority = [f"{name_prefix}A", f"{name_prefix}B"]
-    mode = function_under_test(methods_priority=methods_priority)
-    assert mode.methods_priority == methods_priority
-    assert set(mode.method_classes) == {MethodB, MethodA, MethodC}
+    def test_omit_parameter(self, name_prefix, function_under_test, methods):
+        # Case: Test "omit" parameter
+        mode = function_under_test(omit=[f"{name_prefix}A"])
+        assert set(mode.method_classes) == {methods["MethodB"], methods["MethodC"]}
 
-    # Case: Test "dbus_adapter" parameter
-    class MyDBusAdapter(DBusAdapter): ...
+    def test_methods_parameter(self, name_prefix, function_under_test, methods):
+        # Case: Test "methods" parameter
+        mode = function_under_test(methods=[f"{name_prefix}A", f"{name_prefix}B"])
+        assert set(mode.method_classes) == {methods["MethodA"], methods["MethodB"]}
 
-    mode = function_under_test(dbus_adapter=MyDBusAdapter)
-    assert mode._dbus_adapter_cls == MyDBusAdapter
+    def test_methods_priority_parameter(
+        self, name_prefix, function_under_test, methods
+    ):
+        # Case: Test "methods_priority" parameter
+        methods_priority = [f"{name_prefix}A", f"{name_prefix}B"]
+        mode = function_under_test(methods_priority=methods_priority)
+        assert mode.methods_priority == methods_priority
+        assert set(mode.method_classes) == {
+            methods["MethodA"],
+            methods["MethodB"],
+            methods["MethodC"],
+        }
+
+    def test_methods_dbus_adapter_parameter(self, function_under_test, methods):
+        # Case: Test "dbus_adapter" parameter
+        class MyDBusAdapter(DBusAdapter): ...
+
+        mode = function_under_test(
+            dbus_adapter=MyDBusAdapter, methods=[x.name for x in methods.values()]
+        )
+        assert mode._dbus_adapter_cls == MyDBusAdapter
 
 
 def test_keep_running_with_fake_success(monkeypatch, fake_dbus_adapter):

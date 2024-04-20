@@ -6,9 +6,15 @@ import sys
 import pytest
 
 from wakepy.core import DBusMethodCall
-from wakepy.core.activation import has_enter, has_exit, has_heartbeat
-from wakepy.core.method import Method, MethodOutcome, MethodOutcomeValue, select_methods
-from wakepy.core.registry import MethodRegistryError, get_method, get_methods
+from wakepy.core.method import (
+    Method,
+    MethodOutcome,
+    MethodOutcomeValue,
+    has_enter,
+    has_exit,
+    has_heartbeat,
+)
+from wakepy.core.registry import MethodRegistryError, get_method
 
 if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
     import typing_extensions as typing
@@ -109,42 +115,6 @@ def test_not_possible_to_define_two_methods_with_same_name(testutils, monkeypatc
     # the same name again
     class SomeMethod(TestMethod):  # type: ignore # noqa:F811
         name = somename
-
-
-@pytest.mark.usefixtures("provide_methods_a_f")
-def test_select_methods():
-    (MethodB, MethodD, MethodE) = get_methods(["B", "D", "E"])
-
-    methods = [MethodB, MethodD, MethodE]
-
-    # These can also be filtered with a blacklist
-    assert select_methods(methods, omit=["B"]) == [MethodD, MethodE]
-    assert select_methods(methods, omit=["B", "E"]) == [MethodD]
-    # Extra 'omit' methods do not matter
-    assert select_methods(methods, omit=["B", "E", "foo", "bar"]) == [
-        MethodD,
-    ]
-
-    # These can be filtered with a whitelist
-    assert select_methods(methods, use_only=["B", "E"]) == [MethodB, MethodE]
-
-    # If a whitelist contains extra methods, raise exception
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Methods ['bar', 'foo'] in `use_only` are not part of `methods`!"
-        ),
-    ):
-        select_methods(methods, use_only=["foo", "bar"])
-
-    # Cannot provide both: omit and use_only
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Can only define omit (blacklist) or use_only (whitelist), not both!"
-        ),
-    ):
-        select_methods(methods, use_only=["B"], omit=["E"])
 
 
 def test_method_defaults():

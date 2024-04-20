@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 
 class Heartbeat:
     # TODO: This is just temporary dummy implementation.
+    # Will be created as part of https://github.com/fohrloop/wakepy/issues/109
     def __init__(
         self, method: Method, heartbeat_call_time: Optional[dt.datetime] = None
     ):

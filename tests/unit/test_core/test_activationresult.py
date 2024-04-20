@@ -6,10 +6,13 @@ import typing
 import pytest
 
 from wakepy.core import ActivationResult, MethodActivationResult
-from wakepy.core.activation import StageName, WakepyFakeSuccess
+from wakepy.core.constants import StageName
+from wakepy.core.registry import get_method
 
 if typing.TYPE_CHECKING:
     from typing import List
+
+fake_success_cls = get_method("WAKEPY_FAKE_SUCCESS")
 
 
 @pytest.fixture
@@ -53,7 +56,7 @@ def mr_wakepy_fake_notinuse() -> MethodActivationResult:
     return MethodActivationResult(
         success=False,
         failure_stage=StageName.ACTIVATION,
-        method_name=WakepyFakeSuccess.name,
+        method_name=fake_success_cls.name,
     )
 
 
@@ -62,7 +65,7 @@ def mr_wakepy_fake_success() -> MethodActivationResult:
     return MethodActivationResult(
         success=True,
         failure_stage=StageName.ACTIVATION,
-        method_name=WakepyFakeSuccess.name,
+        method_name=fake_success_cls.name,
     )
 
 

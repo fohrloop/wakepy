@@ -1,6 +1,7 @@
 """Common terms and definitions used in many places"""
 
 import sys
+from typing import List, Set, Tuple, TypeVar, Union
 
 from .strenum import StrEnum, auto
 
@@ -8,6 +9,10 @@ if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
     from typing_extensions import Literal
 else:  # pragma: no-cover-if-py-lt-38
     from typing import Literal
+
+WAKEPY_FAKE_SUCCESS = "WAKEPY_FAKE_SUCCESS"
+"""Name of the Wakepy fake success method and the environment variable used
+to set it"""
 
 
 class PlatformName(StrEnum):
@@ -41,3 +46,23 @@ class BusType(StrEnum):
 
 
 BusTypeValue = Literal["SESSION", "SYSTEM"]
+
+
+class StageName(StrEnum):
+    # These are stages which occur in order for each of the methods
+    # when using a Method for activation.
+
+    NONE = auto()  # No stage at all.
+
+    # The stages in the activation process in order
+    PLATFORM_SUPPORT = auto()
+    REQUIREMENTS = auto()
+    ACTIVATION = auto()
+
+
+StageNameValue = Literal["NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"]
+
+# Type annotations
+T = TypeVar("T")
+Collection = Union[List[T], Tuple[T, ...], Set[T]]
+StrCollection = Collection[str]
