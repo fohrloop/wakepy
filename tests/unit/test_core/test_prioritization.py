@@ -7,10 +7,10 @@ import pytest
 
 from wakepy.core import PlatformName
 from wakepy.core.prioritization import (
+    _check_methods_priority,
     _order_set_of_methods_by_priority,
-    check_methods_priority,
+    _sort_methods_to_priority_groups,
     order_methods_by_priority,
-    sort_methods_to_priority_groups,
 )
 from wakepy.core.registry import get_methods
 
@@ -141,7 +141,7 @@ class TestSortMethodsToPriorityGroups:
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
-        assert sort_methods_to_priority_groups(
+        assert _sort_methods_to_priority_groups(
             methods, methods_priority=["A", "F", "*"]
         ) == [
             {MethodA},
@@ -156,7 +156,7 @@ class TestSortMethodsToPriorityGroups:
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
-        assert sort_methods_to_priority_groups(
+        assert _sort_methods_to_priority_groups(
             methods,
             methods_priority=["A", "F"],
         ) == [
@@ -171,7 +171,7 @@ class TestSortMethodsToPriorityGroups:
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
-        assert sort_methods_to_priority_groups(
+        assert _sort_methods_to_priority_groups(
             methods, methods_priority=["A", "*", "B"]
         ) == [
             {MethodA},
@@ -184,7 +184,7 @@ class TestSortMethodsToPriorityGroups:
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
-        assert sort_methods_to_priority_groups(
+        assert _sort_methods_to_priority_groups(
             methods, methods_priority=["*", "A", "B"]
         ) == [
             {MethodC, MethodD, MethodE, MethodF},
@@ -197,7 +197,7 @@ class TestSortMethodsToPriorityGroups:
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
-        assert sort_methods_to_priority_groups(
+        assert _sort_methods_to_priority_groups(
             methods, methods_priority=[{"A", "B"}, "*", {"E", "F"}]
         ) == [
             {MethodA, MethodB},
@@ -211,7 +211,7 @@ class TestSortMethodsToPriorityGroups:
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
 
-        assert sort_methods_to_priority_groups(
+        assert _sort_methods_to_priority_groups(
             methods, methods_priority=[{"A", "B"}]
         ) == [
             {MethodA, MethodB},
@@ -223,17 +223,17 @@ class TestSortMethodsToPriorityGroups:
         # et
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         (MethodA, MethodB, MethodC, MethodD, MethodE, MethodF) = methods
-        assert sort_methods_to_priority_groups(methods, methods_priority=None) == [
+        assert _sort_methods_to_priority_groups(methods, methods_priority=None) == [
             {MethodA, MethodB, MethodC, MethodD, MethodE, MethodF},
         ]
 
-    def test_sort_methods_to_priority_groups_does_not_edit_args(self):
+    def test__sort_methods_to_priority_groups_does_not_edit_args(self):
         """Test that the prioriry_order argument is not modified by the
         function"""
         methods = get_methods(["A", "B", "C", "D", "E", "F"])
         methods_priority = ["A", "F"]
 
-        _ = sort_methods_to_priority_groups(
+        _ = _sort_methods_to_priority_groups(
             methods,
             methods_priority=methods_priority,
         )
@@ -253,31 +253,33 @@ class TestCheckMethodsPriority:
         return get_methods(["A", "B", "C", "D", "E", "F"])
 
     def test_none(self, methods: List[Type[Method]]):
-        check_methods_priority(methods_priority=None, methods=methods)
+        _check_methods_priority(methods_priority=None, methods=methods)
 
     def test_empty_list(self, methods: List[Type[Method]]):
         # methods_priority is empty list. Does not crash.
-        check_methods_priority(methods_priority=[], methods=methods)
+        _check_methods_priority(methods_priority=[], methods=methods)
 
     def test_list_with_just_asterisk(self, methods: List[Type[Method]]):
         # Does not make sense but should not crash.
-        check_methods_priority(methods_priority=["*"], methods=methods)
+        _check_methods_priority(methods_priority=["*"], methods=methods)
 
     def test_list_of_few_method_names(self, methods: List[Type[Method]]):
         # Simple list of methods
-        check_methods_priority(methods_priority=["A", "B", "F"], methods=methods)
+        _check_methods_priority(methods_priority=["A", "B", "F"], methods=methods)
 
     def test_list_of_few_method_names_and_asterisk(self, methods: List[Type[Method]]):
         # Simple list of methods with asterisk
-        check_methods_priority(methods_priority=["A", "B", "*", "F"], methods=methods)
+        _check_methods_priority(methods_priority=["A", "B", "*", "F"], methods=methods)
 
     def test_set_asterisk_methodname(self, methods: List[Type[Method]]):
         # Simple set + strings
-        check_methods_priority(methods_priority=[{"A", "B"}, "*", "F"], methods=methods)
+        _check_methods_priority(
+            methods_priority=[{"A", "B"}, "*", "F"], methods=methods
+        )
 
     def test_set_asterisk_methodname_set(self, methods: List[Type[Method]]):
         # Simple set + strings
-        check_methods_priority(
+        _check_methods_priority(
             methods_priority=[{"A", "B"}, "*", "E", {"F"}], methods=methods
         )
 
@@ -287,7 +289,7 @@ class TestCheckMethodsPriority:
             ValueError,
             match=re.escape('Method "X" in methods_priority not in selected methods!'),
         ):
-            check_methods_priority(methods_priority=["X"], methods=methods)
+            _check_methods_priority(methods_priority=["X"], methods=methods)
 
     def test_two_asterisks(self, methods: List[Type[Method]]):
         with pytest.raises(
@@ -296,7 +298,7 @@ class TestCheckMethodsPriority:
                 "The asterisk (*) can only occur once in methods_priority!"
             ),
         ):
-            check_methods_priority(
+            _check_methods_priority(
                 methods_priority=["A", "*", "B", "*"], methods=methods
             )
 
@@ -305,7 +307,7 @@ class TestCheckMethodsPriority:
             ValueError,
             match=re.escape('Duplicate method name "A" in methods_priority'),
         ):
-            check_methods_priority(
+            _check_methods_priority(
                 methods_priority=["A", "*", "B", {"A", "C"}], methods=methods
             )
 
@@ -317,7 +319,7 @@ class TestCheckMethodsPriority:
                 "Asterisk (*) may not be a part of a set in methods_priority!"
             ),
         ):
-            check_methods_priority(methods_priority=[{"*"}], methods=methods)
+            _check_methods_priority(methods_priority=[{"*"}], methods=methods)
 
     def test_list_of_methods_as_methods_priority(self, methods: List[Type[Method]]):
         (MethodA, *_) = methods
@@ -325,7 +327,7 @@ class TestCheckMethodsPriority:
             TypeError,
             match=re.escape("methods_priority must be a list[str | set[str]]!"),
         ):
-            check_methods_priority(
+            _check_methods_priority(
                 methods_priority=[MethodA],  # type: ignore
                 methods=methods,
             )

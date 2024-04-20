@@ -79,7 +79,7 @@ def order_methods_by_priority(
     optional; it is added to the end of `methods_priority` if missing.
 
     """
-    unordered_priority_groups: List[Set[MethodCls]] = sort_methods_to_priority_groups(
+    unordered_priority_groups: List[Set[MethodCls]] = _sort_methods_to_priority_groups(
         methods, methods_priority=methods_priority
     )
 
@@ -90,7 +90,7 @@ def order_methods_by_priority(
     return [method for group in ordered_groups for method in group]
 
 
-def sort_methods_to_priority_groups(
+def _sort_methods_to_priority_groups(
     methods: List[MethodCls], methods_priority: Optional[MethodsPriorityOrder]
 ) -> List[Set[MethodCls]]:
     """Sorts Methods in `methods` to groups based on priority order defined by
@@ -121,7 +121,7 @@ def sort_methods_to_priority_groups(
     with names "A", "B", "C", "D", "E", "F":
 
     >>> methods = [MethodA, MethodB, MethodC, MethodD, MethodE, MethodF]
-    >>> sort_methods_to_priority_groups(
+    >>> _sort_methods_to_priority_groups(
             methods,
             methods_priority=["A", "F", "*"]
         )
@@ -132,7 +132,7 @@ def sort_methods_to_priority_groups(
     ]
 
     """
-    check_methods_priority(methods_priority, methods)
+    _check_methods_priority(methods_priority, methods)
 
     # Make this a list of sets just to make things simpler
     methods_priority_sets: List[Set[str]] = [
@@ -164,7 +164,7 @@ def sort_methods_to_priority_groups(
     return out
 
 
-def check_methods_priority(
+def _check_methods_priority(
     methods_priority: Optional[MethodsPriorityOrder], methods: List[MethodCls]
 ) -> None:
     """Checks against `methods` that the `methods_priority` is valid.
