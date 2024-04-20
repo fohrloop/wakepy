@@ -23,7 +23,7 @@ from __future__ import annotations
 import datetime as dt
 import sys
 import typing
-from dataclasses import dataclass
+from dataclasses import InitVar, dataclass, field
 from typing import List, Sequence, Set, Union
 
 from .constants import PlatformName
@@ -63,10 +63,18 @@ class StageName(StrEnum):
 StageNameValue = Literal["NONE", "PLATFORM_SUPPORT", "REQUIREMENTS", "ACTIVATION"]
 
 
+@dataclass
 class ActivationResult:
     """The ActivationResult is responsible of keeping track on the possibly
     successful (max 1), failed and unused methods and providing different views
     on the results of the activation process.
+
+    Parameters
+    ---------
+    results:
+        The MethodActivationResults to be used to fill the ActivationResult
+    modename:
+        Name of the Mode. Optional.
 
     Attributes
     ----------
@@ -97,67 +105,44 @@ class ActivationResult:
         easier access, use .list_methods().
     """
 
-    def __init__(
+    results: InitVar[Optional[List[MethodActivationResult]]] = None
+    # These are the retuls for each of the used wakepy.Methods, in the
+    # order the methods were tried (first = highest priority, last =
+    # lowest priority)
+
+    modename: Optional[str] = None
+    """Name of the mode, if any."""
+
+    active_method: str | None = field(init=False)
+    """The name of the active (successful) method. If no methods are active,
+    this is None."""
+
+    success: bool = field(init=False)
+    """Tells is entering into a mode was successful.
+
+    Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
+    variable (for tests). See also: real_success.
+    """
+
+    real_success: bool = field(init=False)
+    """Tells is entering into a mode was successful. This
+    may not faked with WAKEPY_FAKE_SUCCESS environment variable.
+    """
+
+    failure: bool = field(init=False)
+    """Always opposite of `success`. Included for convenience."""
+
+    _method_results: List[MethodActivationResult] = field(init=False)
+
+    def __post_init__(
         self,
         results: Optional[List[MethodActivationResult]] = None,
-        modename: Optional[str] = None,
-    ):
-        """
-        Parameters
-        ---------
-        results:
-            The MethodActivationResults to be used to fill the ActivationResult
-        modename:
-            Name of the Mode. Optional.
-        """
-
-        # These are the retuls for each of the used wakepy.Methods, in the
-        # order the methods were tried (first = highest priority, last =
-        # lowest priority)
-        self._method_results: list[MethodActivationResult] = results or []
-        self.modename = modename
-
-    @property
-    def real_success(self) -> bool:
-        """Tells is entering into a mode was successful. This
-        may not faked with WAKEPY_FAKE_SUCCESS environment variable.
-        """
-        for res in self._method_results:
-            if res.success and res.method_name != WakepyFakeSuccess.name:
-                return True
-        return False
-
-    @property
-    def success(self) -> bool:
-        """Tells is entering into a mode was successful.
-
-        Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
-        variable (for tests). See also: real_success.
-        """
-        for res in self._method_results:
-            if res.success:
-                return True
-        return False
-
-    @property
-    def failure(self) -> bool:
-        """Always opposite of `success`. Included for convenience."""
-        return not self.success
-
-    @property
-    def active_method(self) -> str | None:
-        """The name of the active (successful) method. If no methods are
-        active, this is None."""
-        methods = [res.method_name for res in self._method_results if res.success]
-        if not methods:
-            return None
-        elif len(methods) == 1:
-            return methods[0]
-        else:
-            raise ValueError(
-                "The ActivationResult cannot have more than one active methods! "
-                f"Active methods: {methods}"
-            )
+    ) -> None:
+        self._method_results = results or []
+        self.success = self._get_success()
+        self.failure = not self.success
+        self.real_success = self._get_real_success()
+        self.active_method = self._get_active_method()
 
     def list_methods(
         self,
@@ -246,6 +231,31 @@ class ActivationResult:
             f'Could not activate Mode "{modename}"!\n\nMethod usage results, in '
             f"order (highest priority first):\n{debug_info}"
         )
+
+    def _get_success(self) -> bool:
+        for res in self._method_results:
+            if res.success:
+                return True
+        return False
+
+    def _get_real_success(self) -> bool:
+
+        for res in self._method_results:
+            if res.success and res.method_name != WakepyFakeSuccess.name:
+                return True
+        return False
+
+    def _get_active_method(self) -> str | None:
+        methods = [res.method_name for res in self._method_results if res.success]
+        if not methods:
+            return None
+        elif len(methods) == 1:
+            return methods[0]
+        else:
+            raise ValueError(
+                "The ActivationResult cannot have more than one active methods! "
+                f"Active methods: {methods}"
+            )
 
 
 @dataclass
