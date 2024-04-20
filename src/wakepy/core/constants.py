@@ -1,7 +1,7 @@
 """Common terms and definitions used in many places"""
 
 import sys
-from typing import List, Literal, Set, Tuple, TypeVar, Union
+from typing import List, Set, Tuple, TypeVar, Union
 
 from .strenum import StrEnum, auto
 
