@@ -18,7 +18,7 @@ import warnings
 
 from wakepy.core.constants import FALSY_ENV_VAR_VALUES, WAKEPY_FAKE_SUCCESS
 
-from .activationresult import ActivationResult
+from .activationresult import ActivationResult, MethodActivationResult
 from .dbus import DBusAdapter, get_dbus_adapter
 from .heartbeat import Heartbeat
 from .method import Method, activate_method, deactivate_method
@@ -171,7 +171,9 @@ class Mode:
         self.heartbeat: Heartbeat | None = None
 
         self._dbus_adapter_cls = dbus_adapter
-        self._dbus_adapter: DBusAdapter | None = None
+        # Retrieved and updated using the _dbus_adapter property
+        self._dbus_adapter_instance: DBusAdapter | None = None
+        self._dbus_adapter_created: bool = False
 
         self._logger = logging.getLogger(__name__)
 
@@ -222,7 +224,8 @@ class Mode:
         dbus_adapter:
             For using a custom dbus-adapter. Optional. If not given, the
             default dbus adapter is used, which is :class:`~wakepy.\\
-            dbus_adapters.jeepney.JeepneyDBusAdapter`
+            dbus_adapters.jeepney.JeepneyDBusAdapter`.
+
 
         Returns
         -------
@@ -288,26 +291,73 @@ class Mode:
         """Activates the mode with one of the methods which belong to the mode.
         The methods are used with descending priority; highest priority first,
         and the priority is determined with the mode.methods_priority.
+
+        The activation may be faked as to be successful by using the
+        WAKEPY_FAKE_SUCCESS environment variable.
         """
-        if not self._dbus_adapter:
-            self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
 
         method_classes = add_fake_success_if_required(
             self.method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
         )
-
-        self.activation_result, self.active_method, self.heartbeat = activate_mode(
-            methods=method_classes,
-            methods_priority=self.methods_priority,
-            dbus_adapter=self._dbus_adapter,
-            modename=self.name,
+        method_classes_ordered = order_methods_by_priority(
+            method_classes, self.methods_priority
         )
+
+        methodresults, self.active_method, self.heartbeat = (
+            self._activate_one_of_methods(
+                method_classes=method_classes_ordered,
+                dbus_adapter=self._dbus_adapter,
+            )
+        )
+
+        self.activation_result = ActivationResult(methodresults, modename=self.name)
         self.active = self.activation_result.success
 
         if not self.active:
             handle_activation_fail(self.on_fail, self.activation_result)
 
         return self.activation_result
+
+    @staticmethod
+    def _activate_one_of_methods(
+        method_classes: list[Type[Method]], **method_kwargs: object
+    ) -> Tuple[List[MethodActivationResult], Optional[Method], Optional[Heartbeat]]:
+        """Activates mode using the first Method in `method_classes` which
+        succeeds. The methods are tried in the order given in `method_classes`
+        argument.
+
+        Parameters
+        ----------
+        method_classes:
+            The list of Methods to be used for activating this Mode.
+        method_kwargs:
+            optional kwargs passed to the all the Method class constructors.
+
+        Returns
+        -------
+        List[MethodActivationResult], Optional[Method], Optional[Heartbeat]
+            A three-tuple: The list of method activation results, the activated
+            method (None if not any), the activated heartbeat (None if not
+            any).
+        """
+
+        methodresults = []
+        while method_classes:
+            methodcls = method_classes.pop(0)
+            method = methodcls(**method_kwargs)
+            methodresult, heartbeat = activate_method(method)
+            methodresults.append(methodresult)
+            if methodresult.success:
+                break
+        else:
+            # Tried activate with all methods, but none of them succeed
+            method, heartbeat = None, None
+
+        # Add unused methods to the results
+        for method_cls in method_classes:
+            methodresults.append(MethodActivationResult(method_cls.name, success=None))
+
+        return methodresults, method, heartbeat
 
     def _deactivate(self) -> bool:
         """Deactivates the active mode, defined by the active Method, if any.
@@ -339,6 +389,17 @@ class Mode:
         self.active = False
 
         return deactivated
+
+    @property
+    def _dbus_adapter(self) -> DBusAdapter | None:
+        """The DbusAdapter instance of the Mode, if any. Created on the first
+        call."""
+        if not self._dbus_adapter_created:
+            # Only do this once even if the returned instance is None, as this
+            # might be a costly operation.
+            self._dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
+            self._dbus_adapter_created = True
+        return self._dbus_adapter_instance
 
 
 def select_methods(
@@ -455,61 +516,6 @@ def should_fake_success(wakepy_fake_success: str | None) -> bool:
         "'%s' set to a truthy value: %s.", WAKEPY_FAKE_SUCCESS, wakepy_fake_success
     )
     return True
-
-
-def activate_mode(
-    methods: list[Type[Method]],
-    dbus_adapter: Optional[DBusAdapter] = None,
-    methods_priority: Optional[MethodsPriorityOrder] = None,
-    modename: Optional[str] = None,
-) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
-    """Activates a mode defined by a collection of Methods. Only the first
-    Method which succeeds activation will be used, in order from highest
-    priority to lowest priority.
-
-    The activation may be faked as to be successful by using the
-    WAKEPY_FAKE_SUCCESS environment variable.
-
-    Parameters
-    ----------
-    methods:
-        The list of Methods to be used for activating this Mode.
-    dbus_adapter:
-        Can be used to define a custom DBus adapter for processing DBus calls
-        in the .caniuse(), .enter_mode(), .heartbeat() and .exit_mode() of the
-        Method. Optional.
-    methods_priority: list[str | set[str]]
-        The priority order, which is a list of method names or asterisk
-        ('*'). The asterisk means "all rest methods" and may occur only
-        once in the priority order, and cannot be part of a set. All method
-        names must be unique and must be part of the `methods`.
-    modename:
-        Name of the Mode. Used for communication to user, logging and in
-        error messages (can be "any string" which makes sense to you).
-        Optional.
-
-    Returns
-    -------
-    ActivationResult, Optional[Method], Optional[Heartbeat]
-        A three-tuple: The activation result object, the activated method (
-        None if not any), the activated heartbeat (None if not any).
-    """
-
-    prioritized_methods = order_methods_by_priority(methods, methods_priority)
-
-    methodresults = []
-    for methodcls in prioritized_methods:
-        method = methodcls(dbus_adapter=dbus_adapter)
-        methodresult, heartbeat = activate_method(method)
-        methodresults.append(methodresult)
-        if methodresult.success:
-            break
-    else:
-        # Tried activate with all methods, but none of them succeed
-        return ActivationResult(methodresults, modename=modename), None, None
-
-    # Activation was succesful.
-    return ActivationResult(methodresults, modename=modename), method, heartbeat
 
 
 def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:

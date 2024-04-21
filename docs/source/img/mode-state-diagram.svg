@@ -140,7 +140,7 @@
          y="63.378372"
          id="tspan7">&quot;with mode&quot; -statement  <tspan
    style="font-style:italic;font-weight:normal"
-   id="tspan8">or mode.activate()</tspan></tspan></text>
+   id="tspan8">or mode._activate()</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.01591px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
@@ -153,7 +153,7 @@
          y="116.73844"
          id="tspan7-1">&quot;with mode&quot; -block ends <tspan
    style="font-style:italic;font-weight:normal"
-   id="tspan9">or mode.deactivate()</tspan></tspan></text>
+   id="tspan9">or mode._deactivate()</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.01591px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
