@@ -117,9 +117,9 @@ class Mode:
     on_fail: "error" | "warn" | "pass" | Callable
         Determines what to do in case mode activation fails. Valid options
         are: "error", "warn", "pass" and a callable. If the option is
-        "error", raises wakepy.ActivationError. Is selected "warn", issues
-        warning. If "pass", does nothing. If `on_fail` is a callable, it
-        must take one positional argument: result, which is an instance of
+        "error", raises :class:`~wakepy.ActivationError`. Is selected "warn",
+        issues warning. If "pass", does nothing. If ``on_fail`` is a callable,
+        it must take one positional argument: result, which is an instance of
         ActivationResult. The ActivationResult contains more detailed
         information about the activation process.
     dbus_adapter:
@@ -223,11 +223,11 @@ class Mode:
         on_fail: "error" | "warn" | "pass" | Callable
             Determines what to do in case mode activation fails. Valid options
             are: "error", "warn", "pass" and a callable. If the option is
-            "error", raises wakepy.ActivationError. Is selected "warn", issues
-            warning. If "pass", does nothing. If `on_fail` is a callable, it
-            must take one positional argument: result, which is an instance of
-            ActivationResult. The ActivationResult contains more detailed
-            information about the activation process.
+            "error", raises :class:`ActivationError`. Is selected "warn",
+            issues warning. If "pass", does nothing. If ``on_fail`` is a
+            callable, it must take one positional argument: result, which is an
+            instance of ActivationResult. The ActivationResult contains more
+            detailed information about the activation process.
         methods_priority: list[str | set[str]]
             The priority order, which is a list of method names or asterisk
             ('*'). The asterisk means "all rest methods" and may occur only
