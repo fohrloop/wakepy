@@ -42,6 +42,11 @@ from wakepy.core import CURRENT_PLATFORM
 from wakepy.core.method import Method
 
 
+class TestMethod(Method):
+    __test__ = False  # for pytest; this won't be interpreted as test class.
+    mode = "_test"
+
+
 class WakepyMethodTestError(Exception): ...
 
 

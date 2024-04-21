@@ -1,17 +1,8 @@
 import pytest
 
+from tests.unit.test_core.testmethods import TestMethod
 from wakepy.core import DBusAddress, DBusMethod, Method, PlatformName
 from wakepy.core.heartbeat import Heartbeat
-
-# B, D, E
-FIRST_MODE = "first_mode"
-# A, F
-SECOND_MODE = "second_mode"
-
-
-class TestMethod(Method):
-    __test__ = False  # for pytest
-    mode = "_test"
 
 
 @pytest.fixture
@@ -71,6 +62,10 @@ def provide_methods_different_platforms(monkeypatch, testutils):
 @pytest.fixture(scope="function")
 def provide_methods_a_f(monkeypatch, testutils):
     testutils.empty_method_registry(monkeypatch)
+    # B, D, E
+    FIRST_MODE = "first_mode"
+    # A, F
+    SECOND_MODE = "second_mode"
 
     class MethodA(TestMethod):
         name = "A"

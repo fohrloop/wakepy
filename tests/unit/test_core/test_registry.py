@@ -2,13 +2,9 @@ import re
 
 import pytest
 
+from tests.unit.test_core.testmethods import TestMethod
 from wakepy.core import Method, get_method, get_methods, get_methods_for_mode
 from wakepy.core.registry import register_method
-
-
-class TestMethod(Method):
-    __test__ = False  # for pytest
-    mode = "_test"
 
 
 @pytest.mark.usefixtures("empty_method_registry")
