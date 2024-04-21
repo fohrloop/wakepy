@@ -35,7 +35,6 @@ if typing.TYPE_CHECKING:
     from .method import Method, MethodCls
     from .prioritization import MethodsPriorityOrder
 
-
     if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
         from typing_extensions import Literal
     else:  # pragma: no-cover-if-py-lt-38
