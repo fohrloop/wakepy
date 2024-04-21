@@ -13,25 +13,13 @@ from __future__ import annotations
 import typing
 from typing import List, Sequence, Set, Union
 
-from .activationresult import ActivationResult
 from .constants import WAKEPY_FAKE_SUCCESS
 from .platform import CURRENT_PLATFORM
 
 if typing.TYPE_CHECKING:
-    import sys
-    from typing import Callable, List, Optional, Tuple, Union
+    from typing import List, Optional, Tuple, Union
 
-    from .constants import Collection
     from .method import MethodCls
-
-    if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
-        from typing_extensions import Literal
-    else:  # pragma: no-cover-if-py-lt-38
-        from typing import Literal
-
-    OnFail = Union[Literal["error", "warn", "pass"], Callable[[ActivationResult], None]]
-
-    MethodClsCollection = Collection[MethodCls]
 
     """The strings in MethodsPriorityOrder are names of wakepy.Methods or the
     asterisk ('*')."""
