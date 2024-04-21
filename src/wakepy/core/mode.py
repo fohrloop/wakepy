@@ -292,7 +292,9 @@ class Mode:
         if not self._dbus_adapter:
             self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
 
-        method_classes = add_fake_success_if_required(self.method_classes)
+        method_classes = add_fake_success_if_required(
+            self.method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
+        )
 
         self.activation_result, self.active_method, self.heartbeat = activate_mode(
             methods=method_classes,
@@ -394,35 +396,44 @@ def select_methods(
 
 
 def add_fake_success_if_required(
-    method_classes: List[Type[Method]],
+    method_classes: List[Type[Method]], wakepy_fake_success: str | None
 ) -> List[Type[Method]]:
     """Adds the WAKEPY_FAKE_SUCCESS method to the list of method classes, if
     the WAKEPY_FAKE_SUCCESS environment variable has been set into a non-falsy
-    value. See also: `should_fake_success`."""
-    if not should_fake_success():
+    value. See also: `should_fake_success`.
+
+    Parameters
+    ----------
+    method_classes:
+        The list of method classes
+    wakepy_fake_success:
+        Value read from WAKEPY_FAKE_SUCCESS environment variable; either None
+        or a string. For example: '0', '1', 'True', or 'False'. None has same
+        behavior as falsy values ('0', 'no', 'false')
+    """
+    if not should_fake_success(wakepy_fake_success):
         return method_classes
 
     return [get_method(WAKEPY_FAKE_SUCCESS)] + method_classes
 
 
-def should_fake_success() -> bool:
+def should_fake_success(wakepy_fake_success: str | None) -> bool:
     """Function which says if fake success should be enabled
+
+    Parameters
+    ----------
+    wakepy_fake_success:
+        Value read from WAKEPY_FAKE_SUCCESS environment variable; either None
+        or a string. For example: '0', '1', 'True', or 'False'. None has same
+        behavior as falsy values ('0', 'no', 'false')
 
     Returns
     -------
     fake_success_enabled:
         True, if fake success is enabled, False otherwise.
 
-    Notes
-    -----
-    Fake success is controlled via WAKEPY_FAKE_SUCCESS environment
-    variable. If that variable is set to a truthy value, fake success is
-    activated.
-
-        Falsy values: '0', 'no', 'false' (case ignored)
-        Truthy values: everything else
-
-    *Motivation*
+    Motivation
+    ----------
     When running on CI system, wakepy might fail to acquire an inhibitor
     lock just because there is no Desktop Environment running. In these
     cases, it might be useful to just tell with an environment variable
@@ -430,17 +441,19 @@ def should_fake_success() -> bool:
     success is done after every other method is tried (and failed).
     """
 
-    if WAKEPY_FAKE_SUCCESS not in os.environ:
+    if wakepy_fake_success is None:
         logger.debug("'%s' not set.", WAKEPY_FAKE_SUCCESS)
         return False
 
-    val = os.environ[WAKEPY_FAKE_SUCCESS]
-
-    if val.lower() in FALSY_ENV_VAR_VALUES:
-        logger.info("%s set to a falsy value: %s.", WAKEPY_FAKE_SUCCESS, val)
+    if wakepy_fake_success.lower() in FALSY_ENV_VAR_VALUES:
+        logger.info(
+            "'%s' set to a falsy value: %s.", WAKEPY_FAKE_SUCCESS, wakepy_fake_success
+        )
         return False
 
-    logger.info("%s set to a truthy value: %s.", WAKEPY_FAKE_SUCCESS, val)
+    logger.info(
+        "'%s' set to a truthy value: %s.", WAKEPY_FAKE_SUCCESS, wakepy_fake_success
+    )
     return True
 
 
