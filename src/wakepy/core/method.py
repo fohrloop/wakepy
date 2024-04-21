@@ -36,10 +36,6 @@ if typing.TYPE_CHECKING:
 MethodCls = Type["Method"]
 
 
-class MethodError(RuntimeError):
-    """Occurred inside wakepy.core.method.Method"""
-
-
 class MethodOutcome(StrEnum):
     NOT_IMPLEMENTED = auto()
     SUCCESS = auto()
@@ -301,7 +297,7 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
 
     Raises
     ------
-    MethodError (RuntimeError), if the deactivation was not successful.
+    RuntimeError, if the deactivation was not successful.
     """
 
     heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
@@ -324,10 +320,10 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
             if retval is not None:
                 raise ValueError("exit_mode returned a value other than None!")
         except Exception as e:
-            raise MethodError(errortxt + "Original error: " + str(e))
+            raise RuntimeError(errortxt + "Original error: " + str(e))
 
     if heartbeat_stopped is not True:
-        raise MethodError(
+        raise RuntimeError(
             f"The heartbeat of {method.__class__.__name__} ({method.name}) could not "
             "be stopped! Suggesting submitting a bug report and rebooting for "
             "clearing the mode. "
