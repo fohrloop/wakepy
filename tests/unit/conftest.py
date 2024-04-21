@@ -22,12 +22,15 @@ class TestUtils:
     @staticmethod
     def empty_method_registry(monkeypatch, fake_success=False):
         """
-        Make the method registry empty for duration of a test. Optionally, keep
-        the WakepyFakeSuccess method in the registry.
+        Make the method registry empty for duration of a test. Keep
+        the WakepyFakeSuccess method in the registry. and optionally set the
+        WAKEPY_FAKE_SUCCESS flag to a truthy value (if `fake_success` is True).
         """
         monkeypatch.setattr("wakepy.core.registry._method_registry", (dict()))
+        # The fake method should always be part of the registry.
+        register_method(WakepyFakeSuccess)
+
         if fake_success:
-            register_method(WakepyFakeSuccess)
             monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "1")
 
 

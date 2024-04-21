@@ -14,6 +14,7 @@ import typing
 from typing import List, Sequence, Set, Union
 
 from .activationresult import ActivationResult
+from .constants import WAKEPY_FAKE_SUCCESS
 from .platform import CURRENT_PLATFORM
 
 if typing.TYPE_CHECKING:
@@ -87,7 +88,13 @@ def order_methods_by_priority(
         _order_set_of_methods_by_priority(group) for group in unordered_priority_groups
     ]
 
-    return [method for group in ordered_groups for method in group]
+    methods = [method for group in ordered_groups for method in group]
+
+    # Prioritize the WAKEPY_FAKE_SUCCESS before anything else.
+    return sorted(
+        methods,
+        key=lambda m: (0 if m.name == WAKEPY_FAKE_SUCCESS else 1,),
+    )
 
 
 def _sort_methods_to_priority_groups(
@@ -243,10 +250,16 @@ def _order_set_of_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls
         Methods (the others are not expected to work at all)
     (2) Sort alphabetically by Method name, ignoring the case
     """
+
+    # Later: Use some better logic for this.
+    # See: https://github.com/fohrloop/wakepy/issues/262
     return sorted(
         methods,
         key=lambda m: (
-            # Prioritize methods supporting CURRENT_PLATFORM over any others
+            # Prioritize the WAKEPY_FAKE_SUCCESS before anything else.
+            0 if m.name == WAKEPY_FAKE_SUCCESS else 1,
+            # Then, prioritize methods supporting CURRENT_PLATFORM over any
+            # others
             0 if CURRENT_PLATFORM in m.supported_platforms else 1,
             m.name.lower() if m.name else "",
         ),
