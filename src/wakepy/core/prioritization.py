@@ -18,12 +18,18 @@ from .constants import WAKEPY_FAKE_SUCCESS
 from .platform import CURRENT_PLATFORM
 
 if typing.TYPE_CHECKING:
-    from typing import Callable, List, Literal, Optional, Tuple
+    import sys
+    from typing import Callable, List, Optional, Tuple, Union
 
     from .constants import Collection
     from .method import MethodCls
 
-    OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
+    if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
+        from typing_extensions import Literal
+    else:  # pragma: no-cover-if-py-lt-38
+        from typing import Literal
+
+    OnFail = Union[Literal["error", "warn", "pass"], Callable[[ActivationResult], None]]
 
     MethodClsCollection = Collection[MethodCls]
 
