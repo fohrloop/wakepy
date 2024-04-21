@@ -83,9 +83,31 @@ jobs:
 
   check-code:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install python
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: install tox
+        run: |
+          python${{ env.PYTHON_VERSION }} -m pip install -U pip wheel && \
+          python${{ env.PYTHON_VERSION }} -m pip install ${{ env.TOX_REQUIREMENT }}
+      - name: Check code
+        run: tox -e check
+
+  mypy-check-src:
+    # This is an *additional* check for mypy using the oldest and newest
+    # supported python
+    runs-on: ubuntu-latest
+    # Note that it's not possible to build the package using python 3.7
+    # (build is only tested on the env.PYTHON_VERSION). Therefore this mypy
+    # check just uses the build from the previous step. And build is required
+    # since it creates the wakepy._version module.
+    needs: build-python-distributions
     strategy:
       matrix:
-        python-version: ["3.7", "3.10", "3.12"]
+        python-version: ["3.7", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
@@ -94,11 +116,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: install tox
-        run: |
-          python${{ matrix.python-version }} -m pip install -U pip wheel && \
-          python${{ matrix.python-version }} -m pip install ${{ env.TOX_REQUIREMENT }}
+        run: python${{ matrix.python-version }} -m pip install ${{ env.TOX_REQUIREMENT }}
       - name: Check code
-        run: tox -e check
+        run: tox -e mypy --skip-build
 
   test-build-docs:
     runs-on: ubuntu-latest
