@@ -10,9 +10,9 @@ import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy import ActivationError, ActivationResult, Method, Mode
-from wakepy.core.activationresult import MethodActivationResult
-from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
 from wakepy.core.dbus import DBusAdapter
+from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import (
     ModeExit,
     activate_mode,
@@ -331,7 +331,6 @@ class TestShouldFakeSuccess:
 class TestActivateMode:
     """tests for activate_mode"""
 
-    @pytest.mark.usefixtures("mocks_for_test_activate_mode")
     def test_activate_without_methods(self):
         res, active_method, heartbeat = activate_mode([], None)
         assert res.list_methods() == []
@@ -339,79 +338,41 @@ class TestActivateMode:
         assert active_method is None
         assert heartbeat is None
 
-    def test_activate_function_success(self, mocks_for_test_activate_mode):
-        """Here we test the activate_mode() function. It calls some
-        other functions which we do not care about as they're tested elsewhere.
-        That is we why monkeypatch those functions with fakes"""
+    def test_activate_function_success(self):
 
-        # Arrange
-        mocks = mocks_for_test_activate_mode
-        methodcls_fail = get_test_method_class(enter_mode=False)
+        methodcls_fail = get_test_method_class(enter_mode=Exception("error"))
         methodcls_success = get_test_method_class(enter_mode=None)
 
-        # Act
-        # Note: prioritize the failing first, so that the failing one will also
-        # be used. This also tests at that the prioritization is used at least
-        # somehow
         result, active_method, heartbeat = activate_mode(
             [methodcls_success, methodcls_fail],
-            dbus_adapter=mocks.dbus_adapter,
         )
 
-        # Assert
-
-        # There is a successful method, so the activation succeeds.
         assert result.success is True
         assert isinstance(active_method, methodcls_success)
-        assert heartbeat is mocks.heartbeat
+        assert heartbeat is None
 
-    def test_activate_function_failure(self, mocks_for_test_activate_mode):
-        # Arrange
-        mocks = mocks_for_test_activate_mode
-        methodcls_fail = get_test_method_class(enter_mode=False)
+    def test_activate_function_success_with_heartbeat(self):
 
-        # Act
-        result, active_method, heartbeat = activate_mode(
-            [methodcls_fail],
-            dbus_adapter=mocks.dbus_adapter,
+        methodcls_success_with_hb = get_test_method_class(
+            enter_mode=None, heartbeat=None
         )
 
-        # Assert
+        result, active_method, heartbeat = activate_mode(
+            [methodcls_success_with_hb],
+        )
+
+        # The activation succeeded, and the method has heartbeat, so the
+        # hearbeat must be instance of Heartbeate
+        assert result.success is True
+        assert isinstance(active_method, methodcls_success_with_hb)
+        assert isinstance(heartbeat, Heartbeat)
+
+    def test_activate_function_failure(self):
+        methodcls_fail = get_test_method_class(enter_mode=Exception("error"))
+
+        result, active_method, heartbeat = activate_mode([methodcls_fail])
+
         # The activation failed, so active_method and heartbeat is None
         assert result.success is False
         assert active_method is None
         assert heartbeat is None
-
-    @staticmethod
-    @pytest.fixture
-    def mocks_for_test_activate_mode(monkeypatch, heartbeat1):
-        """This is the test arrangement step for tests for the
-        `activate_mode` function"""
-
-        mocks = Mock()
-        mocks.heartbeat = heartbeat1
-        mocks.dbus_adapter = Mock(spec_set=DBusAdapter)
-
-        def fake_activate_method(method):
-            try:
-                assert method.enter_mode() is None
-                success = True
-            except Exception:
-                success = False
-
-            return (
-                MethodActivationResult(
-                    method_name=method.name,
-                    success=True if success else False,
-                    failure_stage=None if success else StageName.ACTIVATION,
-                ),
-                mocks.heartbeat,
-            )
-
-        monkeypatch.setattr("wakepy.core.mode.activate_method", fake_activate_method)
-        monkeypatch.setattr(
-            "wakepy.core.prioritization._check_methods_priority",
-            mocks._check_methods_priority,
-        )
-        monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
-        return mocks
