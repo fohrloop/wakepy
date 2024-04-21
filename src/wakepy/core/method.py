@@ -116,7 +116,7 @@ class Method(ABC):
         """Tells if the Method is suitable or unsuitable.
 
         Returns
-        ------
+        -------
         (a) If the Method is suitable, and can be used, return True.
         (b) If the result is uncertain, return None.
         (c) If the Method is unsuitable, may return False or a string.
@@ -153,7 +153,7 @@ class Method(ABC):
         an Exception.
 
         Raises
-        -------
+        ------
         Could raise an Exception of any type.
         """
 

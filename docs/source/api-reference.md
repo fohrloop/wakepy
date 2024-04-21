@@ -23,6 +23,9 @@ Wakepy Core
 
     .. automethod:: __exit__
 
+.. autoclass:: wakepy.Method
+    :members:
+
 .. autoclass:: wakepy.ActivationResult
     :members:
 

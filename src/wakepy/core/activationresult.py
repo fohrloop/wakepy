@@ -39,19 +39,19 @@ class ActivationResult:
     Attributes
     ----------
     modename: str | None
-        The name of the Mode. If the Mode did not have a name, the modename
-        is None.
+        The name of the :class:`Mode`. If the ``Mode`` did not have a name, the
+        modename is ``None``.
     success: bool
         Tells is entering into a mode was successful. Note that this may be
-        faked with WAKEPY_FAKE_SUCCESS environment variable e.g. for testing
-        purposes.
+        faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable e.g. for
+        testing purposes.
     real_success: bool
-        Tells is entering into a mode was successful. This
-        may not faked with WAKEPY_FAKE_SUCCESS environment variable.
+        Tells is entering into a mode was successful. This may not faked with
+        the :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
     failure: bool
-        Always opposite of `success`. Included for convenience.
+        Always opposite of ``success``. Included for convenience.
     active_method: str | None
-        The name of the the active (successful) method, if any.
+        The name of the the active (successful) :class:`Method`, if any.
 
     Methods
     -------
@@ -74,8 +74,8 @@ class ActivationResult:
     """Name of the mode, if any."""
 
     active_method: str | None = field(init=False)
-    """The name of the active (successful) method. If no methods are active,
-    this is None."""
+    """The name of the active (successful) :class`Method`. If no methods are
+    active, this is None."""
 
     success: bool = field(init=False)
     """Tells is entering into a mode was successful.
@@ -111,20 +111,22 @@ class ActivationResult:
     ) -> list[MethodActivationResult]:
         """Get a list of the methods present in the activation process, and
         their activation results. This is the higher-level interface. If you
-        want more control, use .query(). The returned methods are in the order
-        as given in when initializing ActivationResult. If you did not create
-        the ActivationReult manually, the methods are in the priority order;
-        the highest priority methods (those which are/were tried first) are
-        listed first.
+        want more control, use :meth:`.query()<ActivationResult.query>`. The
+        returned methods are in the order as given in when initializing
+        ActivationResult. If you did not create the ActivationReult manually,
+        the methods are in the priority order; the highest priority methods
+        (those which are/were tried first) are listed first.
 
         Parameters
         ----------
-        ignore_platform_fails:
+        ignore_platform_fails: bool
             If True, ignores plaform support check fail. This is the default as
             usually one is not interested in methods which are meant for other
-            platforms. If False, includes also platform fails. Default: True.
-        ignore_unused:
-            If True, ignores all unused / remaining methods. Default: False.
+            platforms. If False, includes also platform fails. Default:
+            ``True``.
+        ignore_unused: bool
+            If True, ignores all unused / remaining methods. Default:
+            ``False``.
         """
 
         success_values = (True, False) if ignore_unused else (True, False, None)
