@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import copy
-import os
 import re
 import typing
 import warnings
-from contextlib import contextmanager
 from unittest.mock import Mock
 
 import pytest
