@@ -107,7 +107,7 @@ jobs:
     needs: build-python-distributions
     strategy:
       matrix:
-        python-version: ["3.7", "3.10", "3.12"]
+        python-version: ["3.7", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
