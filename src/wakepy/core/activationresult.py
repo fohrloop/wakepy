@@ -66,7 +66,7 @@ class ActivationResult:
     """
 
     results: InitVar[Optional[List[MethodActivationResult]]] = None
-    # These are the retuls for each of the used wakepy.Methods, in the
+    # These are the results for each of the used wakepy.Methods, in the
     # order the methods were tried (first = highest priority, last =
     # lowest priority)
 
@@ -168,11 +168,6 @@ class ActivationResult:
             if res.success not in success:
                 continue
             elif res.success is False and res.failure_stage not in fail_stages:
-                continue
-            elif res.success is False and res.method_name == WAKEPY_FAKE_SUCCESS:
-                # The fake method is only listed if it was requested to be,
-                # used, and when it is not requested to be used, the
-                # res.success is False.
                 continue
             out.append(res)
 
