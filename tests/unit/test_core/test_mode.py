@@ -137,7 +137,7 @@ class TestModeContextManager:
     ):
         # This will not fail as when the Mode is activated, the
         # WakepyFakeSuccess method is added to the list of used methods.
-        with Mode(methods=[]):
+        with Mode(method_classes=[]):
             ...
 
 
