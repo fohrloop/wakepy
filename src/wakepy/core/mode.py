@@ -26,15 +26,21 @@ from .prioritization import order_methods_by_priority
 from .registry import get_method, get_methods_for_mode
 
 if typing.TYPE_CHECKING:
+    import sys
     from types import TracebackType
-    from typing import Callable, List, Literal, Optional, Tuple, Type
+    from typing import Callable, List, Optional, Tuple, Type, Union
 
     from .constants import Collection, ModeName, StrCollection
     from .dbus import DBusAdapter, DBusAdapterTypeSeq
     from .method import Method, MethodCls
     from .prioritization import MethodsPriorityOrder
 
-    OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
+    if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
+        from typing_extensions import Literal
+    else:  # pragma: no-cover-if-py-lt-38
+        from typing import Literal
+
+    OnFail = Union[Literal["error", "warn", "pass"], Callable[[ActivationResult], None]]
 
     MethodClsCollection = Collection[MethodCls]
 
