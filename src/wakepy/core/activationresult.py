@@ -36,23 +36,6 @@ class ActivationResult:
     modename:
         Name of the Mode. Optional.
 
-    Attributes
-    ----------
-    modename: str | None
-        The name of the :class:`Mode`. If the ``Mode`` did not have a name, the
-        modename is ``None``.
-    success: bool
-        Tells is entering into a mode was successful. Note that this may be
-        faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable e.g. for
-        testing purposes.
-    real_success: bool
-        Tells is entering into a mode was successful. This may not faked with
-        the :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
-    failure: bool
-        Always opposite of ``success``. Included for convenience.
-    active_method: str | None
-        The name of the the active (successful) :class:`Method`, if any.
-
     Methods
     -------
     list_methods:
@@ -71,26 +54,26 @@ class ActivationResult:
     # lowest priority)
 
     modename: Optional[str] = None
-    """Name of the mode, if any."""
+    """Name of the :class:`Mode`. If the associated ``Mode`` does not have a
+    name, the ``modename`` will be ``None``."""
 
     active_method: str | None = field(init=False)
     """The name of the active (successful) :class`Method`. If no methods are
-    active, this is None."""
+    active, this is ``None``."""
 
     success: bool = field(init=False)
-    """Tells is entering into a mode was successful.
-
-    Note that this may be faked with :ref:`WAKEPY_FAKE_SUCCESS` environment
-    variable (for tests). See also: real_success.
+    """Tells is entering into a mode was successful. Note that this may be
+    faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable e.g. for testing
+    purposes. See also: :attr:`real_success`.
     """
 
     real_success: bool = field(init=False)
     """Tells is entering into a mode was successful. This
-    may not faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
+    may not faked with the :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
     """
 
     failure: bool = field(init=False)
-    """Always opposite of `success`. Included for convenience."""
+    """Always opposite of ``success``. Included for convenience."""
 
     _method_results: List[MethodActivationResult] = field(init=False)
 
