@@ -488,7 +488,11 @@ def activate_mode(
         error messages (can be "any string" which makes sense to you).
         Optional.
 
-    # TODO: Add Returns
+    Returns
+    -------
+    ActivationResult, Optional[Method], Optional[Heartbeat]
+        A three-tuple: The activation result object, the activated method (
+        None if not any), the activated heartbeat (None if not any).
     """
 
     prioritized_methods = order_methods_by_priority(methods, methods_priority)
