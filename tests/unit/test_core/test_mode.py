@@ -281,7 +281,20 @@ class TestSelectMethods:
 
 
 # These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
-FALSY_TEST_VALUES = (None, "0", "no", "NO", "False", "false", "FALSE")
+FALSY_TEST_VALUES = (
+    None,
+    "0",
+    "no",
+    "NO",
+    "N",
+    "n",
+    "False",
+    "false",
+    "FALSE",
+    "F",
+    "f",
+    "",
+)
 TRUTHY_TEST_VALUES = ("1", "yes", "True", "anystring")
 
 

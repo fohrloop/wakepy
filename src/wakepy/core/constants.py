@@ -15,7 +15,7 @@ WAKEPY_FAKE_SUCCESS = "WAKEPY_FAKE_SUCCESS"
 to set it"""
 
 # This variable should only contain lower-case characters.
-FALSY_ENV_VAR_VALUES = ("0", "no", "false")
+FALSY_ENV_VAR_VALUES = ("0", "no", "false", "n", "f", "")
 """The falsy environment variable values. All other values are considered to be
 truthy. These values are case insensitive; Also "NO", "False" and "FALSE" are
 falsy.

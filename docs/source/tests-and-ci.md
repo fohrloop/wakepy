@@ -9,7 +9,7 @@ To force wakepy to fake a successful mode activation, you may set an environment
 
 ```{admonition} Truthy and falsy values
 :class: info
-Only `0`, `no` and `false` are considered as falsy values (case ignored). Any other value is considered truthy.
+Only `0`, `no`, `N`, `false`, `F` and the empty string are considered as falsy values (case ignored). Any other value is considered truthy.
 ```
 
 ### pytest

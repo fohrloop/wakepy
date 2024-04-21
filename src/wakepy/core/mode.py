@@ -409,7 +409,7 @@ def add_fake_success_if_required(
     wakepy_fake_success:
         Value read from WAKEPY_FAKE_SUCCESS environment variable; either None
         or a string. For example: '0', '1', 'True', or 'False'. None has same
-        behavior as falsy values ('0', 'no', 'false')
+        behavior as falsy values ('0', 'no', 'false', 'f', 'n', '').
     """
     if not should_fake_success(wakepy_fake_success):
         return method_classes
@@ -425,7 +425,7 @@ def should_fake_success(wakepy_fake_success: str | None) -> bool:
     wakepy_fake_success:
         Value read from WAKEPY_FAKE_SUCCESS environment variable; either None
         or a string. For example: '0', '1', 'True', or 'False'. None has same
-        behavior as falsy values ('0', 'no', 'false')
+        behavior as falsy values ('0', 'no', 'false', 'f', 'n', '').
 
     Returns
     -------
