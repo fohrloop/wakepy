@@ -138,7 +138,8 @@ class TestOrderMethodsByPriority:
         WindowsA, LinuxA, LinuxB, WakepyFakeSuccess = get_methods(
             ["WinA", "LinuxA", "LinuxB", WAKEPY_FAKE_SUCCESS]
         )
-        # If WAKEPY_FAKE_SUCCESS is used, it is *always* prioritized the highest
+        # If WAKEPY_FAKE_SUCCESS is used, it is *always* prioritized the
+        # highest
         assert order_methods_by_priority(
             [WindowsA, LinuxA, LinuxB, WakepyFakeSuccess],
             methods_priority=["*"],
@@ -154,7 +155,8 @@ class TestOrderMethodsByPriority:
         WindowsA, LinuxA, LinuxB, WakepyFakeSuccess = get_methods(
             ["WinA", "LinuxA", "LinuxB", WAKEPY_FAKE_SUCCESS]
         )
-        # If WAKEPY_FAKE_SUCCESS is used, it is *always* prioritized the highest
+        # If WAKEPY_FAKE_SUCCESS is used, it is *always* prioritized the
+        # highest
         assert order_methods_by_priority(
             [WindowsA, LinuxA, LinuxB, WakepyFakeSuccess],
             methods_priority=[{"WinA", "LinuxB"}, "*"],
