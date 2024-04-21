@@ -279,8 +279,8 @@ class Mode:
 
         # Other types of exceptions are not handled; ignoring them here and
         # returning False will tell python to re-raise the exception. Can't
-        # return None as type-checkers will mark code after with block
-        # unreachable
+        # return None as type-checkers would mark code after with block
+        # unreachable.
 
         return False
 
