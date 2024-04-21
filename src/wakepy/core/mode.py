@@ -292,8 +292,10 @@ class Mode:
         if not self._dbus_adapter:
             self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
 
+        method_classes = add_fake_success_if_required(self.method_classes)
+
         self.activation_result, self.active_method, self.heartbeat = activate_mode(
-            methods=self.method_classes,
+            methods=method_classes,
             methods_priority=self.methods_priority,
             dbus_adapter=self._dbus_adapter,
             modename=self.name,
@@ -388,11 +390,19 @@ def select_methods(
     else:  # pragma: no cover
         raise ValueError("Invalid `omit` and/or `use_only`!")
 
-    if should_fake_success():
-        # The fake method (WAKEPY_FAKE_SUCCESS) is always put first
-        selected_methods.insert(0, get_method(WAKEPY_FAKE_SUCCESS))
-
     return selected_methods
+
+
+def add_fake_success_if_required(
+    method_classes: List[Type[Method]],
+) -> List[Type[Method]]:
+    """Adds the WAKEPY_FAKE_SUCCESS method to the list of method classes, if
+    the WAKEPY_FAKE_SUCCESS environment variable has been set into a non-falsy
+    value. See also: `should_fake_success`."""
+    if not should_fake_success():
+        return method_classes
+
+    return [get_method(WAKEPY_FAKE_SUCCESS)] + method_classes
 
 
 def should_fake_success() -> bool:
