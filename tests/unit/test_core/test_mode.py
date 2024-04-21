@@ -44,7 +44,7 @@ def testmode_cls():
 @pytest.fixture
 def methods_abc(monkeypatch, testutils) -> List[Type[Method]]:
     """This fixture creates three methods, which belong to a given mode."""
-    testutils.empty_method_registry(monkeypatch, fake_success=True)
+    testutils.empty_method_registry(monkeypatch)
 
     class MethodA(Method):
         name = "MethodA"
@@ -95,38 +95,51 @@ def mode1_with_dbus(
     )
 
 
-def test_mode_contextmanager_protocol(
-    mode0: Mode,
-):
-    """Test that the Mode fulfills the context manager protocol"""
-    flag_end_of_with_block = False
+class TestModeContextManager:
 
-    # Test that the context manager protocol works
-    with mode0 as m:
+    @pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
+    def test_mode_contextmanager_protocol(self,
+        mode0: Mode,
+    ):
+        """Test that the Mode fulfills the context manager protocol"""
+        flag_end_of_with_block = False
 
-        # The __enter__ returns the Mode
-        assert m is mode0
-        # We have activated the Mode
-        assert mode0.active
-        # There is an ActivationResult available in .activation_result
-        assert isinstance(m.activation_result, ActivationResult)
-        # The active method is also available
-        assert isinstance(mode0.active_method, Method)
+        # Test that the context manager protocol works
+        with mode0 as m:
 
-        activation_result = copy.deepcopy(m.activation_result)
-        flag_end_of_with_block = True
+            # The __enter__ returns the Mode
+            assert m is mode0
+            # We have activated the Mode
+            assert mode0.active
+            # There is an ActivationResult available in .activation_result
+            assert isinstance(m.activation_result, ActivationResult)
+            # The active method is also available
+            assert isinstance(mode0.active_method, Method)
 
-    # reached the end of the with block
-    assert flag_end_of_with_block
+            activation_result = copy.deepcopy(m.activation_result)
+            flag_end_of_with_block = True
 
-    # After exiting the mode, Mode.active is set to False
-    assert m.active is False
-    # The active_method is set to None
-    assert m.active_method is None
-    # The activation result is still there (not removed during deactivation)
-    assert activation_result == m.activation_result
+        # reached the end of the with block
+        assert flag_end_of_with_block
+
+        # After exiting the mode, Mode.active is set to False
+        assert m.active is False
+        # The active_method is set to None
+        assert m.active_method is None
+        # The activation result is still there (not removed during deactivation)
+        assert activation_result == m.activation_result
 
 
+    @pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
+    def test_no_methods_succeeds_when_using_fake_success(self,
+    ):
+        # This will not fail as when the Mode is activated, the
+        # WakepyFakeSuccess method is added to the list of used methods.
+        with Mode(methods=[]):
+            ...
+
+
+@pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
 class TestModeActivateDeactivate:
     """Tests for Mode._activate and Mode._deactivate"""
 
@@ -155,7 +168,7 @@ class TestModeActivateDeactivate:
                 # Setting active method
                 mode0.active_method = None
 
-
+@pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
 class TestExitModeWithException:
     """Test cases when a Mode is exited with an Exception"""
 
