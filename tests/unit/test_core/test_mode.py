@@ -10,12 +10,12 @@ import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy import ActivationError, ActivationResult, Method, Mode
-from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
+from wakepy.core.activationresult import MethodActivationResult
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import (
     ModeExit,
-    activate_one_of_methods,
     add_fake_success_if_required,
     handle_activation_fail,
     select_methods,
@@ -329,12 +329,13 @@ class TestShouldFakeSuccess:
 
 
 class TestActivateMode:
-    """tests for activate_one_of_methods"""
+    """tests for Mode._activate_one_of_methods"""
 
     def test_activate_without_methods(self):
-        res, active_method, heartbeat = activate_one_of_methods([], None)
-        assert res.list_methods() == []
-        assert res.success is False
+        res, active_method, heartbeat = Mode._activate_one_of_methods(
+            [], dbus_adapter=None
+        )
+        assert res == []
         assert active_method is None
         assert heartbeat is None
 
@@ -343,11 +344,20 @@ class TestActivateMode:
         methodcls_fail = get_test_method_class(enter_mode=Exception("error"))
         methodcls_success = get_test_method_class(enter_mode=None)
 
-        result, active_method, heartbeat = activate_one_of_methods(
+        res, active_method, heartbeat = Mode._activate_one_of_methods(
             [methodcls_success, methodcls_fail],
         )
-
-        assert result.success is True
+        assert len(res) == 2
+        assert res == [
+            MethodActivationResult(
+                method_name=methodcls_success.name,
+                success=True,
+            ),
+            MethodActivationResult(
+                method_name=methodcls_fail.name,
+                success=None,
+            ),
+        ]
         assert isinstance(active_method, methodcls_success)
         assert heartbeat is None
 
@@ -357,22 +367,32 @@ class TestActivateMode:
             enter_mode=None, heartbeat=None
         )
 
-        result, active_method, heartbeat = activate_one_of_methods(
+        res, active_method, heartbeat = Mode._activate_one_of_methods(
             [methodcls_success_with_hb],
         )
 
         # The activation succeeded, and the method has heartbeat, so the
         # hearbeat must be instance of Heartbeate
-        assert result.success is True
+        assert res == [
+            MethodActivationResult(methodcls_success_with_hb.name, success=True)
+        ]
         assert isinstance(active_method, methodcls_success_with_hb)
         assert isinstance(heartbeat, Heartbeat)
 
     def test_activate_function_failure(self):
-        methodcls_fail = get_test_method_class(enter_mode=Exception("error"))
+        exc = Exception("error")
+        methodcls_fail = get_test_method_class(enter_mode=exc)
 
-        result, active_method, heartbeat = activate_one_of_methods([methodcls_fail])
+        res, active_method, heartbeat = Mode._activate_one_of_methods([methodcls_fail])
 
         # The activation failed, so active_method and heartbeat is None
-        assert result.success is False
+        assert res == [
+            MethodActivationResult(
+                methodcls_fail.name,
+                success=False,
+                failure_stage=StageName.ACTIVATION,
+                failure_reason=repr(exc),
+            )
+        ]
         assert active_method is None
         assert heartbeat is None
