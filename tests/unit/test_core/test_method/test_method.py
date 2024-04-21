@@ -5,6 +5,7 @@ import sys
 
 import pytest
 
+from tests.unit.test_core.testmethods import TestMethod
 from wakepy.core import DBusMethodCall
 from wakepy.core.method import (
     Method,
@@ -23,11 +24,6 @@ else:  # pragma: no-cover-if-py-lt-38
 
 if typing.TYPE_CHECKING:
     from wakepy.core import DBusMethod
-
-
-class TestMethod(Method):
-    __test__ = False  # for pytest
-    mode = "_test"
 
 
 def test_overridden_methods_autodiscovery():

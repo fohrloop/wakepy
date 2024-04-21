@@ -14,8 +14,8 @@ from tests.unit.test_core.testmethods import (
     METHOD_MISSING,
     METHOD_OPTIONS,
     WakepyMethodTestError,
+    combinations_of_test_methods,
     get_test_method_class,
-    iterate_test_methods,
 )
 from wakepy.core import Method, MethodActivationResult, PlatformName, get_methods
 from wakepy.core.constants import StageName, StageNameValue
@@ -67,7 +67,7 @@ class TestActivateMethod:
 
     def test_activate_method_method_caniuse_fails(self):
         # Case 1: Fail by returning False from caniuse
-        method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
+        method = get_test_method_class(caniuse=False)()
         res, heartbeat = activate_method(method)
         assert res.success is False
         assert res.failure_stage == StageName.REQUIREMENTS
@@ -77,8 +77,6 @@ class TestActivateMethod:
         # Case 2: Fail by returning some error reason from caniuse
         method = get_test_method_class(
             caniuse="SomeSW version <2.1.5 not supported",
-            enter_mode=True,
-            exit_mode=True,
         )()
         res, heartbeat = activate_method(method)
         assert res.success is False
@@ -145,7 +143,7 @@ class TestTryEnterAndHeartbeat:
         """Tests 1) F* from TABLE 1; enter_mode failing"""
 
         # Case: enter_mode raises exception
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[RuntimeError(FAILURE_REASON)],
             heartbeat=METHOD_OPTIONS,
             exit_mode=METHOD_OPTIONS,
@@ -161,7 +159,7 @@ class TestTryEnterAndHeartbeat:
 
     def test_enter_mode_missing_and_heartbeat(self):
         """Tests 2) MM from TABLE 1; missing both enter_mode and heartbeat"""
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[METHOD_MISSING],
             heartbeat=[METHOD_MISSING],
             exit_mode=METHOD_OPTIONS,
@@ -182,7 +180,7 @@ class TestTryEnterAndHeartbeat:
     def test_enter_mode_missing_heartbeat_failing(self):
         """Tests 3) MF from TABLE 1; enter_mode missing and heartbeat
         failing"""
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[METHOD_MISSING],
             heartbeat=[False],
             exit_mode=METHOD_OPTIONS,
@@ -197,7 +195,7 @@ class TestTryEnterAndHeartbeat:
             assert "The only accepted return value is None" in err_message
             assert heartbeat_call_time is None
 
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[METHOD_MISSING],
             heartbeat=[FAILURE_REASON],
             exit_mode=METHOD_OPTIONS,
@@ -218,7 +216,7 @@ class TestTryEnterAndHeartbeat:
         expected_time = dt.datetime.strptime(
             "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
         ).replace(tzinfo=dt.timezone.utc)
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[METHOD_MISSING],
             heartbeat=[None],
             exit_mode=METHOD_OPTIONS,
@@ -230,7 +228,7 @@ class TestTryEnterAndHeartbeat:
     def test_enter_mode_success_hearbeat_missing(self):
         """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
 
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[None],
             heartbeat=[METHOD_MISSING],
             exit_mode=METHOD_OPTIONS,
@@ -248,7 +246,7 @@ class TestTryEnterAndHeartbeat:
         """
 
         # Case: Heartbeate fails by raising RuntimeError
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[None],
             heartbeat=[RuntimeError(FAILURE_REASON)],
             exit_mode=[None, METHOD_MISSING],
@@ -261,7 +259,7 @@ class TestTryEnterAndHeartbeat:
         # Case: The heartbeat fails, and because enter_mode() has succeed,
         # wakepy tries to call exit_mode(). If that fails, the program must
         # crash, as we are in an unknown state and this is clearly an error.
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[None],
             heartbeat=[False, FAILURE_REASON],
             exit_mode=[False, FAILURE_REASON],
@@ -278,7 +276,7 @@ class TestTryEnterAndHeartbeat:
         # Case: Same as the one above, but this time exit_mode() raises a
         # WakepyMethodTestError. That is re-raised as RuntimeError, instead.
         # If this happens, the Method.exit_mode() has a bug.
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[None],
             heartbeat=[False, FAILURE_REASON],
             exit_mode=[WakepyMethodTestError("foo")],
@@ -298,7 +296,7 @@ class TestTryEnterAndHeartbeat:
             "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
         ).replace(tzinfo=dt.timezone.utc)
 
-        for method in iterate_test_methods(
+        for method in combinations_of_test_methods(
             enter_mode=[None],
             heartbeat=[None],
             exit_mode=METHOD_OPTIONS,

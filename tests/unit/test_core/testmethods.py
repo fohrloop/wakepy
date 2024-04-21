@@ -1,3 +1,37 @@
+"""This module defines two important helpers for the tests
+
+1) get_test_method_class
+A function which may used to create wakepy.Method classes using arguments.
+
+Example
+-------
+Create Method which return True from Method.caniuse() and raises a
+RuntimeError in Method.enter_mode()
+
+>>>  method_cls = get_test_method_class(
+            caniuse=True, enter_mode=RuntimeError("failed")
+)
+
+2) combinations_of_test_methods
+A function which returns an iterator for testing a cross product of different
+Methods. This uses get_test_method_class underneath.
+
+Example
+-------
+>>> METHOD_OPTIONS = [
+    METHOD_MISSING,
+    True,
+    False,
+    RunTimeError('foo'),
+]
+>>> for method in combinations_of_test_methods(
+        enter_mode=[METHOD_MISSING],
+        heartbeat=[METHOD_MISSING],
+        exit_mode=METHOD_OPTIONS,
+    ):
+        # test
+"""
+
 from __future__ import annotations
 
 import itertools
@@ -6,6 +40,11 @@ from typing import Iterable, Type
 
 from wakepy.core import CURRENT_PLATFORM
 from wakepy.core.method import Method
+
+
+class TestMethod(Method):
+    __test__ = False  # for pytest; this won't be interpreted as test class.
+    mode = "_test"
 
 
 class WakepyMethodTestError(Exception): ...
@@ -105,31 +144,16 @@ def get_test_method_class(
     return _test_method_classes[key]
 
 
-def iterate_test_methods(
+def combinations_of_test_methods(
     enter_mode=Iterable,
     heartbeat=Iterable,
     exit_mode=Iterable,
 ) -> Iterable[Method]:
+    """Create an iterator of Methods over the combinations of the given
+    enter_mode, heartbeat and exit_mode"""
     for enter_mode_, heartbeat_, exit_mode_ in itertools.product(
         enter_mode, heartbeat, exit_mode
     ):
         yield get_test_method_class(
             enter_mode=enter_mode_, heartbeat=heartbeat_, exit_mode=exit_mode_
         )()
-
-
-# Just test that iterating the test methods works as expected
-_methods = list(
-    iterate_test_methods(
-        enter_mode=[METHOD_MISSING],
-        heartbeat=[
-            METHOD_MISSING,
-            False,
-            "Failure reason",
-        ],
-        exit_mode=METHOD_OPTIONS,
-    )
-)
-assert len(_methods) == 1 * 3 * 5
-assert all(isinstance(m, Method) for m in _methods)
-del _methods
