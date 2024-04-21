@@ -156,7 +156,7 @@ class Mode:
 
     def __init__(
         self,
-        methods: list[Type[Method]],
+        method_classes: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
         name: Optional[ModeName | str] = None,
         on_fail: OnFail = "error",
@@ -167,7 +167,7 @@ class Mode:
         This is also where the activation process related settings, such as the
         dbus adapter to be used, are defined.
         """
-        self.method_classes = methods
+        self.method_classes = method_classes
         self.active: bool = False
         self.activation_result = ActivationResult()
         self.name = name
@@ -243,7 +243,7 @@ class Mode:
         selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
         return cls(
             name=modename,
-            methods=selected_methods,
+            method_classes=selected_methods,
             methods_priority=methods_priority,
             on_fail=on_fail,
             dbus_adapter=dbus_adapter,
