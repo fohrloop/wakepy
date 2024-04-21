@@ -295,10 +295,12 @@ class Mode:
         method_classes = add_fake_success_if_required(
             self.method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
         )
+        method_classes_ordered = order_methods_by_priority(
+            method_classes, self.methods_priority
+        )
 
         self.activation_result, self.active_method, self.heartbeat = activate_mode(
-            methods=method_classes,
-            methods_priority=self.methods_priority,
+            methods=method_classes_ordered,
             dbus_adapter=self._dbus_adapter,
             modename=self.name,
         )
@@ -460,7 +462,6 @@ def should_fake_success(wakepy_fake_success: str | None) -> bool:
 def activate_mode(
     methods: list[Type[Method]],
     dbus_adapter: Optional[DBusAdapter] = None,
-    methods_priority: Optional[MethodsPriorityOrder] = None,
     modename: Optional[str] = None,
 ) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
     """Activates a mode defined by a collection of Methods. Only the first
@@ -478,11 +479,6 @@ def activate_mode(
         Can be used to define a custom DBus adapter for processing DBus calls
         in the .caniuse(), .enter_mode(), .heartbeat() and .exit_mode() of the
         Method. Optional.
-    methods_priority: list[str | set[str]]
-        The priority order, which is a list of method names or asterisk
-        ('*'). The asterisk means "all rest methods" and may occur only
-        once in the priority order, and cannot be part of a set. All method
-        names must be unique and must be part of the `methods`.
     modename:
         Name of the Mode. Used for communication to user, logging and in
         error messages (can be "any string" which makes sense to you).
@@ -495,10 +491,8 @@ def activate_mode(
         None if not any), the activated heartbeat (None if not any).
     """
 
-    prioritized_methods = order_methods_by_priority(methods, methods_priority)
-
     methodresults = []
-    for methodcls in prioritized_methods:
+    for methodcls in methods:
         method = methodcls(dbus_adapter=dbus_adapter)
         methodresult, heartbeat = activate_method(method)
         methodresults.append(methodresult)

@@ -356,24 +356,12 @@ class TestActivateMode:
         result, active_method, heartbeat = activate_mode(
             [methodcls_success, methodcls_fail],
             dbus_adapter=mocks.dbus_adapter,
-            methods_priority=[
-                methodcls_fail.name,
-                methodcls_success.name,
-            ],
         )
 
         # Assert
 
         # There is a successful method, so the activation succeeds.
         assert result.success is True
-
-        # The failing method is tried first because there is prioritization
-        # step which honors the `methods_priority`
-        assert [x.method_name for x in result.list_methods()] == [
-            methodcls_fail.name,
-            methodcls_success.name,
-        ]
-
         assert isinstance(active_method, methodcls_success)
         assert heartbeat is mocks.heartbeat
 
