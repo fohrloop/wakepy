@@ -15,7 +15,7 @@ from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import (
     ModeExit,
-    activate_mode,
+    activate_one_of_methods,
     add_fake_success_if_required,
     handle_activation_fail,
     select_methods,
@@ -329,10 +329,10 @@ class TestShouldFakeSuccess:
 
 
 class TestActivateMode:
-    """tests for activate_mode"""
+    """tests for activate_one_of_methods"""
 
     def test_activate_without_methods(self):
-        res, active_method, heartbeat = activate_mode([], None)
+        res, active_method, heartbeat = activate_one_of_methods([], None)
         assert res.list_methods() == []
         assert res.success is False
         assert active_method is None
@@ -343,7 +343,7 @@ class TestActivateMode:
         methodcls_fail = get_test_method_class(enter_mode=Exception("error"))
         methodcls_success = get_test_method_class(enter_mode=None)
 
-        result, active_method, heartbeat = activate_mode(
+        result, active_method, heartbeat = activate_one_of_methods(
             [methodcls_success, methodcls_fail],
         )
 
@@ -357,7 +357,7 @@ class TestActivateMode:
             enter_mode=None, heartbeat=None
         )
 
-        result, active_method, heartbeat = activate_mode(
+        result, active_method, heartbeat = activate_one_of_methods(
             [methodcls_success_with_hb],
         )
 
@@ -370,7 +370,7 @@ class TestActivateMode:
     def test_activate_function_failure(self):
         methodcls_fail = get_test_method_class(enter_mode=Exception("error"))
 
-        result, active_method, heartbeat = activate_mode([methodcls_fail])
+        result, active_method, heartbeat = activate_one_of_methods([methodcls_fail])
 
         # The activation failed, so active_method and heartbeat is None
         assert result.success is False

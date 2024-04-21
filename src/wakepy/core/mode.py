@@ -302,10 +302,12 @@ class Mode:
             method_classes, self.methods_priority
         )
 
-        self.activation_result, self.active_method, self.heartbeat = activate_mode(
-            methods=method_classes_ordered,
-            dbus_adapter=self._dbus_adapter,
-            modename=self.name,
+        self.activation_result, self.active_method, self.heartbeat = (
+            activate_one_of_methods(
+                methods=method_classes_ordered,
+                dbus_adapter=self._dbus_adapter,
+                modename=self.name,
+            )
         )
         self.active = self.activation_result.success
 
@@ -473,7 +475,7 @@ def should_fake_success(wakepy_fake_success: str | None) -> bool:
     return True
 
 
-def activate_mode(
+def activate_one_of_methods(
     methods: list[Type[Method]],
     dbus_adapter: Optional[DBusAdapter] = None,
     modename: Optional[str] = None,
