@@ -12,10 +12,11 @@ Mode:
 from __future__ import annotations
 
 import logging
+import os
 import typing
 import warnings
 
-from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
+from wakepy.core.constants import FALSY_ENV_VAR_VALUES, WAKEPY_FAKE_SUCCESS
 
 from .activationresult import ActivationResult
 from .dbus import DBusAdapter, get_dbus_adapter
@@ -36,6 +37,9 @@ if typing.TYPE_CHECKING:
     OnFail = Literal["error", "warn", "pass"] | Callable[[ActivationResult], None]
 
     MethodClsCollection = Collection[MethodCls]
+
+
+logger = logging.getLogger(__name__)
 
 
 class ActivationError(RuntimeError):
@@ -275,8 +279,8 @@ class Mode:
 
         # Other types of exceptions are not handled; ignoring them here and
         # returning False will tell python to re-raise the exception. Can't
-        # return None as type-checkers will mark code after with block
-        # unreachable
+        # return None as type-checkers would mark code after with block
+        # unreachable.
 
         return False
 
@@ -288,8 +292,12 @@ class Mode:
         if not self._dbus_adapter:
             self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
 
+        method_classes = add_fake_success_if_required(
+            self.method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
+        )
+
         self.activation_result, self.active_method, self.heartbeat = activate_mode(
-            methods=self.method_classes,
+            methods=method_classes,
             methods_priority=self.methods_priority,
             dbus_adapter=self._dbus_adapter,
             modename=self.name,
@@ -383,7 +391,70 @@ def select_methods(
             )
     else:  # pragma: no cover
         raise ValueError("Invalid `omit` and/or `use_only`!")
+
     return selected_methods
+
+
+def add_fake_success_if_required(
+    method_classes: List[Type[Method]], wakepy_fake_success: str | None
+) -> List[Type[Method]]:
+    """Adds the WAKEPY_FAKE_SUCCESS method to the list of method classes, if
+    the WAKEPY_FAKE_SUCCESS environment variable has been set into a non-falsy
+    value. See also: `should_fake_success`.
+
+    Parameters
+    ----------
+    method_classes:
+        The list of method classes
+    wakepy_fake_success:
+        Value read from WAKEPY_FAKE_SUCCESS environment variable; either None
+        or a string. For example: '0', '1', 'True', or 'False'. None has same
+        behavior as falsy values ('0', 'no', 'false', 'f', 'n', '').
+    """
+    if not should_fake_success(wakepy_fake_success):
+        return method_classes
+
+    return [get_method(WAKEPY_FAKE_SUCCESS)] + method_classes
+
+
+def should_fake_success(wakepy_fake_success: str | None) -> bool:
+    """Function which says if fake success should be enabled
+
+    Parameters
+    ----------
+    wakepy_fake_success:
+        Value read from WAKEPY_FAKE_SUCCESS environment variable; either None
+        or a string. For example: '0', '1', 'True', or 'False'. None has same
+        behavior as falsy values ('0', 'no', 'false', 'f', 'n', '').
+
+    Returns
+    -------
+    fake_success_enabled:
+        True, if fake success is enabled, False otherwise.
+
+    Motivation
+    ----------
+    When running on CI system, wakepy might fail to acquire an inhibitor
+    lock just because there is no Desktop Environment running. In these
+    cases, it might be useful to just tell with an environment variable
+    that wakepy should fake the successful inhibition anyway. Faking the
+    success is done after every other method is tried (and failed).
+    """
+
+    if wakepy_fake_success is None:
+        logger.debug("'%s' not set.", WAKEPY_FAKE_SUCCESS)
+        return False
+
+    if wakepy_fake_success.lower() in FALSY_ENV_VAR_VALUES:
+        logger.info(
+            "'%s' set to a falsy value: %s.", WAKEPY_FAKE_SUCCESS, wakepy_fake_success
+        )
+        return False
+
+    logger.info(
+        "'%s' set to a truthy value: %s.", WAKEPY_FAKE_SUCCESS, wakepy_fake_success
+    )
+    return True
 
 
 def activate_mode(
@@ -416,30 +487,29 @@ def activate_mode(
         Name of the Mode. Used for communication to user, logging and in
         error messages (can be "any string" which makes sense to you).
         Optional.
+
+    Returns
+    -------
+    ActivationResult, Optional[Method], Optional[Heartbeat]
+        A three-tuple: The activation result object, the activated method (
+        None if not any), the activated heartbeat (None if not any).
     """
 
-    if not methods:
-        # Cannot activate anything as there are no methods.
-        return ActivationResult(modename=modename), None, None
-
     prioritized_methods = order_methods_by_priority(methods, methods_priority)
-    # The fake method is always checked first (WAKEPY_FAKE_SUCCESS)
-    prioritized_methods.insert(0, get_method(WAKEPY_FAKE_SUCCESS))
 
-    results = []
-
+    methodresults = []
     for methodcls in prioritized_methods:
         method = methodcls(dbus_adapter=dbus_adapter)
         methodresult, heartbeat = activate_method(method)
-        results.append(methodresult)
+        methodresults.append(methodresult)
         if methodresult.success:
             break
     else:
         # Tried activate with all methods, but none of them succeed
-        return ActivationResult(results, modename=modename), None, None
+        return ActivationResult(methodresults, modename=modename), None, None
 
     # Activation was succesful.
-    return ActivationResult(results, modename=modename), method, heartbeat
+    return ActivationResult(methodresults, modename=modename), method, heartbeat
 
 
 def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:

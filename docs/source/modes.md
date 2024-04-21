@@ -97,4 +97,4 @@ manual reversal.
 ## General questions
 **What if the process holding the lock dies?**: The lock is automatically removed.
 
-**How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a successful inhibit lock in tests, you may set an environment variable: `WAKEPY_FAKE_SUCCESS` to `yes`.
+**How to use wakepy in tests / CI**: One problem with tests and/or CI systems is that many times the environment is different, and preventing system going to sleep works differently there. To fake a successful inhibit lock in tests, you may set an environment variable: [`WAKEPY_FAKE_SUCCESS`](#WAKEPY_FAKE_SUCCESS) to a truthy value like `1`.

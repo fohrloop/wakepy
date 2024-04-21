@@ -122,7 +122,7 @@ def test_keep_presenting(monkeypatch, fake_dbus_adapter):
 
 
 @pytest.mark.parametrize(
-    "modefactory, expected_name",
+    "mode_under_test, expected_name",
     [
         (keep.running, "keep.running"),
         (keep.presenting, "keep.presenting"),
@@ -132,23 +132,23 @@ class TestOnFail:
     """Test failure handling for keep.presenting and keep.running. (the on_fail
     parameter)"""
 
-    def test_on_fail_pass(self, modefactory, expected_name):
-        with modefactory(methods=[], on_fail="pass") as m:
+    def test_on_fail_pass(self, mode_under_test, expected_name):
+        with mode_under_test(methods=[], on_fail="pass") as m:
             self._assertions_for_activation_failure(m, expected_name)
 
-    def test_on_fail_warn(self, modefactory, expected_name):
+    def test_on_fail_warn(self, mode_under_test, expected_name):
         err_txt = f'Could not activate Mode "{expected_name}"!'
         with pytest.warns(UserWarning, match=re.escape(err_txt)):
-            with modefactory(methods=[], on_fail="warn") as m:
+            with mode_under_test(methods=[], on_fail="warn") as m:
                 self._assertions_for_activation_failure(m, expected_name)
 
-    def test_on_fail_error(self, modefactory, expected_name):
+    def test_on_fail_error(self, mode_under_test, expected_name):
         err_txt = f'Could not activate Mode "{expected_name}"!'
         with pytest.raises(ActivationError, match=re.escape(err_txt)):
-            with modefactory(methods=[], on_fail="error") as m:
+            with mode_under_test(methods=[], on_fail="error") as m:
                 self._assertions_for_activation_failure(m, expected_name)
 
-    def test_on_fail_callable(self, modefactory, expected_name):
+    def test_on_fail_callable(self, mode_under_test, expected_name):
         called = False
 
         def my_callable(result):
@@ -156,7 +156,7 @@ class TestOnFail:
             called = True
             assert isinstance(result, ActivationResult)
 
-        with modefactory(methods=[], on_fail=my_callable) as m:
+        with mode_under_test(methods=[], on_fail=my_callable) as m:
             assert called is True
             self._assertions_for_activation_failure(m, expected_name)
 
