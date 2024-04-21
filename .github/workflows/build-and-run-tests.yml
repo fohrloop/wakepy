@@ -96,7 +96,7 @@ jobs:
       - name: Check code
         run: tox -e check
 
-  mypy-check-src:
+  additional-mypy-checks:
     # This is an *additional* check for mypy using the oldest and newest
     # supported python
     runs-on: ubuntu-latest
