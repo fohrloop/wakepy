@@ -80,13 +80,13 @@ class ActivationResult:
     success: bool = field(init=False)
     """Tells is entering into a mode was successful.
 
-    Note that this may be faked with WAKEPY_FAKE_SUCCESS environment
+    Note that this may be faked with :ref:`WAKEPY_FAKE_SUCCESS` environment
     variable (for tests). See also: real_success.
     """
 
     real_success: bool = field(init=False)
     """Tells is entering into a mode was successful. This
-    may not faked with WAKEPY_FAKE_SUCCESS environment variable.
+    may not faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
     """
 
     failure: bool = field(init=False)
@@ -111,7 +111,7 @@ class ActivationResult:
     ) -> list[MethodActivationResult]:
         """Get a list of the methods present in the activation process, and
         their activation results. This is the higher-level interface. If you
-        want more control, use :meth:`.query()<ActivationResult.query>`. The
+        want more control, use :meth:`~ActivationResult.query`. The
         returned methods are in the order as given in when initializing
         ActivationResult. If you did not create the ActivationReult manually,
         the methods are in the priority order; the highest priority methods
@@ -148,11 +148,11 @@ class ActivationResult:
     ) -> list[MethodActivationResult]:
         """Get a list of the methods present in the activation process, and
         their activation results. This is the lower-level interface. If you
-        want easier access, use .list_methods(). The methods are in the order
-        as given in when initializing ActivationResult. If you did not create
-        the ActivationReult manually, the methods are in the priority order;
-        the highest priority methods (those which are/were tried first) are
-        listed first.
+        want easier access, use :meth:`~ActivationResult.list_methods`. The
+        methods are in the order as given in when initializing
+        ActivationResult. If you did not create the ActivationResult manually,
+        the methods are in the priority order; the highest priority methods
+        (those which are/were tried first) are listed first.
 
         Parameters
         ----------
