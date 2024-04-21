@@ -24,6 +24,7 @@ from .constants import ModeName, ModeNameValue
 
 if typing.TYPE_CHECKING:
     from typing import (
+        Dict,
         List,
         Optional,
         Set,
@@ -40,8 +41,8 @@ if typing.TYPE_CHECKING:
     T = TypeVar("T")
 
     Collection: TypeAlias = Union[List[T], Tuple[T, ...], Set[T]]
-    MethodDict = dict[str, MethodCls]
-    MethodRegistry = dict[str, MethodDict]
+    MethodDict = Dict[str, MethodCls]
+    MethodRegistry = Dict[str, MethodDict]
 
 
 _method_registry: MethodRegistry = dict()
