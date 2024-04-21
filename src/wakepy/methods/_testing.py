@@ -19,5 +19,5 @@ class WakepyFakeSuccess(Method):
     supported_platforms = (CURRENT_PLATFORM,)
 
     def enter_mode(self) -> None:
-        """Does nothing ("succeeds" automatically there are never any
-        Exceptions)"""
+        """Does nothing ("succeeds" automatically; Will never raise an
+        Exception)"""
