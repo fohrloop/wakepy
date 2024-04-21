@@ -464,13 +464,11 @@ def activate_mode(
         Name of the Mode. Used for communication to user, logging and in
         error messages (can be "any string" which makes sense to you).
         Optional.
+
+    # TODO: Add Returns
     """
 
     prioritized_methods = order_methods_by_priority(methods, methods_priority)
-
-    if not prioritized_methods:
-        # Cannot activate anything as there are no methods.
-        return ActivationResult(modename=modename), None, None
 
     methodresults = []
     for methodcls in prioritized_methods:
