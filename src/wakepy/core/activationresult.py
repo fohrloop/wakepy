@@ -30,7 +30,7 @@ class ActivationResult:
     on the results of the activation process.
 
     Parameters
-    ---------
+    ----------
     results:
         The MethodActivationResults to be used to fill the ActivationResult
     modename:

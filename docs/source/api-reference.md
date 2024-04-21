@@ -23,8 +23,12 @@ Wakepy Core
 
     .. automethod:: __exit__
 
+.. autoclass:: wakepy.ActivationResult
+    :members:
+
 .. autoclass:: wakepy.ActivationError
     :exclude-members: args, with_traceback
+
 
 DBus Adapter
 -------------
