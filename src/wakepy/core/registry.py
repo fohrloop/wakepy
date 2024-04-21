@@ -23,24 +23,13 @@ from typing import overload
 from .constants import ModeName, ModeNameValue
 
 if typing.TYPE_CHECKING:
-    from typing import (
-        Dict,
-        List,
-        Optional,
-        Set,
-        Tuple,
-        Type,
-        TypeAlias,
-        TypeVar,
-        Union,
-        overload,
-    )
+    from typing import Dict, List, Optional, Set, Tuple, Type, TypeVar, Union, overload
 
     from wakepy.core.method import Method, MethodCls
 
     T = TypeVar("T")
 
-    Collection: TypeAlias = Union[List[T], Tuple[T, ...], Set[T]]
+    Collection = Union[List[T], Tuple[T, ...], Set[T]]
     MethodDict = Dict[str, MethodCls]
     MethodRegistry = Dict[str, MethodDict]
 
