@@ -28,7 +28,7 @@ class TestUtils:
         monkeypatch.setattr("wakepy.core.registry._method_registry", (dict()))
         if fake_success:
             register_method(WakepyFakeSuccess)
-            monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "yes")
+            monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "1")
 
 
 @pytest.fixture(scope="session")
