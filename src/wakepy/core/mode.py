@@ -49,8 +49,9 @@ logger = logging.getLogger(__name__)
 
 
 class ActivationError(RuntimeError):
-    """Raised if activation of a :class:`Mode` is not successful and the
-    on-fail action is to raise an Exception."""
+    """Raised if the activation of a :class:`Mode` is not successful and the
+    on-fail action is to raise an Exception. See the ``on_fail`` parameter of
+    the ``Mode`` constructor."""
 
 
 class ModeExit(Exception):
