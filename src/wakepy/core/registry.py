@@ -8,8 +8,6 @@ get_method
     Get a single method by name
 get_methods
     Get multiple methods by name
-method_names_to_classes
-    Convert multiple method names to Method classes
 get_methods_for_mode
     Get Methods based on a Mode name
 """
