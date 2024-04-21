@@ -39,7 +39,7 @@ def testutils():
 def empty_method_registry_fixture(monkeypatch):
     TestUtils.empty_method_registry(monkeypatch)
 
+
 @pytest.fixture(scope="function", name="WAKEPY_FAKE_SUCCESS_eq_1")
 def _wakepy_fake_success_fixture(monkeypatch):
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "1")
-

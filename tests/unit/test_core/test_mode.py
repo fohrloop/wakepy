@@ -97,8 +97,9 @@ def mode1_with_dbus(
 
 class TestModeContextManager:
 
-    @pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
-    def test_mode_contextmanager_protocol(self,
+    @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
+    def test_mode_contextmanager_protocol(
+        self,
         mode0: Mode,
     ):
         """Test that the Mode fulfills the context manager protocol"""
@@ -126,12 +127,13 @@ class TestModeContextManager:
         assert m.active is False
         # The active_method is set to None
         assert m.active_method is None
-        # The activation result is still there (not removed during deactivation)
+        # The activation result is still there (not removed during
+        # deactivation)
         assert activation_result == m.activation_result
 
-
-    @pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
-    def test_no_methods_succeeds_when_using_fake_success(self,
+    @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
+    def test_no_methods_succeeds_when_using_fake_success(
+        self,
     ):
         # This will not fail as when the Mode is activated, the
         # WakepyFakeSuccess method is added to the list of used methods.
@@ -139,7 +141,7 @@ class TestModeContextManager:
             ...
 
 
-@pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
+@pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
 class TestModeActivateDeactivate:
     """Tests for Mode._activate and Mode._deactivate"""
 
@@ -168,7 +170,8 @@ class TestModeActivateDeactivate:
                 # Setting active method
                 mode0.active_method = None
 
-@pytest.mark.usefixtures('WAKEPY_FAKE_SUCCESS_eq_1')
+
+@pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
 class TestExitModeWithException:
     """Test cases when a Mode is exited with an Exception"""
 
