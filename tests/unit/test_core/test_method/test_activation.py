@@ -21,7 +21,6 @@ from wakepy.core import Method, MethodActivationResult, PlatformName, get_method
 from wakepy.core.constants import StageName, StageNameValue
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import (
-    MethodError,
     activate_method,
     caniuse_fails,
     deactivate_method,
@@ -460,7 +459,7 @@ class TestDeactivateMethod:
     def test_fail_deactivation_at_exit_mode_bad_value(self):
         method = get_test_method_class(enter_mode=None, exit_mode=123)()
         with pytest.raises(
-            MethodError,
+            RuntimeError,
             match=re.escape(
                 f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
                 "unsuccessful!"
@@ -473,7 +472,7 @@ class TestDeactivateMethod:
     def test_fail_deactivation_at_exit_mode_raises_exception(self):
         method = get_test_method_class(enter_mode=None, exit_mode=Exception("oh no"))()
         with pytest.raises(
-            MethodError,
+            RuntimeError,
             match=re.escape(
                 f"The exit_mode of '{method.__class__.__name__}' ({method.name}) was "
                 "unsuccessful"
@@ -487,7 +486,7 @@ class TestDeactivateMethod:
 
         method = get_test_method_class(enter_mode=None, exit_mode=None)()
         with pytest.raises(
-            MethodError,
+            RuntimeError,
             match=re.escape(
                 f"The heartbeat of {method.__class__.__name__} ({method.name}) could "
                 "not be stopped! Suggesting submitting a bug report and rebooting for "

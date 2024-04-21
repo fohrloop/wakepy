@@ -383,8 +383,8 @@ class Mode:
 
         Raises
         ------
-        MethodError (RuntimeError) if there was active method but an error
-        occurred when trying to deactivate it."""
+        RuntimeError, if there was active method but an error occurred when
+        trying to deactivate it."""
 
         if self.active:
             if self._active_method is None:
