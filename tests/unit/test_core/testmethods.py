@@ -105,11 +105,13 @@ def get_test_method_class(
     return _test_method_classes[key]
 
 
-def iterate_test_methods(
+def combinations_of_test_methods(
     enter_mode=Iterable,
     heartbeat=Iterable,
     exit_mode=Iterable,
 ) -> Iterable[Method]:
+    """Create an iterator of Methods over the combinations of the given
+    enter_mode, heartbeat and exit_mode"""
     for enter_mode_, heartbeat_, exit_mode_ in itertools.product(
         enter_mode, heartbeat, exit_mode
     ):
