@@ -173,7 +173,12 @@ class Mode:
         self.name = name
         self.methods_priority = methods_priority
         self.on_fail = on_fail
-        self.active_method: Method | None = None
+        self._active_method: Method | None = None
+        """This holds the active method instance"""
+        self._used_method: Method | None = None
+        """This holds the used method instance. The used method instance will
+        not be set to None when deactivating."""
+
         self.heartbeat: Heartbeat | None = None
 
         self._dbus_adapter_cls = dbus_adapter
@@ -309,7 +314,7 @@ class Mode:
             method_classes, self.methods_priority
         )
 
-        methodresults, self.active_method, self.heartbeat = (
+        methodresults, self._active_method, self.heartbeat = (
             self._activate_one_of_methods(
                 method_classes=method_classes_ordered,
                 dbus_adapter=self._dbus_adapter,
@@ -318,6 +323,7 @@ class Mode:
 
         self.activation_result = ActivationResult(methodresults, modename=self.name)
         self.active = self.activation_result.success
+        self._used_method = self._active_method
 
         if not self.active:
             handle_activation_fail(self.on_fail, self.activation_result)
@@ -381,16 +387,16 @@ class Mode:
         occurred when trying to deactivate it."""
 
         if self.active:
-            if self.active_method is None:
+            if self._active_method is None:
                 raise RuntimeError(
                     f"Cannot deactivate mode: {str(self.name)}. The active_method is None! This should never happen."  # noqa E501
                 )
-            deactivate_method(self.active_method, self.heartbeat)
+            deactivate_method(self._active_method, self.heartbeat)
             deactivated = True
         else:
             deactivated = False
 
-        self.active_method = None
+        self._active_method = None
         self.heartbeat = None
         self.active = False
 
@@ -406,6 +412,21 @@ class Mode:
             self._dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
             self._dbus_adapter_created = True
         return self._dbus_adapter_instance
+
+    @property
+    def active_method(self) -> str | None:
+        """The name of the active Method. None if Mode is not active."""
+        if self._active_method is None:
+            return None
+        return self._active_method.name
+
+    @property
+    def used_method(self) -> str | None:
+        """The name of the currently used (active) or previously used (already
+        deactivated) Method. None If Mode has never been activated."""
+        if self._used_method is None:
+            return None
+        return self._used_method.name
 
 
 def select_methods(

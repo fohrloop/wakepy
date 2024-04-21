@@ -21,6 +21,7 @@ from wakepy.core.mode import (
     select_methods,
     should_fake_success,
 )
+from wakepy.core.platform import CURRENT_PLATFORM
 from wakepy.core.registry import get_method, get_methods
 
 if typing.TYPE_CHECKING:
@@ -46,17 +47,26 @@ def methods_abc(monkeypatch, testutils) -> List[Type[Method]]:
     """This fixture creates three methods, which belong to a given mode."""
     testutils.empty_method_registry(monkeypatch)
 
-    class MethodA(Method):
+    class TestMethod(Method):
+        supported_platforms = (CURRENT_PLATFORM,)
+
+    class MethodA(TestMethod):
         name = "MethodA"
         mode = "foo"
 
-    class MethodB(Method):
+        def enter_mode(self): ...
+
+    class MethodB(TestMethod):
         name = "MethodB"
         mode = "foo"
 
-    class MethodC(Method):
+        def enter_mode(self): ...
+
+    class MethodC(TestMethod):
         name = "MethodC"
         mode = "foo"
+
+        def enter_mode(self): ...
 
     return [MethodA, MethodB, MethodC]
 
@@ -115,7 +125,7 @@ class TestModeContextManager:
             # There is an ActivationResult available in .activation_result
             assert isinstance(m.activation_result, ActivationResult)
             # The active method is also available
-            assert isinstance(mode0.active_method, Method)
+            assert isinstance(mode0._active_method, Method)
 
             activation_result = copy.deepcopy(m.activation_result)
             flag_end_of_with_block = True
@@ -139,6 +149,41 @@ class TestModeContextManager:
         # WakepyFakeSuccess method is added to the list of used methods.
         with Mode(method_classes=[]):
             ...
+
+
+class TestModeActiveAndUsedMethod:
+    """Test the .active_method and .used_method attributes"""
+
+    def test_simple(self, methods_abc):
+        [MethodA, MethodB, _] = methods_abc
+        mode = Mode(method_classes=[MethodA])
+
+        # before activated, active and userd methods are None
+        assert mode.active_method is None
+        assert mode.used_method is None
+
+        with mode:
+            # When mode is active, active and used methods are same.
+            assert mode.active_method == "MethodA"
+            assert mode.used_method == "MethodA"
+
+        # when mode is not active, active method is None, but used method is
+        # the one used previously.
+        assert mode.active_method is None
+        assert mode.used_method == "MethodA"
+
+        # theoretically, if activating again, it should work. Let's change
+        # the available methods so we see that the names change, too.
+        mode.method_classes = [MethodB]
+        with mode:
+            # This time the active method is the other one used.
+            assert mode.active_method == "MethodB"
+            assert mode.used_method == "MethodB"
+
+        # and when deactivated, the active method is again None, but the used
+        # method remembers the last used method.
+        assert mode.active_method is None
+        assert mode.used_method == "MethodB"
 
 
 @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
@@ -168,7 +213,7 @@ class TestModeActivateDeactivate:
         ):
             with mode0:
                 # Setting active method
-                mode0.active_method = None
+                mode0._active_method = None
 
 
 @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
