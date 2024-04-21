@@ -31,8 +31,8 @@ def modename_broken():
 @pytest.fixture
 def method1(modename_working):
     class WorkingMethod(Method):
-        """This is a succesful method as it implements enter_mode which returns
-        None"""
+        """This is a successful method as it implements enter_mode which
+        returns None"""
 
         name = "method1"
         mode = modename_working
@@ -47,7 +47,7 @@ def method1(modename_working):
 @pytest.fixture
 def method2_broken(modename_broken):
     class BrokenMethod(Method):
-        """This is a unsuccesful method as it implements enter_mode which
+        """This is a unsuccessful method as it implements enter_mode which
         raises an Exception"""
 
         name = "method2_broken"

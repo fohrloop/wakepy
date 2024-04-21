@@ -164,7 +164,7 @@ class Method(ABC):
         #
         # Errors
         # -------
-        # If the mode enter was not succesful, raise an Exception of any type.
+        # If the mode enter was not successful, raise an Exception of any type.
         # This is catched by the mode activation process and handled.
         #
         # Note: The .enter_mode() should always leave anything in a clean in
