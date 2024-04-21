@@ -288,6 +288,9 @@ class Mode:
         """Activates the mode with one of the methods which belong to the mode.
         The methods are used with descending priority; highest priority first,
         and the priority is determined with the mode.methods_priority.
+
+        The activation may be faked as to be successful by using the
+        WAKEPY_FAKE_SUCCESS environment variable.
         """
         if not self._dbus_adapter:
             self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
@@ -465,11 +468,8 @@ def activate_mode(
     modename: Optional[str] = None,
 ) -> Tuple[ActivationResult, Optional[Method], Optional[Heartbeat]]:
     """Activates a mode defined by a collection of Methods. Only the first
-    Method which succeeds activation will be used, in order from highest
-    priority to lowest priority.
-
-    The activation may be faked as to be successful by using the
-    WAKEPY_FAKE_SUCCESS environment variable.
+    Method which succeeds activation will be used. The methods are tried in the
+    order given in `methods` argument.
 
     Parameters
     ----------
