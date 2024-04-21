@@ -328,7 +328,7 @@ class TestShouldFakeSuccess:
         assert should_fake_success(val) is True
 
 
-class TestActivateMode:
+class TestActivateOneOfMethods:
     """tests for Mode._activate_one_of_methods"""
 
     def test_activate_without_methods(self):
