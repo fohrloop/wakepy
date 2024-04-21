@@ -1,3 +1,37 @@
+"""This module defines two important helpers for the tests
+
+1) get_test_method_class
+A function which may used to create wakepy.Method classes using arguments.
+
+Example
+-------
+Create Method which return True from Method.caniuse() and raises a
+RuntimeError in Method.enter_mode()
+
+>>>  method_cls = get_test_method_class(
+            caniuse=True, enter_mode=RuntimeError("failed")
+)
+
+2) combinations_of_test_methods
+A function which returns an iterator for testing a cross product of different
+Methods. This uses get_test_method_class underneath.
+
+Example
+-------
+>>> METHOD_OPTIONS = [
+    METHOD_MISSING,
+    True,
+    False,
+    RunTimeError('foo'),
+]
+>>> for method in combinations_of_test_methods(
+        enter_mode=[METHOD_MISSING],
+        heartbeat=[METHOD_MISSING],
+        exit_mode=METHOD_OPTIONS,
+    ):
+        # test
+"""
+
 from __future__ import annotations
 
 import itertools
