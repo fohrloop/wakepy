@@ -171,7 +171,9 @@ class Mode:
         self.heartbeat: Heartbeat | None = None
 
         self._dbus_adapter_cls = dbus_adapter
-        self._dbus_adapter: DBusAdapter | None = None
+        # Retrieved and updated using the _dbus_adapter property
+        self.__dbus_adapter_instance: DBusAdapter | None = None
+        self.__dbus_adapter_created: bool = False
 
         self._logger = logging.getLogger(__name__)
 
@@ -292,8 +294,6 @@ class Mode:
         The activation may be faked as to be successful by using the
         WAKEPY_FAKE_SUCCESS environment variable.
         """
-        if not self._dbus_adapter:
-            self._dbus_adapter = get_dbus_adapter(self._dbus_adapter_cls)
 
         method_classes = add_fake_success_if_required(
             self.method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
@@ -344,6 +344,17 @@ class Mode:
         self.active = False
 
         return deactivated
+
+    @property
+    def _dbus_adapter(self) -> DBusAdapter | None:
+        """The DbusAdapter instance of the Mode, if any. Created on the first
+        call."""
+        if not self.__dbus_adapter_created:
+            # Only do this once even if the returned instance is None, as this
+            # might be a costly operation.
+            self.__dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
+            self.__dbus_adapter_created = True
+        return self.__dbus_adapter_instance
 
 
 def select_methods(
