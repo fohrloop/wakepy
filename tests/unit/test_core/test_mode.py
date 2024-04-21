@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import copy
+import os
 import re
 import typing
 import warnings
+from contextlib import contextmanager
 from unittest.mock import Mock
 
 import pytest
@@ -11,15 +13,17 @@ import pytest
 from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy import ActivationError, ActivationResult, Method, Mode
 from wakepy.core.activationresult import MethodActivationResult
-from wakepy.core.constants import StageName
+from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName
 from wakepy.core.dbus import DBusAdapter
 from wakepy.core.mode import (
     ModeExit,
     activate_mode,
+    add_fake_success_if_required,
     handle_activation_fail,
     select_methods,
+    should_fake_success,
 )
-from wakepy.core.registry import get_methods
+from wakepy.core.registry import get_method, get_methods
 
 if typing.TYPE_CHECKING:
     from typing import List, Type
@@ -276,6 +280,41 @@ class TestSelectMethods:
             ),
         ):
             select_methods(methods, use_only=["B"], omit=["E"])
+
+
+# These are the only "falsy" values for WAKEPY_FAKE_SUCCESS
+FALSY_TEST_VALUES = (None, "0", "no", "NO", "False", "false", "FALSE")
+TRUTHY_TEST_VALUES = ("1", "yes", "True", "anystring")
+
+
+class TestAddFakeSuccessIfRequired:
+
+    @pytest.mark.parametrize("val", FALSY_TEST_VALUES)
+    def test_falsy_values(self, val, methods_abc: List[Type[Method]]):
+        assert add_fake_success_if_required(methods_abc, val) == methods_abc
+
+    @pytest.mark.parametrize("val", TRUTHY_TEST_VALUES)
+    def test_truthy_values(self, val, methods_abc: List[Type[Method]]):
+        [MethodA, MethodB, MethodC] = methods_abc
+        # If the value is truthy, add the fake success method to the
+        # beginning of the input method list
+        assert add_fake_success_if_required(methods_abc, val) == [
+            get_method(WAKEPY_FAKE_SUCCESS),
+            MethodA,
+            MethodB,
+            MethodC,
+        ]
+
+
+class TestShouldFakeSuccess:
+
+    @pytest.mark.parametrize("val", FALSY_TEST_VALUES)
+    def test_falsy_values(self, val):
+        assert should_fake_success(val) is False
+
+    @pytest.mark.parametrize("val", TRUTHY_TEST_VALUES)
+    def test_truthy_values(self, val):
+        assert should_fake_success(val) is True
 
 
 class TestActivateMode:
