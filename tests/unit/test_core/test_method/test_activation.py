@@ -67,7 +67,7 @@ class TestActivateMethod:
 
     def test_activate_method_method_caniuse_fails(self):
         # Case 1: Fail by returning False from caniuse
-        method = get_test_method_class(caniuse=False, enter_mode=True, exit_mode=True)()
+        method = get_test_method_class(caniuse=False)()
         res, heartbeat = activate_method(method)
         assert res.success is False
         assert res.failure_stage == StageName.REQUIREMENTS
@@ -77,8 +77,6 @@ class TestActivateMethod:
         # Case 2: Fail by returning some error reason from caniuse
         method = get_test_method_class(
             caniuse="SomeSW version <2.1.5 not supported",
-            enter_mode=True,
-            exit_mode=True,
         )()
         res, heartbeat = activate_method(method)
         assert res.success is False
