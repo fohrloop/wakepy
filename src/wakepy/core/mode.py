@@ -172,8 +172,8 @@ class Mode:
 
         self._dbus_adapter_cls = dbus_adapter
         # Retrieved and updated using the _dbus_adapter property
-        self.__dbus_adapter_instance: DBusAdapter | None = None
-        self.__dbus_adapter_created: bool = False
+        self._dbus_adapter_instance: DBusAdapter | None = None
+        self._dbus_adapter_created: bool = False
 
         self._logger = logging.getLogger(__name__)
 
@@ -349,12 +349,12 @@ class Mode:
     def _dbus_adapter(self) -> DBusAdapter | None:
         """The DbusAdapter instance of the Mode, if any. Created on the first
         call."""
-        if not self.__dbus_adapter_created:
+        if not self._dbus_adapter_created:
             # Only do this once even if the returned instance is None, as this
             # might be a costly operation.
-            self.__dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
-            self.__dbus_adapter_created = True
-        return self.__dbus_adapter_instance
+            self._dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
+            self._dbus_adapter_created = True
+        return self._dbus_adapter_instance
 
 
 def select_methods(
