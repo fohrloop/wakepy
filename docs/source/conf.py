@@ -102,6 +102,9 @@ html_theme_options = {
 # and attributes. If a table of contents is made, Sphinx expects each entry to
 # have a separate page. True by default.
 numpydoc_class_members_toctree = False
+# Removes the unnecessary automatically generated Attributes and Methods
+# listings (duplicate info).
+numpydoc_show_class_members = False
 
 
 def setup(app: Sphinx) -> None:
