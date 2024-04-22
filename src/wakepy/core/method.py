@@ -53,13 +53,13 @@ class Method(ABC):
     """Methods are objects that are used to switch modes. The phases for
     changing and being in a Mode is:
 
-    1) enter into a mode by calling enter_mode()
-    2) keep into a mode by calling heartbeat() periodically
-    3) exit froma mode by calling exit_mode()
+    1) enter into a mode by calling :meth:`enter_mode`
+    2) keep into a mode by calling :meth:`heartbeat` periodically
+    3) exit from a mode by calling :meth:`exit_mode`
 
     Typically one would either implement:
-     * enter_mode() and exit_mode()  or just
-     * heartbeat(),
+     * :meth:`enter_mode` and :meth:`exit_mode`  or just
+     * :meth:`heartbeat`,
 
     but also the hybrid option is possible.
     """
@@ -145,7 +145,7 @@ class Method(ABC):
         #   suitable)
 
     def enter_mode(self) -> None:
-        """Enter to a Mode using this Method. Pair with a `exit_mode`.
+        """Enter to a Mode using this Method. Pair with :meth:`exit_mode`.
 
         Returns
         -------
@@ -175,7 +175,7 @@ class Method(ABC):
         return
 
     def exit_mode(self) -> None:
-        """Exit from a Mode using this Method. Paired with `enter_mode`
+        """Exit from a Mode using this Method. Paired with :meth:`enter_mode`.
 
         Returns
         -------
@@ -201,11 +201,11 @@ class Method(ABC):
 
     heartbeat_period: int | float = 55
     """This is the amount of time (in seconds) between two consecutive calls of
-    `heartbeat()`.
+    :meth:`heartbeat`.
     """
 
     def heartbeat(self) -> None:
-        """Called periodically, every `heartbeat_period` seconds.
+        """Called periodically, every :attr:`heartbeat_period` seconds.
 
         Returns
         -------
@@ -238,8 +238,7 @@ class Method(ABC):
 
     @classmethod
     def is_unnamed(cls) -> bool:
-        """Tells if the Method has a name or not. See also docs for
-        `Method.name`.
+        """Tells if the Method has a name or not. See also :attr:`name`.
 
         Returns
         -------
