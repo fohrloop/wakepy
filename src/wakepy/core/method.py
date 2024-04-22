@@ -115,14 +115,17 @@ class Method(ABC):
     ) -> bool | None | str:
         """Tells if the Method is suitable or unsuitable.
 
-        Return
+        Returns
+        -------
+        result: bool | None | str
+            ``True`` means suitable, ``None`` means uncertain, ``False`` means
+            unsuitable and  a string means unsuitable and tells the reason for
+            it.
+
+        Raises
         ------
-        (a) If the Method is suitable, and can be used, return True.
-        (b) If the result is uncertain, return None.
-        (c) If the Method is unsuitable, may return False or a string.
-            Returning a string is recommended, as it  also explains *why* the
-            Method is unsuitable. May also simply raise an Exception, in which
-            case the Exception message is used as failure reason.
+        Exception
+            If the Method may not be used, may raise an Exception.
         """
 
         # Notes for subclassing
@@ -130,6 +133,15 @@ class Method(ABC):
         # This is optional, but highly recommended. With `caniuse()` it
         # is possible to give more information about why some Method is not
         # supported.
+
+        # Subclass return value
+        # ---------------------
+        # (a) If the Method is suitable, and can be used, return True.
+        # (b) If the result is uncertain, return None.
+        # (c) If the Method is unsuitable, may return False or a string.
+        #     Returning a string is recommended, as it  also explains *why*
+        #     the Method is unsuitable. May also simply raise an Exception, in
+        #     which case the Exception message is used as failure reason.
 
         # NOTE: You do not have to test for the current platform here as it is
         # automatically tested if Method has `supported_platforms` attribute
