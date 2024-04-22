@@ -25,9 +25,18 @@ if typing.TYPE_CHECKING:
 
 @dataclass
 class ActivationResult:
-    """The ActivationResult is responsible of keeping track on the possibly
-    successful (max 1), failed and unused methods and providing different views
-    on the results of the activation process.
+    """Responsible of keeping track on the possibly successful (max 1), failed
+    and unused methods and providing different view on the results of the
+    activation process. The ``ActivationResult`` instances are created in
+    activation process of a ``Mode`` like :func:`keep.presenting` and
+    :func:`keep.running`, and one would not typically initialize one manually.
+
+    **If you want to**:
+
+    - Check if the activation was successful: See :attr:`success`
+    - Check the active method: See :attr:`active_method`
+    - Know more about the Methods involved: See :meth:`list_methods` and
+      :meth:`query`.
 
     Parameters
     ----------
@@ -36,16 +45,6 @@ class ActivationResult:
     modename:
         Name of the Mode. Optional.
 
-    Methods
-    -------
-    list_methods:
-        Get a list of the methods present in the activation process, and their
-        activation results. This is the higher-level interface. If you want
-        more control, use .query().
-    query:
-        Lower level interface for getting the list of the methods present in
-        the activation process, and their activation results. If you want
-        easier access, use .list_methods().
     """
 
     results: InitVar[Optional[List[MethodActivationResult]]] = None
