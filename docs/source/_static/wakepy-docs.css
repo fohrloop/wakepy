@@ -71,3 +71,14 @@ div.highlight > pre {
     /* Add bit more air to the code blocks */
     line-height: 155% !important;
 }
+
+/* other */
+
+/* remove extra space above bullet point lists in docstrings */
+dl.py > dd > p + ul {
+    margin-top: -1rem !important;
+}
+/* Add same spacing after bullet point lists as normal paragraphs have */
+dl.py > dd > ul {
+    margin-bottom: 1.15rem !important;
+}
