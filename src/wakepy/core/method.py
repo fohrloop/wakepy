@@ -65,8 +65,11 @@ class Method(ABC):
     """
 
     mode: ModeName | str
-    """The mode for the method. Each Method subclass may be registered to a
-    single mode."""
+    """The name of the mode which the Method implements. Each Method subclass
+    implements a single mode, but multiple Methods may implement the same mode.
+    Setting ``Method.mode`` to `foo` on one or more ``Method`` subclasses
+    defines the Mode `foo` (:class:`Mode` classes are themselves not defined or
+    registered anywhere)"""
 
     supported_platforms: Tuple[PlatformName, ...] = tuple()
     """All the supported platforms. If a platform is not listed here, this
