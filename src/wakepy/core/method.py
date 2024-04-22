@@ -115,8 +115,8 @@ class Method(ABC):
     ) -> bool | None | str:
         """Tells if the Method is suitable or unsuitable.
 
-        Returns
-        -------
+        Return
+        ------
         (a) If the Method is suitable, and can be used, return True.
         (b) If the result is uncertain, return None.
         (c) If the Method is unsuitable, may return False or a string.
@@ -149,12 +149,13 @@ class Method(ABC):
 
         Returns
         -------
-        If entering the mode was successful, returns None. Otherwise, raises
-        an Exception.
+        None:
+            If entering the mode was successful.
 
         Raises
         ------
-        Could raise an Exception of any type.
+        Exception
+            If entering the mode was not succesful.
         """
 
         # Notes for subclassing
@@ -179,8 +180,14 @@ class Method(ABC):
 
         Returns
         -------
-        If exiting the mode was successful, or if there was no need to exit
-        from the mode, returns None. Otherwise, raises an Exception.
+        None:
+            If exiting the mode was successful, or if there was no need to exit
+            from the mode.
+
+        Raises
+        ------
+        Exception
+            If exiting the mode was not succesful.
         """
 
         # Notes for subclassing
@@ -209,8 +216,13 @@ class Method(ABC):
 
         Returns
         -------
-        If calling the heartbeat was successful, returns None. Otherwise,
-        raises an Exception.
+        None:
+            If calling the heartbeat was successful, returns None.
+
+        Raises
+        ------
+        Exception
+            If calling heartbeat was not successful.
         """
         return
 
