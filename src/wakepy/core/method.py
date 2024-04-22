@@ -71,7 +71,7 @@ class Method(ABC):
     supported_platforms: Tuple[PlatformName, ...] = tuple()
     """All the supported platforms. If a platform is not listed here, this
     method is not going to be used on the platform (when used as part of a
-    Mode). Modify this in the subclass"""
+    :class:`Mode`). Modify this in the subclass"""
 
     description: Optional[str] = None
     """Human-readable description for the method. Markdown allowed. Used to
@@ -79,10 +79,10 @@ class Method(ABC):
     """
 
     name: str = unnamed
-    """Human-readable name for the method. Used by end-users to define
-    the Methods used for entering a Mode, for example. If given, must be
-    unique across all Methods available in the python process. Leave unset if
-    the Method should not be listed anywhere (e.g. when Method is meant to be
+    """Human-readable name for the method. Used to define the Methods used for
+    entering a :class:`Mode`, for example. If given, must be unique across all
+    Methods available in the python process for the :attr:`mode`. Left unset
+    if the Method should not be listed anywhere (e.g. when Method is meant to be
     subclassed)."""
 
     # waits for https://github.com/fohrloop/wakepy/issues/256
