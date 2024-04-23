@@ -288,14 +288,14 @@ class TestActivationResult:
             assert ar.real_success == real_success_expected
             assert ar.failure == (not success_expected)
 
-    def test_get_error_text_success(
+    def test_get_failure_text_success(
         self, method_activation_results1: List[MethodActivationResult]
     ):
         ar = ActivationResult(method_activation_results1)
         # error text is empty string in case of success.
-        assert ar.get_error_text() == ""
+        assert ar.get_failure_text() == ""
 
-    def test_get_error_text_failure(
+    def test_get_failure_text_failure(
         self,
         mr_platform_support_fail: MethodActivationResult,
         mr_requirements_fail: MethodActivationResult,
@@ -303,7 +303,7 @@ class TestActivationResult:
         ar = ActivationResult(
             [mr_platform_support_fail, mr_requirements_fail], modename="SomeMode"
         )
-        assert ar.get_error_text() == (
+        assert ar.get_failure_text() == (
             'Could not activate Mode "SomeMode"!\n\nMethod usage results, in order '
             "(highest priority first):\n[(FAIL @PLATFORM_SUPPORT, fail-platform, "
             '"Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, '

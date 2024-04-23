@@ -549,10 +549,10 @@ def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:
     if on_fail == "pass":
         return
     elif on_fail == "warn":
-        warnings.warn(result.get_error_text())
+        warnings.warn(result.get_failure_text())
         return
     elif on_fail == "error":
-        raise ActivationError(result.get_error_text())
+        raise ActivationError(result.get_failure_text())
     elif not callable(on_fail):
         raise ValueError(
             'on_fail must be one of "error", "warn", pass" or a callable which takes '

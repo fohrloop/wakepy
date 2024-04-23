@@ -173,7 +173,7 @@ class ActivationResult:
 
         return out
 
-    def get_error_text(self) -> str:
+    def get_failure_text(self) -> str:
         """Gets information about a failure as text. In case the mode
         activation was successful, returns an empty string."""
 
