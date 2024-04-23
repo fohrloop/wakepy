@@ -17,4 +17,5 @@ from .core import DBusAdapter as DBusAdapter
 from .core import Method as Method
 from .core import Mode as Mode
 from .core import ModeExit as ModeExit
+from .dbus_adapters.jeepney import JeepneyDBusAdapter as JeepneyDBusAdapter
 from .modes import keep as keep

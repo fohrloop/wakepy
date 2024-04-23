@@ -48,7 +48,7 @@ DBus adapters are an advanced concept of wakepy. They would be used in such a ca
     :members:
     :exclude-members: count, index
 
-.. autoclass:: wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter
+.. autoclass:: wakepy.JeepneyDBusAdapter
     :members:
 
 ```
