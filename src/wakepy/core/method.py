@@ -85,8 +85,8 @@ class Method(ABC):
     """Human-readable name for the method. Used to define the Methods used for
     entering a :class:`Mode`, for example. If given, must be unique across all
     Methods available in the python process for the :attr:`mode`. Left unset
-    if the Method should not be listed anywhere (e.g. when Method is meant to be
-    subclassed)."""
+    if the Method should not be listed anywhere (e.g. when Method is meant to
+    be subclassed)."""
 
     # waits for https://github.com/fohrloop/wakepy/issues/256
     # method_kwargs: Dict[str, object]
