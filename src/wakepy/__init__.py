@@ -41,5 +41,5 @@ def __getattr__(name: str) -> object:
     if name == "JeepneyDBusAdapter":
         from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
 
-        return JeepneyDBusAdapter
+        return JeepneyDBusAdapter  # pragma: no-cover-if-no-dbus
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
