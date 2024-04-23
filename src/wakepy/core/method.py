@@ -78,7 +78,8 @@ class Method(ABC):
     """All the supported platforms. If a platform is not listed in
     ``method.supported_platforms``, the ``method`` is not going to be used on
     the platform (when used as part of a :class:`Mode`). Modify this in the
-    subclass. Default: Support all platforms."""
+    subclass. Default: Support all platforms.
+    """
 
     name: str = unnamed
     """Human-readable name for the method. Used to define the Methods used for

@@ -33,6 +33,10 @@ Wakepy Core
 .. autoclass:: wakepy.ActivationError
     :exclude-members: args, with_traceback
 
+.. autoclass:: wakepy.core.constants.PlatformName
+  :members:
+  :undoc-members:
+  :member-order: bysource
 
 DBus Adapter
 -------------
