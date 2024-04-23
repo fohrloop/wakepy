@@ -49,8 +49,9 @@ logger = logging.getLogger(__name__)
 
 
 class ActivationError(RuntimeError):
-    """Raised if activation is not successful and on-fail action is to raise
-    Exception."""
+    """Raised if the activation of a :class:`Mode` is not successful and the
+    on-fail action is to raise an Exception. See the ``on_fail`` parameter of
+    the ``Mode`` constructor."""
 
 
 class ModeExit(Exception):
@@ -58,18 +59,20 @@ class ModeExit(Exception):
     within any with block which is a wakepy mode, and no code below it will
     be executed.
 
-    Example
-    -------
-    ```
-    with keep.running():
-        # do something
-        if some_condition:
-            print('failure')
-            raise ModeExit
-        print('success')
-    ```
+    Examples
+    --------
+    You may use ``ModeExit`` to exit a with block, like this::
 
-    This will print just "failure" in case entering a Mode did not succeed and
+        with keep.running():
+
+            # do something
+
+            if SOME_CONDITION:
+                print('failure')
+                raise ModeExit
+            print('success')
+
+    This will print just "failure" if ``SOME_CONDITION`` is truthy, and
     just "success" in case it did succeed (never both).
     """
 
@@ -116,11 +119,11 @@ class Mode:
     on_fail: "error" | "warn" | "pass" | Callable
         Determines what to do in case mode activation fails. Valid options
         are: "error", "warn", "pass" and a callable. If the option is
-        "error", raises wakepy.ActivationError. Is selected "warn", issues
-        warning. If "pass", does nothing. If `on_fail` is a callable, it
-        must take one positional argument: result, which is an instance of
-        ActivationResult. The ActivationResult contains more detailed
-        information about the activation process.
+        "error", raises :class:`~wakepy.ActivationError`. Is selected "warn",
+        issues a warning. If "pass", does nothing. If ``on_fail`` is a
+        callable, it must take one positional argument: result, which is an
+        instance of :class:`ActivationResult`. The ActivationResult contains
+        more detailed information about the activation process.
     dbus_adapter:
         For using a custom dbus-adapter. Optional. If not given, the
         default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.\\
@@ -134,12 +137,13 @@ class Mode:
     """
 
     active: bool
-    """True if the mode is active. Otherwise, False.
+    """True if the mode is active. Otherwise, False. See also:
+    :attr:`active_method`.
     """
 
     activation_result: ActivationResult
     """The activation result which tells more about the activation process
-    outcome.
+    outcome. See :class:`ActivationResult`.
     """
 
     name: str | None
@@ -191,7 +195,7 @@ class Mode:
     @classmethod
     def from_name(
         cls,
-        modename: ModeName,
+        mode_name: ModeName,
         methods: Optional[StrCollection] = None,
         omit: Optional[StrCollection] = None,
         methods_priority: Optional[MethodsPriorityOrder] = None,
@@ -203,30 +207,30 @@ class Mode:
 
         Parameters
         ----------
-        modename: str
+        mode_name: str
             The name of the mode to create. Must be an existing Mode name;
             something that has used as Method.name attribute in a
             :class:`~wakepy.core.method.Method` subclass. Examples:
             "keep.running", "keep.presenting".
         methods: list, tuple or set of str
             The names of Methods to select from the mode defined with
-            `modename`; a "whitelist" filter. Means "use these and only these
+            `mode_name`; a "whitelist" filter. Means "use these and only these
             Methods". Any Methods in `methods` but not in the selected mode
             will raise a ValueError. Cannot be used same time with `omit`.
             Optional.
         omit: list, tuple or set of str or None
             The names of Methods to remove from the mode defined with
-            `modename`; a "blacklist" filter. Any Method in `omit` but not in
+            `mode_name`; a "blacklist" filter. Any Method in `omit` but not in
             the selected mode will be silently ignored. Cannot be used same
             time with `methods`. Optional.
         on_fail: "error" | "warn" | "pass" | Callable
             Determines what to do in case mode activation fails. Valid options
             are: "error", "warn", "pass" and a callable. If the option is
-            "error", raises wakepy.ActivationError. Is selected "warn", issues
-            warning. If "pass", does nothing. If `on_fail` is a callable, it
-            must take one positional argument: result, which is an instance of
-            ActivationResult. The ActivationResult contains more detailed
-            information about the activation process.
+            "error", raises :class:`ActivationError`. Is selected "warn",
+            issues a warning. If "pass", does nothing. If ``on_fail`` is a
+            callable, it must take one positional argument: result, which is an
+            instance of :class:`ActivationResult`. The ActivationResult
+            contains more detailed information about the activation process.
         methods_priority: list[str | set[str]]
             The priority order, which is a list of method names or asterisk
             ('*'). The asterisk means "all rest methods" and may occur only
@@ -244,10 +248,10 @@ class Mode:
             The context manager for the selected mode.
 
         """
-        methods_for_mode = get_methods_for_mode(modename)
+        methods_for_mode = get_methods_for_mode(mode_name)
         selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
         return cls(
-            name=modename,
+            name=mode_name,
             method_classes=selected_methods,
             methods_priority=methods_priority,
             on_fail=on_fail,
@@ -321,7 +325,7 @@ class Mode:
             )
         )
 
-        self.activation_result = ActivationResult(methodresults, modename=self.name)
+        self.activation_result = ActivationResult(methodresults, mode_name=self.name)
         self.active = self.activation_result.success
         self._used_method = self._active_method
 
@@ -367,7 +371,11 @@ class Mode:
 
         # Add unused methods to the results
         for method_cls in method_classes:
-            methodresults.append(MethodActivationResult(method_cls.name, success=None))
+            methodresults.append(
+                MethodActivationResult(
+                    method_cls.name, mode_name=method_cls.mode_name, success=None
+                )
+            )
 
         return methodresults, method, heartbeat
 
@@ -415,7 +423,8 @@ class Mode:
 
     @property
     def active_method(self) -> str | None:
-        """The name of the active Method. None if Mode is not active."""
+        """The name of the active Method. None if Mode is not active. See also
+        :attr:`used_method`."""
         if self._active_method is None:
             return None
         return self._active_method.name
@@ -423,7 +432,8 @@ class Mode:
     @property
     def used_method(self) -> str | None:
         """The name of the currently used (active) or previously used (already
-        deactivated) Method. None If Mode has never been activated."""
+        deactivated) Method. None If Mode has never been activated. See also:
+        :attr:`active_method`."""
         if self._used_method is None:
             return None
         return self._used_method.name

@@ -163,9 +163,9 @@ with mode:
 # Inactive
 ```
 
-This is handled automatically by the context manager. What actually is called is `Mode.__exit__()` which in turn calls `Mode.deactivate()`, which triggers deactivating the used Method. Deactivating a Method means stopping the `Method.heartbeat()` calls (if heartbeat is used) and calling `Method.exit_mode()`.
+This is handled automatically by the context manager. What actually is called is `Mode.__exit__()` which in turn calls `Mode._deactivate()`, which triggers deactivating the used Method. Deactivating a Method means stopping the `Method.heartbeat()` calls (if heartbeat is used) and calling `Method.exit_mode()`.
 
 ```{note}
-When using the `with` statement, the context manager takes care of calling `Mode.deactivate()` if the `USER_CORE` raises an Exception. It is also possible to use `Mode.deactivate()` directly, but that is not recommended, as explained in [this Note](activating-a-mode-note) in the Activating a Mode section.
+When using the `with` statement, the context manager takes care of calling `Mode._deactivate()` if the `USER_CODE` raises an Exception.
 ```
 

@@ -270,11 +270,13 @@ class DBusAdapter:
     python (dbus-)library.
 
     When subclassing, implement the :func:`~wakepy.DBusAdapter.process`
-    method.
+    method. For an example implementation, see
+    :class:`~wakepy..JeepneyDBusAdapter`.
 
     The __init__() should not take any arguments, and it may raise any subtype
     of Exception, which simply means that the DBusAdapter may not be used. The
-    Exception will be omitted if using the high-level API of wakepy.
+    Exception will be automatically handled if using the high-level API of
+    wakepy (Modes).
     """
 
     def process(self, call: DBusMethodCall) -> object:
@@ -314,7 +316,7 @@ def get_dbus_adapter(
 
 def get_default_dbus_adapter() -> DBusAdapter | None:
     try:
-        from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
+        from wakepy import JeepneyDBusAdapter
     except ImportError:
         return None
     return JeepneyDBusAdapter()  # pragma: no-cover-if-no-dbus

@@ -6,7 +6,7 @@ def test_platformname(assert_strenum_values):
     assert_strenum_values(PlatformName, PlatformNameValue)
 
 
-def test_modename(assert_strenum_values):
+def test_mode_name(assert_strenum_values):
     assert_strenum_values(ModeName, ModeNameValue)
 
 

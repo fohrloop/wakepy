@@ -19,23 +19,23 @@ from wakepy.core.constants import ModeName
 
 
 @pytest.fixture
-def modename_working():
+def mode_name_working():
     return "testmode_working"
 
 
 @pytest.fixture
-def modename_broken():
+def mode_name_broken():
     return "testmode_broken"
 
 
 @pytest.fixture
-def method1(modename_working):
+def method1(mode_name_working):
     class WorkingMethod(Method):
-        """This is a succesful method as it implements enter_mode which returns
-        None"""
+        """This is a successful method as it implements enter_mode which
+        returns None"""
 
         name = "method1"
-        mode = modename_working
+        mode_name = mode_name_working
         supported_platforms = (CURRENT_PLATFORM,)
 
         def enter_mode(self) -> None:
@@ -45,13 +45,13 @@ def method1(modename_working):
 
 
 @pytest.fixture
-def method2_broken(modename_broken):
+def method2_broken(mode_name_broken):
     class BrokenMethod(Method):
-        """This is a unsuccesful method as it implements enter_mode which
+        """This is a unsuccessful method as it implements enter_mode which
         raises an Exception"""
 
         name = "method2_broken"
-        mode = modename_broken
+        mode_name = mode_name_broken
         supported_platforms = (CURRENT_PLATFORM,)
 
         def enter_mode(self) -> None:
@@ -146,7 +146,7 @@ class TestMain:
             main()
 
         assert manager.mock_calls == [
-            call.print(get_startup_text(method1.mode)),
+            call.print(get_startup_text(method1.mode_name)),
             call.wait_until_keyboardinterrupt(),
             call.print("\n\nExited."),
         ]
@@ -171,9 +171,11 @@ class TestMain:
             )
             main()
 
-        expected_result = ActivationResult(results=[], modename=method2_broken.mode)
+        expected_result = ActivationResult(
+            results=[], mode_name=method2_broken.mode_name
+        )
         assert manager.mock_calls == [
-            call.print(get_startup_text(method2_broken.mode)),
+            call.print(get_startup_text(method2_broken.mode_name)),
             call.print(_get_activation_error_text(expected_result)),
         ]
 
@@ -185,8 +187,8 @@ class TestMain:
         wait_until_keyboardinterrupt,
     ):
         # Assume that user has specified some mode in the commandline which
-        # resolves to `method.mode`
-        parse_arguments.return_value = method.mode
+        # resolves to `method.mode_name`
+        parse_arguments.return_value = method.mode_name
 
         mocks = Mock()
         mocks.attach_mock(print_mock, "print")

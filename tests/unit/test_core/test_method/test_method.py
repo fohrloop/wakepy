@@ -7,6 +7,7 @@ import pytest
 
 from tests.unit.test_core.testmethods import TestMethod
 from wakepy.core import DBusMethodCall
+from wakepy.core.constants import PlatformName
 from wakepy.core.method import (
     Method,
     MethodOutcome,
@@ -119,6 +120,9 @@ def test_method_defaults():
     assert m.enter_mode() is None  # type: ignore
     assert m.heartbeat() is None  # type: ignore
     assert m.exit_mode() is None  # type: ignore
+
+    # By default, all platforms are supported
+    assert set(m.supported_platforms) == set(PlatformName)
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")

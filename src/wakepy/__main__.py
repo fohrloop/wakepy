@@ -43,9 +43,9 @@ WAKEPY_TICKBOXES_TEMPLATE = """
 
 
 def main() -> None:
-    modename = parse_arguments(sys.argv[1:])
-    mode = Mode.from_name(modename, on_fail=handle_activation_error)
-    print(get_startup_text(mode=modename))
+    mode_name = parse_arguments(sys.argv[1:])
+    mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
+    print(get_startup_text(mode=mode_name))
     with mode:
         if not mode.active:
             raise ModeExit
@@ -64,13 +64,13 @@ def _get_activation_error_text(result: ActivationResult) -> str:
     from wakepy import __version__
 
     error_text = f"""
-    Wakepy could not activate the "{result.modename}" mode. This might occur because of a bug or because your current platform is not yet supported or your system is missing required software.
+    Wakepy could not activate the "{result.mode_name}" mode. This might occur because of a bug or because your current platform is not yet supported or your system is missing required software.
 
     Check if there is already a related issue in the issue tracker at https://github.com/fohrloop/wakepy/issues/ and if not, please create a new one.
 
     Include the following:
     - wakepy version: {__version__}
-    - Mode: {result.modename}
+    - Mode: {result.mode_name}
     - Python version: {sys.version}
     - Operating system & version: [PLEASE FILL THIS]
     - Desktop Environment & version (if not default): [FILL OR REMOVE THIS LINE]

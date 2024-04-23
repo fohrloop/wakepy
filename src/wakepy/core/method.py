@@ -53,37 +53,46 @@ class Method(ABC):
     """Methods are objects that are used to switch modes. The phases for
     changing and being in a Mode is:
 
-    1) enter into a mode by calling enter_mode()
-    2) keep into a mode by calling heartbeat() periodically
-    3) exit froma mode by calling exit_mode()
+    1) enter into a mode by calling :meth:`enter_mode`
+    2) keep into a mode by calling :meth:`heartbeat` periodically
+    3) exit from a mode by calling :meth:`exit_mode`
 
-    Typically one would either implement:
-     * enter_mode() and exit_mode()  or just
-     * heartbeat(),
-
-    but also the hybrid option is possible.
+    Typically one would either implement either :meth:`enter_mode` and
+    :meth:`exit_mode`  or just :meth:`heartbeat`, but also the hybrid option
+    is possible.
     """
 
-    mode: ModeName | str
-    """The mode for the method. Each Method subclass may be registered to a
-    single mode."""
+    mode_name: ModeName | str
+    """The name of the mode which the Method implements. Each Method subclass
+    implements a single mode, but multiple Methods may implement the same mode.
+    Setting ``Method.mode_name`` to `foo` on one or more ``Method`` subclasses
+    defines the Mode `foo` (:class:`Mode` classes are themselves not defined or
+    registered anywhere)"""
 
-    supported_platforms: Tuple[PlatformName, ...] = tuple()
-    """All the supported platforms. If a platform is not listed here, this
-    method is not going to be used on the platform (when used as part of a
-    Mode). Modify this in the subclass"""
+    supported_platforms: Tuple[PlatformName, ...] = (
+        PlatformName.LINUX,
+        PlatformName.WINDOWS,
+        PlatformName.MACOS,
+        PlatformName.OTHER,
+    )
+    """Lists the platforms the Method supports. If a platform is not listed in
+    ``method.supported_platforms``, the ``method`` is not going to be used on
+    the platform (when used as part of  a :class:`Mode`), and the Method
+    activation result will show a fail in the "PLATFORM" stage.
 
-    description: Optional[str] = None
-    """Human-readable description for the method. Markdown allowed. Used to
-    create documentation.
+    When subclassing, defining ``supported_platforms`` reduces some work
+    required when writing the logic for :meth:`caniuse`.  Additionally, it aids
+    in distinguishing the "PLATFORM" stage fail as a separate type of failure.
+
+    Default: Support all platforms.
     """
 
     name: str = unnamed
-    """Human-readable name for the method. Used by end-users to define
-    the Methods used for entering a Mode, for example. If given, must be
-    unique across all Methods available in the python process. Leave unset if
-    the Method should not be listed anywhere (e.g. when Method is meant to be
-    subclassed)."""
+    """Human-readable name for the method. Used to define the Methods used for
+    entering a :class:`Mode`, for example. If given, must be unique across all
+    Methods available in the python process for the :attr:`mode`. Left unset
+    if the Method should not be listed anywhere (e.g. when Method is meant to
+    be subclassed)."""
 
     # waits for https://github.com/fohrloop/wakepy/issues/256
     # method_kwargs: Dict[str, object]
@@ -116,13 +125,16 @@ class Method(ABC):
         """Tells if the Method is suitable or unsuitable.
 
         Returns
+        -------
+        result: bool | None | str
+            ``True`` means suitable, ``None`` means uncertain, ``False`` means
+            unsuitable and  a string means unsuitable and tells the reason for
+            it.
+
+        Raises
         ------
-        (a) If the Method is suitable, and can be used, return True.
-        (b) If the result is uncertain, return None.
-        (c) If the Method is unsuitable, may return False or a string.
-            Returning a string is recommended, as it  also explains *why* the
-            Method is unsuitable. May also simply raise an Exception, in which
-            case the Exception message is used as failure reason.
+        Exception
+            If the Method may not be used, may raise an Exception.
         """
 
         # Notes for subclassing
@@ -130,6 +142,15 @@ class Method(ABC):
         # This is optional, but highly recommended. With `caniuse()` it
         # is possible to give more information about why some Method is not
         # supported.
+
+        # Subclass return value
+        # ---------------------
+        # (a) If the Method is suitable, and can be used, return True.
+        # (b) If the result is uncertain, return None.
+        # (c) If the Method is unsuitable, may return False or a string.
+        #     Returning a string is recommended, as it  also explains *why*
+        #     the Method is unsuitable. May also simply raise an Exception, in
+        #     which case the Exception message is used as failure reason.
 
         # NOTE: You do not have to test for the current platform here as it is
         # automatically tested if Method has `supported_platforms` attribute
@@ -145,16 +166,17 @@ class Method(ABC):
         #   suitable)
 
     def enter_mode(self) -> None:
-        """Enter to a Mode using this Method. Pair with a `exit_mode`.
+        """Enter to a Mode using this Method. Pair with :meth:`exit_mode`.
 
         Returns
         -------
-        If entering the mode was successful, returns None. Otherwise, raises
-        an Exception.
+        None:
+            If entering the mode was successful.
 
         Raises
-        -------
-        Could raise an Exception of any type.
+        ------
+        Exception
+            If entering the mode was not succesful.
         """
 
         # Notes for subclassing
@@ -164,7 +186,7 @@ class Method(ABC):
         #
         # Errors
         # -------
-        # If the mode enter was not succesful, raise an Exception of any type.
+        # If the mode enter was not successful, raise an Exception of any type.
         # This is catched by the mode activation process and handled.
         #
         # Note: The .enter_mode() should always leave anything in a clean in
@@ -175,12 +197,18 @@ class Method(ABC):
         return
 
     def exit_mode(self) -> None:
-        """Exit from a Mode using this Method. Paired with `enter_mode`
+        """Exit from a Mode using this Method. Paired with :meth:`enter_mode`.
 
         Returns
         -------
-        If exiting the mode was successful, or if there was no need to exit
-        from the mode, returns None. Otherwise, raises an Exception.
+        None:
+            If exiting the mode was successful, or if there was no need to exit
+            from the mode.
+
+        Raises
+        ------
+        Exception
+            If exiting the mode was not succesful.
         """
 
         # Notes for subclassing
@@ -201,16 +229,21 @@ class Method(ABC):
 
     heartbeat_period: int | float = 55
     """This is the amount of time (in seconds) between two consecutive calls of
-    `heartbeat()`.
+    :meth:`heartbeat`.
     """
 
     def heartbeat(self) -> None:
-        """Called periodically, every `heartbeat_period` seconds.
+        """Called periodically, every :attr:`heartbeat_period` seconds.
 
         Returns
         -------
-        If calling the heartbeat was successful, returns None. Otherwise,
-        raises an Exception.
+        None:
+            If calling the heartbeat was successful, returns None.
+
+        Raises
+        ------
+        Exception
+            If calling heartbeat was not successful.
         """
         return
 
@@ -238,12 +271,12 @@ class Method(ABC):
 
     @classmethod
     def is_unnamed(cls) -> bool:
-        """Tells if the Method has a name or not. See also docs for
-        `Method.name`.
+        """Tells if the Method has a name or not. See also :attr:`name`.
 
         Returns
         -------
-        True if the method is without a name. Otherwise False.
+        result: bool
+            ``True`` if the method is without a name. Otherwise ``False``.
         """
         return cls.name == unnamed
 
@@ -262,7 +295,9 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     if method.is_unnamed():
         raise ValueError("Methods without a name may not be used to activate modes!")
 
-    result = MethodActivationResult(success=False, method_name=method.name)
+    result = MethodActivationResult(
+        success=False, method_name=method.name, mode_name=method.mode_name
+    )
 
     if not get_platform_supported(method, platform=CURRENT_PLATFORM):
         result.failure_stage = StageName.PLATFORM_SUPPORT

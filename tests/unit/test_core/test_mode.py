@@ -52,19 +52,19 @@ def methods_abc(monkeypatch, testutils) -> List[Type[Method]]:
 
     class MethodA(TestMethod):
         name = "MethodA"
-        mode = "foo"
+        mode_name = "foo"
 
         def enter_mode(self): ...
 
     class MethodB(TestMethod):
         name = "MethodB"
-        mode = "foo"
+        mode_name = "foo"
 
         def enter_mode(self): ...
 
     class MethodC(TestMethod):
         name = "MethodC"
-        mode = "foo"
+        mode_name = "foo"
 
         def enter_mode(self): ...
 
@@ -255,7 +255,7 @@ class TestHandleActivationFail:
     @staticmethod
     @pytest.fixture
     def result1():
-        return ActivationResult(modename="testmode")
+        return ActivationResult(mode_name="testmode")
 
     @staticmethod
     @pytest.fixture
@@ -412,10 +412,12 @@ class TestActivateOneOfMethods:
         assert res == [
             MethodActivationResult(
                 method_name=methodcls_success.name,
+                mode_name=methodcls_success.mode_name,
                 success=True,
             ),
             MethodActivationResult(
                 method_name=methodcls_fail.name,
+                mode_name=methodcls_success.mode_name,
                 success=None,
             ),
         ]
@@ -435,7 +437,11 @@ class TestActivateOneOfMethods:
         # The activation succeeded, and the method has heartbeat, so the
         # hearbeat must be instance of Heartbeate
         assert res == [
-            MethodActivationResult(methodcls_success_with_hb.name, success=True)
+            MethodActivationResult(
+                methodcls_success_with_hb.name,
+                methodcls_success_with_hb.mode_name,
+                success=True,
+            )
         ]
         assert isinstance(active_method, methodcls_success_with_hb)
         assert isinstance(heartbeat, Heartbeat)
@@ -450,6 +456,7 @@ class TestActivateOneOfMethods:
         assert res == [
             MethodActivationResult(
                 methodcls_fail.name,
+                methodcls_fail.mode_name,
                 success=False,
                 failure_stage=StageName.ACTIVATION,
                 failure_reason=repr(exc),

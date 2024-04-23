@@ -104,7 +104,7 @@ def test_get_default_dbus_adapter_working():
     except Exception:
         assert get_default_dbus_adapter() is None
     else:
-        from wakepy.dbus_adapters.jeepney import JeepneyDBusAdapter
+        from wakepy import JeepneyDBusAdapter
 
         # When jeepney is installed, we get the JeepneyDBusAdapter as default.
         assert isinstance(get_default_dbus_adapter(), JeepneyDBusAdapter)

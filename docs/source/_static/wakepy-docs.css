@@ -6,9 +6,13 @@ html[data-theme=light] {
     /* the contents directive */
     --wakepy-color-contents-bg: #f9f9fb;
     --wakepy-color-contents-border: #eff0f0;
-    --wakepy-color-inline-code: #d1157f;
+    --wakepy-color-inline-code: #ac2c3d;
     --wakepy-color-code-block-bg: #fcfcfd;
     --wakepy-color-code-block-border: #d1d5da;
+    /* Regular links color */
+    --pst-color-link: #3362bf;
+    /* Navigation links color */
+    --pst-color-primary: #3362bf;
 }
 
 
@@ -16,9 +20,13 @@ html[data-theme=dark] {
     /* for explanations, refer to the light theme definitions */
     --wakepy-color-contents-bg: #191825;
     --wakepy-color-contents-border: #293342;
-    --wakepy-color-inline-code:#f35eaa;
+    --wakepy-color-inline-code:#dd7886;
     --wakepy-color-code-block-bg: #272822;
     --wakepy-color-code-block-border: #3c3d2e;
+    /* Regular links color */
+    --pst-color-link: #6e91d8;
+    /* Navigation links color */
+    --pst-color-primary: #6e91d8;
 }
 
 nav.contents  {
@@ -70,4 +78,15 @@ div.highlight > pre {
     border-color: var(--wakepy-color-code-block-border) !important;
     /* Add bit more air to the code blocks */
     line-height: 155% !important;
+}
+
+/* other */
+
+/* remove extra space above bullet point lists in docstrings */
+dl.py > dd > p + ul {
+    margin-top: -1rem !important;
+}
+/* Add same spacing after bullet point lists as normal paragraphs have */
+dl.py > dd > ul {
+    margin-bottom: 1.15rem !important;
 }

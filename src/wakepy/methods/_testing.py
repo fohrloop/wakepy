@@ -15,7 +15,7 @@ class WakepyFakeSuccess(Method):
     """
 
     name = WAKEPY_FAKE_SUCCESS
-    mode = "_fake"
+    mode_name = "_fake"
     supported_platforms = (CURRENT_PLATFORM,)
 
     def enter_mode(self) -> None:

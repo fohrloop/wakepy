@@ -384,12 +384,13 @@ class TestCanIUseFails:
 
 
 @pytest.mark.parametrize(
-    "success, failure_stage, method_name, message, expected_string_representation",
+    "success, failure_stage, method_name, mode_name, message, expected_string_representation",  # noqa: E501
     [
         (
             False,
             StageName.PLATFORM_SUPPORT,
             "fail-platform",
+            "some-mode",
             "Platform XYZ not supported!",
             '(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!")',
         ),
@@ -397,6 +398,7 @@ class TestCanIUseFails:
             False,
             StageName.REQUIREMENTS,
             "other-fail-method",
+            "some-mode",
             "Need SW X version >= 8.9!",
             '(FAIL @REQUIREMENTS, other-fail-method, "Need SW X version >= 8.9!")',
         ),
@@ -404,6 +406,7 @@ class TestCanIUseFails:
             True,
             None,
             "successfulMethod",
+            "some-mode",
             "",
             # Succesful methods do not print empty message
             "(SUCCESS, successfulMethod)",
@@ -412,6 +415,7 @@ class TestCanIUseFails:
             None,
             None,
             "SomeMethod",
+            "some-mode",
             "",
             # Unused methods do not print empty message
             "(UNUSED, SomeMethod)",
@@ -422,17 +426,20 @@ def test_method_activation_result(
     success,
     failure_stage,
     method_name,
+    mode_name,
     message,
     expected_string_representation,
 ):
     mur = MethodActivationResult(
         success=success,
+        mode_name=mode_name,
         failure_stage=failure_stage,
         method_name=method_name,
         failure_reason=message,
     )
     # These attributes are available
     assert mur.method_name == method_name
+    assert mur.mode_name == mode_name
     assert mur.success == success
     assert mur.failure_stage == failure_stage
     assert mur.failure_reason == message

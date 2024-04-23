@@ -63,7 +63,7 @@ def register_method(method_class: Type[Method]) -> None:
 
     logging.debug("Registering Method %s (name: %s)", method_class, method_class.name)
 
-    method_dict: MethodDict = _method_registry.get(method_class.mode, dict())
+    method_dict: MethodDict = _method_registry.get(method_class.mode_name, dict())
 
     if method_class.name in method_dict:
         if method_dict[method_class.name] is not method_class:
@@ -80,11 +80,11 @@ def register_method(method_class: Type[Method]) -> None:
 
     # Register a new method class
     method_dict[method_class.name] = method_class
-    _method_registry.setdefault(method_class.mode, method_dict)
+    _method_registry.setdefault(method_class.mode_name, method_dict)
 
 
 def get_method(
-    method_name: str, mode: Optional[ModeNameValue | str] = None
+    method_name: str, mode_name: Optional[ModeNameValue | str] = None
 ) -> MethodCls:
     """Get a Method class based on its name and optionally the mode.
 
@@ -94,7 +94,7 @@ def get_method(
         The name of the wakepy.Method. The method must be registered which
         means that the module containing the subclass definition must have
         been imported.
-    mode: str | None
+    mode_name: str | None
         If the method_name is registered to methods belonging to multiple
         Modes, you must provide the mode name, to make the selection
         unambiguous. Typical mode names are "keep.running" and
@@ -115,8 +115,8 @@ def get_method(
         " the class is being imported."
     )
 
-    if mode is not None:
-        method_dict = _method_registry.get(mode, dict())
+    if mode_name is not None:
+        method_dict = _method_registry.get(mode_name, dict())
         if method_name not in method_dict:
             raise notfound
         return method_dict[method_name]
@@ -132,7 +132,7 @@ def get_method(
         raise notfound
     elif len(methods_from_all_modes) > 1:
         n = len(methods_from_all_modes)
-        modes = tuple(m.mode for m in methods_from_all_modes)
+        modes = tuple(m.mode_name for m in methods_from_all_modes)
         raise ValueError(
             f'Multiple ({n}) Methods with name "{method_name}" found! '
             f"The selection is unambiguous. Found modes: {modes}"
@@ -143,18 +143,20 @@ def get_method(
 
 @overload
 def get_methods(
-    names: List[str], mode: Optional[ModeName] = None
+    names: List[str], mode_name: Optional[ModeName] = None
 ) -> List[MethodCls]: ...
 @overload
 def get_methods(
-    names: Tuple[str, ...], mode: Optional[ModeName] = None
+    names: Tuple[str, ...], mode_name: Optional[ModeName] = None
 ) -> Tuple[MethodCls, ...]: ...
 @overload
-def get_methods(names: Set[str], mode: Optional[ModeName] = None) -> Set[MethodCls]: ...
+def get_methods(
+    names: Set[str], mode_name: Optional[ModeName] = None
+) -> Set[MethodCls]: ...
 
 
 def get_methods(
-    names: Collection[str], mode: Optional[ModeName] = None
+    names: Collection[str], mode_name: Optional[ModeName] = None
 ) -> Collection[MethodCls]:
     """Get a collection (list, tuple or set) of Method classes based on their
     names, and optionally the mode name.
@@ -165,7 +167,7 @@ def get_methods(
         The names of the wakepy.Methods to get. The methods must be registered
         which means that the modules containing the subclass definitions must
         have been imported.
-    mode: str | None
+    mode_name: str | None
         If a string, only gets methods for the given mode. If None, searches
         the methods from all the modes. In this case, each Method must be found
         only in one mode. Otherwise raises ValueError.
@@ -179,20 +181,20 @@ def get_methods(
     """
 
     if isinstance(names, list):
-        return [get_method(name, mode) for name in names]
+        return [get_method(name, mode_name) for name in names]
     elif isinstance(names, tuple):
-        return tuple(get_method(name, mode) for name in names)
+        return tuple(get_method(name, mode_name) for name in names)
     elif isinstance(names, set):
-        return set(get_method(name, mode) for name in names)
+        return set(get_method(name, mode_name) for name in names)
     else:
         raise TypeError("`names` must be a list, tuple or set")
 
 
 def get_methods_for_mode(
-    mode: ModeName | str,
+    mode_name: ModeName | str,
 ) -> List[MethodCls]:
-    """Get the Method classes belonging to a Mode; Methods with Method.mode =
-    `mode`.
+    """Get the Method classes belonging to a Mode; Methods with
+    Method.mode_name = `mode_name`.
 
     Parameters
     ----------
@@ -204,4 +206,4 @@ def get_methods_for_mode(
     methods: list[MethodCls]
         The Method classes for the Mode.
     """
-    return [m for m in _method_registry.get(mode, dict()).values()]
+    return [m for m in _method_registry.get(mode_name, dict()).values()]

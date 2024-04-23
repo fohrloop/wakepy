@@ -23,6 +23,27 @@ Wakepy Core
 
     .. automethod:: __exit__
 
+.. autoclass:: wakepy.Method
+    :members:
+
+.. autoclass:: wakepy.ActivationResult
+    :members:
+    :exclude-members: results
+
+.. autoclass:: wakepy.MethodActivationResult
+    :members:
+
+.. autoclass:: wakepy.ActivationError
+    :exclude-members: args, with_traceback
+
+.. autoclass:: wakepy.ModeExit
+    :exclude-members: args, with_traceback
+
+.. autoclass:: wakepy.core.constants.PlatformName
+  :members:
+  :undoc-members:
+  :member-order: bysource
+
 DBus Adapter
 -------------
 DBus adapters are an advanced concept of wakepy. They would be used in such a case where wants to use other D-Bus python library than the default (which is `jeepney <https://jeepney.readthedocs.io/>`_).
@@ -37,7 +58,7 @@ DBus adapters are an advanced concept of wakepy. They would be used in such a ca
     :members:
     :exclude-members: count, index
 
-.. autoclass:: wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter
+.. autoclass:: wakepy.JeepneyDBusAdapter
     :members:
 
 ```

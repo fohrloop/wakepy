@@ -23,10 +23,18 @@ falsy.
 
 
 class PlatformName(StrEnum):
+    """All the different platforms wakepy knows about. Any platform that is not
+    detected will be named ``OTHER``."""
+
     WINDOWS = auto()
+
     LINUX = auto()
+
     MACOS = auto()
+    """Mac OS (Darwin)"""
+
     OTHER = auto()
+    """Anything else"""
 
 
 PlatformNameValue = Literal["WINDOWS", "LINUX", "MACOS", "OTHER"]

@@ -14,8 +14,9 @@ if not sys.platform.lower().startswith("linux"):
 import jeepney
 import pytest
 
+from wakepy import JeepneyDBusAdapter
 from wakepy.core import DBusAddress, DBusMethod, DBusMethodCall
-from wakepy.dbus_adapters.jeepney import DBusNotFoundError, JeepneyDBusAdapter
+from wakepy.dbus_adapters.jeepney import DBusNotFoundError
 
 # For some unknown reason, when using jeepney, one will get a warning like
 # this:
