@@ -57,11 +57,9 @@ class Method(ABC):
     2) keep into a mode by calling :meth:`heartbeat` periodically
     3) exit from a mode by calling :meth:`exit_mode`
 
-    Typically one would either implement:
-     * :meth:`enter_mode` and :meth:`exit_mode`  or just
-     * :meth:`heartbeat`,
-
-    but also the hybrid option is possible.
+    Typically one would either implement either :meth:`enter_mode` and
+    :meth:`exit_mode`  or just :meth:`heartbeat`, but also the hybrid option
+    is possible.
     """
 
     mode: ModeName | str
