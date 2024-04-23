@@ -35,6 +35,8 @@ class ActivationResult:
 
     - Check if the activation was successful: See :attr:`success`
     - Check the active method: See :attr:`active_method`
+    - Get information about activation failure in text format: See
+      :meth:`get_failure_text`
     - Know more about the Methods involved: See :meth:`list_methods` and
       :meth:`query`.
 
