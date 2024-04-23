@@ -6,11 +6,13 @@ All wakepy Modes rely somehow on external software, library or dbus service. Thi
 
 ```{admonition} Notes for manual testing
 :class: warning
-###### Before testing
+**Before testing**
+
 - Close browser tabs which might prevent your system from going to sleep (e.g.  YouTube)
 - Close applications which might prevent your system from going to sleep (e.g. video players apps)
 
-###### When ending the test
+**When ending the test**
+
 - Avoid pressing the power button as it might force the computer to sleep.
 ```
 
