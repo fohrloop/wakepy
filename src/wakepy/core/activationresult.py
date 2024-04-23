@@ -159,7 +159,11 @@ class ActivationResult:
 
     def get_failure_text(self) -> str:
         """Gets information about a failure as text. In case the mode
-        activation was successful, returns an empty string."""
+        activation was successful, returns an empty string.
+
+        This is only intended for interactive use, and users should not rely
+        on the exact text format returned by this function. For programmatic
+        use cases, it is advisable to use :meth:`query`, instead."""
 
         if self.success:
             return ""
