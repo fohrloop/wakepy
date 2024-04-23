@@ -214,17 +214,24 @@ class MethodActivationResult:
     """This class is a result from using a single Method to activate a mode."""
 
     method_name: str
+    """The name of the :class:`Method` this result is for."""
 
-    # True: Using Method was successful
-    # False: Using Method failed
-    # None: Method is unused
     success: bool | None
+    """Tells about the result of the activation:
 
-    # None if the method did not fail. Otherwise, the name of the stage where
-    # the method failed.
+    - ``True``: Using Method was successful
+    - ``False``: Using Method failed
+    - ``None``: Method is unused
+    """
+
     failure_stage: Optional[StageName] = None
+    """None if the method did not fail. Otherwise, the name of the stage where
+    the method failed.
+    """
 
     failure_reason: str = ""
+    """Empty string if activating the Method did not fail. Otherwise, failure
+    reason as string, if provided."""
 
     def __repr__(self) -> str:
         error_at = " @" + self.failure_stage if self.failure_stage else ""

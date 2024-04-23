@@ -30,6 +30,9 @@ Wakepy Core
     :members:
     :exclude-members: results
 
+.. autoclass:: wakepy.MethodActivationResult
+    :members:
+
 .. autoclass:: wakepy.ActivationError
     :exclude-members: args, with_traceback
 

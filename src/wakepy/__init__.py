@@ -15,6 +15,7 @@ from .core import ActivationError as ActivationError
 from .core import ActivationResult as ActivationResult
 from .core import DBusAdapter as DBusAdapter
 from .core import Method as Method
+from .core import MethodActivationResult as MethodActivationResult
 from .core import Mode as Mode
 from .core import ModeExit as ModeExit
 from .dbus_adapters.jeepney import JeepneyDBusAdapter as JeepneyDBusAdapter
