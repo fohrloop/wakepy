@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 import wakepy
@@ -5,14 +7,21 @@ import wakepy
 
 def test_imports():
     """tests the public API"""
-    from wakepy import ActivationError  # noqa: F401
-    from wakepy import ActivationResult  # noqa: F401
-    from wakepy import JeepneyDBusAdapter  # noqa: F401
-    from wakepy import Method  # noqa: F401
-    from wakepy import MethodActivationResult  # noqa: F401
-    from wakepy import Mode  # noqa: F401
-    from wakepy import ModeExit  # noqa: F401
-    from wakepy import keep  # noqa: F401
+    from wakepy import ActivationError as ActivationError
+    from wakepy import ActivationResult as ActivationResult
+    from wakepy import Method as Method
+    from wakepy import MethodActivationResult as MethodActivationResult
+    from wakepy import Mode as Mode
+    from wakepy import ModeExit as ModeExit
+    from wakepy import keep as keep
+
+
+@pytest.mark.skipif(
+    not sys.platform.lower().startswith("linux"),
+    reason="dbus methods only supported on linux",
+)
+def test_import_dbus():
+    from wakepy import JeepneyDBusAdapter as JeepneyDBusAdapter
 
 
 def test_successful_attribute_access():
