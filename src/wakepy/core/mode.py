@@ -120,10 +120,10 @@ class Mode:
         Determines what to do in case mode activation fails. Valid options
         are: "error", "warn", "pass" and a callable. If the option is
         "error", raises :class:`~wakepy.ActivationError`. Is selected "warn",
-        issues warning. If "pass", does nothing. If ``on_fail`` is a callable,
-        it must take one positional argument: result, which is an instance of
-        ActivationResult. The ActivationResult contains more detailed
-        information about the activation process.
+        issues a warning. If "pass", does nothing. If ``on_fail`` is a
+        callable, it must take one positional argument: result, which is an
+        instance of :class:`ActivationResult`. The ActivationResult contains
+        more detailed information about the activation process.
     dbus_adapter:
         For using a custom dbus-adapter. Optional. If not given, the
         default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.\\
@@ -227,10 +227,10 @@ class Mode:
             Determines what to do in case mode activation fails. Valid options
             are: "error", "warn", "pass" and a callable. If the option is
             "error", raises :class:`ActivationError`. Is selected "warn",
-            issues warning. If "pass", does nothing. If ``on_fail`` is a
+            issues a warning. If "pass", does nothing. If ``on_fail`` is a
             callable, it must take one positional argument: result, which is an
-            instance of ActivationResult. The ActivationResult contains more
-            detailed information about the activation process.
+            instance of :class:`ActivationResult`. The ActivationResult
+            contains more detailed information about the activation process.
         methods_priority: list[str | set[str]]
             The priority order, which is a list of method names or asterisk
             ('*'). The asterisk means "all rest methods" and may occur only

@@ -57,10 +57,10 @@ def running(
         Determines what to do in case mode activation fails. Valid options
         are: "error", "warn", "pass" and a callable. If the option is
         "error", raises :class:`~wakepy.ActivationError`. Is selected "warn",
-        issues warning. If "pass", does nothing. If ``on_fail`` is a callable,
-        it must take one positional argument: result, which is an instance of
-        ActivationResult. The ActivationResult contains more detailed
-        information about the activation process.
+        issues a warning. If "pass", does nothing. If ``on_fail`` is a
+        callable, it must take one positional argument: result, which is an
+        instance of :class:`~wakepy.ActivationResult`. The ActivationResult
+        contains more detailed information about the activation process.
     dbus_adapter: class or sequence of classes
         Optional argument which can be used to define a custom DBus adapter.
         If given, should be a subclass of :class:`~wakepy.DBusAdapter`, or a
@@ -131,10 +131,10 @@ def presenting(
         Determines what to do in case mode activation fails. Valid options
         are: "error", "warn", "pass" and a callable. If the option is
         "error", raises :class:`~wakepy.ActivationError`. Is selected "warn",
-        issues warning. If "pass", does nothing. If ``on_fail`` is a callable,
-        it must take one positional argument: result, which is an instance of
-        ActivationResult. The ActivationResult contains more detailed
-        information about the activation process.
+        issues a warning. If "pass", does nothing. If ``on_fail`` is a
+        callable, it must take one positional argument: result, which is an
+        instance of :class:`~wakepy.ActivationResult`. The ActivationResult
+        contains more detailed information about the activation process.
     dbus_adapter: class or sequence of classes
         Optional argument which can be used to define a custom DBus adapter.
         If given, should be a subclass of :class:`~wakepy.DBusAdapter`, or a
