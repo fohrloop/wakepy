@@ -75,10 +75,16 @@ class Method(ABC):
         PlatformName.MACOS,
         PlatformName.OTHER,
     )
-    """All the supported platforms. If a platform is not listed in
+    """Lists the platforms the Method supports. If a platform is not listed in
     ``method.supported_platforms``, the ``method`` is not going to be used on
-    the platform (when used as part of a :class:`Mode`). Modify this in the
-    subclass. Default: Support all platforms.
+    the platform (when used as part of  a :class:`Mode`), and the Method
+    activation result will show a fail in the "PLATFORM" stage.
+
+    When subclassing, defining ``supported_platforms`` reduces some work
+    required when writing the logic for :meth:`caniuse`.  Additionally, it aids
+    in distinguishing the "PLATFORM" stage fail as a separate type of failure.
+
+    Default: Support all platforms.
     """
 
     name: str = unnamed
