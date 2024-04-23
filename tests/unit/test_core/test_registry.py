@@ -18,7 +18,7 @@ def test_get_method_which_is_not_yet_defined():
         ValueError, match=re.escape('No Method with name "Some name" found!')
     ):
         # for test coverage, test this branch, too.
-        get_method("Some name", mode="foo")
+        get_method("Some name", mode_name="foo")
 
 
 @pytest.mark.usefixtures("empty_method_registry")
@@ -92,7 +92,7 @@ def test_register_method():
     # Note that defining a subclass automatically registers a method.
     class MethodA(Method):
         name = "A"
-        modename = "foo"
+        mode_name = "foo"
 
     assert get_method("A") is MethodA
 
@@ -104,20 +104,20 @@ def test_register_method():
 
     class MethodA2(Method):
         name = "A"
-        modename = "somemode"
+        mode_name = "somemode"
 
     #  We can get both of the methods from the register
-    assert get_method("A", mode="foo") is MethodA
-    assert get_method("A", mode="somemode") is MethodA2
+    assert get_method("A", mode_name="foo") is MethodA
+    assert get_method("A", mode_name="somemode") is MethodA2
 
     # We can get the method from register after registering it.
     class MethodA3(Method):
         name = "A"
-        modename = "yet_another_mode"
+        mode_name = "yet_another_mode"
 
-    assert get_method("A", mode="foo") is MethodA
-    assert get_method("A", mode="somemode") is MethodA2
-    assert get_method("A", mode="yet_another_mode") is MethodA3
+    assert get_method("A", mode_name="foo") is MethodA
+    assert get_method("A", mode_name="somemode") is MethodA2
+    assert get_method("A", mode_name="yet_another_mode") is MethodA3
 
     ## We get ValueError if trying to get a method by name when there are
     # multiple alternatives (unambiguity)

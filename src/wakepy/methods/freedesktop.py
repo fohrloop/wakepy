@@ -25,7 +25,7 @@ class FreedesktopScreenSaverInhibit(Method):
     """
 
     name = "org.freedesktop.ScreenSaver"
-    modename = ModeName.KEEP_PRESENTING
+    mode_name = ModeName.KEEP_PRESENTING
 
     screen_saver = DBusAddress(
         bus=BusType.SESSION,

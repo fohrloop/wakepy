@@ -301,7 +301,7 @@ class TestActivationResult:
         mr_requirements_fail: MethodActivationResult,
     ):
         ar = ActivationResult(
-            [mr_platform_support_fail, mr_requirements_fail], modename="SomeMode"
+            [mr_platform_support_fail, mr_requirements_fail], mode_name="SomeMode"
         )
         assert ar.get_failure_text() == (
             'Could not activate Mode "SomeMode"!\n\nMethod usage results, in order '
@@ -350,17 +350,17 @@ class TestActivationResult:
         self, method_activation_results: List[MethodActivationResult], request
     ):
         method_activation_results = request.getfixturevalue(method_activation_results)
-        ar1 = ActivationResult(method_activation_results, modename="foo")
-        ar2 = ActivationResult(method_activation_results, modename="foo")
+        ar1 = ActivationResult(method_activation_results, mode_name="foo")
+        ar2 = ActivationResult(method_activation_results, mode_name="foo")
 
         assert ar1 is not ar2
         assert ar1 == ar2
 
     def test__repr__(self, method_activation_results1: List[MethodActivationResult]):
-        ar1 = ActivationResult(method_activation_results1, modename="foo")
+        ar1 = ActivationResult(method_activation_results1, mode_name="foo")
         assert (
             ar1.__repr__()
-            == """ActivationResult(modename='foo', active_method='a-successful-method', success=True, real_success=True, failure=False, _method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)])"""  # noqa: E501
+            == """ActivationResult(mode_name='foo', active_method='a-successful-method', success=True, real_success=True, failure=False, _method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)])"""  # noqa: E501
         )
 
 

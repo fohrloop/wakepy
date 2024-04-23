@@ -44,7 +44,7 @@ class ActivationResult:
     ----------
     results:
         The MethodActivationResults to be used to fill the ActivationResult
-    modename:
+    mode_name:
         Name of the Mode. Optional.
 
     """
@@ -54,9 +54,9 @@ class ActivationResult:
     # order the methods were tried (first = highest priority, last =
     # lowest priority)
 
-    modename: Optional[str] = None
+    mode_name: Optional[str] = None
     """Name of the :class:`Mode`. If the associated ``Mode`` does not have a
-    name, the ``modename`` will be ``None``."""
+    name, the ``mode_name`` will be ``None``."""
 
     active_method: str | None = field(init=False)
     """The name of the active (successful) :class`Method`. If no methods are
@@ -176,10 +176,10 @@ class ActivationResult:
         if self.success:
             return ""
         debug_info = str(self.query())
-        modename = self.modename or "[unnamed mode]"
+        mode_name = self.mode_name or "[unnamed mode]"
 
         return (
-            f'Could not activate Mode "{modename}"!\n\nMethod usage results, in '
+            f'Could not activate Mode "{mode_name}"!\n\nMethod usage results, in '
             f"order (highest priority first):\n{debug_info}"
         )
 

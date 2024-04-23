@@ -195,7 +195,7 @@ class Mode:
     @classmethod
     def from_name(
         cls,
-        modename: ModeName,
+        mode_name: ModeName,
         methods: Optional[StrCollection] = None,
         omit: Optional[StrCollection] = None,
         methods_priority: Optional[MethodsPriorityOrder] = None,
@@ -207,20 +207,20 @@ class Mode:
 
         Parameters
         ----------
-        modename: str
+        mode_name: str
             The name of the mode to create. Must be an existing Mode name;
             something that has used as Method.name attribute in a
             :class:`~wakepy.core.method.Method` subclass. Examples:
             "keep.running", "keep.presenting".
         methods: list, tuple or set of str
             The names of Methods to select from the mode defined with
-            `modename`; a "whitelist" filter. Means "use these and only these
+            `mode_name`; a "whitelist" filter. Means "use these and only these
             Methods". Any Methods in `methods` but not in the selected mode
             will raise a ValueError. Cannot be used same time with `omit`.
             Optional.
         omit: list, tuple or set of str or None
             The names of Methods to remove from the mode defined with
-            `modename`; a "blacklist" filter. Any Method in `omit` but not in
+            `mode_name`; a "blacklist" filter. Any Method in `omit` but not in
             the selected mode will be silently ignored. Cannot be used same
             time with `methods`. Optional.
         on_fail: "error" | "warn" | "pass" | Callable
@@ -248,10 +248,10 @@ class Mode:
             The context manager for the selected mode.
 
         """
-        methods_for_mode = get_methods_for_mode(modename)
+        methods_for_mode = get_methods_for_mode(mode_name)
         selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
         return cls(
-            name=modename,
+            name=mode_name,
             method_classes=selected_methods,
             methods_priority=methods_priority,
             on_fail=on_fail,
@@ -325,7 +325,7 @@ class Mode:
             )
         )
 
-        self.activation_result = ActivationResult(methodresults, modename=self.name)
+        self.activation_result = ActivationResult(methodresults, mode_name=self.name)
         self.active = self.activation_result.success
         self._used_method = self._active_method
 

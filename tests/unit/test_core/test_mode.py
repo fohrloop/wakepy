@@ -52,19 +52,19 @@ def methods_abc(monkeypatch, testutils) -> List[Type[Method]]:
 
     class MethodA(TestMethod):
         name = "MethodA"
-        modename = "foo"
+        mode_name = "foo"
 
         def enter_mode(self): ...
 
     class MethodB(TestMethod):
         name = "MethodB"
-        modename = "foo"
+        mode_name = "foo"
 
         def enter_mode(self): ...
 
     class MethodC(TestMethod):
         name = "MethodC"
-        modename = "foo"
+        mode_name = "foo"
 
         def enter_mode(self): ...
 
@@ -255,7 +255,7 @@ class TestHandleActivationFail:
     @staticmethod
     @pytest.fixture
     def result1():
-        return ActivationResult(modename="testmode")
+        return ActivationResult(mode_name="testmode")
 
     @staticmethod
     @pytest.fixture
