@@ -295,7 +295,9 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     if method.is_unnamed():
         raise ValueError("Methods without a name may not be used to activate modes!")
 
-    result = MethodActivationResult(success=False, method_name=method.name)
+    result = MethodActivationResult(
+        success=False, method_name=method.name, mode_name=method.mode_name
+    )
 
     if not get_platform_supported(method, platform=CURRENT_PLATFORM):
         result.failure_stage = StageName.PLATFORM_SUPPORT

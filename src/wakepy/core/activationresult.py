@@ -22,6 +22,8 @@ from .constants import WAKEPY_FAKE_SUCCESS, StageName, StageNameValue
 if typing.TYPE_CHECKING:
     from typing import Optional
 
+    from .constants import ModeName
+
 
 @dataclass
 class ActivationResult:
@@ -215,6 +217,9 @@ class MethodActivationResult:
 
     method_name: str
     """The name of the :class:`Method` this result is for."""
+
+    mode_name: ModeName | str
+    """The name of the mode of the :class:`Method` this result is for."""
 
     success: bool | None
     """Tells about the result of the activation:

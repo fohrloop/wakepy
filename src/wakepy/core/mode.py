@@ -371,7 +371,11 @@ class Mode:
 
         # Add unused methods to the results
         for method_cls in method_classes:
-            methodresults.append(MethodActivationResult(method_cls.name, success=None))
+            methodresults.append(
+                MethodActivationResult(
+                    method_cls.name, mode_name=method_cls.mode_name, success=None
+                )
+            )
 
         return methodresults, method, heartbeat
 
