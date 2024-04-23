@@ -260,7 +260,7 @@ class TestHandleActivationFail:
     @staticmethod
     @pytest.fixture
     def error_text_match(result1):
-        return re.escape(result1.get_error_text())
+        return re.escape(result1.get_failure_text())
 
     def test_pass(self, result1):
         with warnings.catch_warnings():
