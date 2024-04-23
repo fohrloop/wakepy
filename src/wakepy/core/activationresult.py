@@ -63,16 +63,20 @@ class ActivationResult:
     success: bool = field(init=False)
     """Tells is entering into a mode was successful. Note that this may be
     faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable e.g. for testing
-    purposes. See also: :attr:`real_success`.
+    purposes. See also: :attr:`real_success`, :attr:`failure` and
+    :meth:`get_failure_text`.
     """
 
     real_success: bool = field(init=False)
     """Tells is entering into a mode was successful. This
     may not faked with the :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
+    See also: :attr:`success`.
     """
 
     failure: bool = field(init=False)
-    """Always opposite of ``success``. Included for convenience."""
+    """Always opposite of :attr:`success`. Included for convenience. See also:
+    :meth:`get_failure_text`.
+    """
 
     _method_results: List[MethodActivationResult] = field(init=False)
 
@@ -161,9 +165,11 @@ class ActivationResult:
         """Gets information about a failure as text. In case the mode
         activation was successful, returns an empty string.
 
-        This is only intended for interactive use, and users should not rely
-        on the exact text format returned by this function. For programmatic
-        use cases, it is advisable to use :meth:`query`, instead."""
+        This is only intended for interactive use. Users should not rely
+        on the exact text format returned by this function as it may change
+        without a notice. For programmatic use cases, it is advisable to use
+        :meth:`query`, instead.
+        """
 
         if self.success:
             return ""
