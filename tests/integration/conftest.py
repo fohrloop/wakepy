@@ -85,7 +85,7 @@ def string_operation_service_addr(private_bus: str) -> DBusAddress:
         bus=private_bus,
         service="org.github.wakepy.TestStringOperationService",
         path="/org/github/wakepy/TestStringOperationService",
-        interface="org.github.wakepy.TestStringOperationService",  # TODO: simplify
+        interface="org.github.wakepy.TestStringOperationService",
     )
 
 
@@ -95,7 +95,7 @@ def calculator_service_addr(private_bus: str) -> DBusAddress:
         bus=private_bus,
         service="org.github.wakepy.TestCalculatorService",
         path="/org/github/wakepy/TestCalculatorService",
-        interface="org.github.wakepy.TestCalculatorService",  # TODO: simplify
+        interface="org.github.wakepy.TestCalculatorService",
     )
 
 

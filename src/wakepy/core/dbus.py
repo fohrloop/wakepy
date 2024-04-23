@@ -302,7 +302,7 @@ def get_dbus_adapter(
     if isinstance(dbus_adapter, type):
         return dbus_adapter()
 
-    # TODO: create some better logic which tests if the dbus adapter may be
+    # LATER: create some better logic which tests if the dbus adapter may be
     # used. For now, just return first from the iterable which won't crash upon
     # initialization
     for adapter_cls in dbus_adapter:
