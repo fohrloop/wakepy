@@ -69,10 +69,16 @@ class Method(ABC):
     defines the Mode `foo` (:class:`Mode` classes are themselves not defined or
     registered anywhere)"""
 
-    supported_platforms: Tuple[PlatformName, ...] = tuple()
-    """All the supported platforms. If a platform is not listed here, this
-    method is not going to be used on the platform (when used as part of a
-    :class:`Mode`). Modify this in the subclass"""
+    supported_platforms: Tuple[PlatformName, ...] = (
+        PlatformName.LINUX,
+        PlatformName.WINDOWS,
+        PlatformName.MACOS,
+        PlatformName.OTHER,
+    )
+    """All the supported platforms. If a platform is not listed in
+    ``method.supported_platforms``, the ``method`` is not going to be used on
+    the platform (when used as part of a :class:`Mode`). Modify this in the
+    subclass. Default: Support all platforms."""
 
     name: str = unnamed
     """Human-readable name for the method. Used to define the Methods used for
@@ -262,7 +268,8 @@ class Method(ABC):
 
         Returns
         -------
-        True if the method is without a name. Otherwise False.
+        result: bool
+            ``True`` if the method is without a name. Otherwise ``False``.
         """
         return cls.name == unnamed
 
