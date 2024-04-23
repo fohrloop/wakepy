@@ -59,18 +59,20 @@ class ModeExit(Exception):
     within any with block which is a wakepy mode, and no code below it will
     be executed.
 
-    Example
-    -------
-    ```
-    with keep.running():
-        # do something
-        if some_condition:
-            print('failure')
-            raise ModeExit
-        print('success')
-    ```
+    Examples
+    --------
+    You may use ``ModeExit`` to exit a with block, like this::
 
-    This will print just "failure" in case entering a Mode did not succeed and
+        with keep.running():
+
+            # do something
+
+            if SOME_CONDITION:
+                print('failure')
+                raise ModeExit
+            print('success')
+
+    This will print just "failure" if ``SOME_CONDITION`` is truthy, and
     just "success" in case it did succeed (never both).
     """
 
