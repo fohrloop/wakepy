@@ -135,12 +135,13 @@ class Mode:
     """
 
     active: bool
-    """True if the mode is active. Otherwise, False.
+    """True if the mode is active. Otherwise, False. See also:
+    :attr:`active_method`.
     """
 
     activation_result: ActivationResult
     """The activation result which tells more about the activation process
-    outcome.
+    outcome. See :class:`ActivationResult`.
     """
 
     name: str | None
@@ -416,7 +417,8 @@ class Mode:
 
     @property
     def active_method(self) -> str | None:
-        """The name of the active Method. None if Mode is not active."""
+        """The name of the active Method. None if Mode is not active. See also
+        :attr:`used_method`."""
         if self._active_method is None:
             return None
         return self._active_method.name
@@ -424,7 +426,8 @@ class Mode:
     @property
     def used_method(self) -> str | None:
         """The name of the currently used (active) or previously used (already
-        deactivated) Method. None If Mode has never been activated."""
+        deactivated) Method. None If Mode has never been activated. See also:
+        :attr:`active_method`."""
         if self._used_method is None:
             return None
         return self._used_method.name
