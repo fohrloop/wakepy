@@ -63,7 +63,7 @@ def register_method(method_class: Type[Method]) -> None:
 
     logging.debug("Registering Method %s (name: %s)", method_class, method_class.name)
 
-    method_dict: MethodDict = _method_registry.get(method_class.mode, dict())
+    method_dict: MethodDict = _method_registry.get(method_class.modename, dict())
 
     if method_class.name in method_dict:
         if method_dict[method_class.name] is not method_class:
@@ -80,7 +80,7 @@ def register_method(method_class: Type[Method]) -> None:
 
     # Register a new method class
     method_dict[method_class.name] = method_class
-    _method_registry.setdefault(method_class.mode, method_dict)
+    _method_registry.setdefault(method_class.modename, method_dict)
 
 
 def get_method(
@@ -132,7 +132,7 @@ def get_method(
         raise notfound
     elif len(methods_from_all_modes) > 1:
         n = len(methods_from_all_modes)
-        modes = tuple(m.mode for m in methods_from_all_modes)
+        modes = tuple(m.modename for m in methods_from_all_modes)
         raise ValueError(
             f'Multiple ({n}) Methods with name "{method_name}" found! '
             f"The selection is unambiguous. Found modes: {modes}"
@@ -191,8 +191,8 @@ def get_methods(
 def get_methods_for_mode(
     mode: ModeName | str,
 ) -> List[MethodCls]:
-    """Get the Method classes belonging to a Mode; Methods with Method.mode =
-    `mode`.
+    """Get the Method classes belonging to a Mode; Methods with Method.modename
+     = `mode`.
 
     Parameters
     ----------

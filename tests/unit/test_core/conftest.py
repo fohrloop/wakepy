@@ -69,26 +69,26 @@ def provide_methods_a_f(monkeypatch, testutils):
 
     class MethodA(TestMethod):
         name = "A"
-        mode = SECOND_MODE
+        modename = SECOND_MODE
 
     class MethodB(TestMethod):
         name = "B"
-        mode = FIRST_MODE
+        modename = FIRST_MODE
 
     class MethodC(TestMethod):
         name = "C"
 
     class MethodD(TestMethod):
         name = "D"
-        mode = FIRST_MODE
+        modename = FIRST_MODE
 
     class MethodE(TestMethod):
         name = "E"
-        mode = FIRST_MODE
+        modename = FIRST_MODE
 
     class MethodF(TestMethod):
         name = "F"
-        mode = SECOND_MODE
+        modename = SECOND_MODE
 
 
 @pytest.fixture

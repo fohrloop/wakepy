@@ -92,7 +92,7 @@ def test_register_method():
     # Note that defining a subclass automatically registers a method.
     class MethodA(Method):
         name = "A"
-        mode = "foo"
+        modename = "foo"
 
     assert get_method("A") is MethodA
 
@@ -104,7 +104,7 @@ def test_register_method():
 
     class MethodA2(Method):
         name = "A"
-        mode = "somemode"
+        modename = "somemode"
 
     #  We can get both of the methods from the register
     assert get_method("A", mode="foo") is MethodA
@@ -113,7 +113,7 @@ def test_register_method():
     # We can get the method from register after registering it.
     class MethodA3(Method):
         name = "A"
-        mode = "yet_another_mode"
+        modename = "yet_another_mode"
 
     assert get_method("A", mode="foo") is MethodA
     assert get_method("A", mode="somemode") is MethodA2

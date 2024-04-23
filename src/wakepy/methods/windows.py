@@ -48,12 +48,12 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
-    mode = ModeName.KEEP_RUNNING
+    modename = ModeName.KEEP_RUNNING
     flags = Flags.KEEP_RUNNING
     name = "SetThreadExecutionState"
 
 
 class WindowsKeepPresenting(WindowsSetThreadExecutionState):
-    mode = ModeName.KEEP_PRESENTING
+    modename = ModeName.KEEP_PRESENTING
     flags = Flags.KEEP_PRESENTING
     name = "SetThreadExecutionState"

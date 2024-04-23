@@ -52,19 +52,19 @@ def methods_abc(monkeypatch, testutils) -> List[Type[Method]]:
 
     class MethodA(TestMethod):
         name = "MethodA"
-        mode = "foo"
+        modename = "foo"
 
         def enter_mode(self): ...
 
     class MethodB(TestMethod):
         name = "MethodB"
-        mode = "foo"
+        modename = "foo"
 
         def enter_mode(self): ...
 
     class MethodC(TestMethod):
         name = "MethodC"
-        mode = "foo"
+        modename = "foo"
 
         def enter_mode(self): ...
 

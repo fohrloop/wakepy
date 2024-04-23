@@ -99,11 +99,11 @@ class _GnomeSessionManager(Method, ABC):
 
 class GnomeSessionManagerNoSuspend(_GnomeSessionManager):
     name = "org.gnome.SessionManager"
-    mode = ModeName.KEEP_RUNNING
+    modename = ModeName.KEEP_RUNNING
     flags = GnomeFlag.INHIBIT_SUSPEND
 
 
 class GnomeSessionManagerNoIdle(_GnomeSessionManager):
     name = "org.gnome.SessionManager"
-    mode = ModeName.KEEP_PRESENTING
+    modename = ModeName.KEEP_PRESENTING
     flags = GnomeFlag.INHIBIT_IDLE

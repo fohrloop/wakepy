@@ -62,10 +62,10 @@ class Method(ABC):
     is possible.
     """
 
-    mode: ModeName | str
+    modename: ModeName | str
     """The name of the mode which the Method implements. Each Method subclass
     implements a single mode, but multiple Methods may implement the same mode.
-    Setting ``Method.mode`` to `foo` on one or more ``Method`` subclasses
+    Setting ``Method.modename`` to `foo` on one or more ``Method`` subclasses
     defines the Mode `foo` (:class:`Mode` classes are themselves not defined or
     registered anywhere)"""
 

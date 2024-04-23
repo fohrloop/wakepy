@@ -8,7 +8,7 @@ from wakepy.modes import keep
 
 
 @pytest.mark.parametrize(
-    "name_prefix, function_under_test, modename",
+    "name_prefix, function_under_test, modename_",
     [
         (
             "running",
@@ -29,22 +29,22 @@ class TestKeepRunninAndPresenting:
 
     @staticmethod
     @pytest.fixture
-    def methods(name_prefix, modename, monkeypatch, testutils):
+    def methods(name_prefix, modename_, monkeypatch, testutils):
         """This fixture creates three methods, which belong to a given mode."""
 
         testutils.empty_method_registry(monkeypatch)
 
         class MethodA(Method):
             name = f"{name_prefix}A"
-            mode = modename
+            modename = modename_
 
         class MethodB(Method):
             name = f"{name_prefix}B"
-            mode = modename
+            modename = modename_
 
         class MethodC(Method):
             name = f"{name_prefix}C"
-            mode = modename
+            modename = modename_
 
         return dict(
             MethodA=MethodA,

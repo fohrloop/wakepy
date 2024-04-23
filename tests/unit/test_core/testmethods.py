@@ -44,7 +44,7 @@ from wakepy.core.method import Method
 
 class TestMethod(Method):
     __test__ = False  # for pytest; this won't be interpreted as test class.
-    mode = "_test"
+    modename = "_test"
 
 
 class WakepyMethodTestError(Exception): ...
@@ -124,7 +124,7 @@ def get_test_method_class(
         clskwargs = {
             "supported_platforms": supported_platforms,
             "name": clsname,
-            "mode": "_tests",
+            "modename": "_tests",
         }
         clsmethods = dict()
         clsmethods["caniuse"] = _create_function(caniuse)

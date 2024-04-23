@@ -35,7 +35,7 @@ def method1(modename_working):
         returns None"""
 
         name = "method1"
-        mode = modename_working
+        modename = modename_working
         supported_platforms = (CURRENT_PLATFORM,)
 
         def enter_mode(self) -> None:
@@ -51,7 +51,7 @@ def method2_broken(modename_broken):
         raises an Exception"""
 
         name = "method2_broken"
-        mode = modename_broken
+        modename = modename_broken
         supported_platforms = (CURRENT_PLATFORM,)
 
         def enter_mode(self) -> None:
@@ -146,7 +146,7 @@ class TestMain:
             main()
 
         assert manager.mock_calls == [
-            call.print(get_startup_text(method1.mode)),
+            call.print(get_startup_text(method1.modename)),
             call.wait_until_keyboardinterrupt(),
             call.print("\n\nExited."),
         ]
@@ -171,9 +171,9 @@ class TestMain:
             )
             main()
 
-        expected_result = ActivationResult(results=[], modename=method2_broken.mode)
+        expected_result = ActivationResult(results=[], modename=method2_broken.modename)
         assert manager.mock_calls == [
-            call.print(get_startup_text(method2_broken.mode)),
+            call.print(get_startup_text(method2_broken.modename)),
             call.print(_get_activation_error_text(expected_result)),
         ]
 
@@ -185,8 +185,8 @@ class TestMain:
         wait_until_keyboardinterrupt,
     ):
         # Assume that user has specified some mode in the commandline which
-        # resolves to `method.mode`
-        parse_arguments.return_value = method.mode
+        # resolves to `method.modename`
+        parse_arguments.return_value = method.modename
 
         mocks = Mock()
         mocks.attach_mock(print_mock, "print")
