@@ -74,11 +74,6 @@ class Method(ABC):
     method is not going to be used on the platform (when used as part of a
     :class:`Mode`). Modify this in the subclass"""
 
-    description: Optional[str] = None
-    """Human-readable description for the method. Markdown allowed. Used to
-    create documentation.
-    """
-
     name: str = unnamed
     """Human-readable name for the method. Used to define the Methods used for
     entering a :class:`Mode`, for example. If given, must be unique across all
