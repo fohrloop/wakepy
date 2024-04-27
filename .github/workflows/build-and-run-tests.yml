@@ -81,6 +81,12 @@ jobs:
         # Test only on oldest and newest supported versions
         # different python versions are already tested in another step.
         python-version: ["3.7", "3.13"]
+        exclude:
+        - python-version: "3.7"
+          runs-on: macos-latest
+        include:
+          - python-version: "3.7"
+            runs-on: macos-13
 
     steps:
       - uses: actions/checkout@v4
