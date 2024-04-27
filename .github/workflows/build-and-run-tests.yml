@@ -44,6 +44,7 @@ jobs:
           retention-days: 1
 
   test-supported-python-versions:
+    name: Tests (${{ matrix.python-version }} @${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: build-python-distributions
     strategy:
@@ -70,6 +71,7 @@ jobs:
           tox -e show-uncovered-lines
 
   test-other-platforms:
+    name: Tests (${{ matrix.python-version }} @${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: build-python-distributions
     strategy:
