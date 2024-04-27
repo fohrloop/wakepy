@@ -43,18 +43,32 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  test:
+  test-supported-python-versions:
+    name: Tests (${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: build-python-distributions
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.7", "3.10", "3.12"]
-
+        os: [ubuntu-latest]
+        # All supported python versions on linux
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        include:
+          # Oldest supported python on MacOS
+          - python-version: "3.7"
+            os: macos-13
+          # Newest supported python on MacOS
+          - python-version: "3.13"
+            os: macos-latest
+          # Oldest supported python on Windows
+          - python-version: "3.7"
+            os: windows-latest
+          # Newest supported python on Windows
+          - python-version: "3.13"
+            os: windows-latest
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
           name: wakepy-python-packages
@@ -64,24 +78,27 @@ jobs:
         uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: install tox
-        run: |
-          python -m pip install -U pip wheel &&
-          python -m pip install ${{ env.TOX_REQUIREMENT }}
-
-      - run: python -c "import sys; print(sys.executable)"
-      - run: python -c "import platform; print(platform.platform())"
+          allow-prereleases: true
 
       - name: Run tox
-        run: tox -e ${{ matrix.python-version }} --skip-build
-
-      - name: Show lines not covered by tests
-        # No need to run this is all tests and coverage check passes
-        if: failure()
-        run: tox -e show-uncovered-lines
+        run: |
+          python -m pip install ${{ env.TOX_REQUIREMENT }}
+          tox -e ${{ matrix.python-version }} --skip-build
+          tox -e show-uncovered-lines
+          tox -e mypy --skip-build
 
   check-code:
+    # Reasons this is a separate job
+    # (1) This runs fast. Different from the other steps, this does not require
+    #     the build step. It gives instant feedback if code has minor problems.
+    # (2) This runs isort + black + ruff + mypy. For most of there it is enough
+    #     to run it once with one version of python and one OS.
+    # (3) This runs more comprehensive mypy check as it checks also the tests
+    #     whereas the mypy check in test jobs only runs mypy on the /src
+    #     folder. Note that some mypy check results depend on the used version
+    #     of python and therefore it needs also a separate step (with multiple
+    #     versions of python)
+    name: Check code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -96,35 +113,8 @@ jobs:
       - name: Check code
         run: tox -e check
 
-  additional-mypy-checks:
-    # This is an *additional* check for mypy using the oldest and newest
-    # supported python
-    runs-on: ubuntu-latest
-    # Note that it's not possible to build the package using python 3.7
-    # (build is only tested on the env.PYTHON_VERSION). Therefore this mypy
-    # check just uses the build from the previous step. And build is required
-    # since it creates the wakepy._version module.
-    needs: build-python-distributions
-    strategy:
-      matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.11", "3.12"]
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: wakepy-python-packages
-          path: ./dist/
-      - name: Install python
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: install tox
-        run: python${{ matrix.python-version }} -m pip install ${{ env.TOX_REQUIREMENT }}
-      - name: Check code
-        run: tox -e mypy --skip-build
-
   test-build-docs:
+    name: Test building docs
     runs-on: ubuntu-latest
     needs: build-python-distributions
     steps:

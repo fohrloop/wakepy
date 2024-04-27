@@ -38,7 +38,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
     def _call_set_thread_execution_state(self, flags: int) -> None:
         try:
-            ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type:ignore
+            ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type: ignore[attr-defined,unused-ignore]
         except AttributeError as exc:
             raise RuntimeError("Could not use kernel32.dll!") from exc
 
