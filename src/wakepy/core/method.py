@@ -235,6 +235,10 @@ class Method(ABC):
     def heartbeat(self) -> None:
         """Called periodically, every :attr:`heartbeat_period` seconds.
 
+        **NOTE** Heartbeat support is not yet implemented.
+
+        Ticket: https://github.com/fohrloop/wakepy/issues/109
+
         Returns
         -------
         None:

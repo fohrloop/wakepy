@@ -132,8 +132,14 @@ The {numref}`fig-activate-with-a-method` presents the activity diagram for the "
 1. Checks platform support against the list in the `Method.supported_plaforms`.
 2. Checks requirements using `Method.caniuse()`. Some Methods could require a certain version of some specific Desktop Environment, a version of a 3rd party software, or some DBus service running. During this step, if some 3rd party SW has known bugs on certain versions, the Method may be dismissed.
 3. Tries to activate the Mode using the `Method.enter_mode()`, if defined
-4. Tries to start the heartbeat using the `Method.heartbeat()`, if defined
+4. Tries to start the heartbeat using the `Method.heartbeat()`, if defined.
 5. Starts the Heartbeat, if the `Method.heartbeat()` exists. This will run in a separate thread.
+
+```{admonition} Heartbeat is not yet supported
+:class: note
+
+Heartbeat support is not yet fully implemented. Ticket: [fohrloop/wakepy#109](https://github.com/fohrloop/wakepy/issues/109)
+```
 
 If the first two steps do not fail, at least one of `Method.enter_mode()` and `Method.caniuse()` is defined and they do not raise Exceptions, the Mode activation is successful. This process happens in the `activate_method` function and it returns an `MethodActivationResult` object, and a `Heartbeat` instance (if used and activation was successful).
 :::{figure-md} fig-activate-with-a-method

@@ -6,13 +6,13 @@ html[data-theme=light] {
     /* the contents directive */
     --wakepy-color-contents-bg: #f9f9fb;
     --wakepy-color-contents-border: #eff0f0;
-    --wakepy-color-inline-code: #ac2c3d;
+    --wakepy-color-inline-code: #d70936;
     --wakepy-color-code-block-bg: #fcfcfd;
     --wakepy-color-code-block-border: #d1d5da;
     /* Regular links color */
-    --pst-color-link: #3362bf;
+    --pst-color-link: #0250e3;
     /* Navigation links color */
-    --pst-color-primary: #3362bf;
+    --pst-color-primary: #0250e3;
 }
 
 
