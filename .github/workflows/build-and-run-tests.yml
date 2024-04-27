@@ -43,18 +43,16 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  test:
+  test-supported-python-versions:
     runs-on: ${{ matrix.os }}
     needs: build-python-distributions
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.7", "3.10", "3.12"]
-
+        os: [ubuntu-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
           name: wakepy-python-packages
@@ -65,21 +63,39 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: install tox
+      - name: Run tox
         run: |
-          python -m pip install -U pip wheel &&
           python -m pip install ${{ env.TOX_REQUIREMENT }}
+          tox -e ${{ matrix.python-version }} --skip-build
+          tox -e show-uncovered-lines
 
-      - run: python -c "import sys; print(sys.executable)"
-      - run: python -c "import platform; print(platform.platform())"
+  test-other-platforms:
+    runs-on: ${{ matrix.os }}
+    needs: build-python-distributions
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        # Test only on oldest and newest supported versions
+        # different python versions are already tested in another step.
+        python-version: ["3.7", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: wakepy-python-packages
+          path: ./dist/
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Run tox
-        run: tox -e ${{ matrix.python-version }} --skip-build
-
-      - name: Show lines not covered by tests
-        # No need to run this is all tests and coverage check passes
-        if: failure()
-        run: tox -e show-uncovered-lines
+        run: |
+          python -m pip install ${{ env.TOX_REQUIREMENT }}
+          tox -e ${{ matrix.python-version }} --skip-build
+          tox -e show-uncovered-lines
 
   check-code:
     runs-on: ubuntu-latest
