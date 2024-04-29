@@ -16,7 +16,12 @@ Wakepy has two main modes:
 2. **`keep.presenting`**: same as `keep.running` but keep also the screen awake and prevent automatic screen lock & screensaver  (*e.g.* for showing a video, updating dashboard, monitoring apps, ...)
 <!-- end before docs link -->
 
-
+> [!NOTE]
+> Wakepy API is still experimental 🚧
+> 
+> Since wakepy is still 0.x.x, the API might change without further notice from
+> one release to another. After that, breaking changes should occur only part of
+> a major release (e.g. 1.x.x -> 2.0.0). 
 
 ## Used by
 - [viskillz-blender](https://github.com/viskillz/viskillz-blender) — Generating assets of Mental Cutting Test exercises

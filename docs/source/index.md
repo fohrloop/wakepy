@@ -52,6 +52,14 @@ with keep.presenting():
 ::::
 
 
+```{admonition} Wakepy API is still experimental 🚧
+:class: note
+
+Since wakepy is still 0.x.x, the API might change without further notice from
+one release to another. After that, breaking changes should occur only part of
+a major release (e.g. 1.x.x -> 2.0.0). 
+```
+
 ### Mode quick reference
 
 
