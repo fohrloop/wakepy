@@ -3,7 +3,22 @@
 
 ## Requirements
 
-Wakepy supports Windows, MacOS and Linux flavours which Desktop Environment that implements the `org.freedesktop.ScreenSaver` interface[^linux-support].
+### Python
+
+- CPython 3.7 to 3.13
+
+### Platform
+
+Wakepy supports following platforms:
+
+Windows
+: Supports Windows XP to Windows 11 (client), Windows Server 2003 or higher (server)
+
+MacOS
+: Mac OS X 10.8 Mountain Lion (July 2012) or newer
+
+Linux
+: Distributions using [GNOME](https://en.wikipedia.org/wiki/GNOME) or any Desktop Environment that implements the [Freedesktop.org](https://en.wikipedia.org/wiki/Freedesktop.org) ScreenSaver interface (`org.freedesktop.ScreenSaver`).[^linux-support]
 
 [^linux-support]: The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.
 ## Installing
@@ -14,10 +29,14 @@ To install wakepy from PyPI, run
 pip install wakepy
 ```
 
-```{note}
-On Linux will install also **[`jeepney`](https://jeepney.readthedocs.io/)** for DBus communication (if not installed). On other systems there are no python requirements.
+```{admonition} About dependencies
+:class: note
 
-On Python 3.7 installs [typing-extensions](https://pypi.org/project/typing-extensions/).
+Wakepy does not have python dependencies, except:
+- On *Linux*, **[`jeepney`](https://jeepney.readthedocs.io/)** is currently required for DBus communication. This might change in the future.
+- On Python *3.7*, the [typing-extensions](https://pypi.org/project/typing-extensions/) is required.
+
+The dependencies will be automatically installed if required.
 ```
 
 ## Basic Usage
