@@ -67,8 +67,11 @@ class ActivationResult:
     success: bool = field(init=False)
     """Tells is entering into a mode was successful. Note that this may be
     faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable e.g. for testing
-    purposes. See also: :attr:`real_success`, :attr:`failure` and
-    :meth:`get_failure_text`.
+    purposes.
+
+    See Also
+    --------
+    real_success, failure, get_failure_text
     """
 
     real_success: bool = field(init=False)
@@ -117,6 +120,10 @@ class ActivationResult:
         ignore_unused: bool
             If True, ignores all unused / remaining methods. Default:
             ``False``.
+
+        See Also
+        --------
+        query
         """
 
         success_values = (True, False) if ignore_unused else (True, False, None)
@@ -154,6 +161,10 @@ class ActivationResult:
         fail_stages:
             The fail stages to include in the output. The options are
             "PLATFORM_SUPPORT", "REQUIREMENTS" and "ACTIVATION".
+
+        See Also
+        --------
+        list_methods, get_failure_text
         """
         out = []
         for res in self._method_results:
@@ -173,6 +184,10 @@ class ActivationResult:
         on the exact text format returned by this function as it may change
         without a notice. For programmatic use cases, it is advisable to use
         :meth:`query`, instead.
+
+        See Also
+        --------
+        list_methods, query
         """
 
         if self.success:
