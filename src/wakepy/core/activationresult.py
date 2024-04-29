@@ -61,7 +61,7 @@ class ActivationResult:
     name, the ``mode_name`` will be ``None``."""
 
     active_method: str | None = field(init=False)
-    """The name of the active (successful) :class`Method`. If no methods are
+    """The name of the active (successful) :class:`Method`. If no methods are
     active, this is ``None``."""
 
     success: bool = field(init=False)
