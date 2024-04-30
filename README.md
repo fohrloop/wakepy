@@ -6,7 +6,7 @@
 Cross-platform wakelock / keep-awake / stay-awake written in Python.
 
 ## Supports
-- Python: 3.7 to 3.12
+- Python: 3.7 to 3.13
 - OS: Windows, Linux and macOS
 
 ## What it can do?
