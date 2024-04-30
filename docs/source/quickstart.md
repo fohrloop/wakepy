@@ -49,20 +49,5 @@ one release to another. After that, breaking changes should occur only part of
 a major release (e.g. 1.x.x -> 2.0.0). 
 ```
 
-### Mode quick reference
-
-
-
-| Wakepy mode              | keep.running | keep.presenting |
-| ------------------------ | ------------ | --------------- |
-| Sleep is prevented       | Yes          | Yes             |
-| Screenlock is prevented  | No*          | Yes             |
-| Screensaver is prevented | No*          | Yes             |
-
-
-
-```{note}
-The table above only considers the *automatic* actions (go to sleep, start screenlock, start screensaver), which are based on the *idle timer*; It is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually lock the session/screen or start screensaver.
-```
 
 

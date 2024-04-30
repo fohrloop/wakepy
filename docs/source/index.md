@@ -105,7 +105,7 @@ quickstart
 
 ```{toctree}
 :hidden:
-:caption: 'Getting Started:'
+:caption: 'Reference Manual:'
 :maxdepth: 2
 :numbered: -1
 :titlesonly:
