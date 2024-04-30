@@ -38,8 +38,7 @@ Wakepy may keep the following systems awake:
       <td>Mac OS X 10.8 Mountain Lion (July 2012) or newer</td>
     </tr>
     <tr>
-      <td class="hoverable" rowspan="2">Linux
-      <a class="footnote-reference brackets" href="#linux-support" id="linux-support-note" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></td>
+      <td class="hoverable" rowspan="2">Linux<sup>[1]</sup></td>
       <td>Distributions using <a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a></td>
     </tr>
     <tr>
@@ -48,10 +47,8 @@ Wakepy may keep the following systems awake:
   </tbody>
 </table>
 
-<aside class="footnote brackets" id="linux-support" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#linux-support-note  ">1</a><span class="fn-bracket">]</span></span>
-<p>The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.</p>
-</aside>
+<p style="margin-top:1em;">
+<sup>[1]</sup> The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.<p>
 
 ## Installing
 
