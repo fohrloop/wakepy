@@ -79,3 +79,25 @@ Failed to keep system awake using keep.running mode
 started
 exiting
 ```
+
+
+(which-method-was-used))=
+## Which wakepy Method was used?
+
+When you would like to check *how* exactly did wakepy do what you asked it to,
+you can check the used method from the {class}`Mode <wakepy.Mode>` instance.
+
+**Example**
+
+```python
+from wakepy import keep
+
+with keep.running() as m:
+    print('active_method:', m.active_method)
+    print('used_method:', m.used_method)
+
+print('--------')
+print('active_method:', m.active_method)
+print('used_method:', m.used_method)
+```
+
