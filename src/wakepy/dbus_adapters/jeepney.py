@@ -1,8 +1,19 @@
+from __future__ import annotations
+
+import typing
+from typing import cast
+
 from jeepney import DBusAddress, new_method_call
-from jeepney.io.blocking import open_dbus_connection
+from jeepney.io.blocking import DBusConnection, open_dbus_connection
 from jeepney.wrappers import unwrap_msg
 
 from wakepy.core import DBusAdapter, DBusMethodCall
+from wakepy.core.dbus import BusType
+
+if typing.TYPE_CHECKING:
+    from typing import Optional, Union
+
+    TypeOfBus = Optional[Union[BusType, str]]
 
 
 class DBusNotFoundError(RuntimeError): ...
@@ -30,8 +41,17 @@ class JeepneyDBusAdapter(DBusAdapter):
             signature=call.method.signature,
             body=call.args,
         )
+
+        connection = cast(DBusConnection, self._get_connection(call.method.bus))  # type: ignore[no-any-unimported]
+        reply = connection.send_and_get_reply(msg, timeout=self.timeout)
+        resp = unwrap_msg(reply)
+        return resp
+
+    def _create_new_connection(  # type: ignore[no-any-unimported]
+        self, bus: TypeOfBus = BusType.SESSION
+    ) -> DBusConnection:
         try:
-            connection = open_dbus_connection(bus=call.method.bus)
+            return open_dbus_connection(bus=bus)
         except KeyError as exc:
             if "DBUS_SESSION_BUS_ADDRESS" in str(exc):
                 raise DBusNotFoundError(
@@ -44,6 +64,3 @@ class JeepneyDBusAdapter(DBusAdapter):
                 ) from exc
             else:
                 raise
-        reply = connection.send_and_get_reply(msg, timeout=self.timeout)
-        resp = unwrap_msg(reply)
-        return resp

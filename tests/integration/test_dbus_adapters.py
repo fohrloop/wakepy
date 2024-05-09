@@ -180,3 +180,11 @@ class TestFailuresOnConnectionCreation:
                 match="Some other reason",
             ):
                 self.adapter.process(self.call)
+
+
+def test_jeepney_adapter_caching(private_bus: str):
+    adapter = JeepneyDBusAdapter()
+    con = adapter._get_connection(private_bus)
+
+    # Call again with same bus name -> get same (cached) connection.
+    assert adapter._get_connection(private_bus) is con
