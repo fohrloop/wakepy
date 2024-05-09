@@ -264,7 +264,7 @@ class DBusMethodCall:
         return f"<{self.method.service} {self.args} | bus: {self.method.bus}>"
 
 
-class DBusAdapter:
+class DBusAdapter:  # pragma: no-cover-if-no-dbus
     """Defines the DBusAdapter interface. This is to be subclassed, and each
     subclass is usually an implementation for a DBusAdapter using single
     python (dbus-)library.
