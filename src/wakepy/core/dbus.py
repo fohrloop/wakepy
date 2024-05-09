@@ -279,6 +279,10 @@ class DBusAdapter:
     wakepy (Modes).
     """
 
+    def __init__(self) -> None:
+        # The values are DBusConnections. Type is defined by the used library.
+        self._connections: Dict[Optional[Union[str, BusType]], object] = dict()
+
     def process(self, call: DBusMethodCall) -> object:
         """Processes a :class:`~wakepy.core.DBusMethodCall`.
 
@@ -289,6 +293,29 @@ class DBusAdapter:
           bus to use (session / system / custom addr), the connection must be
           created within the :func:`~wakepy.DBusAdapter.process` call (this may
           of course be cached)."""
+
+    def _get_connection(
+        self, bus: Optional[Union[str, BusType]] = BusType.SESSION
+    ) -> object:
+        """Gets either a new connection or a cached one, if there is such.
+        Caching of connections is done on bus level."""
+
+        if bus in self._connections:
+            return self._connections[bus]
+
+        connection = self._create_new_connection(bus)
+
+        self._connections[bus] = connection
+        return connection
+
+    def _create_new_connection(
+        self, bus: Optional[Union[str, BusType]] = BusType.SESSION
+    ) -> object:
+        """Create a new Dbus connection for a bus using the library of choice.
+        For example, when creating DBusAdapter subclass for jeepney, could
+        return an instance of ``jeepney.io.blocking.DBusConnection``.
+        """
+        raise NotImplementedError("Implement in subclass")
 
 
 def get_dbus_adapter(

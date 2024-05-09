@@ -104,6 +104,7 @@ exclude_lines = [
     "if (?:typing\\.)?TYPE_CHECKING:",
     "@(abc\\.)?abstractmethod",
     "@(typing\\.)?overload",
+    "raise NotImplementedError"
 ]
 
 [tool.coverage.coverage_conditional_plugin.omit]
