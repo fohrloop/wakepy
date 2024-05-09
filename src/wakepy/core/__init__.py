@@ -15,6 +15,7 @@ from .dbus import DBusMethod as DBusMethod
 from .dbus import DBusMethodCall as DBusMethodCall
 from .method import Method as Method
 from .mode import ActivationError as ActivationError
+from .mode import ActivationWarning as ActivationWarning
 from .mode import Mode as Mode
 from .mode import ModeExit as ModeExit
 from .platform import CURRENT_PLATFORM as CURRENT_PLATFORM

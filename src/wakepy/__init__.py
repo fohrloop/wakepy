@@ -20,6 +20,7 @@ except ImportError:  # pragma: no cover
 
 from .core import ActivationError as ActivationError
 from .core import ActivationResult as ActivationResult
+from .core import ActivationWarning as ActivationWarning
 from .core import DBusAdapter as DBusAdapter
 from .core import Method as Method
 from .core import MethodActivationResult as MethodActivationResult

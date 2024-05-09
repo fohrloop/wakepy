@@ -51,7 +51,17 @@ logger = logging.getLogger(__name__)
 class ActivationError(RuntimeError):
     """Raised if the activation of a :class:`Mode` is not successful and the
     on-fail action is to raise an Exception. See the ``on_fail`` parameter of
-    the ``Mode`` constructor."""
+    the ``Mode`` constructor. This is a subclass of `RuntimeError <https://\
+    docs.python.org/3/library/exceptions.html#RuntimeError>`_.
+    """
+
+
+class ActivationWarning(UserWarning):
+    """Issued if the activation of a :class:`Mode` is not successful and the
+    on-fail action is to issue a Warning. See the ``on_fail`` parameter of
+    the ``Mode`` constructor. This is a subclass of `UserWarning <https://docs\
+    .python.org/3/library/exceptions.html#UserWarning>`_.
+    """
 
 
 class ModeExit(Exception):
@@ -559,7 +569,7 @@ def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:
     if on_fail == "pass":
         return
     elif on_fail == "warn":
-        warnings.warn(result.get_failure_text(), UserWarning)
+        warnings.warn(result.get_failure_text(), ActivationWarning)
         return
     elif on_fail == "error":
         raise ActivationError(result.get_failure_text())
