@@ -84,8 +84,11 @@ jobs:
         run: |
           python -m pip install ${{ env.TOX_REQUIREMENT }}
           tox -e ${{ matrix.python-version }} --skip-build
-          tox -e show-uncovered-lines
           tox -e mypy --skip-build
+
+      - name: Show uncovered lines
+        if: success() || failure()
+        run: tox -e show-uncovered-lines
 
   check-code:
     # Reasons this is a separate job
