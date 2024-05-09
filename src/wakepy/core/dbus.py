@@ -317,6 +317,15 @@ class DBusAdapter:  # pragma: no-cover-if-no-dbus
         """
         raise NotImplementedError("Implement in subclass")
 
+    def close_connections(self):
+        """Close all the connections open in this adapter."""
+        for connection in self._connections.values():
+            self.close_connection(connection)
+
+    def close_connection(self, connection: object):
+        """Close a dbus connection. Implement in a subclass"""
+        raise NotImplementedError("Implement in subclass")
+
 
 def get_dbus_adapter(
     dbus_adapter: Optional[Type[DBusAdapter] | DBusAdapterTypeSeq] = None,
