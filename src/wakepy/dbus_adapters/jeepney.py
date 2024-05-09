@@ -1,8 +1,20 @@
+from __future__ import annotations
+
+import typing
+
 from jeepney import DBusAddress, new_method_call
 from jeepney.io.blocking import open_dbus_connection
 from jeepney.wrappers import unwrap_msg
 
 from wakepy.core import DBusAdapter, DBusMethodCall
+from wakepy.core.dbus import BusType
+
+if typing.TYPE_CHECKING:
+    from typing import Dict, Optional, Union
+
+    from jeepney.io.blocking import DBusConnection
+
+    TypeOfBus = Optional[Union[BusType, str]]
 
 
 class DBusNotFoundError(RuntimeError): ...
@@ -17,6 +29,9 @@ class JeepneyDBusAdapter(DBusAdapter):
     # timeout for dbus calls, in seconds
     timeout = 2
 
+    def __init__(self) -> None:
+        self._connections: Dict[TypeOfBus, DBusConnection] = dict()  # type: ignore[no-any-unimported]
+
     def process(self, call: DBusMethodCall) -> object:
         addr = DBusAddress(
             object_path=call.method.path,
@@ -30,8 +45,31 @@ class JeepneyDBusAdapter(DBusAdapter):
             signature=call.method.signature,
             body=call.args,
         )
+
+        connection = self._get_connection(call.method.bus)
+        reply = connection.send_and_get_reply(msg, timeout=self.timeout)
+        resp = unwrap_msg(reply)
+        return resp
+
+    def _get_connection(  # type: ignore[no-any-unimported]
+        self, bus: TypeOfBus = BusType.SESSION
+    ) -> DBusConnection:
+        """Gets either a new connection or a cached one, if there is such.
+        Caching of connections is done on bus level."""
+
+        if bus in self._connections:
+            return self._connections[bus]
+
+        connection = self._create_new_connection(bus)
+
+        self._connections[bus] = connection
+        return connection
+
+    def _create_new_connection(  # type: ignore[no-any-unimported]
+        self, bus: TypeOfBus = BusType.SESSION
+    ) -> DBusConnection:
         try:
-            connection = open_dbus_connection(bus=call.method.bus)
+            return open_dbus_connection(bus=bus)
         except KeyError as exc:
             if "DBUS_SESSION_BUS_ADDRESS" in str(exc):
                 raise DBusNotFoundError(
@@ -44,6 +82,3 @@ class JeepneyDBusAdapter(DBusAdapter):
                 ) from exc
             else:
                 raise
-        reply = connection.send_and_get_reply(msg, timeout=self.timeout)
-        resp = unwrap_msg(reply)
-        return resp
