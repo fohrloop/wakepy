@@ -11,6 +11,10 @@
 - It is now possible to select the used wakepy.Methods with `methods` and
  `omit` and to change the priority order of methods with `methods_priority`.
 
+### Added
+
+- Modes support [on-fail actions](#on-fail-action) ("error", "warn", "pass" or a callable).
+
 ## [0.7.2] (2023-09-27)
 ### Fixed
 - The CLI API on python 3.7 and python 3.8. Thanks to [Aymane11](https://github.com/Aymane11) for [PR #50](https://github.com/fohrloop/wakepy/pull/50)

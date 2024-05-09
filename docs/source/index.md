@@ -98,6 +98,7 @@ Here's some reasons why you might want to consider using wakepy:
 :titlesonly:
 
 quickstart
+tutorial
 ```
 
 ```{toctree}
