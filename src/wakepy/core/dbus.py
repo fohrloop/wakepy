@@ -15,6 +15,7 @@ adapter instance.
 
 from __future__ import annotations
 
+import gc
 import typing
 from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Type, Union
 
@@ -319,8 +320,19 @@ class DBusAdapter:  # pragma: no-cover-if-no-dbus
 
     def close_connections(self):
         """Close all the connections open in this adapter."""
-        for connection in self._connections.values():
+
+        for bus in list(self._connections):
+            connection = self._connections.pop(bus)
             self.close_connection(connection)
+            del connection
+
+            # The gc collect here frees up some resources but unfortunately
+            # takes some time. Tried to call this only every 50th time but
+            # it still makes Gnome freeze if activating and deactivating the
+            # keepawake repeatedly. This is a bit ugly but it's required until
+            # there's a better solution.
+            # See: https://github.com/fohrloop/wakepy/issues/277
+            gc.collect()
 
     def close_connection(self, connection: object):
         """Close a dbus connection. Implement in a subclass"""

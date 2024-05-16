@@ -64,3 +64,6 @@ class JeepneyDBusAdapter(DBusAdapter):
                 ) from exc
             else:
                 raise
+
+    def close_connection(self, connection: DBusConnection):
+        connection.close()
