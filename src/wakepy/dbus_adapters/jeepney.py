@@ -1,3 +1,5 @@
+# mypy: disable-error-code="no-any-unimported"
+
 from __future__ import annotations
 
 import typing
@@ -42,12 +44,12 @@ class JeepneyDBusAdapter(DBusAdapter):
             body=call.args,
         )
 
-        connection = cast(DBusConnection, self._get_connection(call.method.bus))  # type: ignore[no-any-unimported]
+        connection = cast(DBusConnection, self._get_connection(call.method.bus))
         reply = connection.send_and_get_reply(msg, timeout=self.timeout)
         resp = unwrap_msg(reply)
         return resp
 
-    def _create_new_connection(  # type: ignore[no-any-unimported]
+    def _create_new_connection(
         self, bus: TypeOfBus = BusType.SESSION
     ) -> DBusConnection:
         try:
@@ -65,5 +67,5 @@ class JeepneyDBusAdapter(DBusAdapter):
             else:
                 raise
 
-    def close_connection(self, connection: DBusConnection):
+    def close_connection(self, connection: DBusConnection) -> None:
         connection.close()

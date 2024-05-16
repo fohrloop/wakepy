@@ -318,7 +318,7 @@ class DBusAdapter:  # pragma: no-cover-if-no-dbus
         """
         raise NotImplementedError("Implement in subclass")
 
-    def close_connections(self):
+    def close_connections(self) -> None:
         """Close all the connections open in this adapter."""
 
         for bus in list(self._connections):
@@ -334,7 +334,7 @@ class DBusAdapter:  # pragma: no-cover-if-no-dbus
             # See: https://github.com/fohrloop/wakepy/issues/277
             gc.collect()
 
-    def close_connection(self, connection: object):
+    def close_connection(self, connection: object) -> None:
         """Close a dbus connection. Implement in a subclass"""
         raise NotImplementedError("Implement in subclass")
 
