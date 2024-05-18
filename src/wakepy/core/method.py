@@ -368,6 +368,9 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
             "clearing the mode. "
         )
 
+    if method.dbus_adapter:
+        method.dbus_adapter.close_connections()
+
 
 def get_platform_supported(method: Method, platform: PlatformName) -> bool:
     """Checks if method is supported by the platform

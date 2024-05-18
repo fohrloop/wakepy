@@ -26,6 +26,12 @@ Methods are different ways of entering/keeping in a Mode. A Method may support o
 - **Requirements**: D-Bus, GNOME Desktop Environment with gnome-session running. The exact version of required GNOME is unknown, but this should work from GNOME 2.24 ([2008-09-23](https://gitlab.gnome.org/GNOME/gnome-session/-/tags/GNOME_SESSION_2_24_0)) onwards. See [version history of org.gnome.SessionManager.xml](https://gitlab.gnome.org/GNOME/gnome-session/-/commits/main/gnome-session/org.gnome.SessionManager.xml). At least [this](https://fedoraproject.org/wiki/Desktop/Whiteboards/InhibitApis) and [this](https://bugzilla.redhat.com/show_bug.cgi?id=529287#c3) mention GNOME 2.24.
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
 
+````{admonition} May slow down system if called repeatedly
+:class: warning
+
+If used hundreds or thousands of times, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
+````
+
 (keep-running-windows-stes)=
 ### SetThreadExecutionState
 
@@ -33,7 +39,6 @@ Methods are different ways of entering/keeping in a Mode. A Method may support o
 :class: warning
 
 Since this method prevents sleep, screen can be only locked automatically if a screen saver is enabled and it set to ask for password. See [this](#checking-if-windows-will-lock-screen-automatically) for details.
-
 
 ````
 
@@ -105,6 +110,12 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **How to check it?**: Similarly as checking [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager.
 - **Requirements**: Same as [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager.
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
+
+````{admonition} May slow down system if called repeatedly
+:class: warning
+
+If used hundreds or thousands of times, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
+````
 
 (keep-presenting-org-freedesktop-screensaver)=
 ### org.freedesktop.ScreenSaver

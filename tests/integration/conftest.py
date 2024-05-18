@@ -6,7 +6,6 @@ import gc
 import logging
 import subprocess
 import sys
-import warnings
 
 import pytest
 
@@ -33,10 +32,7 @@ def gc_collect_after_dbus_integration_tests():
     # this as garbage colletion is triggered also automatically. The garbage
     # collection must be triggered here manually as the warnings are
     # ResourceWarning is only filtered away in the dbus integration tests.
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        gc.collect()
+    gc.collect()
 
     logger.debug("called gc.collect")
 
