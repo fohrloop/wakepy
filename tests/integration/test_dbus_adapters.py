@@ -32,108 +32,102 @@ pytestmark = pytest.mark.filterwarnings(
 
 
 @pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_numberadd(numberadd_method):
-    adapter = JeepneyDBusAdapter()
-    call = DBusMethodCall(numberadd_method, (2, 3))
-    assert adapter.process(call) == (5,)
+class TestJeepneyCalculatorService:
 
+    def test_numberadd(self, numberadd_method):
+        adapter = JeepneyDBusAdapter()
+        call = DBusMethodCall(numberadd_method, (2, 3))
+        assert adapter.process(call) == (5,)
 
-@pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_number_multiply(numbermultiply_method):
-    adapter = JeepneyDBusAdapter()
-    call = DBusMethodCall(numbermultiply_method, (-5, 3))
-    assert adapter.process(call) == (-15,)
+    def test_number_multiply(self, numbermultiply_method):
+        adapter = JeepneyDBusAdapter()
+        call = DBusMethodCall(numbermultiply_method, (-5, 3))
+        assert adapter.process(call) == (-15,)
 
+    def test_multiply_with_wrong_arguments(self, numbermultiply_method):
+        adapter = JeepneyDBusAdapter()
+        with pytest.raises(struct.error, match="required argument is not an intege"):
+            # Bad input arg type
+            adapter.process(DBusMethodCall(numbermultiply_method, (-5, "foo")))
+        with pytest.raises(
+            ValueError, match=re.escape("Expected args to have 2 items! (has: 3)")
+        ):
+            # Too many input args
+            adapter.process(DBusMethodCall(numbermultiply_method, (-5, 3, 3)))
 
-@pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_wrong_arguments(numbermultiply_method):
-    adapter = JeepneyDBusAdapter()
-    with pytest.raises(struct.error, match="required argument is not an intege"):
-        # Bad input arg type
-        adapter.process(DBusMethodCall(numbermultiply_method, (-5, "foo")))
-    with pytest.raises(
-        ValueError, match=re.escape("Expected args to have 2 items! (has: 3)")
-    ):
-        # Too many input args
-        adapter.process(DBusMethodCall(numbermultiply_method, (-5, 3, 3)))
+    def test_wrong_signature(self, calculator_service_addr):
+        wrong_method = DBusMethod(
+            name="SimpleNumberMultiply",
+            signature="is",  # this is wrong: should be "ii"
+            params=("first_number", "second_number"),
+            output_signature="i",
+            output_params=("result",),
+        ).of(calculator_service_addr)
 
+        adapter = JeepneyDBusAdapter()
+        with pytest.raises(
+            jeepney.wrappers.DBusErrorResponse,
+            match="org.github.wakepy.TestCalculatorService.Error.OtherError",
+        ):
+            # The args are correct for the DBusMethod, but the DBusMethod is
+            # not correct for the service (signature is wrong)
+            adapter.process(DBusMethodCall(wrong_method, (-5, "sdaasd")))
 
-@pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_wrong_signature(calculator_service_addr):
-    wrong_method = DBusMethod(
-        name="SimpleNumberMultiply",
-        signature="is",  # this is wrong: should be "ii"
-        params=("first_number", "second_number"),
-        output_signature="i",
-        output_params=("result",),
-    ).of(calculator_service_addr)
+    def test_nonexisting_method(self, calculator_service_addr):
+        non_existing_method = DBusMethod(
+            name="ThisDoesNotExist",
+            signature="ii",
+            params=("first_number", "second_number"),
+            output_signature="i",
+            output_params=("result",),
+        ).of(calculator_service_addr)
+        adapter = JeepneyDBusAdapter()
 
-    adapter = JeepneyDBusAdapter()
-    with pytest.raises(
-        jeepney.wrappers.DBusErrorResponse,
-        match="org.github.wakepy.TestCalculatorService.Error.OtherError",
-    ):
+        with pytest.raises(
+            jeepney.wrappers.DBusErrorResponse,
+            match="org.github.wakepy.TestCalculatorService.Error.NoMethod",
+        ):
+            # No such method: ThisDoesNotExist
+            adapter.process(DBusMethodCall(non_existing_method, (-5, 2)))
+
+    def test_wrong_service_definition(self, private_bus: str):
+        adapter = JeepneyDBusAdapter()
+
+        wrong_service_addr = DBusAddress(
+            bus=private_bus,
+            service="org.github.wakepy.WrongService",
+            path="/org/github/wakepy/TestCalculatorService",
+            interface="org.github.wakepy.TestCalculatorService",
+        )
+        wrong_method = DBusMethod(
+            name="SimpleNumberMultiply",
+            signature="ii",
+            params=("first_number", "second_number"),
+            output_signature="i",
+            output_params=("result",),
+        ).of(wrong_service_addr)
+
         # The args are correct for the DBusMethod, but the DBusMethod is not
         # correct for the service (signature is wrong)
-        adapter.process(DBusMethodCall(wrong_method, (-5, "sdaasd")))
-
-
-@pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_nonexisting_method(calculator_service_addr):
-    non_existing_method = DBusMethod(
-        name="ThisDoesNotExist",
-        signature="ii",
-        params=("first_number", "second_number"),
-        output_signature="i",
-        output_params=("result",),
-    ).of(calculator_service_addr)
-    adapter = JeepneyDBusAdapter()
-
-    with pytest.raises(
-        jeepney.wrappers.DBusErrorResponse,
-        match="org.github.wakepy.TestCalculatorService.Error.NoMethod",
-    ):
-        # No such method: ThisDoesNotExist
-        adapter.process(DBusMethodCall(non_existing_method, (-5, 2)))
-
-
-@pytest.mark.usefixtures("dbus_calculator_service")
-def test_jeepney_dbus_adapter_wrong_service_definition(private_bus: str):
-    adapter = JeepneyDBusAdapter()
-
-    wrong_service_addr = DBusAddress(
-        bus=private_bus,
-        service="org.github.wakepy.WrongService",
-        path="/org/github/wakepy/TestCalculatorService",
-        interface="org.github.wakepy.TestCalculatorService",
-    )
-    wrong_method = DBusMethod(
-        name="SimpleNumberMultiply",
-        signature="ii",
-        params=("first_number", "second_number"),
-        output_signature="i",
-        output_params=("result",),
-    ).of(wrong_service_addr)
-
-    # The args are correct for the DBusMethod, but the DBusMethod is not
-    # correct for the service (signature is wrong)
-    with pytest.raises(
-        jeepney.wrappers.DBusErrorResponse,
-        match=re.escape(
-            "The name org.github.wakepy.WrongService was not provided by any .service "
-            "files"
-        ),
-    ):
-        adapter.process(DBusMethodCall(wrong_method, (-5, 2)))
+        with pytest.raises(
+            jeepney.wrappers.DBusErrorResponse,
+            match=re.escape(
+                "The name org.github.wakepy.WrongService was not provided by any "
+                ".service files"
+            ),
+        ):
+            adapter.process(DBusMethodCall(wrong_method, (-5, 2)))
 
 
 @pytest.mark.usefixtures("dbus_string_operation_service")
-def test_jeepney_dbus_adapter_string_shorten(string_shorten_method):
-    # The service shortens a string to a given number of characters and tells
-    # how many characters were dropped out.
-    adapter = JeepneyDBusAdapter()
-    call = DBusMethodCall(string_shorten_method, ("cat pinky", 3))
-    assert adapter.process(call) == ("cat", 6)
+class TestJeepneyStringOperationService:
+
+    def test_jeepney_dbus_adapter_string_shorten(self, string_shorten_method):
+        # The service shortens a string to a given number of characters and
+        # tells how many characters were dropped out.
+        adapter = JeepneyDBusAdapter()
+        call = DBusMethodCall(string_shorten_method, ("cat pinky", 3))
+        assert adapter.process(call) == ("cat", 6)
 
 
 class TestFailuresOnConnectionCreation:
@@ -182,9 +176,10 @@ class TestFailuresOnConnectionCreation:
                 self.adapter.process(self.call)
 
 
-def test_jeepney_adapter_caching(private_bus: str):
-    adapter = JeepneyDBusAdapter()
-    con = adapter._get_connection(private_bus)
+class TestJeepneyDbusAdapter:
+    def test_adapter_caching(self, private_bus: str):
+        adapter = JeepneyDBusAdapter()
+        con = adapter._get_connection(private_bus)
 
-    # Call again with same bus name -> get same (cached) connection.
-    assert adapter._get_connection(private_bus) is con
+        # Call again with same bus name -> get same (cached) connection.
+        assert adapter._get_connection(private_bus) is con
