@@ -177,6 +177,16 @@ class TestFailuresOnConnectionCreation:
 
 
 class TestJeepneyDbusAdapter:
+
+    def test_close_connections(self, private_bus: str):
+        adapter = JeepneyDBusAdapter()
+        con = adapter._get_connection(private_bus)
+        # There seems to be no other way checking that the connection is
+        # active..?
+        assert not con.sock._closed  # type: ignore[attr-defined]
+        adapter.close_connections()
+        assert con.sock._closed  # type: ignore[attr-defined]
+
     def test_adapter_caching(self, private_bus: str):
         adapter = JeepneyDBusAdapter()
         con = adapter._get_connection(private_bus)
