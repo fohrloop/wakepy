@@ -31,6 +31,8 @@ The Mode has following important attributes:
 
 (which-method-was-used))=
 ## Which wakepy Method was used?
+```{versionadded} 0.8.0
+```
 
 When you would like to check *how* exactly did wakepy do what you asked it to,
 you can check the used method from the {class}`Mode <wakepy.Mode>` instance.
@@ -65,6 +67,8 @@ used_method: org.gnome.SessionManager
 
 (on-fail-action)=
 ## Controlling the on-fail action
+```{versionadded} 0.8.0
+```
 
 Wakepy follows the [Zen on Python](https://peps.python.org/pep-0020/):
 
@@ -73,8 +77,6 @@ Wakepy follows the [Zen on Python](https://peps.python.org/pep-0020/):
 
 and therefore by default if a mode cannot be activated, an {class}`~wakepy.ActivationError` is raised. The wakepy Modes also take an `on_fail` input argument which may be used to alter the behavior.
 
-```{versionadded} 0.8.0
-```
 
 ### on-fail actions
 
@@ -155,6 +157,9 @@ exiting
 
 
 ## Controlling the Methods to be tried
+
+```{versionadded} 0.8.0
+```
 
 Wakepy tries in order a list of different [Methods](#wakepy-methods). By default this is of methods are all the Methods which implement the selected wakepy Mode. If you do not want to try all the methods, you can 
 
