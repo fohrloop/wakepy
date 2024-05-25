@@ -5,7 +5,7 @@ Wakepy main Python API is are the wakepy [Modes](#wakepy-modes), which are state
 
 ## Entering a wakepy.Mode
 
-The wakepy modes are implemented as context managers of type `wakepy.Mode`; either keep.presenting or keep.running:
+The wakepy modes are implemented as context managers of type {class}`wakepy.Mode`. The available convenience wrappers for creating a Mode are {func}`keep.presenting() <wakepy.keep.presenting>` and {func}`keep.running() <wakepy.keep.running>`. These are used with the `with` statement:
 
 ```{code-block} python
 from wakepy import keep
@@ -15,22 +15,21 @@ with keep.running():
     # / screenlock or blank the screen, but CPU will keep running.
 ```
 
- When entering the context, the `wakepy.Mode` instance (`m`) is returned, which has following attributes:
-
-- `m.active`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
-- `m.activation_result`: An ActivationResult instance which gives more detailed information about the activation process.
-
-````{tip}
-You may want to inform user about failure in activating a mode. For example:
+ When entering the context, a {class}`~wakepy.Mode` instance (`m`) is returned: 
 
 ```{code-block} python
 with keep.running() as m:
-    if not m.active:
-        print('Failed to inhibit system sleep.')
-
-    do_something_that_takes_long_time()
+    ...
 ```
-````
+
+The Mode has following important attributes:
+
+- {attr}`m.active <wakepy.Mode.active>`: `True`, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
+- {attr}`m.active_method <wakepy.Mode.active_method>`: The name of the *active* method. Will be `None` after mode is deactivated.
+- {attr}`m.used_method <wakepy.Mode.used_method>`: The name of the used method. Will not be reset to `None` after deactivation.
+- {attr}`m.activation_result <wakepy.Mode.activation_result>`: An {class}`~wakepy.ActivationResult` instance which gives more detailed information about the activation process.
+
+
 
 (on-fail-action)=
 ## Controlling the on-fail action
