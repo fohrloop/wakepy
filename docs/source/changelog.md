@@ -15,11 +15,11 @@
 - It's now possible to check the active and used method from the Mode instance using the {attr}`Mode.active_method <wakepy.Mode.active_method>` and  {attr}`Mode.used_method <wakepy.Mode.used_method>` ([#268](https://github.com/fohrloop/wakepy/pull/268))
 
 ### 🚨 Backwards incompatible
-- Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: `keep.running` and `keep.presenting` context managers. ([#85](https://github.com/fohrloop/wakepy/pull/85))
+- Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: {func}`keep.running() <wakepy.keep.running>` and {func}`keep.presenting() <wakepy.keep.presenting>` context managers. ([#85](https://github.com/fohrloop/wakepy/pull/85))
 - Renamed the CLI argument `-s, --keep-screen-awake` to `-p, --presentation`. The old ones were deprecated in 0.7.0. ([#179](https://github.com/fohrloop/wakepy/pull/179/))
-- If Mode activation fails, raise `wakepy.ActivationError` by default. Previously there was no "on fail" action, but users needed to check the `result.success` to make sure the activation was successful.
+- If Mode activation fails, raise {class}`ActivationError <wakepy.ActivationError>` by default. Previously there was no "on fail" action, but users needed to check the `result.success` to make sure the activation was successful.
 - The org.freedesktop.ScreenSaver based method is not used on keep.running mode. Systems supporting org.freedesktop.ScreenSaver which are not running Gnome will have no keep.running method until it gets implemented. By default wakepy will raise a wakepy.ActivationError if keep.running is used on such system. Either use keep.preseting mode, or wait or provide a PR.
-- The `WAKEPY_FAKE_SUCCESS` check is done *before* trying any wakepy Methods (previously, it was used when all the tried methods have failed)
+- The [WAKEPY_FAKE_SUCCESS](#WAKEPY_FAKE_SUCCESS) check is done *before* trying any wakepy Methods (previously, it was used when all the tried methods have failed)
 
 ### 🐞 Bug fixes
 - The org.freedesktop.ScreenSaver based method is only used in keep.presenting mode. Previously, it was used on keep.running mode on Linux.
