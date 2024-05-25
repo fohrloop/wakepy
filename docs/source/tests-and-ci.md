@@ -16,7 +16,7 @@ Only `0`, `no`, `N`, `false`, `F` and the empty string are considered as falsy v
 
 To set `WAKEPY_FAKE_SUCCESS` in a single test, you may use the [monkeypatch](https://docs.pytest.org/en/latest/how-to/monkeypatch.html) fixture:
 
-```python
+```{code-block} python
 def test_foo(monkeypatch):
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "yes")
     # ... the test code

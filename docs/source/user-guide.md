@@ -37,7 +37,7 @@ you can check the used method from the {class}`Mode <wakepy.Mode>` instance.
 
 **Example**
 
-```python
+```{code-block} python
 from wakepy import keep
 
 with keep.running() as m:
@@ -94,7 +94,7 @@ and therefore by default if a mode cannot be activated, an {class}`~wakepy.Activ
 
 This is what you could do if you want to inform the user that the activation of the mode was not successful, but still want to continue to run the task:
 
-```python
+```{code-block} python
 from wakepy import keep, ActivationResult
 
 def react_on_failure(result: ActivationResult):
@@ -123,7 +123,7 @@ Running a long task
 
 This is what you could do if you want to inform the user that the activation of the mode was not successful, and then exit from the with block:
 
-```python
+```{code-block} python
 from wakepy import keep, ActivationResult, ModeExit
 
 def react_on_failure(result: ActivationResult):
