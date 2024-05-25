@@ -195,5 +195,35 @@ with keep.running(omit=['org.gnome.SessionManager', 'SomeOtherMethod']):
 ```{seealso}
 `omit` and `methods` parameter of {meth}`Mode.from_name() <wakepy.Mode.from_name>`, {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
 ```
+
+
+## Controlling the order of Methods to be tried
+
 ```{versionadded} 0.8.0
+```
+
+To control the order of the methods to be tried, you may use the `methods_priority` argument. The argument should be a list of method names or sets of method names. Each item in the list is considered as "equal priority" and wakepy's automatic logic will order the methods within the sets. An asterisk (`*`) may be used to denote "any other methods".
+
+
+### Example: prioritizing methods
+
+This would put `MethodA` and `MethodB` to be in the highest priority group, and wakepy's automatic prioritization logic would determine which one of the methods should be tried first. It would also put the `MethodF` to have the least priority and that method would only be tried after trying any other methods have failed.
+
+```{code-block} python
+from wakepy import keep
+
+with keep.running(methods_priority=[{"MethodA", "MethodB"}, "*", "MethodF"]):
+    ...
+```
+
+
+```{seealso}
+`methods_priority` parameter of {meth}`Mode.from_name() <wakepy.Mode.from_name>`, {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
+```
+
+```{admonition} experimental feature
+:class: note
+
+The `methods_priority` is still an experimental feature and may change or be removed without further notice.
+
 ```
