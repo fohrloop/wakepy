@@ -272,7 +272,7 @@ class DBusAdapter:  # pragma: no-cover-if-no-dbus
 
     When subclassing, implement the :func:`~wakepy.DBusAdapter.process`
     method. For an example implementation, see
-    :class:`~wakepy..JeepneyDBusAdapter`.
+    :class:`~wakepy.JeepneyDBusAdapter`.
 
     The __init__() should not take any arguments, and it may raise any subtype
     of Exception, which simply means that the DBusAdapter may not be used. The

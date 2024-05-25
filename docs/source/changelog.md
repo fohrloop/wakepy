@@ -8,12 +8,12 @@
 
 ### ✨ Features
 - Modes support [on-fail actions](#on-fail-action) ("error", "warn", "pass" or a callable). ([#182](https://github.com/fohrloop/wakepy/pull/182))
-- It is now possible to [select the used wakepy.Methods](#how-to-white-or-blacklist-methods) with `methods` and  `omit` and to [change the priority order](#how-to-control-order-of-methods) of methods with `methods_priority`.
+- It is now possible to [select the used wakepy.Methods](#how-to-white-or-blacklist-methods) with `methods` and  `omit` and to [change the priority order](#how-to-control-order-of-methods) of methods with `methods_priority`. ([#75](https://github.com/fohrloop/wakepy/issues/75))
 - Added [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) method which adds support for keep.running mode for users with Gnome Desktop Environment. ([#51](https://github.com/fohrloop/wakepy/pull/51), [#138](https://github.com/fohrloop/wakepy/pull/138), [#278](https://github.com/fohrloop/wakepy/pull/278), [#282](https://github.com/fohrloop/wakepy/pull/282))
 - {class}`ActivationResult <wakepy.ActivationResult>` objects ([#57](https://github.com/fohrloop/wakepy/pull/57), [#258](https://github.com/fohrloop/wakepy/pull/258), [#270](https://github.com/fohrloop/wakepy/pull/270)) in {attr}`Mode.activation_result <wakepy.Mode.activation_result>` which give more detailed information about the activation process.
 - Possibility to exit from a mode context manager early with {class}`ModeExit <wakepy.ModeExit>`  ([#72](https://github.com/fohrloop/wakepy/pull/72))
 - It's now possible to check the active and used method from the Mode instance using the {attr}`Mode.active_method <wakepy.Mode.active_method>` and  {attr}`Mode.used_method <wakepy.Mode.used_method>` ([#268](https://github.com/fohrloop/wakepy/pull/268))
-
+- Added possibility to use any dbus python implementation through the {class}`DBusAdapter <wakepy.DBusAdapter>`. By default uses jeepney through {class}`JeepneyDBusAdapter <wakepy.JeepneyDBusAdapter>`  (See: [#45](https://github.com/fohrloop/wakepy/issues/45))
 ### 🚨 Backwards incompatible
 - Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: {func}`keep.running() <wakepy.keep.running>` and {func}`keep.presenting() <wakepy.keep.presenting>` context managers. ([#85](https://github.com/fohrloop/wakepy/pull/85))
 - Renamed the CLI argument `-s, --keep-screen-awake` to `-p, --presentation`. The old ones were deprecated in 0.7.0. ([#179](https://github.com/fohrloop/wakepy/pull/179/))
@@ -22,7 +22,8 @@
 - The [WAKEPY_FAKE_SUCCESS](#WAKEPY_FAKE_SUCCESS) check is done *before* trying any wakepy Methods (previously, it was used when all the tried methods have failed)
 
 ### 🐞 Bug fixes
-- The org.freedesktop.ScreenSaver based method is only used in keep.presenting mode. Previously, it was used on keep.running mode on Linux.
+- The org.freedesktop.ScreenSaver based method is only used in keep.presenting mode. Previously, it was used on keep.running mode on Linux. ([#46](https://github.com/fohrloop/wakepy/issues/46), [#136](https://github.com/fohrloop/wakepy/issues/136))
+- Still going to sleep - running Fedora 36 ([#18](https://github.com/fohrloop/wakepy/issues/18))
 
 ### 📖 Documentation
 - Rewritten the docs ([#193](https://github.com/fohrloop/wakepy/pull/193), [#194](https://github.com/fohrloop/wakepy/pull/194), [#196](https://github.com/fohrloop/wakepy/pull/196), [#197](https://github.com/fohrloop/wakepy/pull/197), [#198](https://github.com/fohrloop/wakepy/pull/198), [#200](https://github.com/fohrloop/wakepy/pull/200), [#244](https://github.com/fohrloop/wakepy/pull/244), [#271](https://github.com/fohrloop/wakepy/pull/271), [#272](https://github.com/fohrloop/wakepy/pull/272), [#285](https://github.com/fohrloop/wakepy/pull/285))
