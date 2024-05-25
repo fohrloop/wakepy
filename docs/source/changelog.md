@@ -26,7 +26,7 @@
 - Still going to sleep - running Fedora 36 ([#18](https://github.com/fohrloop/wakepy/issues/18))
 
 ### 📖 Documentation
-- Rewritten the docs ([#193](https://github.com/fohrloop/wakepy/pull/193), [#194](https://github.com/fohrloop/wakepy/pull/194), [#196](https://github.com/fohrloop/wakepy/pull/196), [#197](https://github.com/fohrloop/wakepy/pull/197), [#198](https://github.com/fohrloop/wakepy/pull/198), [#200](https://github.com/fohrloop/wakepy/pull/200), [#244](https://github.com/fohrloop/wakepy/pull/244), [#271](https://github.com/fohrloop/wakepy/pull/271), [#272](https://github.com/fohrloop/wakepy/pull/272), [#285](https://github.com/fohrloop/wakepy/pull/285))
+- Rewritten the docs ([#193](https://github.com/fohrloop/wakepy/pull/193), [#194](https://github.com/fohrloop/wakepy/pull/194), [#196](https://github.com/fohrloop/wakepy/pull/196), [#197](https://github.com/fohrloop/wakepy/pull/197), [#198](https://github.com/fohrloop/wakepy/pull/198), [#200](https://github.com/fohrloop/wakepy/pull/200), [#244](https://github.com/fohrloop/wakepy/pull/244), [#271](https://github.com/fohrloop/wakepy/pull/271), [#272](https://github.com/fohrloop/wakepy/pull/272), [#285](https://github.com/fohrloop/wakepy/pull/285), [#286](https://github.com/fohrloop/wakepy/pull/286))
 - Remove /en/ from the URL and rename latest to stable ([#250](https://github.com/fohrloop/wakepy/pull/250))
 
 ### 👷 Maintenance
