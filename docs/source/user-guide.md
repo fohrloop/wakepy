@@ -34,7 +34,12 @@ The Mode has following important attributes:
 (on-fail-action)=
 ## Controlling the on-fail action
 
-By default, if a mode cannot be activated, an {class}`~wakepy.ActivationError` is raised. The wakepy Modes also take an `on_fail` input argument which may be used to alter the behavior.
+Wakepy follows the [Zen on Python](https://peps.python.org/pep-0020/):
+
+> Errors should never pass silently.  
+> Unless explicitly silenced.
+
+and therefore by default if a mode cannot be activated, an {class}`~wakepy.ActivationError` is raised. The wakepy Modes also take an `on_fail` input argument which may be used to alter the behavior.
 
 ```{versionadded} 0.8.0
 ```
