@@ -1,10 +1,6 @@
 # Wakepy Modes
 
-
-
-
-
-The available modes are
+Wakepy Modes are states that you activate, and while the mode is active, wakepy keeps the system awake (inhibits suspend/sleep). In the end you deactivate the mode. Each Mode is implemented with multiple [Methods](#wakepy-methods) which support different platforms. Wakepy selects the used Method automatically, but it may also be selected by the user. The available modes are
 
 | Wakepy mode              | [keep.running](#keep-running-mode) | [keep.presenting](#keep-presenting-mode)|
 | ------------------------ | ------------ | --------------- |
