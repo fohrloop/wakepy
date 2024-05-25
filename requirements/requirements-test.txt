@@ -1,0 +1,19 @@
+# requirements for running unit tests
+
+# Python 3.7 support dropped in tox 4.9.0
+tox==4.14.2; python_version>='3.8'
+tox==4.8.0; python_version<'3.8'
+
+# Python 3.7 support dropped in pytest 8.0.0
+pytest==8.1.1; python_version>='3.8'
+pytest==7.4.4; python_version=='3.7'
+
+pytest-cov==4.1.0
+coverage-conditional-plugin==0.9.0
+
+# Python 3.7 support dropped in time-machine 2.11.0
+time-machine==2.14.0; python_version>='3.8'
+time-machine==2.10.0; python_version=='3.7'
+
+# Jeepney is used in the integration tests for creating a D-Bus server
+jeepney==0.8.0;sys_platform=='linux'

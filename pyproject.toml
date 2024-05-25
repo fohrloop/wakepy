@@ -1,15 +1,18 @@
 [project]
 name = "wakepy"
 dynamic = ["version"]
-description = "Simple wakelock / keep-awake / stay-awake"
+description = "wakelock / keep-awake / stay-awake"
 authors = [
-    {name = "Niko Pasanen", email = "niko@pasanen.me"},
+    {name = "Niko Föhr", email = "fohrloop@gmail.com"},
 ]
 dependencies = [
-    # Default install on linux uses jeepney
-    # use --no-deps to skip if necessary
-    "jeepney >= 0.7.1;sys_platform=='linux'"
+    # For using the D-Bus based methods
+    "jeepney >= 0.7.1;sys_platform=='linux'",
+    # The typing.Literal was introduced in Python 3.8. Need to install
+    # typing-extensions for Python 3.7 support.
+    'typing-extensions; python_version < "3.8.0"',
 ]
+
 # Python 3.7 introduces from __future__ import annotations
 requires-python = ">=3.7"
 readme = "README.md"
@@ -30,38 +33,26 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
-[project.optional-dependencies]
-doc = [
-    "sphinx~=5.0",
-    "sphinx_design~=0.4.1",
-    "sphinx-copybutton~=0.5.2",
-    "myst-parser~=1.0.0",
-    "furo",
-]
-dev = [
-    "sphinx-autobuild",
-    "IPython",
-    "black==23.3.0",
-    "pytest",
-    "mypy==1.3.0",
-    "tox==4.6.0",
-    "isort==5.12.0",
-    "ruff==0.0.270",
-]
 
 [project.urls]
-Homepage = "https://github.com/np-8/wakepy"
-"Source Code" = "https://github.com/np-8/wakepy"
-"Issue Tracker" = "https://github.com/np-8/wakepy/issues"
+Homepage = "https://github.com/fohrloop/wakepy"
+"Source Code" = "https://github.com/fohrloop/wakepy"
+"Issue Tracker" = "https://github.com/fohrloop/wakepy/issues"
+Documentation = "https://wakepy.readthedocs.io/"
+Changelog = "https://wakepy.readthedocs.io/stable/changelog.html"
 
 [project.scripts]
 wakepy = "wakepy.__main__:main"
 
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools==69.1.0", "setuptools_scm==8.1.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_file = "src/wakepy/_version.py"
 
 [tool.mypy]
+exclude = ['venv/*', '.venv/*', 'docs/*', '.tox/*']
 check_untyped_defs = true
 disallow_any_generics = true
 no_implicit_optional = true
@@ -71,33 +62,67 @@ warn_redundant_casts = true
 warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
+warn_unused_ignores = true
 no_implicit_reexport = true
-exclude = "wakepy/_deprecated/"
+disallow_untyped_defs = true
+disallow_any_unimported = true
 
 [[tool.mypy.overrides]]
-module = 'jeepney.*'
+module = [
+    'jeepney.*',
+    'tox.*'
+]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-# This package will be removed soon. Do not fix.
-module = 'wakepy._deprecated.*'
-check_untyped_defs = false
+module = ['tests.*', 'tasks']
+disallow_untyped_defs = false
 
+[[tool.mypy.overrides]]
+module = ['toxfile']
+disallow_any_unimported = false
+
+[tool.pytest.ini_options]
+filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy.*:DeprecationWarning"
+
+[tool.coverage.run]
+plugins = ["coverage_conditional_plugin"]
+omit = [
+    "tests/*",
+]
+[tool.coverage.paths]
+source = [
+    # This makes the coverage report paths shorter for the tox results, which
+    # otherwise are of the format: .tox/py311/lib/python3.11/site-packages/wakepy/somefile.py
+    "src/wakepy",
+    "**/site-packages/wakepy"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if (?:typing\\.)?TYPE_CHECKING:",
+    "@(abc\\.)?abstractmethod",
+    "@(typing\\.)?overload",
+    "raise NotImplementedError"
+]
+
+[tool.coverage.coverage_conditional_plugin.omit]
+# Dbus adapters are only available on linux
+"platform_system != 'Linux'" = "**/wakepy/dbus_adapters/*.py"
+
+[tool.coverage.coverage_conditional_plugin.rules]
+no-cover-if-no-dbus = "platform_system != 'Linux'"
+no-cover-if-py-gte-38 = "sys_version_info >= (3, 8)"
+no-cover-if-py-lt-38 = "sys_version_info < (3, 8)"
+
+[tool.isort]
+profile = "black"
 
 [tool.ruff]
 # Same as Black.
 line-length = 88
-
-target-version = "py310"
-
-# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-select = ["E", "F"]
-ignore = []
-
 fix = true
-# Allow autofix for all enabled rules (when `--fix`) is provided.
-fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"]
-unfixable = []
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -114,5 +139,18 @@ exclude = [
     "venv",
 ]
 
+[tool.ruff.lint]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+# W505: doc-line-too-long. Ref: https://docs.astral.sh/ruff/rules/doc-line-too-long/
+# W291: trailing-whitespace. Ref: https://docs.astral.sh/ruff/rules/trailing-whitespace/
+select = ["E", "F", "W505", "W291"]
+ignore = []
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.pycodestyle]
+# limits docstring and comments to 79 characters.
+max-doc-length = 79

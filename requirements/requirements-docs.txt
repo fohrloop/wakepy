@@ -1,0 +1,11 @@
+# Requirements for building the documentation.
+sphinx==7.2.6
+sphinx_design==0.5.0
+sphinx-copybutton==0.5.2
+myst-parser==2.0.0
+sphinx-book-theme==1.1.2
+# a numpydoc 1.7.0rc0.dev0. This one has https://github.com/numpy/numpydoc/pull/527 merged
+# At some point: Can use 1.7.0 (which is not available in PyPI at the time of writing)
+numpydoc @ git+https://github.com/numpy/numpydoc.git@46f532a824639a97479039fc122533915cdfa10f
+# Need to build in order to get the _version.py
+build==1.1.1

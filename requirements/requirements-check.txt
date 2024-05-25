@@ -1,0 +1,6 @@
+# requirements for code style; linters, code analysis and formatting tools
+invoke==2.2.0
+black==24.2.0
+isort==5.13.2
+ruff==0.3.2
+-r requirements-mypy.txt

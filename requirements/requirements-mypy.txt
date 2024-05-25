@@ -1,0 +1,13 @@
+# mypy 1.9.0 only supports Python 3.8+
+mypy==1.9.0; python_version>='3.8'
+# Last mypy version to support Python 3.7
+mypy==1.4.1; python_version=='3.7'
+
+
+# The following installs are for mypy.
+pytest -c requirements-test.txt
+time-machine -c requirements-test.txt
+
+types-colorama
+types-colorama==0.4.15.12; python_version>='3.7'
+
