@@ -1,4 +1,3 @@
-(user-guide)=
 # User Guide
 
 Wakepy main Python API is are the wakepy [Modes](#wakepy-modes), which are states that are activated and deactivated and which keep your system awake. The method for activating the mode depends on your platform (among other things) and is determined by the used [Method](#wakepy-methods).  For example [keep.presenting](#keep-presenting-mode) mode is implemented by [org.gnome.SessionManager](#keep-presenting-org-gnome-sessionmanager) for Linux with GNOME DE, [SetThreadExecutionState](#keep-presenting-windows-stes) for Windows and [caffeinate](#keep-presenting-macos-caffeinate) for MacOS. In most cases, wakepy does nothing but calls an executable (caffeinate), a DLL function call (SetThreadExecutionState) or a D-Bus method (org.gnome.SessionManager). Wakepy helps in this by providing a coherent API which should just work™ on any system. Or, at least that is the vision of wakepy.

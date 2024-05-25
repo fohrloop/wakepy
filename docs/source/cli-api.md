@@ -1,4 +1,3 @@
-(cli-api)=
 # CLI API
 
 It is possibe to start wakepy from the command line either by running
