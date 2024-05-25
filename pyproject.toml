@@ -45,7 +45,7 @@ Changelog = "https://wakepy.readthedocs.io/stable/changelog.html"
 wakepy = "wakepy.__main__:main"
 
 [build-system]
-requires = ["setuptools==69.1.0", "setuptools_scm==8.0.4"]
+requires = ["setuptools==69.1.0", "setuptools_scm==8.1.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
