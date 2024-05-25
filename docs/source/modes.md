@@ -2,11 +2,23 @@
 
 
 
+
+
 The available modes are
-| Wakepy mode                              | What it does                                        |
-| ---------------------------------------- | --------------------------------------------------- |
-| [keep.running](#keep-running-mode)       | Automatic sleep is prevented                        |
-| [keep.presenting](#keep-presenting-mode) | Automatic sleep, screensaver & screenlock prevented |
+
+| Wakepy mode              | [keep.running](#keep-running-mode) | [keep.presenting](#keep-presenting-mode)|
+| ------------------------ | ------------ | --------------- |
+| Sleep is prevented       | Yes          | Yes             |
+| Screenlock is prevented  | No[^win-slock]          | Yes             |
+| Screensaver is prevented | No          | Yes             |
+
+[^win-slock]: Depending on system settings, it is possible that Windows will not automatically lock the system, because Windows will lock the screen either when (1) returning from suspend (which is now inhibited) or (2) when returning from Screen Saver, *if ScreenSaverIsSecure is set or enforced by a Group Policy (GPO)*.  See: [wakepy/#169](https://github.com/fohrloop/wakepy/issues/169)
+
+```{note}
+The table above only considers the *automatic* actions (go to sleep, start screenlock, start screensaver), which are based on the *idle timer*; It is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually lock the session/screen or start screensaver.
+```
+
+
 
 ## Entering a mode
 

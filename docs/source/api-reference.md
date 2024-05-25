@@ -1,13 +1,22 @@
 <!-- NOTE: If you change the title (API Reference), you must update the code
 in wakepy-docs.js! -->
 # API Reference
+
+```{admonition} Wakepy API is still experimental 🚧
+:class: note
+
+Since wakepy is still 0.x.x, the API might change without further notice from
+one release to another. After that, breaking changes should occur only part of
+a major release (e.g. 1.x.x -> 2.0.0). 
+```
+
+
 ```{eval-rst}
 
 .. autosummary::
 
     wakepy.keep.running
     wakepy.keep.presenting
-    wakepy.DBusAdapter
 
 Wakepy Modes
 -------------
@@ -34,6 +43,9 @@ Wakepy Core
     :members:
 
 .. autoclass:: wakepy.ActivationError
+    :exclude-members: args, with_traceback
+
+.. autoclass:: wakepy.ActivationWarning
     :exclude-members: args, with_traceback
 
 .. autoclass:: wakepy.ModeExit

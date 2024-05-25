@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from wakepy import ActivationError
+from wakepy import ActivationError, ActivationWarning
 from wakepy.core import ActivationResult, DBusAdapter, Method, Mode, ModeName
 from wakepy.modes import keep
 
@@ -138,7 +138,7 @@ class TestOnFail:
 
     def test_on_fail_warn(self, mode_under_test, expected_name):
         err_txt = f'Could not activate Mode "{expected_name}"!'
-        with pytest.warns(UserWarning, match=re.escape(err_txt)):
+        with pytest.warns(ActivationWarning, match=re.escape(err_txt)):
             with mode_under_test(methods=[], on_fail="warn") as m:
                 self._assertions_for_activation_failure(m, expected_name)
 

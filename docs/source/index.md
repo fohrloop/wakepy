@@ -1,72 +1,89 @@
-# Quickstart
+# Overview
+
+## What is wakepy?
+
+Wakepy is a package with an Python API and a CLI tool for *keeping a system awake*. Namely:
+
+⌛ **Keeping CPU awake**:  For long running tasks. Inhibit the automatic, timer based sleep or suspend action, but allow screenlock and screensaver turning on and monitor turning off. (See: [keep.running](#keep-running-mode))
+
+🖥️ **Keeping screen awake**:  For long running tasks which require also the screen on and screenlock and screensaver inhibited. (See: [keep.presenting](#keep-presenting-mode))
 
 
-## Requirements
+## Supported platforms
 
-Wakepy supports Windows, MacOS and Linux flavours which Desktop Environment that implements the `org.freedesktop.ScreenSaver` interface[^linux-support].
+Wakepy may keep the following systems awake:
 
-[^linux-support]: The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.
+
+<table class="wakepy-table">
+  <colgroup>
+    <col style="width: 25%;">
+    <col style="width: 75%;">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Platform</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="hoverable" rowspan="2">Windows</td>
+      <td>Windows XP to Windows 11</td>
+    </tr>
+    <tr>
+      <td>Windows Server 2003 or higher</td>
+    </tr>
+    <tr>
+      <td>Mac OS</td>
+      <td>Mac OS X 10.8 Mountain Lion (July 2012) or newer</td>
+    </tr>
+    <tr>
+      <td class="hoverable" rowspan="2">Linux<sup>[1]</sup></td>
+      <td>Distributions using <a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a></td>
+    </tr>
+    <tr>
+      <td>Desktop Environments which implement the <a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a> ScreenSaver interface (<code>org.freedesktop.ScreenSaver</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="margin-top:1em;">
+<sup>[1]</sup> The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.<p>
+
 ## Installing
 
-To install wakepy from PyPI, run
+Wakepy supports CPython 3.7 to 3.13, and may be installed with
 
-```{code-block} text
+```
 pip install wakepy
 ```
 
-```{note}
-On Linux will install also **[`jeepney`](https://jeepney.readthedocs.io/)** for DBus communication (if not installed). On other systems there are no python requirements.
+## Why wakepy?
+Here's some reasons why you might want to consider using wakepy:
 
-On Python 3.7 installs [typing-extensions](https://pypi.org/project/typing-extensions/).
-```
+🛡️ For security reasons
+: When you don't want to use a technique which keeps the screen awake and disables the automatic screen lock. I.e. you *only* want to disable the automatic suspend. 
 
-## Basic Usage
+🦸 You need a cross-platform solution
+: Same code works on Windows, macOS and Linux.
 
-If you want to keep a long task running, but do not want to prevent screen from locking and/or blanking, you can use `keep.running` context manager. If you also want to prevent screen lock and screen blank, use `keep.presenting`:
+⚙️ You want to have more control
+: It is possible to whitelist or blacklist the used wakepy Methods. It is also possible to prioritize them and define a on-fail action in case activating a wakepy mode fails.
 
+✂️ You want to keep the amount of dependencies low
+: If you're running wakepy on Linux,  [jeepney](https://jeepney.readthedocs.io/) is required for D-Bus based methods. On Python 3.7,  [typing-extensions](https://pypi.org/project/typing-extensions/) is needed for typing. Otherwise: wakepy has no python dependencies.
 
-::::{tab-set}
+⚖️ Package needs to have a permissive licence
+: Wakepy is licenced under permissive [MIT License](https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt).
 
-:::{tab-item} No screen required
+## Where wakepy is used?
 
-```{code-block} python
-from wakepy import keep
-
-with keep.running():
-    # Do something that takes a long time
-```
-
-:::
-
-:::{tab-item} Screen required
-
-```{code-block} python
-from wakepy import keep
-
-with keep.presenting():
-    # Do something that takes a long time
-```
-
-:::
-
-::::
-
-
-### Mode quick reference
-
-
-
-| Wakepy mode              | keep.running | keep.presenting |
-| ------------------------ | ------------ | --------------- |
-| Sleep is prevented       | Yes          | Yes             |
-| Screenlock is prevented  | No*          | Yes             |
-| Screensaver is prevented | No*          | Yes             |
-
-
-
-```{note}
-The table above only considers the *automatic* actions (go to sleep, start screenlock, start screensaver), which are based on the *idle timer*; It is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually lock the session/screen or start screensaver.
-```
+- [viskillz-blender](https://github.com/viskillz/viskillz-blender) — Generating assets of Mental Cutting Test exercises
+- [mpc-autofill](https://github.com/chilli-axe/mpc-autofill) — Automating MakePlayingCards' online ordering system
+- [lakeshorecryotronics/python-driver](https://github.com/lakeshorecryotronics/python-driver) — Lake Shore instruments python Driver
+- [UCSD-E4E/baboon-tracking](https://github.com/UCSD-E4E/baboon-tracking) — In pipelines of a Computer Vision project tracking baboons
+- [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI
+- [minarca](https://github.com/ikus060/minarca) — Cross-platform data backup software
 
 
 
@@ -80,11 +97,23 @@ The table above only considers the *automatic* actions (go to sleep, start scree
 :numbered: -1
 :titlesonly:
 
+quickstart
+tutorial
+```
+
+```{toctree}
+:hidden:
+:caption: 'Reference Manual:'
+:maxdepth: 2
+:numbered: -1
+:titlesonly:
+
 modes
 methods-reference
 api-reference
 cli-api
 ```
+
 
 ```{toctree}
 :hidden:
