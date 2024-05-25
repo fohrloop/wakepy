@@ -56,3 +56,4 @@ Since deprecations may affect many users, they are communicated well before and 
 ## Changelog
 
 - See: https://wakepy.readthedocs.io/stable/changelog.html
+
