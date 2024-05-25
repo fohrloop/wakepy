@@ -1,6 +1,5 @@
 # Quickstart
 
-
 ## Installing
 
 To install wakepy from PyPI, run
@@ -9,24 +8,30 @@ To install wakepy from PyPI, run
 pip install wakepy
 ```
 
-## Basic Usage
 
-### Long running tasks
+## Command line interface (CLI)
 
-If you want to keep a long task running, but do not want to prevent screen from locking and/or blanking, you can use the [`keep.running`](#keep-running-mode) function which returns a context manager:
+To keep system from sleeping, run
 
+```
+wakepy
+```
+
+For presentation mode, add `-p` flag. See also: [CLI API](#cli-api)
+
+## Keeping the system on with wakepy (Python)
+
+In the simplest case, keeping a system running long running task with wakepy would be in python (See: [`keep.running`](#keep-running-mode)):
 
 ```{code-block} python
 from wakepy import keep
 
 with keep.running():
     # Do something that takes a long time. The system may start screensaver
-    # / screenlock, but CPU will keep running.
+    # / screenlock or blank the screen, but CPU will keep running.
 ```
 
-
-### Keeping screen awake
-If you want to prevent screen lock and screen blank *in addition to* keeping CPU awake, use the [`keep.presenting`](#keep-presenting-mode) function which returns a context manager:
+If you want to *also* prevent screen lock and screen blank, use the [`keep.presenting`](#keep-presenting-mode) mode:
 
 
 ```{code-block} python
