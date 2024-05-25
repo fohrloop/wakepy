@@ -168,8 +168,32 @@ Wakepy tries in order a list of different [Methods](#wakepy-methods). By default
 
 Only either `omit` or `methods` may be given (not both).
 
+### Example: whitelisting methods
+
+This would try the methods called `org.gnome.SessionManager` and `SomeOtherMethod`, but never any other methods. Note that the order is *not* defined by the whitelist.
+
+```{code-block} python
+from wakepy import keep
+
+with keep.running(methods=['org.gnome.SessionManager', 'SomeOtherMethod']):
+    ...
+```
+
+### Example: blacklisting methods
+
+This would *never* try the methods called `org.gnome.SessionManager` and `SomeOtherMethod`, but only any other methods implementing the selected Mode.
+
+```{code-block} python
+from wakepy import keep
+
+with keep.running(omit=['org.gnome.SessionManager', 'SomeOtherMethod']):
+    ...
+```
+
+
 
 ```{seealso}
 `omit` and `methods` parameter of {meth}`Mode.from_name() <wakepy.Mode.from_name>`, {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
 ```
-
+```{versionadded} 0.8.0
+```
