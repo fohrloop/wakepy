@@ -29,7 +29,39 @@ The Mode has following important attributes:
 - {attr}`m.used_method <wakepy.Mode.used_method>`: The name of the used method. Will not be reset to `None` after deactivation.
 - {attr}`m.activation_result <wakepy.Mode.activation_result>`: An {class}`~wakepy.ActivationResult` instance which gives more detailed information about the activation process.
 
+(which-method-was-used))=
+## Which wakepy Method was used?
 
+When you would like to check *how* exactly did wakepy do what you asked it to,
+you can check the used method from the {class}`Mode <wakepy.Mode>` instance.
+
+**Example**
+
+```python
+from wakepy import keep
+
+with keep.running() as m:
+    print('active_method:', m.active_method)
+    print('used_method:', m.used_method)
+
+print('--------')
+print('active_method:', m.active_method)
+print('used_method:', m.used_method)
+```
+
+Example output:
+
+```
+active_method: org.gnome.SessionManager
+used_method: org.gnome.SessionManager
+--------
+active_method: None
+used_method: org.gnome.SessionManager
+```
+
+```{seealso}
+{attr}`Mode.active_method <wakepy.Mode.active_method>`,  {attr}`Mode.used_method <wakepy.Mode.used_method>`
+```
 
 (on-fail-action)=
 ## Controlling the on-fail action
@@ -122,36 +154,3 @@ exiting
 ```
 
 
-(which-method-was-used))=
-## Which wakepy Method was used?
-
-When you would like to check *how* exactly did wakepy do what you asked it to,
-you can check the used method from the {class}`Mode <wakepy.Mode>` instance.
-
-**Example**
-
-```python
-from wakepy import keep
-
-with keep.running() as m:
-    print('active_method:', m.active_method)
-    print('used_method:', m.used_method)
-
-print('--------')
-print('active_method:', m.active_method)
-print('used_method:', m.used_method)
-```
-
-Example output:
-
-```
-active_method: org.gnome.SessionManager
-used_method: org.gnome.SessionManager
---------
-active_method: None
-used_method: org.gnome.SessionManager
-```
-
-```{seealso}
-{attr}`Mode.active_method <wakepy.Mode.active_method>`,  {attr}`Mode.used_method <wakepy.Mode.used_method>`
-```
