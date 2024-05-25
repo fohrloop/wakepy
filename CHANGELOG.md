@@ -8,11 +8,11 @@
 
 ### ✨ Features
 - Modes support [on-fail actions](#on-fail-action) ("error", "warn", "pass" or a callable). ([#182](https://github.com/fohrloop/wakepy/pull/182))
-- It is now possible to select the used wakepy.Methods with `methods` and  `omit` and to change the priority order of methods with `methods_priority`.
-- Added org.Gnome.SessionManager method which adds support for keep.running mode for users with Gnome Desktop Environment. ([#51](https://github.com/fohrloop/wakepy/pull/51), [#138](https://github.com/fohrloop/wakepy/pull/138), [#278](https://github.com/fohrloop/wakepy/pull/278), [#282](https://github.com/fohrloop/wakepy/pull/282))
-- ActivationResult objects ([#57](https://github.com/fohrloop/wakepy/pull/57), [#258](https://github.com/fohrloop/wakepy/pull/258), [#270](https://github.com/fohrloop/wakepy/pull/270))
-- ModeExit ([#72](https://github.com/fohrloop/wakepy/pull/72))
-- It's now possible to check the active and used method from the Mode instance ([#268](https://github.com/fohrloop/wakepy/pull/268))
+- It is now possible to [select the used wakepy.Methods](#how-to-white-or-blacklist-methods) with `methods` and  `omit` and to [change the priority order](#how-to-control-order-of-methods) of methods with `methods_priority`.
+- Added [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) method which adds support for keep.running mode for users with Gnome Desktop Environment. ([#51](https://github.com/fohrloop/wakepy/pull/51), [#138](https://github.com/fohrloop/wakepy/pull/138), [#278](https://github.com/fohrloop/wakepy/pull/278), [#282](https://github.com/fohrloop/wakepy/pull/282))
+- {class}`ActivationResult <wakepy.ActivationResult>` objects ([#57](https://github.com/fohrloop/wakepy/pull/57), [#258](https://github.com/fohrloop/wakepy/pull/258), [#270](https://github.com/fohrloop/wakepy/pull/270)) in {attr}`Mode.activation_result <wakepy.Mode.activation_result>` which give more detailed information about the activation process.
+- Possibility to exit from a mode context manager early with {class}`ModeExit <wakepy.ModeExit>`  ([#72](https://github.com/fohrloop/wakepy/pull/72))
+- It's now possible to check the active and used method from the Mode instance using the {attr}`Mode.active_method <wakepy.Mode.active_method>` and  {attr}`Mode.used_method <wakepy.Mode.used_method>` ([#268](https://github.com/fohrloop/wakepy/pull/268))
 
 ### 🚨 Backwards incompatible
 - Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: `keep.running` and `keep.presenting` context managers. ([#85](https://github.com/fohrloop/wakepy/pull/85))

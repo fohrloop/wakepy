@@ -155,7 +155,7 @@ started
 exiting
 ```
 
-
+(how-to-white-or-blacklist-methods)=
 ## Controlling the Methods to be tried
 
 ```{versionadded} 0.8.0
@@ -196,7 +196,7 @@ with keep.running(omit=['org.gnome.SessionManager', 'SomeOtherMethod']):
 `omit` and `methods` parameter of {meth}`Mode.from_name() <wakepy.Mode.from_name>`, {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
 ```
 
-
+(how-to-control-order-of-methods)=
 ## Controlling the order of Methods to be tried
 
 ```{versionadded} 0.8.0
