@@ -12,7 +12,6 @@
 - If Mode activation fails, raise `wakepy.ActivationError` by default. Previously there was no "on fail" action, but users needed to check the `result.success` to make sure the activation was successful.
 - The `WAKEPY_FAKE_SUCCESS` check is done *before* any other Methods (previously, it would be checked if all other methods failed)
 
-
 ## wakepy 0.7.2
 🗓️ 2023-09-27
 
@@ -38,6 +37,14 @@
 ### ⚠️ Deprecations
 - Old Python API:  The `keepawake()`, `set_keepawake` and `unset_keepwake`. These will be removed in a future version of wakepy. Use `keep.running()`or `keep.presenting()`, instead.
 - The `-s, --keep-screen-awake` option of the `wakepy` CLI command. Use `-p, --presentation ` option, instead.
+
+### 📖 Documentation
+- Created Readthedocs pages
+
+### 👷 Maintenance
+* Added manual CI tests
+- Start using tox
+- Enforce pass in isort, black, ruff and mypy in tests
 
 ## wakepy 0.6.0
 🗓️ 2023-02-27
