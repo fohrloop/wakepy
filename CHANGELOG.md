@@ -3,14 +3,54 @@
 ## wakepy 0.8.0
 🗓️ not published
 
+### 🏆 Highlights
+- This is a basically a complete rewrite of wakepy.
+
 ### ✨ Features
-- Modes support [on-fail actions](#on-fail-action) ("error", "warn", "pass" or a callable).
+- Modes support [on-fail actions](#on-fail-action) ("error", "warn", "pass" or a callable). ([#182](https://github.com/fohrloop/wakepy/pull/182))
 - It is now possible to select the used wakepy.Methods with `methods` and  `omit` and to change the priority order of methods with `methods_priority`.
+- Added org.Gnome.SessionManager method which adds support for keep.running mode for users with Gnome Desktop Environment. ([#51](https://github.com/fohrloop/wakepy/pull/51), [#138](https://github.com/fohrloop/wakepy/pull/138), [#278](https://github.com/fohrloop/wakepy/pull/278), [#282](https://github.com/fohrloop/wakepy/pull/282))
+- ActivationResult objects ([#57](https://github.com/fohrloop/wakepy/pull/57), [#258](https://github.com/fohrloop/wakepy/pull/258), [#270](https://github.com/fohrloop/wakepy/pull/270))
+- ModeExit ([#72](https://github.com/fohrloop/wakepy/pull/72))
+- It's now possible to check the active and used method from the Mode instance ([#268](https://github.com/fohrloop/wakepy/pull/268))
 
 ### 🚨 Backwards incompatible
-- Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: `keep.running` and `keep.presenting` context managers.
+- Removed `set_keepawake` and `unset_keepawake functions` and the `keepawake` context manager. These were deprecated in 0.7.0 and are replaced with the new api: `keep.running` and `keep.presenting` context managers. ([#85](https://github.com/fohrloop/wakepy/pull/85))
+- Renamed the CLI argument `-s, --keep-screen-awake` to `-p, --presentation`. The old ones were deprecated in 0.7.0. ([#179](https://github.com/fohrloop/wakepy/pull/179/))
 - If Mode activation fails, raise `wakepy.ActivationError` by default. Previously there was no "on fail" action, but users needed to check the `result.success` to make sure the activation was successful.
-- The `WAKEPY_FAKE_SUCCESS` check is done *before* any other Methods (previously, it would be checked if all other methods failed)
+- The org.freedesktop.ScreenSaver based method is not used on keep.running mode. Systems supporting org.freedesktop.ScreenSaver which are not running Gnome will have no keep.running method until it gets implemented. By default wakepy will raise a wakepy.ActivationError if keep.running is used on such system. Either use keep.preseting mode, or wait or provide a PR.
+- The `WAKEPY_FAKE_SUCCESS` check is done *before* trying any wakepy Methods (previously, it was used when all the tried methods have failed)
+
+### 🐞 Bug fixes
+- The org.freedesktop.ScreenSaver based method is only used in keep.presenting mode. Previously, it was used on keep.running mode on Linux.
+
+### 📖 Documentation
+- Rewritten the docs ([#193](https://github.com/fohrloop/wakepy/pull/193), [#194](https://github.com/fohrloop/wakepy/pull/194), [#196](https://github.com/fohrloop/wakepy/pull/196), [#197](https://github.com/fohrloop/wakepy/pull/197), [#198](https://github.com/fohrloop/wakepy/pull/198), [#200](https://github.com/fohrloop/wakepy/pull/200), [#244](https://github.com/fohrloop/wakepy/pull/244), [#271](https://github.com/fohrloop/wakepy/pull/271), [#272](https://github.com/fohrloop/wakepy/pull/272), [#285](https://github.com/fohrloop/wakepy/pull/285))
+- Remove /en/ from the URL and rename latest to stable ([#250](https://github.com/fohrloop/wakepy/pull/250))
+
+### 👷 Maintenance
+- Made the CI tests mandatory for every PR (previously manual) ([#191](https://github.com/fohrloop/wakepy/pull/191))
+- 100% test coverage + use branch coverage instead of line coverage + enforce 100% coverage ([#221](https://github.com/fohrloop/wakepy/pull/221), [#222](https://github.com/fohrloop/wakepy/pull/222))
+- Run black+isort+ruff also on tests ([#224](https://github.com/fohrloop/wakepy/pull/224))
+- Run mypy also on tests + fix the new mypy issues ([#227](https://github.com/fohrloop/wakepy/pull/227))
+- Add tests for Python 3.12 and 3.13. Now test all supported versions of python on linux, and oldest and newest supported versions on MacOS and Windows.  ([#160](https://github.com/fohrloop/wakepy/pull/160), [#236](https://github.com/fohrloop/wakepy/pull/236), [#273](https://github.com/fohrloop/wakepy/pull/273))
+- Pin docs and tests dependencies ([#220](https://github.com/fohrloop/wakepy/pull/220))
+- Build docs in CI tests to prevent breaking docs ([#211](https://github.com/fohrloop/wakepy/pull/211))
+- Run tox and pipeline tests against build wheel instead of the source tree ([#231](https://github.com/fohrloop/wakepy/pull/231), [#236](https://github.com/fohrloop/wakepy/pull/236))
+- Build both, sdist (tar.gz) and wheel (.whl). 0.7.x had just wheels and <=0.6.x just dist. Start using setuptools-scm and switch from flit to setuptools ([#235](https://github.com/fohrloop/wakepy/pull/235)).
+- Add invoke commands ([#223](https://github.com/fohrloop/wakepy/pull/223))
+- Add automatic publishing GitHub workflow ([#238](https://github.com/fohrloop/wakepy/pull/238))
+- Limit docstrings and comments to 79 characters ([#207](https://github.com/fohrloop/wakepy/pull/207))
+- WakepyFakeSuccess Method ([#152](https://github.com/fohrloop/wakepy/pull/152)) instead of using some custom logic with `WAKEPY_FAKE_SUCCESS`.
+- Split package extras: dev, doc, test and check (was: doc, dev) ([#213](https://github.com/fohrloop/wakepy/pull/213)) and start using requirements-*.txt instead of misusing extras ([#228](https://github.com/fohrloop/wakepy/pull/228))
+- Ruff: Update from 0.0.270 to 0.3.2 ([#206](https://github.com/fohrloop/wakepy/pull/206)), use `--no-fix` in tox ([#208](https://github.com/fohrloop/wakepy/pull/208)), Stricter ruff rules: W291 ([#209](https://github.com/fohrloop/wakepy/pull/209))
+- Black: Update from 23.3.0 to 24.2.0 and reformat ([#217](https://github.com/fohrloop/wakepy/pull/217))
+- Isort: Update from 5.12.0 to 5.13.2 ([#218](https://github.com/fohrloop/wakepy/pull/218))
+- Mypy: Update from 1.3.0 to 1.9.0 ([#219](https://github.com/fohrloop/wakepy/pull/219)), stricter settings; `disallow_untyped_defs = true` ([#242](https://github.com/fohrloop/wakepy/pull/242)), `disallow_any_unimported = true` and `warn_unused_ignores = true` ([#243](https://github.com/fohrloop/wakepy/pull/243))
+- Make wakepy statically typed: Add py.typed ([PEP 561](https://peps.python.org/pep-0561/)) to advertize that wakepy is a fully typed package ([#232](https://github.com/fohrloop/wakepy/pull/232)), add mypy checks on 3.7-3.12 ([#265](https://github.com/fohrloop/wakepy/pull/265))
+- Other tox improvements ([#233](https://github.com/fohrloop/wakepy/pull/233))
+- Convert from flat layout to src layout ([#234](https://github.com/fohrloop/wakepy/pull/234))
+- Cleanup .gitignore ([#237](https://github.com/fohrloop/wakepy/pull/237))
 
 ## wakepy 0.7.2
 🗓️ 2023-09-27
