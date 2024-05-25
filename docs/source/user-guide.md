@@ -5,7 +5,7 @@ Wakepy main Python API is are the wakepy [Modes](#wakepy-modes), which are state
 
 ## Entering a wakepy.Mode
 
-The wakepy modes are implemented as context managers of type {class}`wakepy.Mode`. The available convenience wrappers for creating a Mode are {func}`keep.presenting() <wakepy.keep.presenting>` and {func}`keep.running() <wakepy.keep.running>`. These are used with the `with` statement:
+The wakepy modes are implemented as context managers of type {class}`wakepy.Mode`. The available convenience wrappers for creating a Mode are {func}`keep.running() <wakepy.keep.running>` and {func}`keep.presenting() <wakepy.keep.presenting>`. These are used with the `with` statement:
 
 ```{code-block} python
 from wakepy import keep
@@ -34,7 +34,7 @@ The Mode has following important attributes:
 (on-fail-action)=
 ## Controlling the on-fail action
 
-By default, if a mode cannot be activated, an {class}`~wakepy.ActivationError` is raised. The {func}`keep.presenting <wakepy.keep.presenting>` and {func}`keep.running <wakepy.keep.running>` also take an `on_fail` parameter which may be used to alter the behavior.
+By default, if a mode cannot be activated, an {class}`~wakepy.ActivationError` is raised. The wakepy Modes also take an `on_fail` input argument which may be used to alter the behavior.
 
 ```{versionadded} 0.8.0
 ```
@@ -47,6 +47,11 @@ By default, if a mode cannot be activated, an {class}`~wakepy.ActivationError` i
 | "warn"  | Issues an {class}`~wakepy.ActivationWarning` |
 | "pass"  | Does nothing |
 | Callable | The callable is called with one argument: the result of the activation which is <br> a instance of {class}`~wakepy.ActivationResult`. The call occurs before the with block is entered. |
+
+
+```{seealso}
+{class}`Mode.__init__() <wakepy.Mode>` `on_fail` argument.
+```
 
 #### Example: Notify user with a custom callable
 
@@ -66,7 +71,7 @@ with keep.running(methods=[], on_fail=react_on_failure):
     run_long_task()
 ```
 
-- The `on_fail` parameter to {func}`keep.running <wakepy.keep.running>` is a callable which gets called with an {class}`~wakepy.ActivationResult` when the activation of the mode fails.
+- The `on_fail` parameter to {func}`keep.running() <wakepy.keep.running>` is a callable which gets called with an {class}`~wakepy.ActivationResult` when the activation of the mode fails.
 - Here we use empty list in `methods` to force failure
 
 Example output:
@@ -132,3 +137,16 @@ print('active_method:', m.active_method)
 print('used_method:', m.used_method)
 ```
 
+Example output:
+
+```
+active_method: org.gnome.SessionManager
+used_method: org.gnome.SessionManager
+--------
+active_method: None
+used_method: org.gnome.SessionManager
+```
+
+```{seealso}
+{attr}`Mode.active_method <wakepy.Mode.active_method>`,  {attr}`Mode.used_method <wakepy.Mode.used_method>`
+```
