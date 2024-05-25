@@ -111,7 +111,11 @@ with keep.presenting():
 ```
 
 
+```{admonition} Next Steps
+:class: seealso
 
+See the [User Guide](#user-guide) and the available wakepy [Modes](#wakepy-modes) and [Methods](#wakepy-methods)
+```
 ```{admonition} Wakepy API is still experimental 🚧
 :class: note
 
@@ -135,6 +139,8 @@ a major release (e.g. 1.x.x -> 2.0.0).
 ## Links
 - GitHub: [github.com/fohrloop/wakepy](https://github.com/fohrloop/wakepy)
 - PyPI: [pypi.org/project/wakepy](https://pypi.org/project/wakepy/)
+
+
 
 ```{toctree}
 :hidden:
