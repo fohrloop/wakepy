@@ -154,3 +154,17 @@ exiting
 ```
 
 
+## Controlling the Methods to be tried
+
+Wakepy tries in order a list of different [Methods](#wakepy-methods). By default this is of methods are all the Methods which implement the selected wakepy Mode. If you do not want to try all the methods, you can 
+
+- Blacklist methods with the `omit` parameter
+- Whitelist methods with the `methods` parameter
+
+Only either `omit` or `methods` may be given (not both).
+
+
+```{seealso}
+`omit` and `methods` parameter of {meth}`Mode.from_name() <wakepy.Mode.from_name>`, {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
+```
+
