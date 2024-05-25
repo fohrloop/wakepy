@@ -4,7 +4,7 @@
 🗓️ not published
 
 ### 🏆 Highlights
-- This is a basically a complete rewrite of wakepy.
+- This is a basically a complete rewrite of wakepy. It adds support for keep.running mode on Gnome, on-fail action, possibility to control the used methods and their priority, more information about the used methods and the activation process and possibility to exit the mode early. In addition, testing and CI pipelines were updated to ease maintenance.
 
 ### ✨ Features
 - Modes support [on-fail actions](#on-fail-action) ("error", "warn", "pass" or a callable). ([#182](https://github.com/fohrloop/wakepy/pull/182))
