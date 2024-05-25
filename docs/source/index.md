@@ -142,7 +142,7 @@ a major release (e.g. 1.x.x -> 2.0.0).
 :numbered: -1
 :titlesonly:
 
-tutorial
+user-guide
 ```
 
 ```{toctree}

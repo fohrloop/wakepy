@@ -1,4 +1,36 @@
-# Tutorial
+# User Guide
+
+Wakepy main Python API is are the wakepy [Modes](#wakepy-modes), which are states that are activated and deactivated and which keep your system awake. The method for activating the mode depends on your platform (among other things) and is determined by the used [Method](#wakepy-methods).  For example [keep.presenting](#keep-presenting-mode) mode is implemented by [org.gnome.SessionManager](#keep-presenting-org-gnome-sessionmanager) for Linux with GNOME DE, [SetThreadExecutionState](#keep-presenting-windows-stes) for Windows and [caffeinate](#keep-presenting-macos-caffeinate) for MacOS. In most cases, wakepy does nothing but calls an executable (caffeinate), a DLL function call (SetThreadExecutionState) or a D-Bus method (org.gnome.SessionManager). Wakepy helps in this by providing a coherent API which should just work™ on any system. Or, at least that is the vision of wakepy.
+
+
+## Entering a wakepy.Mode
+
+The wakepy modes are implemented as context managers of type `wakepy.Mode`; either keep.presenting or keep.running:
+
+```{code-block} python
+from wakepy import keep
+
+with keep.running():
+    # Do something that takes a long time. The system may start screensaver
+    # / screenlock or blank the screen, but CPU will keep running.
+```
+
+ When entering the context, the `wakepy.Mode` instance (`m`) is returned, which has following attributes:
+
+- `m.active`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
+- `m.activation_result`: An ActivationResult instance which gives more detailed information about the activation process.
+
+````{tip}
+You may want to inform user about failure in activating a mode. For example:
+
+```{code-block} python
+with keep.running() as m:
+    if not m.active:
+        print('Failed to inhibit system sleep.')
+
+    do_something_that_takes_long_time()
+```
+````
 
 (on-fail-action)=
 ## Controlling the on-fail action

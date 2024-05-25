@@ -1,3 +1,4 @@
+(wakepy-modes)=
 # Wakepy Modes
 
 Wakepy Modes are states that you activate, and while the mode is active, wakepy keeps the system awake (inhibits suspend/sleep). In the end you deactivate the mode. Each Mode is implemented with multiple [Methods](#wakepy-methods) which support different platforms. Wakepy selects the used Method automatically, but it may also be selected by the user. The available modes are
@@ -13,27 +14,6 @@ Wakepy Modes are states that you activate, and while the mode is active, wakepy 
 ```{note}
 The table above only considers the *automatic* actions (go to sleep, start screenlock, start screensaver), which are based on the *idle timer*; It is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually lock the session/screen or start screensaver.
 ```
-
-
-
-## Entering a mode
-
-The wakepy modes are implemented as context managers of type `wakepy.Mode`. When entering the context, the `wakepy.Mode` instance (`m`) is returned, which has following attributes:
-
-- `m.active`: True, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
-- `m.activation_result`: An ActivationResult instance which gives more detailed information about the activation process.
-
-````{tip}
-You may want to inform user about failure in activating a mode. For example:
-
-```{code-block} python
-with keep.running() as m:
-    if not m.active:
-        print('Failed to inhibit system sleep.')
-
-    do_something_that_takes_long_time()
-```
-````
 
 
 (keep-running-mode)=
