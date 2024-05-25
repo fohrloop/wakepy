@@ -149,6 +149,7 @@ a major release (e.g. 1.x.x -> 2.0.0).
 :titlesonly:
 
 user-guide
+tests-and-ci
 ```
 
 ```{toctree}
@@ -162,17 +163,6 @@ modes
 methods-reference
 api-reference
 cli-api
-```
-
-
-```{toctree}
-:hidden:
-:caption: 'Advanced Usage:'
-:maxdepth: 2
-:numbered: -1
-:titlesonly:
-
-tests-and-ci
 ```
 
 
