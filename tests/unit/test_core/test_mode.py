@@ -435,7 +435,7 @@ class TestActivateOneOfMethods:
         )
 
         # The activation succeeded, and the method has heartbeat, so the
-        # hearbeat must be instance of Heartbeate
+        # heartbeat must be instance of Heartbeate
         assert res == [
             MethodActivationResult(
                 methodcls_success_with_hb.name,

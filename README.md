@@ -53,3 +53,6 @@ Since deprecations may affect many users, they are communicated well before and 
 
 <!-- end after docs link -->
 
+## Changelog
+
+- See: https://wakepy.readthedocs.io/stable/changelog.html

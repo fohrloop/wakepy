@@ -76,6 +76,55 @@ Here's some reasons why you might want to consider using wakepy:
 ⚖️ Package needs to have a permissive licence
 : Wakepy is licenced under permissive [MIT License](https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt).
 
+
+
+## Command line interface (CLI)
+
+To keep system from sleeping, run
+
+```
+wakepy
+```
+
+For presentation mode, add `-p` flag. See also: [CLI API](#cli-api)
+
+## Basic usage within Python
+
+In the simplest case, keeping a system running long running task with wakepy would be in python (See: [`keep.running`](#keep-running-mode)):
+
+```{code-block} python
+from wakepy import keep
+
+with keep.running():
+    # Do something that takes a long time. The system may start screensaver
+    # / screenlock or blank the screen, but CPU will keep running.
+```
+
+If you want to *also* prevent screen lock and screen blank, use the [`keep.presenting`](#keep-presenting-mode) mode:
+
+
+```{code-block} python
+from wakepy import keep
+
+with keep.presenting():
+    # Do something that takes a long time and requires the screen to be awake
+```
+
+
+```{admonition} Next Steps
+:class: seealso
+
+See the [User Guide](#user-guide) and the available wakepy [Modes](#wakepy-modes) and [Methods](#wakepy-methods)
+```
+```{admonition} Wakepy API is still experimental 🚧
+:class: note
+
+Since wakepy is still 0.x.x, the API might change without further notice from
+one release to another. After that, breaking changes should occur only part of
+a major release (e.g. 1.x.x -> 2.0.0). 
+```
+
+
 ## Where wakepy is used?
 
 - [viskillz-blender](https://github.com/viskillz/viskillz-blender) — Generating assets of Mental Cutting Test exercises
@@ -91,14 +140,16 @@ Here's some reasons why you might want to consider using wakepy:
 - GitHub: [github.com/fohrloop/wakepy](https://github.com/fohrloop/wakepy)
 - PyPI: [pypi.org/project/wakepy](https://pypi.org/project/wakepy/)
 
+
+
 ```{toctree}
 :hidden:
 :maxdepth: 2
 :numbered: -1
 :titlesonly:
 
-quickstart
-tutorial
+user-guide
+tests-and-ci
 ```
 
 ```{toctree}
@@ -112,17 +163,6 @@ modes
 methods-reference
 api-reference
 cli-api
-```
-
-
-```{toctree}
-:hidden:
-:caption: 'Advanced Usage:'
-:maxdepth: 2
-:numbered: -1
-:titlesonly:
-
-tests-and-ci
 ```
 
 
