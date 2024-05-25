@@ -426,7 +426,7 @@ def try_enter_and_heartbeat(method: Method) -> Tuple[bool, str, Optional[dt.date
         with the method was successful, otherwise False. The err_message is a
         string which may be non-empty only when success is False. The
         heartbeat_call_time is the datetime (in UTC) just before calling the
-        method.hearbeat().
+        method.heartbeat().
 
     Raises
     ------

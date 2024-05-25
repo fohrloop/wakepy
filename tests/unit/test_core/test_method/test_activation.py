@@ -224,7 +224,7 @@ class TestTryEnterAndHeartbeat:
             # Expecting: Return Success + '' +  heartbeat time
             assert res == (True, "", expected_time)
 
-    def test_enter_mode_success_hearbeat_missing(self):
+    def test_enter_mode_success_heartbeat_missing(self):
         """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
 
         for method in combinations_of_test_methods(
