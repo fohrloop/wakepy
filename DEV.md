@@ -4,13 +4,9 @@ This document serves as documentation for the package developers.
 
 ## Branches and tags
 
-TODO: fix
-- **`dev`** branch: for development. All PRs should be against it. Documented at [wakepy.readthedocs.io/dev/](https://wakepy.readthedocs.io/dev/)
-- **`main`** branch: The stable/released version(s) of wakepy. Documented at [wakepy.readthedocs.io](https://wakepy.readthedocs.io/), which is the same as the [wakepy.readthedocs.io/stable/](https://wakepy.readthedocs.io/stable/).
+- **`main`** branch: The only long-living branch. All PRs are done against it.
 - Use a local short-lived feature branch for development.
-
-TODO: fix
-- Release versions use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the dev branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
+- Releases use [Semantic Versioning](https://semver.org/) and are marked with git tags (on the `main` branch) with format `v[major].[minor].[patch]`; e.g. v1.2.0 or v2.2.0.
 
 ## Installing for development
 
@@ -38,10 +34,10 @@ invoke docs
 - **Deploying**: Just push to github, and it will be automatically built by readthedocs. The settings can be adjusted [here](https://readthedocs.org/dashboard).
 - Versions selected for documentation are selected in the readthedocs UI. Select one version per `major.minor` version (latest of them) from the git tags.
 
-TODO: fix this:
-- The `latest` version (default versio) in readthedocs follows the `main` branch automatically.
-
-
+### urls
+- The `stable` version in readthedocs ([wakepy.readthedocs.io/stable/](https://wakepy.readthedocs.io/stable/)) is the latest *release* (tagged version), as documented in [here](https://docs.readthedocs.io/en/stable/versions.html).
+- The `latest` version in readthedocs ([wakepy.readthedocs.io/latest/](https://wakepy.readthedocs.io/latest/)) follows the HEAD of the `main` branch automatically. This is the *development* version.
+- The released versions X.Y.Z can also be accessed at `wakepy.readthedocs.io/vX.Y.Z/`
 
 # Testing
 
