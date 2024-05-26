@@ -161,10 +161,10 @@ def get_startup_text(mode: ModeName) -> str:
 
 
 def wait_until_keyboardinterrupt() -> None:
-    spinning_chars = ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
+    spinner_symbols = ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
     try:
-        for char in itertools.cycle(spinning_chars):  # pragma: no branch
-            print("\r" + char + r" [Press Ctrl+C to exit] ", end="")
+        for spinner_symbol in itertools.cycle(spinner_symbols):  # pragma: no branch
+            print("\r" + spinner_symbol + r" [Press Ctrl+C to exit] ", end="")
             time.sleep(0.8)
     except KeyboardInterrupt:
         pass
