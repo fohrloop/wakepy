@@ -41,7 +41,15 @@ invoke docs
 
 # Testing
 
-Wakepy uses pytest for testing the source tree with one python version and tox for testing the created wheel with multiple python versions.
+Wakepy uses pytest for testing the source tree with one python version and tox for testing the created wheel with multiple python versions. The test commands from smallest to largest iteration cycle:
+
+- `python -m pytest /tests/unit/some.py::somefunc` - Run a single test on single python version. Tests against source tree.
+- `python -m pytest ` - Run all unit and integration tests on single python version. Tests against source tree.
+- `inv test` (`invoke test`) - pytest + black + isort + ruff + mypy checks on single python version. Tests against source tree.
+- `tox` - pytest on multiple python versions & black + isort + ruff + mypy on single python version. Tests are run agains a build (.whl) version instead of the source tree.
+- GitHub Actions (PR checks): pytest + mypy on multiple python versions and multiple operating systems. Code check (isort + black + ruff + mypy) on single python version. Test that documentation build does not crash.
+
+Below a few more words about the `inv test` and `tox` options.
 
 ## Running tests with single environment
 
