@@ -1,7 +1,7 @@
 # Changelog
 
 ## wakepy 0.8.0
-🗓️ 2024-05-25
+🗓️ 2024-05-26
 
 ### 🏆 Highlights
 - This is a basically a complete rewrite of wakepy. It adds support for keep.running mode on Gnome, on-fail action, possibility to control the used methods and their priority, more information about the used methods and the activation process and possibility to exit the mode early. In addition, testing and CI pipelines were updated to ease maintenance.
