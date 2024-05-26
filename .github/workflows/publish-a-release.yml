@@ -37,7 +37,7 @@ jobs:
 
   publish-to-pypi:
     name: 📦 Publish wakepy to PyPI
-    needs: sign-artifacts
+    needs: build-and-test
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: signed-wakepy-python-packages
+          name: wakepy-python-packages
           path: ./dist/
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@81e9d935c883d0b210363ab89cf05f3894778450 #v1.8.14
