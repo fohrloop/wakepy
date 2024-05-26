@@ -36,7 +36,7 @@ jobs:
           retention-days: 1
 
   publish-to-pypi:
-    name: Publish wakepy to PyPI
+    name: 📦 Publish wakepy to PyPI
     needs: sign-artifacts
     runs-on: ubuntu-latest
     environment:
@@ -55,7 +55,7 @@ jobs:
           print-hash: true
 
   publish-to-github-releases:
-    name: Publish wakepy to GitHub
+    name: 📦 Publish wakepy to GitHub
     needs: sign-artifacts
     runs-on: ubuntu-latest
     environment:
