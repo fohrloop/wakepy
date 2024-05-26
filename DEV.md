@@ -76,36 +76,15 @@ tox -e py310 -- --pdb
 
 # Deployment
 
-- Create a wheel with
+The deployment is automated, but changelog creation takes a few manual steps, since then it's possible to use Sphinx syntax to refer and link to python classes, methods and attributes within the changelog, and it's possible to get the same changelog to RTD and GitHub Releases.
 
-```
-python -m pip wheel --no-deps .
-```
-- Push to PyPI  (assuming the one-time setup below done)
-```
-python -m twine  upload wakepy-<version>-py3-none-any.whl --repository wakepy
-```
-- If made a new version, remember to update the `main` branch so ReadTheDocs may update the documentation.
-- Also, check that readthedocs has included all the correct versions (git tags)
-
-
-## Setting up twine/pip for uploading to PyPI
-- This should be done once per system
-- (1) Get a PyPI token for the *project* from [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/)
-- (2) Create a `$HOME/.pypirc` file with following contents:
-
-```
-[distutils]
-  index-servers =
-    pypi
-    wakepy
-
-[pypi]
-  username = __token__
-  password = # either a user-scoped token or a project-scoped token you want to set as the default
-
-[wakepy]
-  repository = https://upload.pypi.org/legacy/
-  username = __token__
-  password = # the wakepy project scoped token here.
-```
+**Steps**:
+- Add changelog and release date to [changelog.md](docs/source/changelog.md)
+- Merge the changes to main.
+- Locally, fetch and checkout latest main, and create a new git tag with format "vX.Y.X"
+- Push the tag to GitHub. Verify that the tag commit is same as latest main commit.
+- Go to GitHub and run the action for release (https://github.com/fohrloop/wakepy/actions/workflows/publish-a-release.yml) on the "main" branch.
+- After release, go to GitHub Releases at https://github.com/fohrloop/wakepy/releases/tag/main. Start editing the description of the latest release.
+- Copy-paste the changelog from https://wakepy.readthedocs.io/stable/changelog.html to the description. Add titles (`###`)  and list markers (`-`) back.
+- Copy-paste the text further to a text editor and find and replace "wakepy.readthedocs.io/stable" with "wakepy.readthedocs.io/X.Y.Z" to keep the changelog links working even after later releases.
+- Copy-paste back to the GitHub Releases, and save with title "wakepy X.Y.Z"
