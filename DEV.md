@@ -82,9 +82,9 @@ tox -e py310 -- --pdb
 
 - When using tox within this project, what happens is (1) wakepy is built with `python -m build`. This creates sdist from source tree and then wheel from the sdist. (2) Tests are ran against the created *wheel* (if not `skip_install=True` for that environment).
 
-# Deployment
+# Creating a release
 
-The deployment is automated, but changelog creation takes a few manual steps, since then it's possible to use Sphinx syntax to refer and link to python classes, methods and attributes within the changelog, and it's possible to get the same changelog to RTD and GitHub Releases.
+The release process is automated, but changelog creation takes a few manual steps, since then it's possible to use Sphinx syntax to refer and link to python classes, methods and attributes within the changelog, and it's possible to get the same changelog to RTD and GitHub Releases.
 
 **Steps**:
 - Add changelog and release date to [changelog.md](docs/source/changelog.md)
