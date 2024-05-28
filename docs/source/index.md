@@ -90,8 +90,6 @@ wakepy
 
 For presentation mode, add `-p` flag. See also: [CLI API](#cli-api)
 
-
-
 ## Basic usage within Python
 
 In the simplest case, keeping a system running long running task with wakepy would be in python (See: [`keep.running`](#keep-running-mode)):
