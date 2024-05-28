@@ -58,6 +58,8 @@ Wakepy supports CPython 3.7 to 3.13, and may be installed with
 pip install wakepy
 ```
 
+To get the `wakepy` [CLI command](#cli-api) working, you might need to restart the shell / terminal application.
+
 ## Why wakepy?
 Here's some reasons why you might want to consider using wakepy:
 
@@ -87,6 +89,8 @@ wakepy
 ```
 
 For presentation mode, add `-p` flag. See also: [CLI API](#cli-api)
+
+
 
 ## Basic usage within Python
 

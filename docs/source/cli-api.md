@@ -24,3 +24,10 @@ options:
   -p, --presentation       Presentation mode; inhibit automatic sleep, screensaver and
                            screenlock
 ```
+
+
+````{admonition} Command "wakepy" not found?
+:class: note
+
+If you just installed `wakepy`, you might need to restart shell / terminal application to make added to the PATH.
+````
