@@ -128,7 +128,7 @@ If used hundreds or thousands of times, may slow down system. See: [wakepy/#277]
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**:  The org.freedesktop.ScreenSaver does not expose a method for listing the inhibitors, but you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
 - **Requirements**: D-Bus, and a [freedesktop.org compliant desktop environment](https://www.freedesktop.org/wiki/Desktops/), which should implement the org.freedesktop.ScreenSaver.Inhibit method.
-- **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([PR #171](https://github.com/fohrloop/wakepy/pull/171) by [fohrloop](https://github.com/fohrloop/)).
+- **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([wakepy/#171](https://github.com/fohrloop/wakepy/pull/171)) and openSUSE 15.5 with KDE Plasma 5.27.9 ([wakepy/#310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2135512139)) by [fohrloop](https://github.com/fohrloop/).
 
 (keep-presenting-windows-stes)=
 ### SetThreadExecutionState

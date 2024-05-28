@@ -38,17 +38,20 @@ Wakepy may keep the following systems awake:
       <td>Mac OS X 10.8 Mountain Lion (July 2012) or newer</td>
     </tr>
     <tr>
-      <td class="hoverable" rowspan="2">Linux<sup>[1]</sup></td>
+      <td class="hoverable" rowspan="3">Linux<sup>[1]</sup></td>
       <td>Distributions using <a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a></td>
     </tr>
     <tr>
-      <td>Desktop Environments which implement the <a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a> ScreenSaver interface (<code>org.freedesktop.ScreenSaver</code>)</td>
+      <td>Distributions using <a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a><sup>[2]</sup></td>
+    </tr>
+    <tr>
+      <td>Any other Desktop Environments which implement the <a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a> <a href="https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html">ScreenSaver</a> interface<sup>[2]</sup></td>
     </tr>
   </tbody>
 </table>
 
 <p style="margin-top:1em;">
-<sup>[1]</sup> The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.<p>
+<sup>[1]</sup> The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments. <sup>[2]</sup> Only the presentation mode currently.<p>
 
 ## Installing
 
