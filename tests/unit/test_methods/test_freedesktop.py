@@ -7,11 +7,13 @@ would expect from a dbus service."""
 import re
 
 import pytest
+from unittest.mock import patch
 
 from wakepy.core.dbus import BusType, DBusAdapter, DBusAddress, DBusMethod
 from wakepy.methods.freedesktop import (
     FreedesktopPowerManagementInhibit,
     FreedesktopScreenSaverInhibit,
+    _kde_plasma_version_ge_than,
 )
 
 screen_saver = DBusAddress(
@@ -140,3 +142,15 @@ class TestFreedesktopExitMode:
         method = method_cls(dbus_adapter=DBusAdapter())
         assert method.inhibit_cookie is None
         assert method.exit_mode() is None
+
+
+def test_plasmashell_version_ge_than():
+
+    with patch(
+        "wakepy.methods.freedesktop.subprocess.getoutput",
+        return_value="plasmashell 1.2.3",
+    ):
+
+        assert _kde_plasma_version_ge_than((1, 2, 0)) is True
+        assert _kde_plasma_version_ge_than((1, 2, 3)) is True
+        assert _kde_plasma_version_ge_than((1, 2, 4)) is False

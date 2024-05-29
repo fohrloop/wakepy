@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import typing
+import re
 
 from wakepy.core import (
     BusType,
@@ -16,7 +18,7 @@ from wakepy.core import (
 )
 
 if typing.TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, Tuple
 
 
 class FreedesktopInhibitorWithCookieMethod(Method):
@@ -157,9 +159,9 @@ class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
         if XDG_CURRENT_DESKTOP not in os.environ:
             raise RuntimeError(f"{XDG_CURRENT_DESKTOP} not set!")
 
-        if os.environ[XDG_CURRENT_DESKTOP] != "KDE":
-            # Could in theory support also other DEs, but every DE may behave
-            # differently with this.
+        if os.environ[XDG_CURRENT_DESKTOP] == "KDE":
+
+            # TODO: get plasmashell version
 
             raise RuntimeError(
                 (
@@ -168,3 +170,28 @@ class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
                 )
             )
         return True
+
+
+def _kde_plasma_version_ge_than(versiontuple_min: Tuple[int, int, int]) -> bool:
+    """Check if KDE Plasma version is greater than or equal to a given version
+
+    Parameters
+    ----------
+    versiontuple_min:
+        The minimum acceptable version. For example: (5,27,9)
+
+    Returns
+    -------
+    bool
+        True, if the KDE Plasma version is greater than or equal to the given
+        minimum version. Otherwise, False.
+    """
+    # returns for example 'plasmashell 5.27.9'
+    out = subprocess.getoutput("plasmashell --version")
+    mtch = re.match("plasmashell ([0-9][0-9.]*)$", out)
+    if mtch is None:
+        return False
+
+    versionstring = mtch.group(1)
+    versiontuple = tuple(int(x) for x in versionstring.split("."))
+    return versiontuple >= versiontuple_min
