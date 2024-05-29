@@ -19,36 +19,10 @@ if typing.TYPE_CHECKING:
     from typing import Optional
 
 
-class FreedesktopScreenSaverInhibit(Method):
-    """Method using org.freedesktop.ScreenSaver D-Bus API
+class FreedesktopInhibitorWithCookieMethod(Method):
+    """Base class for freedesktop.org D-Bus based methods."""
 
-    https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html
-    """
-
-    name = "org.freedesktop.ScreenSaver"
-    mode_name = ModeName.KEEP_PRESENTING
-
-    screen_saver = DBusAddress(
-        bus=BusType.SESSION,
-        service="org.freedesktop.ScreenSaver",
-        path="/org/freedesktop/ScreenSaver",
-        interface="org.freedesktop.ScreenSaver",
-    )
-
-    method_inhibit = DBusMethod(
-        name="Inhibit",
-        signature="ss",
-        params=("application_name", "reason_for_inhibit"),
-        output_signature="u",
-        output_params=("cookie",),
-    ).of(screen_saver)
-
-    method_uninhibit = DBusMethod(
-        name="UnInhibit",
-        signature="u",
-        params=("cookie",),
-    ).of(screen_saver)
-
+    service_dbus_address: DBusAddress
     supported_platforms = (PlatformName.LINUX,)
 
     def __init__(self, **kwargs: object) -> None:
@@ -66,9 +40,7 @@ class FreedesktopScreenSaverInhibit(Method):
 
         retval = self.process_dbus_call(call)
         if retval is None:
-            raise RuntimeError(
-                "Could not get inhibit cookie from org.freedesktop.ScreenSaver"
-            )
+            raise RuntimeError(f"Could not get inhibit cookie from {self.name}")
         self.inhibit_cookie = retval[0]
 
     def exit_mode(self) -> None:
@@ -83,8 +55,43 @@ class FreedesktopScreenSaverInhibit(Method):
         self.process_dbus_call(call)
         self.inhibit_cookie = None
 
+    @property
+    def method_inhibit(self) -> DBusMethod:
+        return DBusMethod(
+            name="Inhibit",
+            signature="ss",
+            params=("application_name", "reason_for_inhibit"),
+            output_signature="u",
+            output_params=("cookie",),
+        ).of(self.service_dbus_address)
 
-class FreedesktopPowerManagementInhibit(Method):
+    @property
+    def method_uninhibit(self) -> DBusMethod:
+        return DBusMethod(
+            name="UnInhibit",
+            signature="u",
+            params=("cookie",),
+        ).of(self.service_dbus_address)
+
+
+class FreedesktopScreenSaverInhibit(FreedesktopInhibitorWithCookieMethod):
+    """Method using org.freedesktop.ScreenSaver D-Bus API
+
+    https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html
+    """
+
+    name = "org.freedesktop.ScreenSaver"
+    mode_name = ModeName.KEEP_PRESENTING
+
+    service_dbus_address = DBusAddress(
+        bus=BusType.SESSION,
+        service="org.freedesktop.ScreenSaver",
+        path="/org/freedesktop/ScreenSaver",
+        interface="org.freedesktop.ScreenSaver",
+    )
+
+
+class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
     """Method using org.freedesktop.PowerManagement D-Bus API
 
     According to [1] and [2] this might be obsolete. The spec itself can be
@@ -136,32 +143,12 @@ class FreedesktopPowerManagementInhibit(Method):
     name = "org.freedesktop.PowerManagement"
     mode_name = ModeName.KEEP_RUNNING
 
-    power_management = DBusAddress(
+    service_dbus_address = DBusAddress(
         bus=BusType.SESSION,
         service="org.freedesktop.PowerManagement",
         path="/org/freedesktop/PowerManagement/Inhibit",
         interface="org.freedesktop.PowerManagement.Inhibit",
     )
-
-    method_inhibit = DBusMethod(
-        name="Inhibit",
-        signature="ss",
-        params=("application_name", "reason_for_inhibit"),
-        output_signature="u",
-        output_params=("cookie",),
-    ).of(power_management)
-
-    method_uninhibit = DBusMethod(
-        name="UnInhibit",
-        signature="u",
-        params=("cookie",),
-    ).of(power_management)
-
-    supported_platforms = (PlatformName.LINUX,)
-
-    def __init__(self, **kwargs: object) -> None:
-        super().__init__(**kwargs)
-        self.inhibit_cookie: Optional[int] = None
 
     def caniuse(self) -> bool | None | str:
 
@@ -181,31 +168,3 @@ class FreedesktopPowerManagementInhibit(Method):
                 )
             )
         return True
-
-    def enter_mode(self) -> None:
-        call = DBusMethodCall(
-            method=self.method_inhibit,
-            args=dict(
-                application_name="wakepy",
-                reason_for_inhibit="wakelock active",
-            ),
-        )
-
-        retval = self.process_dbus_call(call)
-        if retval is None:
-            raise RuntimeError(
-                "Could not get inhibit cookie from org.freedesktop.PowerManagement"
-            )
-        self.inhibit_cookie = retval[0]
-
-    def exit_mode(self) -> None:
-        if self.inhibit_cookie is None:
-            # Nothing to exit from.
-            return
-
-        call = DBusMethodCall(
-            method=self.method_uninhibit,
-            args=dict(cookie=self.inhibit_cookie),
-        )
-        self.process_dbus_call(call)
-        self.inhibit_cookie = None
