@@ -136,7 +136,7 @@ class FreedesktopPowerManagementInhibit(Method):
     name = "org.freedesktop.PowerManagement"
     mode_name = ModeName.KEEP_RUNNING
 
-    screen_saver = DBusAddress(
+    power_management = DBusAddress(
         bus=BusType.SESSION,
         service="org.freedesktop.PowerManagement",
         path="/org/freedesktop/PowerManagement/Inhibit",
@@ -149,13 +149,13 @@ class FreedesktopPowerManagementInhibit(Method):
         params=("application_name", "reason_for_inhibit"),
         output_signature="u",
         output_params=("cookie",),
-    ).of(screen_saver)
+    ).of(power_management)
 
     method_uninhibit = DBusMethod(
         name="UnInhibit",
         signature="u",
         params=("cookie",),
-    ).of(screen_saver)
+    ).of(power_management)
 
     supported_platforms = (PlatformName.LINUX,)
 
