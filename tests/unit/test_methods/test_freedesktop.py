@@ -9,7 +9,10 @@ import re
 import pytest
 
 from wakepy.core.dbus import BusType, DBusAdapter, DBusAddress, DBusMethod
-from wakepy.methods.freedesktop import FreedesktopScreenSaverInhibit
+from wakepy.methods.freedesktop import (
+    FreedesktopPowerManagementInhibit,
+    FreedesktopScreenSaverInhibit,
+)
 
 screen_saver = DBusAddress(
     bus=BusType.SESSION,
@@ -18,19 +21,14 @@ screen_saver = DBusAddress(
     interface="org.freedesktop.ScreenSaver",
 )
 
+power_management = DBusAddress(
+    bus=BusType.SESSION,
+    service="org.freedesktop.PowerManagement",
+    path="/org/freedesktop/PowerManagement/Inhibit",
+    interface="org.freedesktop.PowerManagement.Inhibit",
+)
 
 fake_cookie = 75848243423
-
-
-@pytest.fixture
-def method_inhibit1():
-    return DBusMethod(
-        name="Inhibit",
-        signature="ss",
-        params=("application_name", "reason_for_inhibit"),
-        output_signature="u",
-        output_params=("cookie",),
-    )
 
 
 def get_test_dbus_adapter(process) -> DBusAdapter:
@@ -44,10 +42,25 @@ def get_test_dbus_adapter(process) -> DBusAdapter:
 
 class TestFreedesktopEnterMode:
 
-    def test_success(self, method_inhibit1: DBusMethod):
+    @pytest.mark.parametrize(
+        "method_cls, dbus_address",
+        [
+            (FreedesktopScreenSaverInhibit, screen_saver),
+            (FreedesktopPowerManagementInhibit, power_management),
+        ],
+    )
+    def test_success(self, method_cls, dbus_address: DBusAddress):
+
+        method_inhibit = DBusMethod(
+            name="Inhibit",
+            signature="ss",
+            params=("application_name", "reason_for_inhibit"),
+            output_signature="u",
+            output_params=("cookie",),
+        )
 
         def process(call):
-            assert call.method == method_inhibit1.of(screen_saver)
+            assert call.method == method_inhibit.of(dbus_address)
             assert call.get_kwargs() == {
                 "application_name": "wakepy",
                 "reason_for_inhibit": "wakelock active",
@@ -55,14 +68,12 @@ class TestFreedesktopEnterMode:
 
             return (fake_cookie,)
 
-        method = FreedesktopScreenSaverInhibit(
-            dbus_adapter=get_test_dbus_adapter(process)
-        )
+        method = method_cls(dbus_adapter=get_test_dbus_adapter(process))
         # At the start, there is no inhibit cookie.
         assert method.inhibit_cookie is None
 
         # Act
-        enter_retval = method.enter_mode()  # type: ignore[func-returns-value]
+        enter_retval = method.enter_mode()
 
         # Assert
         assert enter_retval is None
@@ -70,52 +81,62 @@ class TestFreedesktopEnterMode:
         # DBusAdapter
         assert method.inhibit_cookie == fake_cookie
 
-    def test_with_dbus_adapter_which_returns_none(self):
+    @pytest.mark.parametrize(
+        "method_cls",
+        [FreedesktopScreenSaverInhibit, FreedesktopPowerManagementInhibit],
+    )
+    def test_with_dbus_adapter_which_returns_none(self, method_cls):
 
         def process(_):
             return None
 
-        method = FreedesktopScreenSaverInhibit(
-            dbus_adapter=get_test_dbus_adapter(process)
-        )
+        method = method_cls(dbus_adapter=get_test_dbus_adapter(process))
 
         with pytest.raises(
             RuntimeError,
-            match=re.escape(
-                "Could not get inhibit cookie from org.freedesktop.ScreenSaver"
-            ),
+            match=re.escape(f"Could not get inhibit cookie from {method_cls.name}"),
         ):
-            assert method.enter_mode() is False  # type: ignore[func-returns-value]
+            assert method.enter_mode() is False
 
 
 class TestFreedesktopExitMode:
 
-    def test_successful_exit(self):
+    @pytest.mark.parametrize(
+        "method_cls, dbus_address",
+        [
+            (FreedesktopScreenSaverInhibit, screen_saver),
+            (FreedesktopPowerManagementInhibit, power_management),
+        ],
+    )
+    def test_successful_exit(self, method_cls, dbus_address: DBusAddress):
         # Arrange
+
         method_uninhibit = DBusMethod(
             name="UnInhibit",
             signature="u",
             params=("cookie",),
-        ).of(screen_saver)
+        ).of(dbus_address)
 
         def process(call):
             assert call.method == method_uninhibit
             assert call.get_kwargs() == {"cookie": fake_cookie}
 
-        method = FreedesktopScreenSaverInhibit(
-            dbus_adapter=get_test_dbus_adapter(process)
-        )
+        method = method_cls(dbus_adapter=get_test_dbus_adapter(process))
         method.inhibit_cookie = fake_cookie
 
         # Act
-        exit_retval = method.exit_mode()  # type: ignore[func-returns-value]
+        exit_retval = method.exit_mode()
 
         # Assert
         assert exit_retval is None
         # exiting mode unsets the inhibit_cookie
         assert method.inhibit_cookie is None
 
-    def test_screensaver_exit_before_enter(self):
-        method = FreedesktopScreenSaverInhibit(dbus_adapter=DBusAdapter())
+    @pytest.mark.parametrize(
+        "method_cls",
+        [FreedesktopScreenSaverInhibit, FreedesktopPowerManagementInhibit],
+    )
+    def test_screensaver_exit_before_enter(self, method_cls):
+        method = method_cls(dbus_adapter=DBusAdapter())
         assert method.inhibit_cookie is None
-        assert method.exit_mode() is None  # type: ignore[func-returns-value]
+        assert method.exit_mode() is None
