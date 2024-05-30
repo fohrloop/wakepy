@@ -216,6 +216,21 @@ class TestPowerManagementCanIUse:
         ):
             assert method.caniuse() is True
 
+    def test_on_other_de(self, monkeypatch):
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "XFCE")
+
+        method = FreedesktopPowerManagementInhibit()
+
+        with pytest.raises(
+            RuntimeError,
+            match=re.escape(
+                "org.freedesktop.PowerManagemen does not support XFCE as it has a bug "
+                "which prevents automatic screenlock / screensaver. See: "
+                "https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/65"
+            ),
+        ):
+            method.caniuse()
+
 
 class TestGetKDEPlasmaVersion:
     def test_success(self):
