@@ -4,6 +4,7 @@ These tests do *not* use IO / real or fake DBus calls. Instead, a special dbus
 adapter is used which simply asserts the Call objects and returns what we
 would expect from a dbus service."""
 
+import os
 import re
 from unittest.mock import patch
 
@@ -275,7 +276,8 @@ class TestGetCurrentDesktopEnvironment:
         assert _get_current_desktop_environment() == "XFCE"
 
     def test_not_set(self, monkeypatch):
-        monkeypatch.delenv("XDG_SESSION_DESKTOP")
+        if os.environ.get("XDG_SESSION_DESKTOP"):
+            monkeypatch.delenv("XDG_SESSION_DESKTOP")
         assert _get_current_desktop_environment() is None
 
     def test_other(self, monkeypatch):
