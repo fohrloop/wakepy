@@ -9,6 +9,10 @@ html[data-theme=light] {
     --wakepy-color-inline-code: #d70936;
     --wakepy-color-code-block-bg: #fcfcfd;
     --wakepy-color-code-block-border: #d1d5da;
+    /* tables */
+    --wakepy-table-color-header-bg: #f6f6f6;
+    --wakepy-table-color-bg: #fff;
+    --wakepy-table-color-border: #ddd;
     /* Regular links color */
     --pst-color-link: #0250e3;
     /* Navigation links color */
@@ -23,6 +27,9 @@ html[data-theme=dark] {
     --wakepy-color-inline-code:#dd7886;
     --wakepy-color-code-block-bg: #272822;
     --wakepy-color-code-block-border: #3c3d2e;
+    --wakepy-table-color-header-bg: #29313d;
+    --wakepy-table-color-bg: #0f1216;
+    --wakepy-table-color-border: #29313d;
     /* Regular links color */
     --pst-color-link: #6e91d8;
     /* Navigation links color */
@@ -102,13 +109,13 @@ dl.py > dd > ul {
 
 .wakepy-table th,
 .wakepy-table td {
-  border: 1px solid #ddd;
+  border: 1px solid var(--wakepy-table-color-border);
   padding: 12px;
   text-align: left;
 }
 
 .wakepy-table th {
-  background-color: #f6f6f6;
+  background-color: var(--wakepy-table-color-header-bg);
   font-weight: bold;
 }
 
@@ -117,5 +124,5 @@ dl.py > dd > ul {
 }
 
 .wakepy-table td {
-  background-color: #fff;
+  background-color: var(--wakepy-table-color-bg);
 }
