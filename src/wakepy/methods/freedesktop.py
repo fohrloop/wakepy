@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import typing
-import re
 
 from wakepy.core import (
     BusType,
@@ -161,37 +161,38 @@ class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
 
         if os.environ[XDG_CURRENT_DESKTOP] == "KDE":
 
-            # TODO: get plasmashell version
-
-            raise RuntimeError(
-                (
-                    f"{self.name} only supports KDE. {XDG_CURRENT_DESKTOP} "
-                    f"was set to {os.environ[XDG_CURRENT_DESKTOP]}"
+            kde_version = _get_kde_plasma_version()
+            if kde_version < self._min_kde_plasma_version:
+                raise RuntimeError(
+                    (
+                        f"{self.name} only supports KDE. {XDG_CURRENT_DESKTOP} "
+                        f"was set to {os.environ[XDG_CURRENT_DESKTOP]}"
+                    )
                 )
-            )
+            # KDE Plasma with a supported version
+            return True
+
+        # Other DE
         return True
 
 
-def _kde_plasma_version_ge_than(versiontuple_min: Tuple[int, int, int]) -> bool:
-    """Check if KDE Plasma version is greater than or equal to a given version
-
-    Parameters
-    ----------
-    versiontuple_min:
-        The minimum acceptable version. For example: (5,27,9)
+def _get_kde_plasma_version() -> Tuple[int, int, int] | None:
+    """Get the KDE Plasma version as tuple.
 
     Returns
     -------
-    bool
-        True, if the KDE Plasma version is greater than or equal to the given
-        minimum version. Otherwise, False.
+    versiontuple:
+        The detected KDE Plasma version. For example: (5,27,9)
+        If no KDE Plasma is found, returns None.
+
     """
     # returns for example 'plasmashell 5.27.9'
     out = subprocess.getoutput("plasmashell --version")
     mtch = re.match("plasmashell ([0-9][0-9.]*)$", out)
     if mtch is None:
-        return False
+        return None
 
     versionstring = mtch.group(1)
     versiontuple = tuple(int(x) for x in versionstring.split("."))
-    return versiontuple >= versiontuple_min
+    assert len(versiontuple) == 3, "The plasmashell version must be in format X.Y.Z"
+    return versiontuple

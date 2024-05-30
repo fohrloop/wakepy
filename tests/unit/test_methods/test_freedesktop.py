@@ -5,15 +5,15 @@ adapter is used which simply asserts the Call objects and returns what we
 would expect from a dbus service."""
 
 import re
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
 
 from wakepy.core.dbus import BusType, DBusAdapter, DBusAddress, DBusMethod
 from wakepy.methods.freedesktop import (
     FreedesktopPowerManagementInhibit,
     FreedesktopScreenSaverInhibit,
-    _kde_plasma_version_ge_than,
+    _get_kde_plasma_version,
 )
 
 screen_saver = DBusAddress(
@@ -144,13 +144,29 @@ class TestFreedesktopExitMode:
         assert method.exit_mode() is None
 
 
-def test_plasmashell_version_ge_than():
+def test_get_kde_plasma_version():
 
     with patch(
         "wakepy.methods.freedesktop.subprocess.getoutput",
         return_value="plasmashell 1.2.3",
     ):
+        assert _get_kde_plasma_version() == (1, 2, 3)
 
-        assert _kde_plasma_version_ge_than((1, 2, 0)) is True
-        assert _kde_plasma_version_ge_than((1, 2, 3)) is True
-        assert _kde_plasma_version_ge_than((1, 2, 4)) is False
+    with patch(
+        "wakepy.methods.freedesktop.subprocess.getoutput",
+        return_value="plasmashell 4.5.6",
+    ):
+        assert _get_kde_plasma_version() == (4, 5, 6)
+
+    with patch(
+        "wakepy.methods.freedesktop.subprocess.getoutput",
+        return_value="foo",
+    ):
+        assert _get_kde_plasma_version() is None
+
+    with patch(
+        "wakepy.methods.freedesktop.subprocess.getoutput",
+        return_value="If 'plasmashell' is not a typo you can use command-not-found to"
+        " lookup the package that contains it, like this: cnf fooo",
+    ):
+        assert _get_kde_plasma_version() is None
