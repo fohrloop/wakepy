@@ -191,11 +191,9 @@ class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
                 )
 
             if kde_version < self._min_kde_plasma_version:
+                min_version_str = ".".join(str(x) for x in self._min_kde_plasma_version)
                 raise RuntimeError(
-                    (
-                        f"{self.name} only supports KDE. {XDG_SESSION_DESKTOP} "
-                        f"was set to {os.environ[XDG_SESSION_DESKTOP]}"
-                    )
+                    (f"{self.name} only supports KDE >= {min_version_str}")
                 )
             # KDE Plasma with a supported version
             return True

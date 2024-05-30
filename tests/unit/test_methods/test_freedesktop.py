@@ -145,6 +145,78 @@ class TestFreedesktopExitMode:
         assert method.exit_mode() is None
 
 
+class TestPowerManagementCanIUse:
+
+    def test_on_kde_5_12_90(self, monkeypatch):
+        # Should support KDE 5.12.90 +
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "KDE")
+
+        method = FreedesktopPowerManagementInhibit()
+
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="plasmashell 5.12.90",
+        ):
+            assert method.caniuse() is True
+
+    def test_on_kde_6_0_0(self, monkeypatch):
+        # Should support KDE 5.12.90 +
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "KDE")
+
+        method = FreedesktopPowerManagementInhibit()
+
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="plasmashell 6.0.0",
+        ):
+            assert method.caniuse() is True
+
+    def test_on_kde_5_12_89(self, monkeypatch):
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "KDE")
+
+        method = FreedesktopPowerManagementInhibit()
+
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="plasmashell 5.12.89",
+        ):
+            with pytest.raises(
+                RuntimeError,
+                match=re.escape(
+                    "org.freedesktop.PowerManagement only supports KDE >= 5.12.90"
+                ),
+            ):
+                method.caniuse()
+
+    def test_on_kde_version_none(self, monkeypatch):
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "KDE")
+
+        method = FreedesktopPowerManagementInhibit()
+
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="noversion",
+        ):
+            with pytest.raises(
+                RuntimeError,
+                match=re.escape(
+                    "Running on KDE but could not detect KDE Plasma version"
+                ),
+            ):
+                method.caniuse()
+
+    def test_on_other_de(self, monkeypatch):
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "RandomDE")
+
+        method = FreedesktopPowerManagementInhibit()
+
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="foo",
+        ):
+            assert method.caniuse() is True
+
+
 class TestGetKDEPlasmaVersion:
     def test_success(self):
 
