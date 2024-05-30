@@ -164,7 +164,7 @@ def wait_until_keyboardinterrupt() -> None:
     spinner_symbols = ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
     try:
         for spinner_symbol in itertools.cycle(spinner_symbols):  # pragma: no branch
-            print("\r" + spinner_symbol + r" [Press Ctrl+C to exit] ", end="")
+            print("\r " + spinner_symbol + r" [Press Ctrl+C to exit] ", end="")
             time.sleep(0.8)
     except KeyboardInterrupt:
         pass
