@@ -14,6 +14,7 @@ from wakepy.methods.freedesktop import (
     FreedesktopPowerManagementInhibit,
     FreedesktopScreenSaverInhibit,
     _get_kde_plasma_version,
+    _get_current_desktop_environment,
 )
 
 screen_saver = DBusAddress(
@@ -144,29 +145,52 @@ class TestFreedesktopExitMode:
         assert method.exit_mode() is None
 
 
-def test_get_kde_plasma_version():
+class TestGetKDEPlasmaVersion:
+    def test_success(self):
 
-    with patch(
-        "wakepy.methods.freedesktop.subprocess.getoutput",
-        return_value="plasmashell 1.2.3",
-    ):
-        assert _get_kde_plasma_version() == (1, 2, 3)
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="plasmashell 1.2.3",
+        ):
+            assert _get_kde_plasma_version() == (1, 2, 3)
 
-    with patch(
-        "wakepy.methods.freedesktop.subprocess.getoutput",
-        return_value="plasmashell 4.5.6",
-    ):
-        assert _get_kde_plasma_version() == (4, 5, 6)
+    def test_success2(self):
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="plasmashell 4.5.6",
+        ):
+            assert _get_kde_plasma_version() == (4, 5, 6)
 
-    with patch(
-        "wakepy.methods.freedesktop.subprocess.getoutput",
-        return_value="foo",
-    ):
-        assert _get_kde_plasma_version() is None
+    def test_bad_output(self):
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="foo",
+        ):
+            assert _get_kde_plasma_version() is None
 
-    with patch(
-        "wakepy.methods.freedesktop.subprocess.getoutput",
-        return_value="If 'plasmashell' is not a typo you can use command-not-found to"
-        " lookup the package that contains it, like this: cnf fooo",
-    ):
-        assert _get_kde_plasma_version() is None
+    def test_unknown_command(self):
+        with patch(
+            "wakepy.methods.freedesktop.subprocess.getoutput",
+            return_value="If 'plasmashell' is not a typo you can use command-not-found to"
+            " lookup the package that contains it, like this: cnf fooo",
+        ):
+            assert _get_kde_plasma_version() is None
+
+
+class TestGetCurrentDesktopEnvironment:
+
+    def test_kde(self, monkeypatch):
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "KDE")
+        assert _get_current_desktop_environment() == "KDE"
+
+    def test_xfce(self, monkeypatch):
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "xfce")
+        assert _get_current_desktop_environment() == "XFCE"
+
+    def test_not_set(self, monkeypatch):
+        monkeypatch.delenv("XDG_SESSION_DESKTOP")
+        assert _get_current_desktop_environment() is None
+
+    def test_other(self, monkeypatch):
+        monkeypatch.setenv("XDG_SESSION_DESKTOP", "FOO")
+        assert _get_current_desktop_environment() == "FOO"
