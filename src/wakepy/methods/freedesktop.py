@@ -223,7 +223,7 @@ def _get_current_desktop_environment() -> str | None:
     return de_from_env_var
 
 
-def _get_kde_plasma_version() -> Tuple[int, int, int] | None:
+def _get_kde_plasma_version() -> Optional[Tuple[int, int, int]]:
     """Get the KDE Plasma version as tuple.
 
     Returns
