@@ -1,5 +1,14 @@
 # Changelog
 
+## wakepy 0.9.0
+🗓️ unreleased
+
+### ✨ Features
+- Support keep.running mode in KDE Plasma 5.12.90 and newer through the [org.freedesktop.PowerManagement](#keep-running-org-freedesktop-powermanagement) method. It may also be used on other DEs which implement this older freedesktop.org D-Bus interface (but not Xcfe). ([#324](https://github.com/fohrloop/wakepy/pull/324))
+
+### 📖 Documentation
+- Document that the [org.freedesktop.ScreenSaver](keep-presenting-org-freedesktop-screensaver) method for keep.presenting mode also supports KDE Plasma. ([#324](https://github.com/fohrloop/wakepy/pull/324))
+
 ## wakepy 0.8.0
 🗓️ 2024-05-26
 
