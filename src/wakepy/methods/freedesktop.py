@@ -20,6 +20,22 @@ from wakepy.core import (
 if typing.TYPE_CHECKING:
     from typing import Optional, Tuple
 
+XDG_SESSION_DESKTOP = "XDG_SESSION_DESKTOP"
+"""The environment variable for the xdg desktop of the current session. Defined
+in pam_systemd manual[1].
+
+Note that there's also XDG_CURRENT_DESKTOP which contains a colon-separated
+list of DEs, defined in [2]
+
+[1]: https://www.freedesktop.org/software/systemd/man/pam_systemd.html
+[2]: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
+"""
+
+KDE = "KDE"
+"""Constant for KDE desktop environment / KDE Plasma"""
+XFCE = "XFCE"
+"""Constant for Xfce desktop environemtn"""
+
 
 class FreedesktopInhibitorWithCookieMethod(Method):
     """Base class for freedesktop.org D-Bus based methods."""
@@ -152,28 +168,54 @@ class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
         interface="org.freedesktop.PowerManagement.Inhibit",
     )
 
+    _min_kde_plasma_version = (5, 12, 90)
+    """The minimum KDE Plasma version which supports this method.
+
+    In earlier versions of KDE Plasma, there was a bug which caused the
+    PowerManagement.Inhibit to behave similarly to the
+    org.freedesktop.ScreenSaver interface. This was fixed in commit
+    152400c1b6880506ee1395011686c2b191f419a0 which was part of KDE Plasma
+    5.12.90.
+    """
+
     def caniuse(self) -> bool | None | str:
 
-        XDG_CURRENT_DESKTOP = "XDG_CURRENT_DESKTOP"
+        current_de = _get_current_desktop_environment()
 
-        if XDG_CURRENT_DESKTOP not in os.environ:
-            raise RuntimeError(f"{XDG_CURRENT_DESKTOP} not set!")
-
-        if os.environ[XDG_CURRENT_DESKTOP] == "KDE":
-
+        if current_de == KDE:
             kde_version = _get_kde_plasma_version()
+
+            if kde_version is None:
+                raise RuntimeError(
+                    "Running on KDE but could not detect KDE Plasma version."
+                )
+
             if kde_version < self._min_kde_plasma_version:
                 raise RuntimeError(
                     (
-                        f"{self.name} only supports KDE. {XDG_CURRENT_DESKTOP} "
-                        f"was set to {os.environ[XDG_CURRENT_DESKTOP]}"
+                        f"{self.name} only supports KDE. {XDG_SESSION_DESKTOP} "
+                        f"was set to {os.environ[XDG_SESSION_DESKTOP]}"
                     )
                 )
             # KDE Plasma with a supported version
             return True
 
-        # Other DE
+        # Other DEs
         return True
+
+
+def _get_current_desktop_environment() -> str | None:
+    """Get the desktop environment of the current session. If the DE cannot be
+    determined, return None"""
+    if XDG_SESSION_DESKTOP not in os.environ:
+        return None
+
+    de_from_env_var = os.environ[XDG_SESSION_DESKTOP]
+    if de_from_env_var.upper() == KDE:
+        return KDE
+    elif de_from_env_var.upper() == XFCE:
+        return XFCE
+    return de_from_env_var
 
 
 def _get_kde_plasma_version() -> Tuple[int, int, int] | None:
