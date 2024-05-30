@@ -11,6 +11,7 @@
 - Document that the [org.freedesktop.ScreenSaver](keep-presenting-org-freedesktop-screensaver) method for keep.presenting mode also supports KDE Plasma. ([#324](https://github.com/fohrloop/wakepy/pull/324))
 - Update dev docs ([#308](https://github.com/fohrloop/wakepy/pull/308))
 - Mention that shell should be restarted for wakepy CLI tool ([#321](https://github.com/fohrloop/wakepy/pull/321))
+- Fix: Supported Platforms table background does not support dark mode ([#316](https://github.com/fohrloop/wakepy/pull/316))
 
 ## wakepy 0.8.0
 🗓️ 2024-05-26
