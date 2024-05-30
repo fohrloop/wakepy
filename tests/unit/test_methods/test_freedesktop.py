@@ -216,7 +216,7 @@ class TestPowerManagementCanIUse:
         ):
             assert method.caniuse() is True
 
-    def test_on_other_de(self, monkeypatch):
+    def test_on_other_xfce(self, monkeypatch):
         monkeypatch.setenv("XDG_SESSION_DESKTOP", "XFCE")
 
         method = FreedesktopPowerManagementInhibit()
