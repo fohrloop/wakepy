@@ -258,8 +258,8 @@ class TestGetKDEPlasmaVersion:
     def test_unknown_command(self):
         with patch(
             "wakepy.methods.freedesktop.subprocess.getoutput",
-            return_value="If 'plasmashell' is not a typo you can use command-not-found to"
-            " lookup the package that contains it, like this: cnf fooo",
+            return_value="If 'plasmashell' is not a typo you can use command-not-found"
+            " to lookup the package that contains it, like this: cnf fooo",
         ):
             assert _get_kde_plasma_version() is None
 
