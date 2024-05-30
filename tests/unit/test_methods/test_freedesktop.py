@@ -13,8 +13,8 @@ from wakepy.core.dbus import BusType, DBusAdapter, DBusAddress, DBusMethod
 from wakepy.methods.freedesktop import (
     FreedesktopPowerManagementInhibit,
     FreedesktopScreenSaverInhibit,
-    _get_kde_plasma_version,
     _get_current_desktop_environment,
+    _get_kde_plasma_version,
 )
 
 screen_saver = DBusAddress(
