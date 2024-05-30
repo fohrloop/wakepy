@@ -223,7 +223,7 @@ def _get_current_desktop_environment() -> str | None:
     return de_from_env_var
 
 
-def _get_kde_plasma_version() -> Optional[Tuple[int, int, int]]:
+def _get_kde_plasma_version() -> Optional[Tuple[int, ...]]:
     """Get the KDE Plasma version as tuple.
 
     Returns
@@ -241,5 +241,4 @@ def _get_kde_plasma_version() -> Optional[Tuple[int, int, int]]:
 
     versionstring = mtch.group(1)
     versiontuple = tuple(int(x) for x in versionstring.split("."))
-    assert len(versiontuple) == 3, "The plasmashell version must be in format X.Y.Z"
     return versiontuple
