@@ -4,7 +4,7 @@
 🗓️ 2024-05-31
 
 ### ✨ Features
-- Support keep.running mode in KDE Plasma 5.12.90 and newer through the [org.freedesktop.PowerManagement](#keep-running-org-freedesktop-powermanagement) method. It may also be used on other DEs which implement this older freedesktop.org D-Bus interface (but not Xcfe). ([#324](https://github.com/fohrloop/wakepy/pull/324))
+- Support keep.running mode in KDE Plasma 5.12.90 and newer through the [org.freedesktop.PowerManagement](#org-freedesktop-powermanagement) method. It may also be used on other DEs which implement this older freedesktop.org D-Bus interface (but not Xcfe). ([#324](https://github.com/fohrloop/wakepy/pull/324))
 - Cooler CLI spinner ([#309](https://github.com/fohrloop/wakepy/pull/309), [#323](https://github.com/fohrloop/wakepy/pull/323))
 
 ### 📖 Documentation

@@ -33,7 +33,7 @@ If used thousands of times really fast, may slow down system. See: [wakepy/#277]
 ````
 
 
-(keep-running-org-freedesktop-powermanagement)=
+(org-freedesktop-powermanagement)=
 ### org.freedesktop.PowerManagement
 - **Name**: `org.freedesktop.PowerManagement`
 - **Introduced in**: wakepy 0.9.0
