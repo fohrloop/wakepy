@@ -19,7 +19,7 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 ### org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager`
 - **Introduced in**: wakepy 0.8.0
-- **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service with flag 4 ("Inhibit suspending the session or computer") when activating and saves the returned cookie on the Method instance. Uses the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie when deactivating.
+- **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service  when activating and saves the returned cookie on the Method instance. For [`keep.running`](#keep-running-mode) mode uses flag 4 ("Inhibit suspending the session or computer"), and in [`keep.presenting`](#keep-presenting-mode) mode uses the flag 8 ("Inhibit the session being marked as idle"). To deactivate the mode, calls the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie.
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**:  You may check the list of inhibitors using the [GetInhibitors](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.GetInhibitors) method, which gives you list of object paths like `["/org/gnome/SessionManager/Inhibitor20"]`. Then you can use the [GetAppId](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetAppId), [GetFlags](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetFlags) and [GetReason](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetReason) methods on the [org.gnome.SessionManager.Inhibitor](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor) interface of the listed objects on the org.gnome.SessionManager service to translate that into something meaningful. A good tool for this is [D-Spy](https://apps.gnome.org/Dspy/). Alternatively, you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
@@ -27,9 +27,9 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
 
 ````{admonition} May slow down system if called repeatedly
-:class: warning
+:class: info
 
-If used hundreds or thousands of times, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
+If used thousands of times really fast, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
 ````
 
 
@@ -113,23 +113,6 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 
 ## keep.presenting
 
-(keep-presenting-org-gnome-sessionmanager)=
-### org.gnome.SessionManager
-
-- **Name**: `org.gnome.SessionManager`
-- **Introduced in**: wakepy 0.8.0
-- **How it works**: Exactly the same as the [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager, but using the flag 8 ("Inhibit the session being marked as idle").
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: Similarly as checking [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager.
-- **Requirements**: Same as [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager.
-- **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
-
-````{admonition} May slow down system if called repeatedly
-:class: warning
-
-If used hundreds or thousands of times, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
-````
 
 (keep-presenting-org-freedesktop-screensaver)=
 ### org.freedesktop.ScreenSaver
