@@ -41,19 +41,19 @@ Wakepy may keep the following systems awake. ⌛: [keep.running](#keep-running-m
       <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td><a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a></td>
+      <td><a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a><sup>[3]</sup></td>
       <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-gnome-sessionmanager">org.gnome.SessionManager</a><br>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a></td>
       <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td><a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a></td>
+      <td><a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a><sup>[4]</sup></td>
       <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-powermanagement">org.freedesktop.PowerManagement</a><br>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a></td>
       <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td><a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a><sup>[3]</sup></td>
+      <td><a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a><sup>[5]</sup></td>
       <td>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-powermanagement">org.freedesktop.PowerManagement</a><br>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a>
@@ -65,11 +65,13 @@ Wakepy may keep the following systems awake. ⌛: [keep.running](#keep-running-m
 
 <p style="margin-top:1em;">
 
-| #        |  Notes          |
-| -------- | --------------- |
-| 1    | Windows XP to Windows 11, or Windows Server 2003 or higher.         |
-| 2    | Mac OS X 10.8 Mountain Lion (July 2012) or newer.         |
-| 3    | Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces.      |
+| #   | Notes                                                                                                                        |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Windows XP to Windows 11, or Windows Server 2003 or higher.                                                                  |
+| 2   | Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
+| 3   | GNOME 2.24 (Sept 2008) onwards.                                                                                             |
+| 4   | KDE Plasma 5.12.90 (May 2018) onwards.                                                                                               |
+| 5   | Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces. |
 
 ## Installing
 
