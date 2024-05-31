@@ -18,8 +18,27 @@ The table above only considers the *automatic* actions (go to sleep, start scree
 (keep-running-mode)=
 ## keep.running
 
-What is `keep.running` mode?
-: While `keep.running` mode is activated, the system may not automatically go to sleep (or suspend) meaning that programs will continue running and can use CPU.
+While `keep.running` mode is activated, the system may not automatically go to sleep (or suspend) meaning that programs will continue running and can use CPU.
+
+**Python example**
+```{code-block} python
+from wakepy import keep
+
+with keep.running():
+    # Do something that takes a long time. The system may start screensaver
+    # / screenlock or blank the screen, but CPU will keep running.
+```
+
+```{admonition} See also
+:class: seealso
+
+See the [User Guide](#user-guide) and the API Reference for {func}`keep.running() <wakepy.keep.running>` for more details.
+```
+
+**CLI**
+```{code-block}
+wakepy
+```
 
 
 Can I lock my computer after entered `keep.running` mode?
@@ -33,11 +52,29 @@ display. Automatic lock screen is not guaranteed, but it is  not prevented in an
 (keep-presenting-mode)=
 ## keep.presenting
 
-What is `keep.presenting` mode?
-: While `keep.presenting` mode is activated, the system may not automatically go to sleep (or
-suspend) meaning that programs will continue running and can use CPU. In addition to
-that, automatic start of screensaver & screenlock are prevented, meaning that you can
+While `keep.presenting` mode is activated, the system may not automatically go to sleep (or suspend) meaning that programs will continue running and can use CPU. In addition to that, automatic start of screensaver & screenlock are prevented, meaning that you can
 show content in the `keep.presenting` mode.
+
+**Python example**
+```{code-block} python
+from wakepy import keep
+
+with keep.presenting():
+    # Do something that takes a long time and requires the screen to be awake
+```
+
+```{admonition} See also
+:class: seealso
+
+See the [User Guide](#user-guide) and the API Reference for {func}`keep.presenting() <wakepy.keep.presenting>` for more details.
+```
+
+**CLI**
+```{code-block}
+wakepy -p
+```
+
+
 
 Can I manually start lockscreen / screensaver in `keep.presenting` mode?
 : Yes. Only the idle timer based screensaver / lockscreen is prevented. Note that
@@ -45,7 +82,7 @@ manually entering screensaver does not deactivate the mode.
 
 
 
-## Questions about wakepy in general
+## Wakepy Modes FAQ
 
 What happens id the process holding the lock dies?
 : The lock is automatically removed. Wakepy always leaves the system to a clean state, and does not do any kind of configuration changes or anything which would need manual reversal if the process is killed abruptly.
