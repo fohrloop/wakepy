@@ -42,16 +42,16 @@ Wakepy may keep the following systems awake:
       <td>Distributions using <a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a></td>
     </tr>
     <tr>
-      <td>Distributions using <a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a><sup>[2]</sup></td>
+      <td>Distributions using <a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a></td>
     </tr>
     <tr>
-      <td>Any other Desktop Environments which implement the <a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a> <a href="https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html">ScreenSaver</a> interface<sup>[2]</sup></td>
+      <td>Any other Desktop Environments which implement the <a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a> <a href="https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html">org.freedesktop.ScreenSaver</a> and org.freedesktop.PowerManagement interfaces</td>
     </tr>
   </tbody>
 </table>
 
 <p style="margin-top:1em;">
-<sup>[1]</sup> The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments. <sup>[2]</sup> Only the presentation mode currently.<p>
+<sup>[1]</sup> The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.
 
 ## Installing
 
