@@ -69,7 +69,7 @@ Wakepy may keep the following systems awake. ⌛: [keep.running](#keep-running-m
 | -------- | --------------- |
 | 1    | Windows XP to Windows 11, or Windows Server 2003 or higher.         |
 | 2    | Mac OS X 10.8 Mountain Lion (July 2012) or newer.         |
-| 3    | Freedesktop.org compliant Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces.        |
+| 3    | Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces.      |
 
 ## Installing
 
