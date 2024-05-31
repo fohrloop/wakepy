@@ -156,16 +156,15 @@ a major release (e.g. 1.x.x -> 2.0.0).
 - GitHub: [github.com/fohrloop/wakepy](https://github.com/fohrloop/wakepy)
 - PyPI: [pypi.org/project/wakepy](https://pypi.org/project/wakepy/)
 
+---------------
 
-## Footnotes
-
-| #   | Notes                                                                                                                        |
-| --- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Windows XP or higher. Windows Server 2003 or higher.                                                                  |
-| 2   | Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
-| 3   | GNOME 2.24 (Sept 2008) onwards.                                                                                             |
-| 4   | KDE Plasma 5.12.90 (May 2018) onwards.                                                                                               |
-| 5   | Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces. |
+| Footnotes                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------------------------------- |
+| <sup>[1]</sup> Windows XP or higher. Windows Server 2003 or higher.                                                          |
+| <sup>[2]</sup> Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
+| <sup>[3]</sup> GNOME 2.24 (Sept 2008) onwards.                                                                                              |
+| <sup>[4]</sup> KDE Plasma 5.12.90 (May 2018) onwards.                                                                                       |
+| <sup>[5]</sup> Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces. |
 
 
 
