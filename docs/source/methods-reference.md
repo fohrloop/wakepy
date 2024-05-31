@@ -53,7 +53,6 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 - **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([wakepy/#171](https://github.com/fohrloop/wakepy/pull/171)) and openSUSE 15.5 with KDE Plasma 5.27.9 ([wakepy/#310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2135512139)) by [fohrloop](https://github.com/fohrloop/).
 
 
-
 (org-gnome-sessionmanager)=
 ## org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager`

@@ -11,47 +11,65 @@ Wakepy is a package with an Python API and a CLI tool for *keeping a system awak
 
 ## Supported platforms
 
-Wakepy may keep the following systems awake:
+Wakepy may keep the following systems awake. ⌛: [keep.running](#keep-running-mode) mode, 🖥️:[keep.presenting](#keep-presenting-mode) mode.
 
 
 <table class="wakepy-table">
   <colgroup>
-    <col style="width: 25%;">
-    <col style="width: 75%;">
+    <col style="width: 18%;">
+    <col style="width: 68%;">
+    <col style="width: 14%;">
   </colgroup>
   <thead>
     <tr>
       <th>Platform</th>
-      <th>Details</th>
+      <th>Methods</th>
+      <th>Modes</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td class="hoverable" rowspan="2">Windows</td>
-      <td>Windows XP to Windows 11</td>
+      <td>Windows<sup>[1]</sup></td>
+      <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#setthreadexecutionstate">SetThreadExecutionState</a></td>
+      <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td>Windows Server 2003 or higher</td>
     </tr>
     <tr>
-      <td>Mac OS</td>
-      <td>Mac OS X 10.8 Mountain Lion (July 2012) or newer</td>
+      <td>macOS<sup>[2]</sup></td>
+      <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#macos-caffeinate">caffeinate</a></td>
+      <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td class="hoverable" rowspan="3">Linux<sup>[1]</sup></td>
-      <td>Distributions using <a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a></td>
+      <td><a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a></td>
+      <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-gnome-sessionmanager">org.gnome.SessionManager</a><br>
+      <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a></td>
+      <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td>Distributions using <a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a></td>
+      <td><a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a></td>
+      <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-powermanagement">org.freedesktop.PowerManagement</a><br>
+      <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a></td>
+      <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td>Any other Desktop Environments which implement the <a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a> <a href="https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html">org.freedesktop.ScreenSaver</a> and org.freedesktop.PowerManagement interfaces</td>
+      <td><a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a><sup>[3]</sup></td>
+      <td>
+      <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-powermanagement">org.freedesktop.PowerManagement</a><br>
+      <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a>
+      </td>
+      <td>⌛ 🖥️</td>
     </tr>
   </tbody>
 </table>
 
 <p style="margin-top:1em;">
-<sup>[1]</sup> The Linux support is under active development. Target is to support at least GNOME, KDE, Xfce, Cinnamon, LXQt and MATE Desktop Environments.
+
+| #        |  Notes          |
+| -------- | --------------- |
+| 1    | Windows XP to Windows 11, or Windows Server 2003 or higher.         |
+| 2    | Mac OS X 10.8 Mountain Lion (July 2012) or newer.         |
+| 3    | Freedesktop.org compliant Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces.        |
 
 ## Installing
 
