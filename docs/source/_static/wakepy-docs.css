@@ -9,6 +9,7 @@ html[data-theme=light] {
     --wakepy-color-inline-code: #d70936;
     --wakepy-color-code-block-bg: #fcfcfd;
     --wakepy-color-code-block-border: #d1d5da;
+    --wakepy-table-color-header-bottom-border: #f6f6f6;
     /* tables */
     --wakepy-table-color-header-bg: #f6f6f6;
     --wakepy-table-color-bg: #fff;
@@ -17,6 +18,12 @@ html[data-theme=light] {
     --pst-color-link: #0250e3;
     /* Navigation links color */
     --pst-color-primary: #0250e3;
+    /* override table row coloring (odd rows) */
+    --pst-color-table-row-zebra-low-bg: rgb(255, 255, 255) !important;
+    /* override table row coloring (even rows) */
+    --pst-color-table-row-zebra-high-bg: rgb(255, 255, 255) !important;
+    /* override table row hover background color */
+    --pst-color-table-row-hover-bg: #dce7fc !important;
 }
 
 
@@ -27,13 +34,20 @@ html[data-theme=dark] {
     --wakepy-color-inline-code:#dd7886;
     --wakepy-color-code-block-bg: #272822;
     --wakepy-color-code-block-border: #3c3d2e;
-    --wakepy-table-color-header-bg: #29313d;
+    --wakepy-table-color-header-bg: #222832ff;
     --wakepy-table-color-bg: #0f1216;
     --wakepy-table-color-border: #29313d;
+    --wakepy-table-color-header-bottom-border: #29313d;
     /* Regular links color */
     --pst-color-link: #6e91d8;
     /* Navigation links color */
     --pst-color-primary: #6e91d8;
+    /* override table row coloring (odd rows) */
+    --pst-color-table-row-zebra-low-bg: #121212ff !important;
+    /* override table row coloring (even rows) */
+    --pst-color-table-row-zebra-high-bg: #121212ff !important;
+    /* override table row hover background color */
+    --pst-color-table-row-hover-bg: #222832ff !important;
 }
 
 nav.contents  {
@@ -126,4 +140,10 @@ dl.py > dd > ul {
 
 .wakepy-table td {
   background-color: var(--wakepy-table-color-bg);
+}
+
+/* all tables.  */
+thead > tr {
+  background-color: var(--wakepy-table-color-header-bg) !important;
+  border-bottom: 1px solid var(--wakepy-table-color-header-bottom-border) !important;
 }
