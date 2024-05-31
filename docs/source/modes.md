@@ -15,30 +15,6 @@ Wakepy Modes are states that you activate, and while the mode is active, wakepy 
 The table above only considers the *automatic* actions (go to sleep, start screenlock, start screensaver), which are based on the *idle timer*; It is still possible to put system to sleep by selecting Suspend/Sleep from a menu, closing the laptop lid or pressing a power key, for example. It is also possible to manually lock the session/screen or start screensaver.
 ```
 
-
-## Table of methods
-
-| Platform | DE    | Method                                                             |
-| -------- | ----- | ------------------------------------------------------------------ |
-| Linux    | GNOME | [org.gnome.SessionManager](#org-gnome-sessionmanager) |
-| MacOS    | *     | [caffeinate](#macos-caffeinate)                       |
-| Windows  | *     | [SetThreadExecutionState](#windows-stes)              |
-
-
-
-
-
-
-
-| Platform | DE              | Method                                                                      |
-| -------- | --------------- | --------------------------------------------------------------------------- |
-| Linux    | GNOME           | [org.gnome.SessionManager](#org-gnome-sessionmanager)       |
-| Linux    | GNOME + others? | [org.freedesktop.ScreenSaver](#org-freedesktop-screensaver) |
-| MacOS    | *               | [caffeinate](#macos-caffeinate)                             |
-| Windows  | *               | [SetThreadExecutionState](#windows-stes)                    |
-
-
-
 (keep-running-mode)=
 ## keep.running
 
