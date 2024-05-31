@@ -63,15 +63,6 @@ Wakepy may keep the following systems awake. ⌛: [keep.running](#keep-running-m
   </tbody>
 </table>
 
-<p style="margin-top:1em;">
-
-| #   | Notes                                                                                                                        |
-| --- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Windows XP or higher. Windows Server 2003 or higher.                                                                  |
-| 2   | Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
-| 3   | GNOME 2.24 (Sept 2008) onwards.                                                                                             |
-| 4   | KDE Plasma 5.12.90 (May 2018) onwards.                                                                                               |
-| 5   | Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces. |
 
 ## Installing
 
@@ -164,6 +155,17 @@ a major release (e.g. 1.x.x -> 2.0.0).
 ## Links
 - GitHub: [github.com/fohrloop/wakepy](https://github.com/fohrloop/wakepy)
 - PyPI: [pypi.org/project/wakepy](https://pypi.org/project/wakepy/)
+
+
+## Footnotes
+
+| #   | Notes                                                                                                                        |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Windows XP or higher. Windows Server 2003 or higher.                                                                  |
+| 2   | Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
+| 3   | GNOME 2.24 (Sept 2008) onwards.                                                                                             |
+| 4   | KDE Plasma 5.12.90 (May 2018) onwards.                                                                                               |
+| 5   | Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces. |
 
 
 
