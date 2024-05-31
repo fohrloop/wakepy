@@ -18,6 +18,7 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 (org-freedesktop-screensaver)=
 ### org.freedesktop.ScreenSaver
 - **Name**: `org.freedesktop.ScreenSaver`
+- **Modes**: [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.6.0
 - **How it works**: Uses the Inhibit method of [org.freedesktop.ScreenSaver](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) D-Bus service when activating and saves the returned cookie on the Method instance. Uses the org.freedesktop.ScreenSaver.UnInhibit method with the cookie when deactivating. The org.freedesktop.ScreenSaver can only be used to prevent idle; that is why there is no "keep.running" mode counterpart.
 - **Multiprocess safe?**: Yes
@@ -31,6 +32,7 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 (org-gnome-sessionmanager)=
 ### org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager`
+- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.8.0
 - **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service  when activating and saves the returned cookie on the Method instance. For [`keep.running`](#keep-running-mode) mode uses flag 4 ("Inhibit suspending the session or computer"), and in [`keep.presenting`](#keep-presenting-mode) mode uses the flag 8 ("Inhibit the session being marked as idle"). To deactivate the mode, calls the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie.
 - **Multiprocess safe?**: Yes
@@ -49,6 +51,7 @@ If used thousands of times really fast, may slow down system. See: [wakepy/#277]
 (org-freedesktop-powermanagement)=
 ### org.freedesktop.PowerManagement
 - **Name**: `org.freedesktop.PowerManagement`
+- **Modes**: [`keep.running`](#keep-running-mode)
 - **Introduced in**: wakepy 0.9.0
 - **How it works**: Uses the Inhibit method of the org.freedesktop.PowerManagement D-Bus service when activating and saves the returned cookie on the Method instance. Uses UnInhibit method of the same service with the cookie when deactivating. The org.freedesktop.PowerManagement is an obsolete spec, but certain Desktop Environments provide that as the only option for inhibiting the suspend action. The documentation was previously hosted on [freedesktop.org](https://www.freedesktop.org/wiki/Specifications/power-management-spec/) but the links on the page are dead. The spec has three versions: 0.1, 0.2 and 0.3. The 0.3 is not found anywhere but the version 0.2 of the spec can be read in the [Internet Archive](https://web.archive.org/web/20090417010057/http://people.freedesktop.org/~hughsient/temp/power-management-spec-0.2.html)
 - **Multiprocess safe?**: Yes
@@ -70,6 +73,7 @@ Since this method prevents sleep, screen can be only locked automatically if a s
 ````
 
 - **Name**: `SetThreadExecutionState`
+- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.1.0
 - **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating [`keep.running`](#keep-running-mode) mode, and additionally ES_DISPLAY_REQUIRED flag when activating [`keep.presenting`](#keep-presenting-mode) mode. Uses the  ES_CONTINUOUS flag for deactivating. Note that currently it is not possible to use two wakepy modes using SetThreadExecutionState at the same time in the same thread! (See: [Issue 167](https://github.com/fohrloop/wakepy/issues/167))
 - **Multiprocess safe?**: Yes
@@ -116,8 +120,9 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 ### caffeinate
 
 - **Name**: `caffeinate`
+- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.3.0
-- **How it works**: It calls the `caffeinate` command to activate the [`keep.running`](#keep-running-mode) mode and add the `-d` flag ("Create an assertion to prevent the display from sleeping.") for [`keep.presenting`](#keep-presenting-mode) mode. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
+- **How it works**: It calls the `caffeinate` command to activate the keep.running mode and add the `-d` flag ("Create an assertion to prevent the display from sleeping.") for keep.presenting mode. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate` or similar associated with it using a task manager.
