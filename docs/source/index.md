@@ -72,7 +72,7 @@ Wakepy supports CPython 3.7 to 3.13, and may be installed with
 pip install wakepy
 ```
 
-To get the `wakepy` [CLI command](#cli-api) working, you might need to restart the shell / terminal application.
+To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">CLI command</a> working, you might need to restart the shell / terminal application.
 
 ## Why wakepy?
 Here's some reasons why you might want to consider using wakepy:
@@ -102,11 +102,11 @@ To keep system from sleeping, run
 wakepy
 ```
 
-For presentation mode, add `-p` flag. See also: [CLI API](#cli-api)
+For presentation mode, add `-p` flag. See also: <a href="https://wakepy.readthedocs.io/stable/cli-api.html">CLI API</a>.
 
 ## Basic usage within Python
 
-In the simplest case, keeping a system running long running task with wakepy would be in python (See: [`keep.running`](#keep-running-mode)):
+In the simplest case, keeping a system running long running task with wakepy would be in python (See: <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running</a>):
 
 ```{code-block} python
 from wakepy import keep
@@ -116,7 +116,7 @@ with keep.running():
     # / screenlock or blank the screen, but CPU will keep running.
 ```
 
-If you want to *also* prevent screen lock and screen blank, use the [`keep.presenting`](#keep-presenting-mode) mode:
+If you want to *also* prevent screen lock and screen blank, use the <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a>mode:
 
 
 ```{code-block} python
