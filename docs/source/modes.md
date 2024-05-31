@@ -25,7 +25,7 @@ suspend) meaning that programs will continue running and can use CPU.
 
 | Platform | DE    | Method                                                             |
 | -------- | ----- | ------------------------------------------------------------------ |
-| Linux    | GNOME | [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) |
+| Linux    | GNOME | [org.gnome.SessionManager](#org-gnome-sessionmanager) |
 | MacOS    | *     | [caffeinate](#keep-running-macos-caffeinate)                       |
 | Windows  | *     | [SetThreadExecutionState](#keep-running-windows-stes)              |
 
@@ -61,7 +61,7 @@ show content in the `keep.presenting` mode.
 
 | Platform | DE              | Method                                                                      |
 | -------- | --------------- | --------------------------------------------------------------------------- |
-| Linux    | GNOME           | [org.gnome.SessionManager](#keep-presenting-org-gnome-sessionmanager)       |
+| Linux    | GNOME           | [org.gnome.SessionManager](#org-gnome-sessionmanager)       |
 | Linux    | GNOME + others? | [org.freedesktop.ScreenSaver](#keep-presenting-org-freedesktop-screensaver) |
 | MacOS    | *               | [caffeinate](#keep-presenting-macos-caffeinate)                             |
 | Windows  | *               | [SetThreadExecutionState](#keep-presenting-windows-stes)                    |
