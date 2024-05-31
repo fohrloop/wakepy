@@ -4,14 +4,14 @@
 
 Wakepy is a package with an Python API and a CLI tool for *keeping a system awake*. Namely:
 
-⌛ **Keeping CPU awake**:  For long running tasks. Inhibit the automatic, timer based sleep or suspend action, but allow screenlock and screensaver turning on and monitor turning off. (See: [keep.running](#keep-running-mode))
+⌛ **Keeping CPU awake**:  For long running tasks. Inhibit the automatic, timer based sleep or suspend action, but allow screenlock and screensaver turning on and monitor turning off. (See: <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running</a>)
 
-🖥️ **Keeping screen awake**:  For long running tasks which require also the screen on and screenlock and screensaver inhibited. (See: [keep.presenting](#keep-presenting-mode))
+🖥️ **Keeping screen awake**:  For long running tasks which require also the screen on and screenlock and screensaver inhibited. (See: <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a>)
 
 
 ## Supported platforms
 
-Wakepy may keep the following systems awake. ⌛: [keep.running](#keep-running-mode) mode, 🖥️:[keep.presenting](#keep-presenting-mode) mode.
+Wakepy may keep the following systems awake. ⌛: <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running</a> mode, 🖥️:<a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a> mode.
 
 
 <table class="wakepy-table">
