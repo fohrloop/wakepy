@@ -62,7 +62,7 @@ show content in the `keep.presenting` mode.
 | Platform | DE              | Method                                                                      |
 | -------- | --------------- | --------------------------------------------------------------------------- |
 | Linux    | GNOME           | [org.gnome.SessionManager](#org-gnome-sessionmanager)       |
-| Linux    | GNOME + others? | [org.freedesktop.ScreenSaver](#keep-presenting-org-freedesktop-screensaver) |
+| Linux    | GNOME + others? | [org.freedesktop.ScreenSaver](#org-freedesktop-screensaver) |
 | MacOS    | *               | [caffeinate](#macos-caffeinate)                             |
 | Windows  | *               | [SetThreadExecutionState](#windows-stes)                    |
 
