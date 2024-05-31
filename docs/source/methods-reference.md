@@ -1,7 +1,6 @@
 (wakepy-methods)=
 # Wakepy Methods
 
-
 **What are wakepy Methods?**
 Methods are different ways of entering in (or keeping a) Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](#org-gnome-sessionmanager) D-Bus service is one way of entering  the [`keep.running`](#keep-running-mode) mode, and it requires D-Bus and (a certain version of) GNOME. The following methods exist:
 
@@ -16,7 +15,7 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 
 
 (macos-caffeinate)=
-### caffeinate
+## caffeinate
 
 - **Name**: `caffeinate`
 - **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
@@ -29,7 +28,7 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 
 
 (org-freedesktop-powermanagement)=
-### org.freedesktop.PowerManagement
+## org.freedesktop.PowerManagement
 - **Name**: `org.freedesktop.PowerManagement`
 - **Modes**: [`keep.running`](#keep-running-mode)
 - **Introduced in**: wakepy 0.9.0
@@ -42,7 +41,7 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 - **Tested on**:  openSUSE 15.5 with KDE Plasma 5.27.9 ([Comment in #310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2140156882) by [fohrloop](https://github.com/fohrloop/)).
 
 (org-freedesktop-screensaver)=
-### org.freedesktop.ScreenSaver
+## org.freedesktop.ScreenSaver
 - **Name**: `org.freedesktop.ScreenSaver`
 - **Modes**: [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.6.0
@@ -56,7 +55,7 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 
 
 (org-gnome-sessionmanager)=
-### org.gnome.SessionManager
+## org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager`
 - **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.8.0
@@ -75,7 +74,7 @@ If used thousands of times really fast, may slow down system. See: [wakepy/#277]
 
 
 (windows-stes)=
-### SetThreadExecutionState
+## SetThreadExecutionState
 
 ````{admonition} Windows will not lock the screen automatically if Screen Saver settings do not require it
 :class: warning
