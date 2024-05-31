@@ -15,6 +15,32 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 ```
 
 
+(macos-caffeinate)=
+### caffeinate
+
+- **Name**: `caffeinate`
+- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
+- **Introduced in**: wakepy 0.3.0
+- **How it works**: It calls the `caffeinate` command to activate the keep.running mode and add the `-d` flag ("Create an assertion to prevent the display from sleeping.") for keep.presenting mode. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
+- **Multiprocess safe?**: Yes
+- **What if the process holding the lock dies?**: The lock is automatically removed.
+- **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate` or similar associated with it using a task manager.
+- **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
+
+
+(org-freedesktop-powermanagement)=
+### org.freedesktop.PowerManagement
+- **Name**: `org.freedesktop.PowerManagement`
+- **Modes**: [`keep.running`](#keep-running-mode)
+- **Introduced in**: wakepy 0.9.0
+- **How it works**: Uses the Inhibit method of the org.freedesktop.PowerManagement D-Bus service when activating and saves the returned cookie on the Method instance. Uses UnInhibit method of the same service with the cookie when deactivating. The org.freedesktop.PowerManagement is an obsolete spec, but certain Desktop Environments provide that as the only option for inhibiting the suspend action. The documentation was previously hosted on [freedesktop.org](https://www.freedesktop.org/wiki/Specifications/power-management-spec/) but the links on the page are dead. The spec has three versions: 0.1, 0.2 and 0.3. The 0.3 is not found anywhere but the version 0.2 of the spec can be read in the [Internet Archive](https://web.archive.org/web/20090417010057/http://people.freedesktop.org/~hughsient/temp/power-management-spec-0.2.html)
+- **Multiprocess safe?**: Yes
+- **What if the process holding the lock dies?**: The lock is automatically removed.
+- **How to check it?**:  You may check if there are *any* inhibitors using the HasInhibit method of the `/org/freedesktop/PowerManagement/Inhibit` object on the `org.freedesktop.PowerManagement.Inhibit` interface. Note that updating the inhibit flag from `false` to `true` may take a few seconds. A good tool for this is [D-Spy](https://apps.gnome.org/Dspy/). Alternatively, you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
+- **Requirements**: D-Bus + KDE Plasma >=5.12.90 or other DE which implements this older freedesktop D-Bus interface. Exception: Xfce is not supported.
+- **About unsupported DEs** Older versions of KDE Plasma had a bug which also prevented the screenlock/screesaver activation. The bug was fixed in [D11182](https://phabricator.kde.org/D11182), commit  [152400c1b688](https://phabricator.kde.org/R122:152400c1b6880506ee1395011686c2b191f419a0) and was part of the KDE Plasma to 5.12.90 ( = 5.13 Beta) [release](https://kde.org/announcements/changelogs/plasma/5/5.12.5-5.12.90/). This Method is not supported either on Xfce as it has similar bug which prevents also the automatic screenlock/screensaver (See: [xfce4-power-manager/#65](https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/65)), hence, wakepy refuses to use org.freedesktop.PowerManagement as method for keep.running mode on KDE < 5.12.90 and on any version of Xfce.
+- **Tested on**:  openSUSE 15.5 with KDE Plasma 5.27.9 ([Comment in #310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2140156882) by [fohrloop](https://github.com/fohrloop/)).
+
 (org-freedesktop-screensaver)=
 ### org.freedesktop.ScreenSaver
 - **Name**: `org.freedesktop.ScreenSaver`
@@ -46,20 +72,6 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 
 If used thousands of times really fast, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
 ````
-
-
-(org-freedesktop-powermanagement)=
-### org.freedesktop.PowerManagement
-- **Name**: `org.freedesktop.PowerManagement`
-- **Modes**: [`keep.running`](#keep-running-mode)
-- **Introduced in**: wakepy 0.9.0
-- **How it works**: Uses the Inhibit method of the org.freedesktop.PowerManagement D-Bus service when activating and saves the returned cookie on the Method instance. Uses UnInhibit method of the same service with the cookie when deactivating. The org.freedesktop.PowerManagement is an obsolete spec, but certain Desktop Environments provide that as the only option for inhibiting the suspend action. The documentation was previously hosted on [freedesktop.org](https://www.freedesktop.org/wiki/Specifications/power-management-spec/) but the links on the page are dead. The spec has three versions: 0.1, 0.2 and 0.3. The 0.3 is not found anywhere but the version 0.2 of the spec can be read in the [Internet Archive](https://web.archive.org/web/20090417010057/http://people.freedesktop.org/~hughsient/temp/power-management-spec-0.2.html)
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**:  You may check if there are *any* inhibitors using the HasInhibit method of the `/org/freedesktop/PowerManagement/Inhibit` object on the `org.freedesktop.PowerManagement.Inhibit` interface. Note that updating the inhibit flag from `false` to `true` may take a few seconds. A good tool for this is [D-Spy](https://apps.gnome.org/Dspy/). Alternatively, you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
-- **Requirements**: D-Bus + KDE Plasma >=5.12.90 or other DE which implements this older freedesktop D-Bus interface. Exception: Xfce is not supported.
-- **About unsupported DEs** Older versions of KDE Plasma had a bug which also prevented the screenlock/screesaver activation. The bug was fixed in [D11182](https://phabricator.kde.org/D11182), commit  [152400c1b688](https://phabricator.kde.org/R122:152400c1b6880506ee1395011686c2b191f419a0) and was part of the KDE Plasma to 5.12.90 ( = 5.13 Beta) [release](https://kde.org/announcements/changelogs/plasma/5/5.12.5-5.12.90/). This Method is not supported either on Xfce as it has similar bug which prevents also the automatic screenlock/screensaver (See: [xfce4-power-manager/#65](https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/65)), hence, wakepy refuses to use org.freedesktop.PowerManagement as method for keep.running mode on KDE < 5.12.90 and on any version of Xfce.
-- **Tested on**:  openSUSE 15.5 with KDE Plasma 5.27.9 ([Comment in #310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2140156882) by [fohrloop](https://github.com/fohrloop/)).
 
 
 (windows-stes)=
@@ -115,18 +127,6 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 
 
 ````
-
-(macos-caffeinate)=
-### caffeinate
-
-- **Name**: `caffeinate`
-- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
-- **Introduced in**: wakepy 0.3.0
-- **How it works**: It calls the `caffeinate` command to activate the keep.running mode and add the `-d` flag ("Create an assertion to prevent the display from sleeping.") for keep.presenting mode. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate` or similar associated with it using a task manager.
-- **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
 
 
 
