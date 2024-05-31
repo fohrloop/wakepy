@@ -27,7 +27,7 @@ suspend) meaning that programs will continue running and can use CPU.
 | -------- | ----- | ------------------------------------------------------------------ |
 | Linux    | GNOME | [org.gnome.SessionManager](#org-gnome-sessionmanager) |
 | MacOS    | *     | [caffeinate](#keep-running-macos-caffeinate)                       |
-| Windows  | *     | [SetThreadExecutionState](#keep-running-windows-stes)              |
+| Windows  | *     | [SetThreadExecutionState](#windows-stes)              |
 
 
 Does keep.running prevent manually putting system to sleep?
@@ -64,7 +64,7 @@ show content in the `keep.presenting` mode.
 | Linux    | GNOME           | [org.gnome.SessionManager](#org-gnome-sessionmanager)       |
 | Linux    | GNOME + others? | [org.freedesktop.ScreenSaver](#keep-presenting-org-freedesktop-screensaver) |
 | MacOS    | *               | [caffeinate](#keep-presenting-macos-caffeinate)                             |
-| Windows  | *               | [SetThreadExecutionState](#keep-presenting-windows-stes)                    |
+| Windows  | *               | [SetThreadExecutionState](#windows-stes)                    |
 
 Does keep.presenting prevent manually putting system to sleep?
 : Only the  automatical, idle timer timeout based sleep / suspend is prevented; Will not

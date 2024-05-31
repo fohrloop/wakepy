@@ -46,7 +46,7 @@ If used thousands of times really fast, may slow down system. See: [wakepy/#277]
 - **Tested on**:  openSUSE 15.5 with KDE Plasma 5.27.9 ([Comment in #310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2140156882) by [fohrloop](https://github.com/fohrloop/)).
 
 
-(keep-running-windows-stes)=
+(windows-stes)=
 ### SetThreadExecutionState
 
 ````{admonition} Windows will not lock the screen automatically if Screen Saver settings do not require it
@@ -58,7 +58,7 @@ Since this method prevents sleep, screen can be only locked automatically if a s
 
 - **Name**: `SetThreadExecutionState`
 - **Introduced in**: wakepy 0.1.0
-- **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating, and with ES_CONTINUOUS when deactivating. Note that currently it is not possible to use two wakepy modes using SetThreadExecutionState at the same time in the same thread! (See: [Issue 167](https://github.com/fohrloop/wakepy/issues/167))
+- **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating [`keep.running`](#keep-running-mode) mode, and additionally ES_DISPLAY_REQUIRED flag when activating [`keep.presenting`](#keep-presenting-mode) mode. Uses the  ES_CONTINUOUS flag for deactivating. Note that currently it is not possible to use two wakepy modes using SetThreadExecutionState at the same time in the same thread! (See: [Issue 167](https://github.com/fohrloop/wakepy/issues/167))
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: Run `powercfg /requests` in an elevated cmd or Powershell.
@@ -124,21 +124,6 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **How to check it?**:  The org.freedesktop.ScreenSaver does not expose a method for listing the inhibitors, but you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
 - **Requirements**: D-Bus, and a [freedesktop.org compliant desktop environment](https://www.freedesktop.org/wiki/Desktops/), which should implement the org.freedesktop.ScreenSaver.Inhibit method.
 - **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([wakepy/#171](https://github.com/fohrloop/wakepy/pull/171)) and openSUSE 15.5 with KDE Plasma 5.27.9 ([wakepy/#310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2135512139)) by [fohrloop](https://github.com/fohrloop/).
-
-(keep-presenting-windows-stes)=
-### SetThreadExecutionState
-
-- **Name**: `SetThreadExecutionState`
-- **Introduced in**: wakepy 0.1.0
-- **How it works**: Exactly the same as the [keep.running](keep-running-windows-stes), but using ES_CONTINUOUS, ES_SYSTEM_REQUIRED *and* ES_DISPLAY_REQUIRED flags when activating.
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: Like the [keep.running](keep-running-windows-stes)
-- **Requirements**: Same as for the [keep.running](keep-running-windows-stes) using SetThreadExecutionState.
-- **Tested on**:  Windows 10 Pro version 22H2 build 19045.332 with and without Screen Saver + ScreenSaverIsSecure set in settings, Windows 10 Enterprise version 22H2 build 19045.3803 with Group Policies enforcing ScreenSaverIsSecure ([Issue #169](https://github.com/fohrloop/wakepy/issues/169) by [fohrloop](https://github.com/fohrloop/)).
-
-
-
 
 
 (keep-presenting-macos-caffeinate)=
