@@ -99,12 +99,12 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 
 ````
 
-(keep-running-macos-caffeinate)=
+(macos-caffeinate)=
 ### caffeinate
 
 - **Name**: `caffeinate`
 - **Introduced in**: wakepy 0.3.0
-- **How it works**: It calls the `caffeinate` command. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
+- **How it works**: It calls the `caffeinate` command to activate the [`keep.running`](#keep-running-mode) mode and add the `-d` flag ("Create an assertion to prevent the display from sleeping.") for [`keep.presenting`](#keep-presenting-mode) mode. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate` or similar associated with it using a task manager.
@@ -126,14 +126,4 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 - **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([wakepy/#171](https://github.com/fohrloop/wakepy/pull/171)) and openSUSE 15.5 with KDE Plasma 5.27.9 ([wakepy/#310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2135512139)) by [fohrloop](https://github.com/fohrloop/).
 
 
-(keep-presenting-macos-caffeinate)=
-### caffeinate
-
-- **Name**: `caffeinate`
-- **Introduced in**: wakepy 0.3.0
-- **How it works**: It calls the `caffeinate` command with `-d` flag ("Create an assertion to prevent the display from sleeping."). See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate -d` or similar associated with it using a task manager.
-- **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
 
