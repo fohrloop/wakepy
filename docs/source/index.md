@@ -67,7 +67,7 @@ Wakepy may keep the following systems awake. ⌛: [keep.running](#keep-running-m
 
 | #   | Notes                                                                                                                        |
 | --- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Windows XP to Windows 11, or Windows Server 2003 or higher.                                                                  |
+| 1   | Windows XP or higher. Windows Server 2003 or higher.                                                                  |
 | 2   | Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
 | 3   | GNOME 2.24 (Sept 2008) onwards.                                                                                             |
 | 4   | KDE Plasma 5.12.90 (May 2018) onwards.                                                                                               |
