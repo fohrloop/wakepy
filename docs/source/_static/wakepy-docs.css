@@ -23,7 +23,7 @@ html[data-theme=light] {
     /* override table row coloring (even rows) */
     --pst-color-table-row-zebra-high-bg: rgb(255, 255, 255) !important;
     /* override table row hover background color */
-    --pst-color-table-row-hover-bg: #dce7fc !important;
+    --pst-color-table-row-hover-bg: #fafafaff !important;
 }
 
 
@@ -47,7 +47,7 @@ html[data-theme=dark] {
     /* override table row coloring (even rows) */
     --pst-color-table-row-zebra-high-bg: #121212ff !important;
     /* override table row hover background color */
-    --pst-color-table-row-hover-bg: #222832ff !important;
+    --pst-color-table-row-hover-bg: #171717ff !important;
 }
 
 nav.contents  {
