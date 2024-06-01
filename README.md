@@ -157,6 +157,7 @@ with keep.presenting():
 ## Links
 - GitHub: [github.com/fohrloop/wakepy](https://github.com/fohrloop/wakepy)
 - PyPI: [pypi.org/project/wakepy](https://pypi.org/project/wakepy/)
+- Documentation: [wakepy.readthedocs.io/stable](https://wakepy.readthedocs.io/stable)
 - Changelog: [wakepy.readthedocs.io/stable/changelog.html](https://wakepy.readthedocs.io/stable/changelog.html)
 
 
