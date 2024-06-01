@@ -7,7 +7,6 @@
 Cross-platform wakelock / keep-awake / stay-awake written in Python.
 
 <!-- start wakepy readme main -->
-
 ## What is wakepy?
 
 Wakepy is a package with an Python API and a CLI tool for *keeping a system awake*. It has two main modes:
@@ -86,15 +85,19 @@ Here's some reasons why you might want to consider using wakepy:
 
 
 <dl>
-  <dt>🛡️ For security reasons</dt>
-  <dd>When you don't want to use a technique which keeps the screen awake and disables the automatic screen lock. I.e. you *only* want to disable the automatic suspend.</dd>
-  <dt>🦸 You need a cross-platform solution</dt>
-  <dd>Same code works on Windows, macOS and Linux.</dd>
-  <dt>⚙️ You want to have more control</dt>
+  <dt>🙅🏼‍♂️ Non-disruptive methods ✅</dt>
+  <dd>No mouse wiggling or pressing random keys like F15. Wakepy is completely non-disruptive. It uses the APIs and programs the system provides for keeping a system awake.</dd>
+  <dt>🛡️Safe to crash 💥</dt>
+  <dd>No changing of any system settings; killing the process abruptly will not leave the keepawake on, and will not require any manual clean-up.</dd>
+  <dt>🚨 For security reasons 🔒</dt>
+  <dd>With <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode"><b><code>keep.running</code></b></a> mode you can disable <i>just</i> the automatic suspend and keep the automatic screen lock untouched.</dd>
+  <dt>🌐 You need a cross-platform solution 🦸</dt>
+  <dd>Same code works on Windows, macOS and Linux on multiple different Desktop Environments.</dd>
+  <dt>💪 You want to have more control ⚙️</dt>
   <dd>It is possible to whitelist or blacklist the used wakepy Methods. It is also possible to prioritize them and define a on-fail action in case activating a wakepy mode fails.</dd>
-  <dt>✂️ You want to keep the amount of dependencies low</dt>
+  <dt>✂️ You want to keep the amount of dependencies low 📦</dt>
   <dd>If you're running wakepy on Linux,  <a href="https://jeepney.readthedocs.io/">jeepney</A> is required for D-Bus based methods. On Python 3.7,  <a href="https://pypi.org/project/typing-extensions/">typing-extensions</a> is needed for typing. Otherwise: wakepy has no python dependencies.</dd>
-  <dt>⚖️ Package needs to have a permissive licence</dt>
+  <dt>⚖️ Package needs to have a permissive licence ✔️</dt>
   <dd>Wakepy is licenced under permissive <a href="https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt">MIT License</a>.</dd>
 </dl>
 
