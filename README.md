@@ -82,21 +82,19 @@ To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">
 ## Why wakepy?
 Here's some reasons why you might want to consider using wakepy:
 
-🛡️ For security reasons
-: When you don't want to use a technique which keeps the screen awake and disables the automatic screen lock. I.e. you *only* want to disable the automatic suspend. 
 
-🦸 You need a cross-platform solution
-: Same code works on Windows, macOS and Linux.
-
-⚙️ You want to have more control
-: It is possible to whitelist or blacklist the used wakepy Methods. It is also possible to prioritize them and define a on-fail action in case activating a wakepy mode fails.
-
-✂️ You want to keep the amount of dependencies low
-: If you're running wakepy on Linux,  [jeepney](https://jeepney.readthedocs.io/) is required for D-Bus based methods. On Python 3.7,  [typing-extensions](https://pypi.org/project/typing-extensions/) is needed for typing. Otherwise: wakepy has no python dependencies.
-
-⚖️ Package needs to have a permissive licence
-: Wakepy is licenced under permissive [MIT License](https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt).
-
+<dl>
+  <dt>🛡️ For security reasons</dt>
+  <dd>When you don't want to use a technique which keeps the screen awake and disables the automatic screen lock. I.e. you *only* want to disable the automatic suspend.</dd>
+  <dt>🦸 You need a cross-platform solution</dt>
+  <dd>Same code works on Windows, macOS and Linux.</dd>
+  <dt>⚙️ You want to have more control</dt>
+  <dd>It is possible to whitelist or blacklist the used wakepy Methods. It is also possible to prioritize them and define a on-fail action in case activating a wakepy mode fails.</dd>
+  <dt>✂️ You want to keep the amount of dependencies low</dt>
+  <dd>If you're running wakepy on Linux,  <a href="https://jeepney.readthedocs.io/">jeepney</A> is required for D-Bus based methods. On Python 3.7,  <a href="https://pypi.org/project/typing-extensions/">typing-extensions</a> is needed for typing. Otherwise: wakepy has no python dependencies.</dd>
+  <dt>⚖️ Package needs to have a permissive licence</dt>
+  <dd>Wakepy is licenced under permissive <a href="https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt">MIT License</a>.</dd>
+</dl>
 
 
 ## Command line interface (CLI)
