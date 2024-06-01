@@ -1,27 +1,63 @@
 (wakepy-methods)=
 # Wakepy Methods
 
-
 **What are wakepy Methods?**
-Methods are different ways of entering in (or keeping a) Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](#keep-running-org-gnome-sessionmanager) D-Bus service is one way of entering  the [`keep.running`](#keep-running-section) mode, and it requires D-Bus and (a certain version of) GNOME. The following methods exist:
+Methods are different ways of entering in (or keeping a) Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](#org-gnome-sessionmanager) D-Bus service is one way of entering  the [`keep.running`](#keep-running-mode) mode, and it requires D-Bus and (a certain version of) GNOME. The following methods exist (⌛: [`keep.running`](#keep-running-mode), 🖥️: [`keep.presenting`](#keep-presenting-mode)): 
+
+| Method                          | Modes |
+| ------------------------------- | ----- |
+| [caffeinate](#macos-caffeinate) | ⌛ 🖥️ |
+| [org.freedesktop.PowerManagement](org-freedesktop-powermanagement) | ⌛ |
+| [org.freedesktop.ScreenSaver](org-freedesktop-screensaver) | 🖥️ |
+| [org.gnome.SessionManager](org-gnome-sessionmanager) | ⌛🖥️ |
+| [SetThreadExecutionState](windows-stes) | ⌛🖥️ |
 
 
+(macos-caffeinate)=
+## caffeinate
 
-<!-- using the contents directive https://myst-parser.readthedocs.io/en/latest/syntax/organising_content.html -->
-```{contents}
-:local: True
-:depth: 2
-:class: this-will-duplicate-information-and-it-is-still-useful-here
-```
+- **Name**: `caffeinate`
+- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
+- **Introduced in**: wakepy 0.3.0
+- **How it works**: It calls the `caffeinate` command to activate the keep.running mode and add the `-d` flag ("Create an assertion to prevent the display from sleeping.") for keep.presenting mode. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
+- **Multiprocess safe?**: Yes
+- **What if the process holding the lock dies?**: The lock is automatically removed.
+- **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate` or similar associated with it using a task manager.
+- **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
 
-(keep-running-section)=
-## keep.running
 
-(keep-running-org-gnome-sessionmanager)=
-### org.gnome.SessionManager
+(org-freedesktop-powermanagement)=
+## org.freedesktop.PowerManagement
+- **Name**: `org.freedesktop.PowerManagement`
+- **Modes**: [`keep.running`](#keep-running-mode)
+- **Introduced in**: wakepy 0.9.0
+- **How it works**: Uses the Inhibit method of the org.freedesktop.PowerManagement D-Bus service when activating and saves the returned cookie on the Method instance. Uses UnInhibit method of the same service with the cookie when deactivating. The org.freedesktop.PowerManagement is an obsolete spec, but certain Desktop Environments provide that as the only option for inhibiting the suspend action. The documentation was previously hosted on [freedesktop.org](https://www.freedesktop.org/wiki/Specifications/power-management-spec/) but the links on the page are dead. The spec has three versions: 0.1, 0.2 and 0.3. The 0.3 is not found anywhere but the version 0.2 of the spec can be read in the [Internet Archive](https://web.archive.org/web/20090417010057/http://people.freedesktop.org/~hughsient/temp/power-management-spec-0.2.html)
+- **Multiprocess safe?**: Yes
+- **What if the process holding the lock dies?**: The lock is automatically removed.
+- **How to check it?**:  You may check if there are *any* inhibitors using the HasInhibit method of the `/org/freedesktop/PowerManagement/Inhibit` object on the `org.freedesktop.PowerManagement.Inhibit` interface. Note that updating the inhibit flag from `false` to `true` may take a few seconds. A good tool for this is [D-Spy](https://apps.gnome.org/Dspy/). Alternatively, you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
+- **Requirements**: D-Bus + KDE Plasma >=5.12.90 or other DE which implements this older freedesktop D-Bus interface. Exception: Xfce is not supported.
+- **About unsupported DEs** Older versions of KDE Plasma had a bug which also prevented the screenlock/screesaver activation. The bug was fixed in [D11182](https://phabricator.kde.org/D11182), commit  [152400c1b688](https://phabricator.kde.org/R122:152400c1b6880506ee1395011686c2b191f419a0) and was part of the KDE Plasma 5.12.90 ( = 5.13 Beta) [release](https://kde.org/announcements/changelogs/plasma/5/5.12.5-5.12.90/). This Method is not supported either on Xfce as it has similar bug which prevents also the automatic screenlock/screensaver (See: [xfce4-power-manager/#65](https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/65)), hence, wakepy refuses to use org.freedesktop.PowerManagement as method for keep.running mode on KDE < 5.12.90 and on any version of Xfce.
+- **Tested on**:  openSUSE 15.5 with KDE Plasma 5.27.9 ([Comment in #310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2140156882) by [fohrloop](https://github.com/fohrloop/)).
+
+(org-freedesktop-screensaver)=
+## org.freedesktop.ScreenSaver
+- **Name**: `org.freedesktop.ScreenSaver`
+- **Modes**: [`keep.presenting`](#keep-presenting-mode)
+- **Introduced in**: wakepy 0.6.0
+- **How it works**: Uses the Inhibit method of [org.freedesktop.ScreenSaver](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) D-Bus service when activating and saves the returned cookie on the Method instance. Uses the org.freedesktop.ScreenSaver.UnInhibit method with the cookie when deactivating. The org.freedesktop.ScreenSaver can only be used to prevent idle; that is why there is no "keep.running" mode counterpart.
+- **Multiprocess safe?**: Yes
+- **What if the process holding the lock dies?**: The lock is automatically removed.
+- **How to check it?**:  The org.freedesktop.ScreenSaver does not expose a method for listing the inhibitors, but you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
+- **Requirements**: D-Bus, and a [freedesktop.org compliant desktop environment](https://www.freedesktop.org/wiki/Desktops/), which should implement the org.freedesktop.ScreenSaver.Inhibit method.
+- **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([wakepy/#171](https://github.com/fohrloop/wakepy/pull/171)) and openSUSE 15.5 with KDE Plasma 5.27.9 ([wakepy/#310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2135512139)) by [fohrloop](https://github.com/fohrloop/).
+
+
+(org-gnome-sessionmanager)=
+## org.gnome.SessionManager
 - **Name**: `org.gnome.SessionManager`
+- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.8.0
-- **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service with flag 4 ("Inhibit suspending the session or computer") when activating and saves the returned cookie on the Method instance. Uses the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie when deactivating.
+- **How it works**: Uses the [Inhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibit) method of [org.gnome.SessionManager](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager) D-Bus service  when activating and saves the returned cookie on the Method instance. For [`keep.running`](#keep-running-mode) mode uses flag 4 ("Inhibit suspending the session or computer"), and in [`keep.presenting`](#keep-presenting-mode) mode uses the flag 8 ("Inhibit the session being marked as idle"). To deactivate the mode, calls the [Uninhibit](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Uninhibit) method of the org.gnome.SessionManager with the cookie.
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**:  You may check the list of inhibitors using the [GetInhibitors](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.GetInhibitors) method, which gives you list of object paths like `["/org/gnome/SessionManager/Inhibitor20"]`. Then you can use the [GetAppId](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetAppId), [GetFlags](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetFlags) and [GetReason](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor.GetReason) methods on the [org.gnome.SessionManager.Inhibitor](https://lira.no-ip.org:8443/doc/gnome-session/dbus/gnome-session.html#org.gnome.SessionManager.Inhibitor) interface of the listed objects on the org.gnome.SessionManager service to translate that into something meaningful. A good tool for this is [D-Spy](https://apps.gnome.org/Dspy/). Alternatively, you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
@@ -29,27 +65,14 @@ Methods are different ways of entering in (or keeping a) Mode. A Method may supp
 - **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
 
 ````{admonition} May slow down system if called repeatedly
-:class: warning
+:class: info
 
-If used hundreds or thousands of times, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
+If used thousands of times really fast, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
 ````
 
 
-(keep-running-org-freedesktop-powermanagement)=
-### org.freedesktop.PowerManagement
-- **Name**: `org.freedesktop.PowerManagement`
-- **Introduced in**: wakepy 0.9.0
-- **How it works**: Uses the Inhibit method of the org.freedesktop.PowerManagement D-Bus service when activating and saves the returned cookie on the Method instance. Uses UnInhibit method of the same service with the cookie when deactivating. The org.freedesktop.PowerManagement is an obsolete spec, but certain Desktop Environments provide that as the only option for inhibiting the suspend action. The documentation was previously hosted on [freedesktop.org](https://www.freedesktop.org/wiki/Specifications/power-management-spec/) but the links on the page are dead. The spec has three versions: 0.1, 0.2 and 0.3. The 0.3 is not found anywhere but the version 0.2 of the spec can be read in the [Internet Archive](https://web.archive.org/web/20090417010057/http://people.freedesktop.org/~hughsient/temp/power-management-spec-0.2.html)
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**:  You may check if there are *any* inhibitors using the HasInhibit method of the `/org/freedesktop/PowerManagement/Inhibit` object on the `org.freedesktop.PowerManagement.Inhibit` interface. Note that updating the inhibit flag from `false` to `true` may take a few seconds. A good tool for this is [D-Spy](https://apps.gnome.org/Dspy/). Alternatively, you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
-- **Requirements**: D-Bus + KDE Plasma >=5.12.90 or other DE which implements this older freedesktop D-Bus interface. Exception: Xfce is not supported.
-- **About unsupported DEs** Older versions of KDE Plasma had a bug which also prevented the screenlock/screesaver activation. The bug was fixed in [D11182](https://phabricator.kde.org/D11182), commit  [152400c1b688](https://phabricator.kde.org/R122:152400c1b6880506ee1395011686c2b191f419a0) and was part of the KDE Plasma to 5.12.90 ( = 5.13 Beta) [release](https://kde.org/announcements/changelogs/plasma/5/5.12.5-5.12.90/). This Method is not supported either on Xfce as it has similar bug which prevents also the automatic screenlock/screensaver (See: [xfce4-power-manager/#65](https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/65)), hence, wakepy refuses to use org.freedesktop.PowerManagement as method for keep.running mode on KDE < 5.12.90 and on any version of Xfce.
-- **Tested on**:  openSUSE 15.5 with KDE Plasma 5.27.9 ([Comment in #310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2140156882) by [fohrloop](https://github.com/fohrloop/)).
-
-
-(keep-running-windows-stes)=
-### SetThreadExecutionState
+(windows-stes)=
+## SetThreadExecutionState
 
 ````{admonition} Windows will not lock the screen automatically if Screen Saver settings do not require it
 :class: warning
@@ -59,8 +82,9 @@ Since this method prevents sleep, screen can be only locked automatically if a s
 ````
 
 - **Name**: `SetThreadExecutionState`
+- **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.1.0
-- **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating, and with ES_CONTINUOUS when deactivating. Note that currently it is not possible to use two wakepy modes using SetThreadExecutionState at the same time in the same thread! (See: [Issue 167](https://github.com/fohrloop/wakepy/issues/167))
+- **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating [`keep.running`](#keep-running-mode) mode, and additionally ES_DISPLAY_REQUIRED flag when activating [`keep.presenting`](#keep-presenting-mode) mode. Uses the  ES_CONTINUOUS flag for deactivating. Note that currently it is not possible to use two wakepy modes using SetThreadExecutionState at the same time in the same thread! (See: [Issue 167](https://github.com/fohrloop/wakepy/issues/167))
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: Run `powercfg /requests` in an elevated cmd or Powershell.
@@ -101,73 +125,6 @@ print('SPI_GETSCREENSAVETIMEOUT', retval.value)
 
 ````
 
-(keep-running-macos-caffeinate)=
-### caffeinate
-
-- **Name**: `caffeinate`
-- **Introduced in**: wakepy 0.3.0
-- **How it works**: It calls the `caffeinate` command. See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate` or similar associated with it using a task manager.
-- **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
 
 
-## keep.presenting
-
-(keep-presenting-org-gnome-sessionmanager)=
-### org.gnome.SessionManager
-
-- **Name**: `org.gnome.SessionManager`
-- **Introduced in**: wakepy 0.8.0
-- **How it works**: Exactly the same as the [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager, but using the flag 8 ("Inhibit the session being marked as idle").
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: Similarly as checking [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager.
-- **Requirements**: Same as [keep.running](#keep-running-org-gnome-sessionmanager) using org.gnome.SessionManager.
-- **Tested on**:  Ubuntu 22.04.3 LTS with GNOME 42.9 ([PR #138](https://github.com/fohrloop/wakepy/pull/138) by [fohrloop](https://github.com/fohrloop/)).
-
-````{admonition} May slow down system if called repeatedly
-:class: warning
-
-If used hundreds or thousands of times, may slow down system. See: [wakepy/#277](https://github.com/fohrloop/wakepy/issues/277)
-````
-
-(keep-presenting-org-freedesktop-screensaver)=
-### org.freedesktop.ScreenSaver
-- **Name**: `org.freedesktop.ScreenSaver`
-- **Introduced in**: wakepy 0.6.0
-- **How it works**: Uses the Inhibit method of [org.freedesktop.ScreenSaver](https://people.freedesktop.org/~hadess/idle-inhibition-spec/re01.html) D-Bus service when activating and saves the returned cookie on the Method instance. Uses the org.freedesktop.ScreenSaver.UnInhibit method with the cookie when deactivating. The org.freedesktop.ScreenSaver can only be used to prevent idle; that is why there is no "keep.running" mode counterpart.
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**:  The org.freedesktop.ScreenSaver does not expose a method for listing the inhibitors, but you could monitor your inhibit call with [`dbus-monitor`](https://dbus.freedesktop.org/doc/dbus-monitor.1.html).
-- **Requirements**: D-Bus, and a [freedesktop.org compliant desktop environment](https://www.freedesktop.org/wiki/Desktops/), which should implement the org.freedesktop.ScreenSaver.Inhibit method.
-- **Tested on**:  Ubuntu 22.04 with GNOME 42.9 ([wakepy/#171](https://github.com/fohrloop/wakepy/pull/171)) and openSUSE 15.5 with KDE Plasma 5.27.9 ([wakepy/#310](https://github.com/fohrloop/wakepy/issues/310#issuecomment-2135512139)) by [fohrloop](https://github.com/fohrloop/).
-
-(keep-presenting-windows-stes)=
-### SetThreadExecutionState
-
-- **Name**: `SetThreadExecutionState`
-- **Introduced in**: wakepy 0.1.0
-- **How it works**: Exactly the same as the [keep.running](keep-running-windows-stes), but using ES_CONTINUOUS, ES_SYSTEM_REQUIRED *and* ES_DISPLAY_REQUIRED flags when activating.
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: Like the [keep.running](keep-running-windows-stes)
-- **Requirements**: Same as for the [keep.running](keep-running-windows-stes) using SetThreadExecutionState.
-- **Tested on**:  Windows 10 Pro version 22H2 build 19045.332 with and without Screen Saver + ScreenSaverIsSecure set in settings, Windows 10 Enterprise version 22H2 build 19045.3803 with Group Policies enforcing ScreenSaverIsSecure ([Issue #169](https://github.com/fohrloop/wakepy/issues/169) by [fohrloop](https://github.com/fohrloop/)).
-
-
-
-
-
-(keep-presenting-macos-caffeinate)=
-### caffeinate
-
-- **Name**: `caffeinate`
-- **Introduced in**: wakepy 0.3.0
-- **How it works**: It calls the `caffeinate` command with `-d` flag ("Create an assertion to prevent the display from sleeping."). See docs at [ss64.com](https://ss64.com/mac/caffeinate.html) or at archives from [developer.apple.com](https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html)
-- **Multiprocess safe?**: Yes
-- **What if the process holding the lock dies?**: The lock is automatically removed.
-- **How to check it?**: You should be able to see a process with a command `/bin/bash caffeinate -d` or similar associated with it using a task manager.
-- **Requirements**: Mac OS X 10.8 Mountain Lion (July 2012) or newer.
 

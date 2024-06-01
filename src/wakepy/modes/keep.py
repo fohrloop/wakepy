@@ -23,7 +23,7 @@ def running(
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
 
-    :ref:`Documentation of keep.running mode. <keep-running-mode>`
+    ➡️ :ref:`Documentation of keep.running mode. <keep-running-mode>` ⬅️
 
     Parameters
     ----------
@@ -97,7 +97,7 @@ def presenting(
     """Create a wakepy mode (a context manager) for keeping a system running
     and showing content.
 
-    :ref:`Documentation of keep.presenting mode. <keep-presenting-mode>`
+    ➡️ :ref:`Documentation of keep.presenting mode. <keep-presenting-mode>` ⬅️
 
     Parameters
     ----------
