@@ -151,12 +151,16 @@ with keep.presenting():
 <!-- start wakepy readme part2 -->
 ## Where wakepy is used?
 
-- [viskillz-blender](https://github.com/viskillz/viskillz-blender) — Generating assets of Mental Cutting Test exercises
+- [aTrain](https://github.com/JuergenFleiss/aTrain) — transcription of speech recordings utilizing machine learning models.
 - [mpc-autofill](https://github.com/chilli-axe/mpc-autofill) — Automating MakePlayingCards' online ordering system
-- [lakeshorecryotronics/python-driver](https://github.com/lakeshorecryotronics/python-driver) — Lake Shore instruments python Driver
-- [UCSD-E4E/baboon-tracking](https://github.com/UCSD-E4E/baboon-tracking) — In pipelines of a Computer Vision project tracking baboons
-- [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI
 - [minarca](https://github.com/ikus060/minarca) — Cross-platform data backup software
+- [OceanOptics/Inlinino](https://github.com/OceanOptics/Inlinino) — Data logger for oceanography
+- [cogent3/EnsemblLite](https://github.com/cogent3/EnsemblLite) —  Obtaining dumps of Ensembl MySQL databases
+- [lakeshore](https://github.com/lakeshorecryotronics/python-driver) — Lake Shore instruments python Driver
+- [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI
+- [UCSD-E4E/baboon-tracking](https://github.com/UCSD-E4E/baboon-tracking) — In pipelines of a Computer Vision project tracking baboons
+- [pysimai](https://github.com/ansys/pysimai) — A Python wrapper for Ansys SimAI
+- [viskillz-blender](https://www.sciencedirect.com/science/article/pii/S2352711023000249) — Generating assets of Mental Cutting Test exercises
 
 
 ## Links
