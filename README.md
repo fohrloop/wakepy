@@ -139,7 +139,7 @@ with keep.presenting():
 <!-- end wakepy readme main -->
 
 > [!TIP]
-> See the [User Guide](#user-guide) and the available wakepy [Modes](#wakepy-modes) and [Methods](#wakepy-methods)
+> See the [User Guide](https://wakepy.readthedocs.io/stable/user-guide.html) and the available wakepy [Modes](https://wakepy.readthedocs.io/stable/modes.html) and [Methods](https://wakepy.readthedocs.io/stable/methods-reference.html)
 
 > [!NOTE]
 > Wakepy API is still experimental 🚧
