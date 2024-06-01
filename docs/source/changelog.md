@@ -1,5 +1,12 @@
 # Changelog
 
+## wakepy 0.9.0.post1
+🗓️ 2024-06-01
+
+### 📖 Documentation
+- Update docs and README after 0.8.0 & 0.9.0 releases ([#331](https://github.com/fohrloop/wakepy/pull/331))
+
+
 ## wakepy 0.9.0
 🗓️ 2024-05-31
 
