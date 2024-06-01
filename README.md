@@ -164,7 +164,9 @@ with keep.presenting():
 
 ---------------
 
-| Footnotes                                                                                                                    |
+## Footnotes
+
+|                                                                                                                     |
 | ---------------------------------------------------------------------------------------------------------------------------- |
 | <sup>[1]</sup> Windows XP or higher. Windows Server 2003 or higher.                                                          |
 | <sup>[2]</sup> Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
