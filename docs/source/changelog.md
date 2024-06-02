@@ -1,5 +1,11 @@
 # Changelog
 
+## wakepy 0.10.0
+🗓️ Unreleased
+
+### ✨ Features
+- The [SetThreadExecutionState](#windows-stes) Method may now have multiple modes (same or different) activated within the same python thread without them interfering with each other on activation or deactivation, as wakepy creates a *separate worker thread* for the single purpose of setting and keeping the thread execution flag each time you activate a mode with the `SetThreadExecutionState` wakepy.Method.
+
 ## wakepy 0.9.0.post1
 🗓️ 2024-06-01
 
