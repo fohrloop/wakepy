@@ -88,8 +88,6 @@ class WindowsSetThreadExecutionState(Method, ABC):
 def _inhibit_until_released(
     flags: Flags, exit_event: Event, queue: Queue[int | Exception]
 ) -> None:
-    # Sets the flags until Flags.RELEASE is used or until the thread
-    # which called this dies.
     _call_and_put_result_in_queue(flags.value, queue)
     exit_event.wait(_release_event_timeout)
     _call_and_put_result_in_queue(Flags.RELEASE.value, queue)
