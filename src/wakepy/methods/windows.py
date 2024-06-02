@@ -23,7 +23,6 @@ class Flags(enum.IntFlag):
     KEEP_PRESENTING = ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
     RELEASE = ES_CONTINUOUS
 
-
 class WindowsSetThreadExecutionState(Method, ABC):
     """This is a method which calls the SetThreadExecutionState function from
     the kernel32.dll. The SetThreadExecutionState informs the system that it is
@@ -36,6 +35,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
     _wait_timeout = 5  # seconds
     """timeout for calls like queue.get() and thread.join() which could
     otherwise block execution indefinitely."""
+
 
     @property
     @abstractmethod
@@ -88,9 +88,14 @@ def _inhibit_until_released(
     # Sets the flags until Flags.RELEASE is used or until the thread
     # which called this dies.
     _call_and_put_result_in_queue(flags.value, queue)
-    exit_event.wait()
+    exit_event.wait(_release_event_timeout)
     _call_and_put_result_in_queue(Flags.RELEASE.value, queue)
 
+_release_event_timeout = None 
+"""Timeout for the release events (to stop a inhibit thread). None means 
+wait indefinitely. This attribute exists for tests (make tests not to
+wait forever).
+"""
 
 def _call_and_put_result_in_queue(
     flags: int, queue: Queue[int|Exception]

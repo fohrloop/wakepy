@@ -10,7 +10,10 @@ from wakepy.methods.windows import (
     WindowsKeepRunning,
 )
 
+import wakepy.methods.windows as windows
 
+windows._release_event_timeout = 1
+"""Make tests *not* to wait forever"""
 class TestWindowsSetThreadExecutionState:
 
     @pytest.mark.parametrize(
