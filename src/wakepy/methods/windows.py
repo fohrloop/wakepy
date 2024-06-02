@@ -4,6 +4,7 @@ import ctypes
 import enum
 import logging
 import threading
+import typing
 from abc import ABC, abstractmethod
 from queue import Queue
 from threading import Event, Thread
@@ -94,7 +95,7 @@ def _inhibit_until_released(
     _call_and_put_result_in_queue(Flags.RELEASE.value, queue)
 
 
-_release_event_timeout = None
+_release_event_timeout: int | float | None = None
 """Timeout for the release events (to stop a inhibit thread). None means
 wait indefinitely. This attribute exists for tests (make tests not to
 wait forever).
@@ -147,7 +148,7 @@ def _call_set_thread_execution_state(flags: int) -> int:
     if retval == 0:
         raise RuntimeError("SetThreadExecutionState returned NULL")
 
-    return retval
+    return typing.cast(int, retval)
 
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
