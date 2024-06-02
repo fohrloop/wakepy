@@ -67,9 +67,10 @@ class WindowsSetThreadExecutionState(Method, ABC):
         self._inhibiting_thread = None
 
     def _check_thread_response(self) -> None:
-        """Waits a message from the inhibitor thread queue. If the item put
-        into the queue is not None, raises an Exception. Re-raises any
-        Exceptions put into the queue.
+        """Waits a message from the inhibitor thread queue. It should be an
+        integer representing the previous thread execution state flags. If 
+        it's not, raises an Exception. Re-raises any Exceptions put into the
+        queue.
         """
         res = self._queue_from_thread.get(timeout=self._wait_timeout)
 
