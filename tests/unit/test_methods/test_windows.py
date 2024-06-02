@@ -12,7 +12,7 @@ from wakepy.methods.windows import (
 
 import wakepy.methods.windows as windows
 
-windows._release_event_timeout = 1
+windows._release_event_timeout = 0.001
 """Make tests *not* to wait forever"""
 class TestWindowsSetThreadExecutionState:
 
@@ -29,18 +29,15 @@ class TestWindowsSetThreadExecutionState:
     def test_enter_mode_success(self, method_cls, expected_flag):
         method = method_cls()
 
-        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+        def set_thread_execution_state(flags):
+            assert flags == expected_flag
+            return flags
+
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", set_thread_execution_state):
             retval = method.enter_mode()
 
         assert retval is None
-        ctypesmock.windll.kernel32.SetThreadExecutionState.assert_called_with(
-            expected_flag
-        )
 
-        # cleanup (otherwise will wait forever for the release event in the
-        # inhibitor thread)
-        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-            method.exit_mode()
 
     @pytest.mark.parametrize(
         "method_cls",
@@ -48,15 +45,18 @@ class TestWindowsSetThreadExecutionState:
     )
     def test_exit_mode_success(self, method_cls):
         method = method_cls()
-
-        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+        # prepare: enter the mode
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", lambda x:x):
             method.enter_mode()
+
+        def set_thread_execution_state(flags):
+            assert flags == ES_CONTINUOUS
+            return flags
+
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", set_thread_execution_state):
             retval = method.exit_mode()
 
         assert retval is None
-        ctypesmock.windll.kernel32.SetThreadExecutionState.assert_called_with(
-            ES_CONTINUOUS
-        )
 
     @pytest.mark.parametrize(
         "method_cls",
@@ -68,16 +68,9 @@ class TestWindowsSetThreadExecutionState:
         def raising_exc(_):
             raise AttributeError("foo")
 
-        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-            ctypesmock.windll.kernel32.SetThreadExecutionState.side_effect = raising_exc
-
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", raising_exc):
             with pytest.raises(RuntimeError, match="Could not use kernel32.dll!"):
                 method.enter_mode()
-
-        # cleanup (otherwise will wait forever for the release event in the
-        # inhibitor thread)
-        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-            method.exit_mode()
 
     @pytest.mark.parametrize(
         "method_cls",
@@ -86,14 +79,27 @@ class TestWindowsSetThreadExecutionState:
     def test_exit_mode_with_exception(self, method_cls):
         method = method_cls()
 
-        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", lambda x:x):
             method.enter_mode()
 
         def raising_exc(_):
             raise AttributeError("foo")
 
-        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-            ctypesmock.windll.kernel32.SetThreadExecutionState.side_effect = raising_exc
-
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", raising_exc):
             with pytest.raises(RuntimeError, match="Could not use kernel32.dll!"):
+                method.exit_mode()
+
+    @pytest.mark.parametrize(
+        "method_cls",
+        [WindowsKeepPresenting, WindowsKeepRunning],
+    )
+    def test_exit_mode_with_bad_return_value_from_thread(self, method_cls):
+        method = method_cls()
+
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", lambda x:x):
+            method.enter_mode()
+
+        # returning 0 means returning NULL (error in SetThreadExecutionState call)
+        with patch("wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState", lambda x:0):
+            with pytest.raises(RuntimeError, match="SetThreadExecutionState returned NULL"):
                 method.exit_mode()
