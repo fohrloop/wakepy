@@ -87,7 +87,7 @@ def test(c, pdb: bool = False) -> None:
     pdb_flag = " --pdb " if pdb else ""
     res = run(
         f"env -u DBUS_SESSION_BUS_ADDRESS python -m pytest -W error {pdb_flag}"
-        "--cov-branch --cov wakepy --cov-fail-under=100",
+        "--cov-branch --cov ./src --cov-fail-under=100",
         ignore_errors=True,
     )
     if res.exited:
