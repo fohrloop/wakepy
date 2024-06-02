@@ -125,17 +125,14 @@ with keep.running():
     # / screenlock or blank the screen, but CPU will keep running.
 ```
 
+If you want to *also* prevent screen lock and screen blank, use the <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a> mode:
 
-If you want to *also* prevent screen lock and screen blank, use the <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a>mode:
-
-
-```{code-block} python
+```python
 from wakepy import keep
 
 with keep.presenting():
     # Do something that takes a long time and requires the screen to be awake
 ```
-
 <!-- end wakepy readme main -->
 
 > [!TIP]
@@ -176,9 +173,9 @@ with keep.presenting():
 
 ## Footnotes
 
-|                                                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------------------- |
-| <sup>[1]</sup> Windows XP or higher. Windows Server 2003 or higher.                                                          |
+|                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------- |
+| <sup>[1]</sup> Windows XP or higher. Windows Server 2003 or higher.                                                                         |
 | <sup>[2]</sup> Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
 | <sup>[3]</sup> GNOME 2.24 (Sept 2008) onwards.                                                                                              |
 | <sup>[4]</sup> KDE Plasma 5.12.90 (May 2018) onwards.                                                                                       |
