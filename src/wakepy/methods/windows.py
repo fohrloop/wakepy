@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 import ctypes
 import enum
 import threading
+import typing
 from abc import ABC, abstractmethod
 from queue import Queue
 from threading import Event, Thread
 
 from wakepy.core import Method, ModeName, PlatformName
 
-import typing 
 if typing.TYPE_CHECKING:
     from typing import Optional
 
@@ -55,14 +57,14 @@ class WindowsSetThreadExecutionState(Method, ABC):
             args=(self.flags, self._release, self._queue_from_thread),
         )
         self._inhibiting_thread.start()
-        return self._check_thread_response()
+        self._check_thread_response()
 
     def exit_mode(self) -> None:
         self._release.set()
-        retval = self._check_thread_response()
-        self._inhibiting_thread.join(timeout=self._wait_timeout)
+        self._check_thread_response()
+        if self._inhibiting_thread:
+            self._inhibiting_thread.join(timeout=self._wait_timeout)
         self._inhibiting_thread = None
-        return retval
 
     def _check_thread_response(self) -> None:
         """Waits a message from the inhibitor thread queue. If the item put
@@ -79,7 +81,9 @@ class WindowsSetThreadExecutionState(Method, ABC):
         raise RuntimeError(f"Unknown result type: {type(res)} ({res})")
 
 
-def _inhibit_until_released(flags: Flags, exit_event: Event, queue: Queue):
+def _inhibit_until_released(
+    flags: Flags, exit_event: Event, queue: Queue[Optional[Exception]]
+) -> None:
     # Sets the flags until Flags.RELEASE is used or until the thread
     # which called this dies.
     _call_and_put_result_in_queue(flags.value, queue)
@@ -87,7 +91,9 @@ def _inhibit_until_released(flags: Flags, exit_event: Event, queue: Queue):
     _call_and_put_result_in_queue(Flags.RELEASE.value, queue)
 
 
-def _call_and_put_result_in_queue(flags: int, queue: Queue):
+def _call_and_put_result_in_queue(
+    flags: int, queue: Queue[Optional[Exception]]
+) -> None:
     try:
         _call_set_thread_execution_state(flags)
         queue.put(None)
