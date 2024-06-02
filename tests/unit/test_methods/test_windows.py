@@ -11,69 +11,86 @@ from wakepy.methods.windows import (
 )
 
 
-@pytest.mark.parametrize(
-    "method_cls, expected_flag",
-    [
-        (
-            WindowsKeepPresenting,
-            ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED,
-        ),
-        (WindowsKeepRunning, ES_CONTINUOUS | ES_SYSTEM_REQUIRED),
-    ],
-)
-def test_enter_mode_success(method_cls, expected_flag):
-    method = method_cls()
+class TestWindowsSetThreadExecutionState:
 
-    with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-        retval = method.enter_mode()
+    @pytest.mark.parametrize(
+        "method_cls, expected_flag",
+        [
+            (
+                WindowsKeepPresenting,
+                ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED,
+            ),
+            (WindowsKeepRunning, ES_CONTINUOUS | ES_SYSTEM_REQUIRED),
+        ],
+    )
+    def test_enter_mode_success(self, method_cls, expected_flag):
+        method = method_cls()
 
-    assert retval is None
-    ctypesmock.windll.kernel32.SetThreadExecutionState.assert_called_with(expected_flag)
+        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+            retval = method.enter_mode()
 
+        assert retval is None
+        ctypesmock.windll.kernel32.SetThreadExecutionState.assert_called_with(
+            expected_flag
+        )
 
-@pytest.mark.parametrize(
-    "method_cls",
-    [WindowsKeepPresenting, WindowsKeepRunning],
-)
-def test_exit_mode_success(method_cls):
-    method = method_cls()
+        # cleanup (otherwise will wait forever for the release event in the
+        # inhibitor thread)
+        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+            method.exit_mode()
 
-    with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-        retval = method.exit_mode()
+    @pytest.mark.parametrize(
+        "method_cls",
+        [WindowsKeepPresenting, WindowsKeepRunning],
+    )
+    def test_exit_mode_success(self, method_cls):
+        method = method_cls()
 
-    assert retval is None
-    ctypesmock.windll.kernel32.SetThreadExecutionState.assert_called_with(ES_CONTINUOUS)
+        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+            method.enter_mode()
+            retval = method.exit_mode()
 
+        assert retval is None
+        ctypesmock.windll.kernel32.SetThreadExecutionState.assert_called_with(
+            ES_CONTINUOUS
+        )
 
-@pytest.mark.parametrize(
-    "method_cls",
-    [WindowsKeepPresenting, WindowsKeepRunning],
-)
-def test_enter_mode_with_exception(method_cls):
-    method = method_cls()
+    @pytest.mark.parametrize(
+        "method_cls",
+        [WindowsKeepPresenting, WindowsKeepRunning],
+    )
+    def test_enter_mode_with_exception(self, method_cls):
+        method = method_cls()
 
-    def raising_exc(_):
-        raise AttributeError("foo")
+        def raising_exc(_):
+            raise AttributeError("foo")
 
-    with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-        ctypesmock.windll.kernel32.SetThreadExecutionState.side_effect = raising_exc
+        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+            ctypesmock.windll.kernel32.SetThreadExecutionState.side_effect = raising_exc
 
-        with pytest.raises(RuntimeError, match="Could not use kernel32.dll!"):
+            with pytest.raises(RuntimeError, match="Could not use kernel32.dll!"):
+                method.enter_mode()
+
+        # cleanup (otherwise will wait forever for the release event in the
+        # inhibitor thread)
+        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+            method.exit_mode()
+
+    @pytest.mark.parametrize(
+        "method_cls",
+        [WindowsKeepPresenting, WindowsKeepRunning],
+    )
+    def test_exit_mode_with_exception(self, method_cls):
+        method = method_cls()
+
+        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
             method.enter_mode()
 
+        def raising_exc(_):
+            raise AttributeError("foo")
 
-@pytest.mark.parametrize(
-    "method_cls",
-    [WindowsKeepPresenting, WindowsKeepRunning],
-)
-def test_exit_mode_with_exception(method_cls):
-    method = method_cls()
+        with patch("wakepy.methods.windows.ctypes") as ctypesmock:
+            ctypesmock.windll.kernel32.SetThreadExecutionState.side_effect = raising_exc
 
-    def raising_exc(_):
-        raise AttributeError("foo")
-
-    with patch("wakepy.methods.windows.ctypes") as ctypesmock:
-        ctypesmock.windll.kernel32.SetThreadExecutionState.side_effect = raising_exc
-
-        with pytest.raises(RuntimeError, match="Could not use kernel32.dll!"):
-            method.exit_mode()
+            with pytest.raises(RuntimeError, match="Could not use kernel32.dll!"):
+                method.exit_mode()

@@ -1,6 +1,9 @@
 import ctypes
 import enum
+import threading
 from abc import ABC, abstractmethod
+from queue import Queue
+from threading import Event, Thread
 
 from wakepy.core import Method, ModeName, PlatformName
 
@@ -19,32 +22,76 @@ class Flags(enum.IntFlag):
 
 class WindowsSetThreadExecutionState(Method, ABC):
     """This is a method which calls the SetThreadExecutionState function from
-    the kernel32.dll. The SetThreadExecutionState informs the system that it
-    is in use preventing the system from entering sleep or turning off
-    the display while the application is running" (depending on the used
-    flags)."""
+    the kernel32.dll. The SetThreadExecutionState informs the system that it is
+    in use preventing the system from entering sleep or turning off the display
+    while the application is running" (depending on the used flags)."""
 
-    # The docs say that supports Windows XP and above (client) or Windows
-    # Server 2003 and above (server)
+    # The SetThreadExecutionState docs say that it supports Windows XP and
+    # above (client) or Windows Server 2003 and above (server)
     supported_platforms = (PlatformName.WINDOWS,)
-
-    def enter_mode(self) -> None:
-        # Sets the flags until Flags.RELEASE is used or until the thread
-        # which called this dies.
-        self._call_set_thread_execution_state(self.flags.value)
-
-    def exit_mode(self) -> None:
-        self._call_set_thread_execution_state(Flags.RELEASE.value)
-
-    def _call_set_thread_execution_state(self, flags: int) -> None:
-        try:
-            ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type: ignore[attr-defined,unused-ignore]
-        except AttributeError as exc:
-            raise RuntimeError("Could not use kernel32.dll!") from exc
+    _wait_timeout = 5  # seconds
 
     @property
     @abstractmethod
     def flags(self) -> Flags: ...
+
+    def __init__(self, **kwargs: object) -> None:
+        super().__init__(**kwargs)
+        self._inhibiting_thread: Thread | None = None
+        self._release = Event()
+        self._queue_from_thread = Queue()
+
+    def enter_mode(self) -> None:
+        # Because the ExecutionState flags are global per each thread, and
+        # multiple wakepy modes might be activated simultaneously, we must
+        # put all the SetThreadExecutionState inhibitor flags into separate
+        # threads. See: https://github.com/fohrloop/wakepy/issues/167
+        self._inhibiting_thread = threading.Thread(
+            target=_inhibit_until_released,
+            args=(self.flags, self._release, self._queue_from_thread),
+        )
+        self._inhibiting_thread.start()
+        return self._get_thread_response()
+
+    def exit_mode(self) -> None:
+        self._release.set()
+        retval = self._get_thread_response()
+        self._inhibiting_thread.join(timeout=self._wait_timeout)
+        self._inhibiting_thread = None
+        return retval
+
+    def _get_thread_response(self) -> None:
+        res = self._queue_from_thread.get(timeout=self._wait_timeout)
+
+        if res is None:
+            return  # success
+        elif isinstance(res, Exception):
+            # re-raise any exceptions occurred in the thread
+            raise res
+        raise RuntimeError(f"Unknown result type: {type(res)} ({res})")
+
+
+def _inhibit_until_released(flags: Flags, exit_event: Event, queue: Queue):
+    # Sets the flags until Flags.RELEASE is used or until the thread
+    # which called this dies.
+    _call_and_put_result_in_queue(flags.value, queue)
+    exit_event.wait()
+    _call_and_put_result_in_queue(Flags.RELEASE.value, queue)
+
+
+def _call_and_put_result_in_queue(flags: int, queue: Queue):
+    try:
+        _call_set_thread_execution_state(flags)
+        queue.put(None)
+    except Exception as exc:
+        queue.put(exc)
+
+
+def _call_set_thread_execution_state(flags: int) -> None:
+    try:
+        ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type: ignore[attr-defined,unused-ignore]
+    except AttributeError as exc:
+        raise RuntimeError("Could not use kernel32.dll!") from exc
 
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
