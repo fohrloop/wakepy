@@ -7,7 +7,7 @@ import pytest
 if sys.platform != "win32":
     pytest.skip(allow_module_level=True)
 
-import wakepy.methods.windows as windows # type: ignore[unreachable, unused-ignore]
+import wakepy.methods.windows as windows  # type: ignore[unreachable, unused-ignore]
 from wakepy.methods.windows import (
     ES_CONTINUOUS,
     ES_DISPLAY_REQUIRED,
