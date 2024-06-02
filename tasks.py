@@ -34,6 +34,7 @@ tox -e build
 
 from __future__ import annotations
 
+import os 
 import platform
 import typing
 
@@ -91,6 +92,6 @@ def test(c, pdb: bool = False) -> None:
         ignore_errors=True,
     )
     if res.exited:
-        run("coverage html && python -m webbrowser -t htmlcov/index.html")
+        run(f"coverage html && python -m webbrowser -t htmlcov{os.sep}index.html")
 
     check(c)
