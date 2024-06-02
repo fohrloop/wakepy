@@ -97,8 +97,8 @@ def _inhibit_until_released(
 
 _release_event_timeout: int | float | None = None
 """Timeout for the release events (to stop a inhibit thread). None means
-wait indefinitely. This attribute exists for tests (make tests not to
-wait forever).
+wait indefinitely. This variable exists for tests (edit this to make tests not
+to wait forever in case of errors).
 """
 
 
