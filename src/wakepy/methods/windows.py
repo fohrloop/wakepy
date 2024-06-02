@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import ctypes
 import enum
+import logging
 import threading
 from abc import ABC, abstractmethod
 from queue import Queue
 from threading import Event, Thread
-import logging 
+
 from wakepy.core import Method, ModeName, PlatformName
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ class Flags(enum.IntFlag):
     KEEP_PRESENTING = ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
     RELEASE = ES_CONTINUOUS
 
+
 class WindowsSetThreadExecutionState(Method, ABC):
     """This is a method which calls the SetThreadExecutionState function from
     the kernel32.dll. The SetThreadExecutionState informs the system that it is
@@ -36,7 +38,6 @@ class WindowsSetThreadExecutionState(Method, ABC):
     """timeout for calls like queue.get() and thread.join() which could
     otherwise block execution indefinitely."""
 
-
     @property
     @abstractmethod
     def flags(self) -> Flags: ...
@@ -45,7 +46,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
         super().__init__(**kwargs)
         self._inhibiting_thread: Thread | None = None
         self._release = Event()
-        self._queue_from_thread: Queue[int|Exception] = Queue()
+        self._queue_from_thread: Queue[int | Exception] = Queue()
 
     def enter_mode(self) -> None:
         # Because the ExecutionState flags are global per each thread, and
@@ -68,14 +69,14 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
     def _check_thread_response(self) -> None:
         """Waits a message from the inhibitor thread queue. It should be an
-        integer representing the previous thread execution state flags. If 
+        integer representing the previous thread execution state flags. If
         it's not, raises an Exception. Re-raises any Exceptions put into the
         queue.
         """
         res = self._queue_from_thread.get(timeout=self._wait_timeout)
 
         if isinstance(res, int):
-            logger.debug('The previous flags were %s (%s)', res, Flags(res))
+            logger.debug("The previous flags were %s (%s)", res, Flags(res))
             return  # success
         elif isinstance(res, Exception):
             # re-raise any exceptions occurred in the thread
@@ -84,7 +85,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
 
 def _inhibit_until_released(
-    flags: Flags, exit_event: Event, queue: Queue[int|Exception]
+    flags: Flags, exit_event: Event, queue: Queue[int | Exception]
 ) -> None:
     # Sets the flags until Flags.RELEASE is used or until the thread
     # which called this dies.
@@ -92,15 +93,15 @@ def _inhibit_until_released(
     exit_event.wait(_release_event_timeout)
     _call_and_put_result_in_queue(Flags.RELEASE.value, queue)
 
-_release_event_timeout = None 
+
+_release_event_timeout = None
 """Timeout for the release events (to stop a inhibit thread). None means 
 wait indefinitely. This attribute exists for tests (make tests not to
 wait forever).
 """
 
-def _call_and_put_result_in_queue(
-    flags: int, queue: Queue[int|Exception]
-) -> None:
+
+def _call_and_put_result_in_queue(flags: int, queue: Queue[int | Exception]) -> None:
     try:
         prev_flags = _call_set_thread_execution_state(flags)
         queue.put(prev_flags)
@@ -110,19 +111,19 @@ def _call_and_put_result_in_queue(
 
 def _call_set_thread_execution_state(flags: int) -> int:
     """Call the SetThreadExecutionState with the given flags.
-    
+
     Parameters
     ----------
     flags: int
         The flags to set. For example, KEEP_PRESENTING state is 2147483651
         and the RELEASE flags is 2147483648.
-    
+
     Returns
     -------
-    int: 
-        Flags value of the previous thread execution state as returned from the 
+    int:
+        Flags value of the previous thread execution state as returned from the
         SetThreadExecutionState call.
-    
+
     Raises
     ------
     RuntimeError:
@@ -132,9 +133,11 @@ def _call_set_thread_execution_state(flags: int) -> int:
     try:
         # This sets the return type to be unsigned 32-bit integer. Otherwise it
         # will be a signed 32-bit integer which is overflown. So for example
-        # instead of returning 2147483649 it would return -2147483647. 
+        # instead of returning 2147483649 it would return -2147483647.
         ctypes.windll.kernel32.SetThreadExecutionState.restype = ctypes.c_uint32
-        logger.debug('Calling SetThreadExecutionState with flags: %s (%s)', flags, Flags(flags))
+        logger.debug(
+            "Calling SetThreadExecutionState with flags: %s (%s)", flags, Flags(flags)
+        )
         # The return value will be 0 in case of error, and the value of the
         # previous thread execution state otherwise.
         retval = ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type: ignore[attr-defined,unused-ignore]
@@ -142,9 +145,10 @@ def _call_set_thread_execution_state(flags: int) -> int:
         raise RuntimeError("Could not use kernel32.dll!") from exc
 
     if retval == 0:
-        raise RuntimeError('SetThreadExecutionState returned NULL')
+        raise RuntimeError("SetThreadExecutionState returned NULL")
 
     return retval
+
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
     mode_name = ModeName.KEEP_RUNNING
