@@ -135,7 +135,7 @@ def _call_set_thread_execution_state(flags: int) -> int:
         # This sets the return type to be unsigned 32-bit integer. Otherwise it
         # will be a signed 32-bit integer which is overflown. So for example
         # instead of returning 2147483649 it would return -2147483647.
-        ctypes.windll.kernel32.SetThreadExecutionState.restype = ctypes.c_uint32 # type: ignore[attr-defined,unused-ignore]
+        ctypes.windll.kernel32.SetThreadExecutionState.restype = ctypes.c_uint32  # type: ignore[attr-defined,unused-ignore]
         logger.debug(
             "Calling SetThreadExecutionState with flags: %s (%s)", flags, Flags(flags)
         )

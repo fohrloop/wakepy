@@ -1,7 +1,11 @@
 import re
+import sys
 from unittest.mock import patch
 
 import pytest
+
+if sys.platform != "win32":
+    pytest.skip(allow_module_level=True)
 
 import wakepy.methods.windows as windows
 from wakepy.methods.windows import (
