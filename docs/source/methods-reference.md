@@ -4,13 +4,13 @@
 **What are wakepy Methods?**
 Methods are different ways of entering in (or keeping a) Mode. A Method may support one or more platforms, and may have one or more requirements for software it should be able to talk to or execute. For example, on Linux. using the Inhibit method of the [org.gnome.SessionManager](#org-gnome-sessionmanager) D-Bus service is one way of entering  the [`keep.running`](#keep-running-mode) mode, and it requires D-Bus and (a certain version of) GNOME. The following methods exist (⌛: [`keep.running`](#keep-running-mode), 🖥️: [`keep.presenting`](#keep-presenting-mode)): 
 
-| Method                          | Modes |
-| ------------------------------- | ----- |
-| [caffeinate](#macos-caffeinate) | ⌛ 🖥️ |
-| [org.freedesktop.PowerManagement](org-freedesktop-powermanagement) | ⌛ |
-| [org.freedesktop.ScreenSaver](org-freedesktop-screensaver) | 🖥️ |
-| [org.gnome.SessionManager](org-gnome-sessionmanager) | ⌛🖥️ |
-| [SetThreadExecutionState](windows-stes) | ⌛🖥️ |
+| Method                                                             | Modes |
+| ------------------------------------------------------------------ | ----- |
+| [caffeinate](#macos-caffeinate)                                    | ⌛ 🖥️   |
+| [org.freedesktop.PowerManagement](org-freedesktop-powermanagement) | ⌛     |
+| [org.freedesktop.ScreenSaver](org-freedesktop-screensaver)         | 🖥️     |
+| [org.gnome.SessionManager](org-gnome-sessionmanager)               | ⌛🖥️    |
+| [SetThreadExecutionState](windows-stes)                            | ⌛🖥️    |
 
 
 (macos-caffeinate)=
@@ -84,7 +84,8 @@ Since this method prevents sleep, screen can be only locked automatically if a s
 - **Name**: `SetThreadExecutionState`
 - **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.1.0
-- **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating [`keep.running`](#keep-running-mode) mode, and additionally ES_DISPLAY_REQUIRED flag when activating [`keep.presenting`](#keep-presenting-mode) mode. Uses the  ES_CONTINUOUS flag for deactivating. Note that currently it is not possible to use two wakepy modes using SetThreadExecutionState at the same time in the same thread! (See: [Issue 167](https://github.com/fohrloop/wakepy/issues/167))
+- **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating [`keep.running`](#keep-running-mode) mode, and additionally ES_DISPLAY_REQUIRED flag when activating [`keep.presenting`](#keep-presenting-mode) mode. It then uses the ES_CONTINUOUS flag for deactivating.
+- **Wakepy specialities**: Note that as of wakepy 0.10.0 you can have multiple modes (same or different) activated within the same python thread without them interfering with each other on activation or deactivation, as wakepy creates a *separate worker thread* for the single purpose of setting and keeping the thread execution flag each time you activate a mode with the `SetThreadExecutionState` wakepy.Method.
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: Run `powercfg /requests` in an elevated cmd or Powershell.
