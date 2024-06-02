@@ -3,15 +3,13 @@ from __future__ import annotations
 import ctypes
 import enum
 import threading
-import typing
 from abc import ABC, abstractmethod
 from queue import Queue
 from threading import Event, Thread
-
+import logging 
 from wakepy.core import Method, ModeName, PlatformName
 
-if typing.TYPE_CHECKING:
-    from typing import Optional
+logger = logging.getLogger(__name__)
 
 # Different flags for WindowsSetThreadExecutionState
 # See: https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate
@@ -36,6 +34,8 @@ class WindowsSetThreadExecutionState(Method, ABC):
     # above (client) or Windows Server 2003 and above (server)
     supported_platforms = (PlatformName.WINDOWS,)
     _wait_timeout = 5  # seconds
+    """timeout for calls like queue.get() and thread.join() which could
+    otherwise block execution indefinitely."""
 
     @property
     @abstractmethod
@@ -45,7 +45,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
         super().__init__(**kwargs)
         self._inhibiting_thread: Thread | None = None
         self._release = Event()
-        self._queue_from_thread: Queue[Optional[Exception]] = Queue()
+        self._queue_from_thread: Queue[int|Exception] = Queue()
 
     def enter_mode(self) -> None:
         # Because the ExecutionState flags are global per each thread, and
@@ -73,7 +73,8 @@ class WindowsSetThreadExecutionState(Method, ABC):
         """
         res = self._queue_from_thread.get(timeout=self._wait_timeout)
 
-        if res is None:
+        if isinstance(res, int):
+            logger.debug('The previous flags were %s (%s)', res, Flags(res))
             return  # success
         elif isinstance(res, Exception):
             # re-raise any exceptions occurred in the thread
@@ -82,7 +83,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
 
 def _inhibit_until_released(
-    flags: Flags, exit_event: Event, queue: Queue[Optional[Exception]]
+    flags: Flags, exit_event: Event, queue: Queue[int|Exception]
 ) -> None:
     # Sets the flags until Flags.RELEASE is used or until the thread
     # which called this dies.
@@ -92,21 +93,52 @@ def _inhibit_until_released(
 
 
 def _call_and_put_result_in_queue(
-    flags: int, queue: Queue[Optional[Exception]]
+    flags: int, queue: Queue[int|Exception]
 ) -> None:
     try:
-        _call_set_thread_execution_state(flags)
-        queue.put(None)
+        prev_flags = _call_set_thread_execution_state(flags)
+        queue.put(prev_flags)
     except Exception as exc:
         queue.put(exc)
 
 
-def _call_set_thread_execution_state(flags: int) -> None:
+def _call_set_thread_execution_state(flags: int) -> int:
+    """Call the SetThreadExecutionState with the given flags.
+    
+    Parameters
+    ----------
+    flags: int
+        The flags to set. For example, KEEP_PRESENTING state is 2147483651
+        and the RELEASE flags is 2147483648.
+    
+    Returns
+    -------
+    int: 
+        Flags value of the previous thread execution state as returned from the 
+        SetThreadExecutionState call.
+    
+    Raises
+    ------
+    RuntimeError:
+        If the kernel32.dll is not found or if the SetThreadExecutionState
+        returns NULL (0), indicating an error.
+    """
     try:
-        ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type: ignore[attr-defined,unused-ignore]
+        # This sets the return type to be unsigned 32-bit integer. Otherwise it
+        # will be a signed 32-bit integer which is overflown. So for example
+        # instead of returning 2147483649 it would return -2147483647. 
+        ctypes.windll.kernel32.SetThreadExecutionState.restype = ctypes.c_uint32
+        logger.debug('Calling SetThreadExecutionState with flags: %s (%s)', flags, Flags(flags))
+        # The return value will be 0 in case of error, and the value of the
+        # previous thread execution state otherwise.
+        retval = ctypes.windll.kernel32.SetThreadExecutionState(flags)  # type: ignore[attr-defined,unused-ignore]
     except AttributeError as exc:
         raise RuntimeError("Could not use kernel32.dll!") from exc
 
+    if retval == 0:
+        raise RuntimeError('SetThreadExecutionState returned NULL')
+
+    return retval
 
 class WindowsKeepRunning(WindowsSetThreadExecutionState):
     mode_name = ModeName.KEEP_RUNNING
