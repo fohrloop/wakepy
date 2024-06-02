@@ -121,7 +121,8 @@ class TestWindowsSetThreadExecutionState:
         ):
             method.enter_mode()
 
-        # returning 0 means returning NULL (error in SetThreadExecutionState call)
+        # returning 0 means returning NULL (error in SetThreadExecutionState
+        # call)
         with patch(
             "wakepy.methods.windows.ctypes.windll.kernel32.SetThreadExecutionState",
             lambda x: 0,
@@ -138,7 +139,8 @@ class TestWindowsSetThreadExecutionState:
     def test_exit_mode_before_enter(self, method_cls):
         # does not make much practical sense but required for test coverage
         method = method_cls()
-        # need to add something to the queue; otherwise would wait until an exception
+        # need to add something to the queue; otherwise would wait until an
+        # exception
         method._queue_from_thread.put(1)
         method.exit_mode()
         assert method._inhibiting_thread is None
