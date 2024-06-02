@@ -7,6 +7,10 @@ from threading import Event, Thread
 
 from wakepy.core import Method, ModeName, PlatformName
 
+import typing 
+if typing.TYPE_CHECKING:
+    from typing import Optional
+
 # Different flags for WindowsSetThreadExecutionState
 # See: https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate
 ES_CONTINUOUS = 0x80000000
@@ -39,7 +43,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
         super().__init__(**kwargs)
         self._inhibiting_thread: Thread | None = None
         self._release = Event()
-        self._queue_from_thread = Queue()
+        self._queue_from_thread: Queue[Optional[Exception]] = Queue()
 
     def enter_mode(self) -> None:
         # Because the ExecutionState flags are global per each thread, and
@@ -51,16 +55,20 @@ class WindowsSetThreadExecutionState(Method, ABC):
             args=(self.flags, self._release, self._queue_from_thread),
         )
         self._inhibiting_thread.start()
-        return self._get_thread_response()
+        return self._check_thread_response()
 
     def exit_mode(self) -> None:
         self._release.set()
-        retval = self._get_thread_response()
+        retval = self._check_thread_response()
         self._inhibiting_thread.join(timeout=self._wait_timeout)
         self._inhibiting_thread = None
         return retval
 
-    def _get_thread_response(self) -> None:
+    def _check_thread_response(self) -> None:
+        """Waits a message from the inhibitor thread queue. If the item put
+        into the queue is not None, raises an Exception. Re-raises any
+        Exceptions put into the queue.
+        """
         res = self._queue_from_thread.get(timeout=self._wait_timeout)
 
         if res is None:
