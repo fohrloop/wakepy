@@ -34,7 +34,7 @@ tox -e build
 
 from __future__ import annotations
 
-import os 
+import os
 import platform
 import typing
 
