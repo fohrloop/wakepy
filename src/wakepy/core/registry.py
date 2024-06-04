@@ -56,12 +56,12 @@ def register_method(method_class: Type[Method]) -> None:
 
     if method_class.is_unnamed():
         # Methods without a name will not be registered
-        logging.debug(
+        logger.debug(
             "Not registering Method %s as it does not have a name set.", method_class
         )
         return
 
-    logging.debug("Registering Method %s (name: %s)", method_class, method_class.name)
+    logger.debug("Registering Method %s (name: %s)", method_class, method_class.name)
 
     method_dict: MethodDict = _method_registry.get(method_class.mode_name, dict())
 
