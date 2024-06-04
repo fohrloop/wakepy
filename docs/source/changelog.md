@@ -4,7 +4,7 @@
 🗓️ unreleased
 
 ### ✨ Features
-- 📢 CLI arguments: Change `-k, --keep-running` to be `-r, --keep-running` and `-p, --presentation` to be `-p, --keep-presenting`; Be more consistent with the naming of the [Modes](#wakepy-modes). The old alternatives are deprecated and will be removed in a future release.
+- 📢 CLI arguments: Change `-k, --keep-running` to be `-r, --keep-running` and `-p, --presentation` to be `-p, --keep-presenting`; Be more consistent with the naming of the [Modes](#wakepy-modes). The old alternatives are deprecated and will be removed in a future release. ([#356](https://github.com/fohrloop/wakepy/pull/356))
 
 ### 👷 Maintenance
 - Fixed GitHub Release pipeline: Creates releases only from tags. Added automatic titles. Cannot accidentally publish with "main" tag. ([#328](https://github.com/fohrloop/wakepy/pull/328), [#346](https://github.com/fohrloop/wakepy/pull/346))
