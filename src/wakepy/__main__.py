@@ -42,7 +42,7 @@ WAKEPY_TICKBOXES_TEMPLATE = """
  [{presentation_mode}] Display is kept on and automatic screenlock disabled.
 """
 
-_deprecations = []
+_deprecations: list[str] = []
 
 
 def main() -> None:
