@@ -1,5 +1,11 @@
 # Changelog
 
+## wakepy X.Y.Z
+🗓️ unreleased
+
+### 👷 Maintenance
+- Fixed GitHub Release pipeline: Creates releases only from tags. Added automatic titles. Cannot accidentally publish with "main" tag. ([#328](https://github.com/fohrloop/wakepy/pull/328), [#346](https://github.com/fohrloop/wakepy/pull/346))
+
 ## wakepy 0.9.1
 🗓️ 2024-06-04
 

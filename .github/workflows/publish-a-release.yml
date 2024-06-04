@@ -36,24 +36,24 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # publish-to-pypi:
-  #   name: 📦 Publish wakepy to PyPI
-  #   needs: build-and-test
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: pypi
-  #     url: https://pypi.org/p/wakepy
-  #   permissions:
-  #     id-token: write  # mandatory for trusted publishing
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: wakepy-python-packages
-  #         path: ./dist/
-  #     - name: Publish distribution 📦 to PyPI
-  #       uses: pypa/gh-action-pypi-publish@81e9d935c883d0b210363ab89cf05f3894778450 #v1.8.14
-  #       with:
-  #         print-hash: true
+  publish-to-pypi:
+    name: 📦 Publish wakepy to PyPI
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/wakepy
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: wakepy-python-packages
+          path: ./dist/
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@81e9d935c883d0b210363ab89cf05f3894778450 #v1.8.14
+        with:
+          print-hash: true
 
   publish-to-github-releases:
     name: 📦 Publish wakepy to GitHub
