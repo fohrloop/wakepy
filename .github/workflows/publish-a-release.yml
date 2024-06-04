@@ -10,6 +10,7 @@ name: Publish a wakepy release 📦
 jobs:
 
   build-and-test:
+    if: startsWith(github.ref, 'refs/tags/v')
     uses: ./.github/workflows/build-and-run-tests.yml
 
   sign-artifacts:
@@ -69,10 +70,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: >-
+          VERSION="${{github.repository}}" &&
           gh release create
           '${{ github.ref_name }}'
           --repo '${{ github.repository }}'
+          --title "wakepy ${VERSION:1}"
           --notes ""
+          --draft
       - name: Publish distribution & signatures 📦 to GitHub Releases
         env:
           GITHUB_TOKEN: ${{ github.token }}
