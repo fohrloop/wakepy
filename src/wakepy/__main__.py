@@ -24,7 +24,7 @@ from wakepy.core.constants import ModeName
 from wakepy.core.mode import Mode
 
 if typing.TYPE_CHECKING:
-    from typing import List
+    from typing import List, Tuple
 
     from wakepy import ActivationResult
 
@@ -42,17 +42,15 @@ WAKEPY_TICKBOXES_TEMPLATE = """
  [{presentation_mode}] Display is kept on and automatic screenlock disabled.
 """
 
-_deprecations: list[str] = []
-
 
 def main() -> None:
-    mode_name = parse_arguments(sys.argv[1:])
+    mode_name, deprecations = parse_arguments(sys.argv[1:])
     mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
     print(get_startup_text(mode=mode_name))
 
     # print the deprecations _after_ the startup text to make them more visible
-    for deprecation_msg in _deprecations:
-        warnings.warn(deprecation_msg, category=DeprecationWarning)
+    for deprecation_msg in deprecations:
+        warnings.warn(deprecation_msg, category=DeprecationWarning)  # pragma: no cover
 
     with mode:
         if not mode.active:
@@ -96,19 +94,20 @@ def _get_activation_error_text(result: ActivationResult) -> str:
 
 def parse_arguments(
     sysargs: List[str],
-) -> ModeName:
+) -> Tuple[ModeName, list[str]]:
     """Parses arguments from sys.argv and returns kwargs for"""
 
     args = _get_argparser().parse_args(sysargs)
+    deprecations: list[str] = []
 
     if args.k:
-        _deprecations.append(
+        deprecations.append(
             "Using -k is deprecated in wakepy 0.10.0, and will be removed in a future "
             "release. Use -r/--keep-running, instead. "
             "Note that this is the default value so -r is optional.",
         )
     if args.presentation:
-        _deprecations.append(
+        deprecations.append(
             "Using --presentation is deprecated in wakepy 0.10.0, and will be removed "
             "in a future release. Use -p/--keep-presenting, instead. ",
         )
@@ -129,7 +128,7 @@ def parse_arguments(
         assert keep_presenting
         mode = ModeName.KEEP_PRESENTING
 
-    return mode
+    return mode, deprecations
 
 
 def _get_argparser() -> argparse.ArgumentParser:
