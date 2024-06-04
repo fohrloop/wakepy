@@ -15,20 +15,20 @@ Wakepy is a package with an Python API and a CLI tool for *keeping a system awak
 
 🖥️ **Keeping screen awake**:  For long running tasks which require also the screen on and screenlock and screensaver inhibited.  *E.g.* for showing a video and dashboard / monitoring apps. (See: <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode"><b><code>keep.presenting</code></b></a>)
 
-## Supported platforms
+## Supported runtime environments
 
 Wakepy may keep the following systems awake. ⌛: <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running</a> mode, 🖥️:<a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a> mode.
 
 
 <table class="wakepy-table">
   <colgroup>
-    <col style="width: 18%;">
-    <col style="width: 68%;">
+    <col style="width: 31%;">
+    <col style="width: 55%;">
     <col style="width: 14%;">
   </colgroup>
   <thead>
     <tr>
-      <th>Platform</th>
+      <th>Runtime environment</th>
       <th>Methods</th>
       <th>Modes</th>
     </tr>
@@ -40,26 +40,24 @@ Wakepy may keep the following systems awake. ⌛: <a href="https://wakepy.readth
       <td>⌛ 🖥️</td>
     </tr>
     <tr>
-    </tr>
-    <tr>
       <td>macOS<sup>[2]</sup></td>
       <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#macos-caffeinate">caffeinate</a></td>
       <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td><a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a><sup>[3]</sup></td>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/GNOME">GNOME</a><sup>[3]</sup></td>
       <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-gnome-sessionmanager">org.gnome.SessionManager</a><br>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a></td>
       <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td><a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a><sup>[4]</sup></td>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/KDE_Plasma">KDE Plasma</a><sup>[4]</sup></td>
       <td><a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-powermanagement">org.freedesktop.PowerManagement</a><br>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a></td>
       <td>⌛ 🖥️</td>
     </tr>
     <tr>
-      <td><a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a><sup>[5]</sup></td>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/Freedesktop.org">Freedesktop.org</a> DE<sup>[5]</sup></td>
       <td>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-powermanagement">org.freedesktop.PowerManagement</a><br>
       <a href="https://wakepy.readthedocs.io/stable/methods-reference.html#org-freedesktop-screensaver">org.freedesktop.ScreenSaver</a>
@@ -69,10 +67,11 @@ Wakepy may keep the following systems awake. ⌛: <a href="https://wakepy.readth
   </tbody>
 </table>
 
+Unix above refers to Linux in wakepy 0.9.x, but upcoming releases of wakepy will support any Unix-like systems, e.g. FreeBSD ([wakepy/#359](https://github.com/fohrloop/wakepy/issues/)). See also: [Wakepy roadmap](#wakepy-roadmap).
 
 ## Installing
 
-Wakepy supports CPython 3.7 to 3.13, and may be installed with
+Wakepy supports CPython 3.7 to 3.13 (PyPy support: [wakepy/#274](https://github.com/fohrloop/wakepy/issues/274)), and may be installed with
 
 ```
 pip install wakepy
@@ -168,6 +167,73 @@ with keep.presenting():
 - 📖 Documentation: [wakepy.readthedocs.io/stable](https://wakepy.readthedocs.io/stable)
 - 📝 Changelog: [wakepy.readthedocs.io/stable/changelog.html](https://wakepy.readthedocs.io/stable/changelog.html)
 
+
+## Wakepy roadmap
+
+Wakepy vision is to support *any*<sup>†</sup> environment which runs Python. The following runtime environments will get support in the future<sup>†</sup>. Please vote or comment on the issue to raise them towards top of priorities. I'm also happy to receive PRs or comments explaining how it could be implemented.
+
+<sup>†</sup>: if technically possible.
+
+<table class="wakepy-table">
+  <colgroup>
+    <col style="width: 50%;">
+    <col style="width: 50%;">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Runtime environment</th>
+      <th>Issue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>WSL</td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/36">wakepy/#36</a></td>
+    </tr>
+    <tr>
+      <td>cygwin</td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/363">wakepy/#363</a></td>
+    </tr>
+    <tr>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/Cinnamon_(desktop_environment)">Cinnamon</a></td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/312">wakepy/#312</a></td>
+    </tr>
+    <tr>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/Xfce">Xfce</a></td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/311">wakepy/#311</a></td>
+    </tr>
+    <tr>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/MATE_(desktop_environment)">Mate</a></td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/314">wakepy/#314</a></td>
+    </tr>
+    <tr>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/LXQt">LXQt</a></td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/313">wakepy/#313</a></td>
+    </tr>
+    <tr>
+      <td>Unix + <a href="https://en.wikipedia.org/wiki/Systemd">systemd</a></td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/335">wakepy/#335</a></td>
+    </tr>
+    <tr>
+      <td>ChromeOS</td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/364">wakepy/#364</a></td>
+    </tr>
+    <tr>
+      <td>Android</td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/358">wakepy/#358</a></td>
+    </tr>
+    <tr>
+      <td>Jupyter Notebook (hosted on eg. Google Colab)</td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/195">wakepy/#195</a></td>
+    </tr>
+    <tr>
+      <td>Browser (Pyodide, PyPy.js, Brython, Transcrypt, Skulpt)</td>
+      <td><a href="https://github.com/fohrloop/wakepy/issues/362">wakepy/#362</a></td>
+    </tr>
+  </tbody>
+</table>
+
+In addition, [supporting PyPy](https://github.com/fohrloop/wakepy/issues/274) is on the roadmap. If you have ideas or comments, please post yours on [wakepy/#317](https://github.com/fohrloop/wakepy/discussions/317).
 
 ---------------
 
