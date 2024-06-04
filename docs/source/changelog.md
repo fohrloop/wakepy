@@ -5,7 +5,9 @@
 
 ### 🐞 Bug fixes
 - The [SetThreadExecutionState](#windows-stes) Method may now have multiple modes (same or different) activated within the same python thread without them interfering with each other on activation or deactivation, as wakepy creates a *separate worker thread* for the single purpose of setting and keeping the thread execution flag each time you activate a mode with the `SetThreadExecutionState` wakepy.Method. ([#342](https://github.com/fohrloop/wakepy/pull/342))
-- Importing wakepy (0.8.0 and 0.9.0) messed up logging. In particular, the logging level was changed to WARNING due to direct call to `logging.debug()` instead of `logger.debug()`. ([#344](https://github.com/fohrloop/wakepy/pull/344))
+- Importing wakepy (0.8.0 and 0.9.0) messed up logging. In particular, the logging level was changed to WARNING due to direct call to `logging.debug()` instead of `logger.debug()`. ([#344](https://github.com/fohrloop/wakepy/pull/344)). Thanks to [@reidswanson](https://github.com/reidswanson) for reporting it.
+- 👷 Fixed running the dev command `inv test` on Windows ([#339](https://github.com/fohrloop/wakepy/pull/339), [#341](https://github.com/fohrloop/wakepy/pull/341))
+
 
 ## wakepy 0.9.0.post1
 🗓️ 2024-06-01
