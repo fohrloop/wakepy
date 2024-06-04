@@ -203,7 +203,7 @@
        ry="7.5644441" />
     <text
        xml:space="preserve"
-       style="font-size:7.06945px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       style="font-size:7.06945px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
        x="101.45972"
        y="24.349356"
        id="text2-1"><tspan
@@ -223,7 +223,7 @@
        ry="4" />
     <text
        xml:space="preserve"
-       style="font-size:5.0321px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
        x="100.24952"
        y="58.862259"
        id="text1-9-2-2-6-1-4-5"><tspan
@@ -243,7 +243,7 @@
        ry="4.002717" />
     <text
        xml:space="preserve"
-       style="font-size:5.0321px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
        x="100.48346"
        y="100.80473"
        id="text1-9-2-2-6-1-4-5-1"><tspan
@@ -268,7 +268,7 @@
        ry="2.3874717" />
     <text
        xml:space="preserve"
-       style="font-size:4.01046px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6c87e0;fill-opacity:1;stroke-width:0.278941;stroke-dashoffset:0.415748"
+       style="font-size:4.01046px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6c87e0;fill-opacity:1;stroke-width:0.278941;stroke-dashoffset:0.415748"
        x="153.80508"
        y="80.319687"
        id="text1-9-2-2-6-1-4-5-5-7-9-7"><tspan
@@ -288,7 +288,7 @@
        ry="2.3874717" />
     <text
        xml:space="preserve"
-       style="font-size:4.01046px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6c87e0;fill-opacity:1;stroke-width:0.278941;stroke-dashoffset:0.415748"
+       style="font-size:4.01046px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6c87e0;fill-opacity:1;stroke-width:0.278941;stroke-dashoffset:0.415748"
        x="101.84096"
        y="146.45413"
        id="text1-9-2-2-6-1-4-5-5-7-9-7-7"><tspan
@@ -314,7 +314,7 @@
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
-       style="font-size:3.01591px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
+       style="font-size:3.01591px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
        x="122.59029"
        y="76.933365"
        id="text1-9-7-1-9-1-12-2-52-7-0-7-9"><tspan
@@ -325,7 +325,7 @@
          id="tspan7-6-0-2">[no more methods]</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:3.01591px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
+       style="font-size:3.01591px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
        x="90.46357"
        y="123.99159"
        id="text1-9-7-1-9-1-12-2-52-7-0-7-9-4"><tspan
@@ -336,7 +336,7 @@
          id="tspan7-6-0-2-7">[failure]</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:3.01591px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
+       style="font-size:3.01591px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
        x="115.08034"
        y="86.62648"
        id="text1-9-7-1-9-1-12-2-52-7-0-7-9-0"><tspan
@@ -372,7 +372,7 @@
        transform="rotate(45)" />
     <text
        xml:space="preserve"
-       style="font-size:3.01591px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
+       style="font-size:3.01591px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2f2f2f;fill-opacity:0.579625;stroke-width:0.35;stroke-dashoffset:0.415748"
        x="110.76816"
        y="132.52794"
        id="text1-9-7-1-9-1-12-2-52-7-0-7-9-4-9-6"><tspan
@@ -404,7 +404,7 @@
        r="4.3473601" />
     <text
        xml:space="preserve"
-       style="font-size:3.50244px;line-height:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#fefefe;fill-opacity:0.579625;stroke-width:0.349999;stroke-dashoffset:0.415748"
+       style="font-size:3.50244px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans, Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#fefefe;fill-opacity:0.579625;stroke-width:0.349999;stroke-dashoffset:0.415748"
        x="101.81939"
        y="164.96959"
        id="text1-9-7-1-9-1-12-2-5-8-6"><tspan
