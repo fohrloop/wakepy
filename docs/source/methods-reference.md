@@ -85,7 +85,7 @@ Since this method prevents sleep, screen can be only locked automatically if a s
 - **Modes**: [`keep.running`](#keep-running-mode), [`keep.presenting`](#keep-presenting-mode)
 - **Introduced in**: wakepy 0.1.0
 - **How it works**: It calls the [SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate) function from the Kernel32.dll with ES_CONTINUOUS and ES_SYSTEM_REQUIRED flags when activating [`keep.running`](#keep-running-mode) mode, and additionally ES_DISPLAY_REQUIRED flag when activating [`keep.presenting`](#keep-presenting-mode) mode. It then uses the ES_CONTINUOUS flag for deactivating.
-- **Wakepy specialities**: Note that as of wakepy 0.10.0 you can have multiple modes (same or different) activated within the same python thread without them interfering with each other on activation or deactivation, as wakepy creates a *separate worker thread* for the single purpose of setting and keeping the thread execution flag each time you activate a mode with the `SetThreadExecutionState` wakepy.Method.
+- **Wakepy specialities**: Note that as of wakepy 0.9.1 you can have multiple modes (same or different) activated within the same python thread without them interfering with each other on activation or deactivation, as wakepy creates a *separate worker thread* for the single purpose of setting and keeping the thread execution flag each time you activate a mode with the `SetThreadExecutionState` wakepy.Method.
 - **Multiprocess safe?**: Yes
 - **What if the process holding the lock dies?**: The lock is automatically removed.
 - **How to check it?**: Run `powercfg /requests` in an elevated cmd or Powershell.
