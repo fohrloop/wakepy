@@ -89,10 +89,10 @@ The release process is automated, but changelog creation takes a few manual step
 **Steps**:
 - Add changelog and release date to [changelog.md](docs/source/changelog.md)
 - Merge the changes to main.
-- Locally, fetch and checkout latest main, and create a new git tag with format "vX.Y.X"
+- Locally, fetch and checkout latest main, and create a new git tag with format vX.Y.Z
 - Push the tag to GitHub. Verify that the tag commit is same as latest main commit.
-- Go to GitHub and run the action for release (https://github.com/fohrloop/wakepy/actions/workflows/publish-a-release.yml) on the "main" branch.
-- After release, go to GitHub Releases at https://github.com/fohrloop/wakepy/releases/tag/main. Start editing the description of the latest release.
+- Go to GitHub and run the action for release (https://github.com/fohrloop/wakepy/actions/workflows/publish-a-release.yml) *on the tag vX.Y.Z*.
+- After release, go to GitHub Releases at https://github.com/fohrloop/wakepy/releases/. Start editing the description of the latest release.
 - Copy-paste the changelog from https://wakepy.readthedocs.io/stable/changelog.html to the description. Add titles (`###`)  and list markers (`-`) back.
 - Copy-paste the text further to a text editor and find and replace "wakepy.readthedocs.io/stable" with "wakepy.readthedocs.io/X.Y.Z" to keep the changelog links working even after later releases.
-- Copy-paste back to the GitHub Releases, and save with title "wakepy X.Y.Z"
+- Copy-paste back to the GitHub Releases, and save.
