@@ -16,6 +16,7 @@ import itertools
 import sys
 import time
 import typing
+import warnings
 from textwrap import dedent, fill
 
 from wakepy import ModeExit
@@ -23,7 +24,7 @@ from wakepy.core.constants import ModeName
 from wakepy.core.mode import Mode
 
 if typing.TYPE_CHECKING:
-    from typing import List
+    from typing import List, Tuple
 
     from wakepy import ActivationResult
 
@@ -38,14 +39,19 @@ WAKEPY_TEXT_TEMPLATE = r"""                  _
 
 WAKEPY_TICKBOXES_TEMPLATE = """
  [{no_auto_suspend}] System will continue running programs
- [{presentation_mode}] Presentation mode is on
+ [{presentation_mode}] Display is kept on and automatic screenlock disabled.
 """
 
 
 def main() -> None:
-    mode_name = parse_arguments(sys.argv[1:])
+    mode_name, deprecations = parse_arguments(sys.argv[1:])
     mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
     print(get_startup_text(mode=mode_name))
+
+    # print the deprecations _after_ the startup text to make them more visible
+    for deprecation_msg in deprecations:
+        warnings.warn(deprecation_msg, category=DeprecationWarning)  # pragma: no cover
+
     with mode:
         if not mode.active:
             raise ModeExit
@@ -88,24 +94,41 @@ def _get_activation_error_text(result: ActivationResult) -> str:
 
 def parse_arguments(
     sysargs: List[str],
-) -> ModeName:
+) -> Tuple[ModeName, list[str]]:
     """Parses arguments from sys.argv and returns kwargs for"""
 
     args = _get_argparser().parse_args(sysargs)
+    deprecations: list[str] = []
 
-    n_flags_selected = sum((args.keep_running, args.presentation))
+    if args.k:
+        deprecations.append(
+            "Using -k is deprecated in wakepy 0.10.0, and will be removed in a future "
+            "release. Use -r/--keep-running, instead. "
+            "Note that this is the default value so -r is optional.",
+        )
+    if args.presentation:
+        deprecations.append(
+            "Using --presentation is deprecated in wakepy 0.10.0, and will be removed "
+            "in a future release. Use -p/--keep-presenting, instead. ",
+        )
+
+    # For the duration of deprecation, allow also the old flags
+    keep_running = args.keep_running or args.k
+    keep_presenting = args.keep_presenting or args.presentation
+
+    n_flags_selected = sum((keep_running, keep_presenting))
 
     if n_flags_selected > 1:
         raise ValueError('You may only select one of the modes! See: "wakepy -h"')
 
-    if args.keep_running or n_flags_selected == 0:
+    if keep_running or n_flags_selected == 0:
         # The default action, if nothing is selected, is "keep running"
         mode = ModeName.KEEP_RUNNING
     else:
-        assert args.presentation
+        assert keep_presenting
         mode = ModeName.KEEP_PRESENTING
 
-    return mode
+    return mode, deprecations
 
 
 def _get_argparser() -> argparse.ArgumentParser:
@@ -119,27 +142,42 @@ def _get_argparser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "-k",
+        "-r",
         "--keep-running",
         help=(
-            "Keep programs running; inhibit automatic idle timer based sleep / "
-            "suspend. If a screen lock (or a screen saver) with a password is enabled, "
-            "your system *may* still lock the session automatically. You may, and "
-            "probably should, lock the session manually. Locking the workstation does "
-            "not stop programs from executing. This is used as the default if no modes "
-            "are selected."
+            "Keep programs running (DEFAULT); inhibit automatic idle timer based sleep "
+            "/ suspend. If a screen lock (or a screen saver) with a password is "
+            "enabled, your system *may* still lock the session automatically. You may, "
+            "and probably should, lock the session manually. Locking the workstation "
+            "does not stop programs from executing."
         ),
+        action="store_true",
+        default=False,
+    )
+
+    # old name for -r, --keep-running. Used during deprecation time
+    parser.add_argument(
+        "-k",
+        help=argparse.SUPPRESS,
         action="store_true",
         default=False,
     )
 
     parser.add_argument(
         "-p",
-        "--presentation",
+        "--keep-presenting",
         help=(
             "Presentation mode; inhibit automatic idle timer based sleep, screensaver, "
             "screenlock and display power management."
         ),
+        action="store_true",
+        default=False,
+    )
+
+    # old name for -p, --keep-presenting. Used during deprecation time
+    parser.add_argument(
+        "--presentation",
+        help=argparse.SUPPRESS,
         action="store_true",
         default=False,
     )

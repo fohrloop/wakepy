@@ -63,39 +63,53 @@ def method2_broken(mode_name_broken):
 @pytest.mark.parametrize(
     "args",
     [
-        ["-k"],
+        ["-r"],
         ["--keep-running"],
         # Also no args means keep running
         [],
     ],
 )
 def test_get_argparser_keep_running(args):
-    assert parse_arguments(args) == ModeName.KEEP_RUNNING
+    assert parse_arguments(args) == (ModeName.KEEP_RUNNING, [])
 
 
 @pytest.mark.parametrize(
     "args",
     [
         ["-p"],
-        ["--presentation"],
+        ["--keep-presenting"],
     ],
 )
 def test_get_argparser_keep_presenting(args):
-    assert parse_arguments(args) == ModeName.KEEP_PRESENTING
+    assert parse_arguments(args) == (ModeName.KEEP_PRESENTING, [])
 
 
 @pytest.mark.parametrize(
     "args",
     [
-        ["-k", "-p"],
-        ["--presentation", "-k"],
+        ["-r", "-p"],
+        ["--keep-presenting", "-r"],
         ["-p", "--keep-running"],
-        ["--presentation", "--keep-running"],
+        ["--keep-presenting", "--keep-running"],
     ],
 )
 def test_get_argparser_too_many_modes(args):
     with pytest.raises(ValueError, match="You may only select one of the modes!"):
         assert parse_arguments(args)
+
+
+@pytest.mark.parametrize(
+    "args, expected_mode",
+    [
+        (["--presentation"], ModeName.KEEP_PRESENTING),
+        (["-k"], ModeName.KEEP_RUNNING),
+    ],
+)
+def test_deprecations(args, expected_mode):
+    mode, deprecations = parse_arguments(args)
+    assert mode == expected_mode
+    assert len(deprecations) == 1
+    assert f"Using {args[0]} is deprecated in wakepy 0.10.0" in deprecations[0]
 
 
 def test_get_startup_text_smoke_test():
@@ -188,7 +202,7 @@ class TestMain:
     ):
         # Assume that user has specified some mode in the commandline which
         # resolves to `method.mode_name`
-        parse_arguments.return_value = method.mode_name
+        parse_arguments.return_value = method.mode_name, []
 
         mocks = Mock()
         mocks.attach_mock(print_mock, "print")
