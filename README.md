@@ -234,6 +234,10 @@ Wakepy vision is to support *any*<sup>†</sup> environment which runs Python. T
 
 In addition, [supporting PyPy](https://github.com/fohrloop/wakepy/issues/274) is on the roadmap. If you have ideas or comments, please post yours on [wakepy/#317](https://github.com/fohrloop/wakepy/discussions/317).
 
+## Licenses
+
+The contents of this repository are licensed with [MIT License](https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt), which is permissive and allows you to use the code as part of any application or library, commercial or not, with the following exception: The GitHub Invertocat logo used in the social share image is property of GitHub, downloaded from [github.com/logos](https://github.com/logos) and is used under the terms specified by GitHub.
+
 ---------------
 
 ## Footnotes
