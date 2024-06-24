@@ -1,3 +1,5 @@
+![](./img/wakepy-banner.png)
+<br><br><br>
 # Overview
 
 ```{include} ../../README.md
