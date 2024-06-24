@@ -1,7 +1,7 @@
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/fohrloop/wakepy)&nbsp;![PyPI](https://img.shields.io/pypi/v/wakepy)&nbsp;![PyPI - Downloads](https://img.shields.io/pypi/dm/wakepy)&nbsp;[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)&nbsp;![mypy](https://img.shields.io/badge/mypy-checked-blue)&nbsp;![mypy](https://img.shields.io/badge/code_style-black-black)&nbsp;![coverage](https://img.shields.io/badge/coverage-100%25-32bb13)
 [![pyversions](https://img.shields.io/pypi/pyversions/wakepy.svg)](https://pypi.python.org/pypi/wakepy)&nbsp;![License](https://img.shields.io/github/license/fohrloop/wakepy)
 
-![](./docs/source/img/wakepy-logo.svg)
+![](./docs/source/img/wakepy-banner.svg)
 
 Cross-platform wakelock / keep-awake / stay-awake written in Python.
 
@@ -233,6 +233,10 @@ Wakepy vision is to support *any*<sup>†</sup> environment which runs Python. T
 </table>
 
 In addition, [supporting PyPy](https://github.com/fohrloop/wakepy/issues/274) is on the roadmap. If you have ideas or comments, please post yours on [wakepy/#317](https://github.com/fohrloop/wakepy/discussions/317).
+
+## Licenses
+
+The contents of this repository are licensed with [MIT License](https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt), which is permissive and allows you to use the code as part of any application or library, commercial or not, with the following exception: The GitHub Invertocat logo used in the social share image is property of GitHub, downloaded from [github.com/logos](https://github.com/logos) and is used under the terms specified by GitHub.
 
 ---------------
 

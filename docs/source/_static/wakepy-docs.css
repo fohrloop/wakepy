@@ -147,3 +147,12 @@ thead > tr {
   background-color: var(--wakepy-table-color-header-bg) !important;
   border-bottom: 1px solid var(--wakepy-table-color-header-bottom-border) !important;
 }
+
+.logo {
+    margin-top: -10px !important;
+    margin-bottom: -5px !important;
+}
+
+html[data-theme=dark] .bd-content img:not(.only-dark,.dark-light) {
+    background-color: var(--wakepy-color-contents-bg) !important;
+}

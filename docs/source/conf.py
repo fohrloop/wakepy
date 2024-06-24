@@ -78,6 +78,7 @@ exclude_patterns: list[str] = []
 
 html_static_path = ["_static"]
 html_css_files = ["wakepy-docs.css"]
+html_logo = "img/logo-small.svg"
 
 # -- Options for HTML output -------------------------------------------------
 
