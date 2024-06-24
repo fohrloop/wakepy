@@ -1,4 +1,4 @@
-![](./img/wakepy-banner.png)
+![](./img/wakepy-banner.svg)
 <br><br><br>
 # Overview
 
