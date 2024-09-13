@@ -49,6 +49,8 @@ class PlatformType(StrEnum):
     :meth:`~wakepy.Method.supported_platforms`.
     """
 
+    # All of the IdentifiedPlatformType are always part of the PlatformType
+    # (also enforced with a test)
     WINDOWS = IdentifiedPlatformType.WINDOWS.value
     """Any Windows version from Windows 10 onwards."""
 
@@ -64,6 +66,8 @@ class PlatformType(StrEnum):
     UNKNOWN = IdentifiedPlatformType.UNKNOWN.value
     """Any non-identified platform"""
 
+    # These are special, combined platform types that make it easier to
+    # define the MethodSubclass.supported_platforms.
     BSD = auto()
     """Any BSD system (Currently just FreeBSD / GhostBSD, but is likely to
     change in the future)."""
