@@ -5,6 +5,10 @@
 
 ### ✨ Features
 - 📢 CLI arguments: Change `-k, --keep-running` to be `-r, --keep-running` and `-p, --presentation` to be `-p, --keep-presenting`; Be more consistent with the naming of the [Modes](#wakepy-modes). The old alternatives are deprecated and will be removed in a future release. ([#356](https://github.com/fohrloop/wakepy/pull/356))
+- If platform is unknown to wakepy, do not fail any Method in the platform check phase anymore, but try to use it. This means for example that any system running GNOME that is not Linux (or BSD) could still use wakepy with the [org.gnome.SessionManager](https://wakepy.readthedocs.io/stable/methods-reference.html#org-gnome-sessionmanager) ([#379](https://github.com/fohrloop/wakepy/pull/379))
+
+### 🚨 Backwards incompatible
+- Renamed [`PlatformName`](https://wakepy.readthedocs.io/v0.9.0.post1/api-reference.html#wakepy.core.constants.PlatformName) to [`PlatformType`](https://wakepy.readthedocs.io/v0.10.0/api-reference.html#wakepy.core.constants.PlatformType) and added new types: `ANY`, which means "any platform", `BSD`, meaning "any BSD system" in the future, but currently just FreeBSD / GhostBSD, and  `UNIX_LIKE_FOSS`, which means "Unix-like desktop environment, but FOSS". Includes: Linux and BSD. Excludes: Android (mobile), MacOS (non-FOSS), ChromeOS (non-FOSS). Only affects you if you have created custom [Method](https://wakepy.readthedocs.io/v0.9.0.post1/api-reference.html#wakepy.Method) subclasses.  ([#379](https://github.com/fohrloop/wakepy/pull/379))
 
 ### 👷 Maintenance
 - Fixed GitHub Release pipeline: Creates releases only from tags. Added automatic titles. Cannot accidentally publish with "main" tag. ([#328](https://github.com/fohrloop/wakepy/pull/328), [#346](https://github.com/fohrloop/wakepy/pull/346))
