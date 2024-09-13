@@ -5,6 +5,7 @@ Exception: ActivationResult is tested in it's own file
 
 import datetime as dt
 import re
+from unittest.mock import patch
 
 import pytest
 import time_machine
@@ -17,23 +18,23 @@ from tests.unit.test_core.testmethods import (
     combinations_of_test_methods,
     get_test_method_class,
 )
-from wakepy.core import Method, MethodActivationResult, PlatformName, get_methods
-from wakepy.core.constants import StageName, StageNameValue
+from wakepy.core import Method, MethodActivationResult, PlatformType
+from wakepy.core.constants import IdentifiedPlatformType, StageName, StageNameValue
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.method import (
     activate_method,
     caniuse_fails,
     deactivate_method,
-    get_platform_supported,
     try_enter_and_heartbeat,
 )
-from wakepy.core.platform import CURRENT_PLATFORM
+
+P = IdentifiedPlatformType
 
 
 class TestActivateMethod:
     """tests for activate_method"""
 
-    def test_activate_method_method_without_name(self):
+    def test_method_without_name(self):
         """Methods used for activation must have a name. If not, there should
         be a ValueError raised"""
 
@@ -46,25 +47,45 @@ class TestActivateMethod:
         ):
             activate_method(method)
 
-    def test_activate_method_method_without_platform_support(self):
+    @patch("wakepy.core.method.CURRENT_PLATFORM", IdentifiedPlatformType.WINDOWS)
+    def test_method_without_platform_support(self):
         UnsupportedMethod = get_test_method_class(
-            supported_platforms=(
-                PlatformName.WINDOWS
-                if CURRENT_PLATFORM != PlatformName.WINDOWS
-                else PlatformName.LINUX
-            ),
+            supported_platforms=(PlatformType.LINUX,),
         )
 
         unsupported_method = UnsupportedMethod()
 
-        # The current platform is set to linux, so method supporting only linux
-        # should fail.
+        # The supported_platform is LINUX and CURRENT_PLATFORM is set to
+        # WINDOWS so this must fail.
         res, heartbeat = activate_method(unsupported_method)
         assert res.failure_stage == StageName.PLATFORM_SUPPORT
         assert res.success is False
         assert heartbeat is None
 
-    def test_activate_method_method_caniuse_fails(self):
+    def test_with_unknown_platform_support_any(self):
+        SupportedMethod = get_test_method_class(
+            supported_platforms=(PlatformType.ANY,), caniuse=True, enter_mode=None
+        )
+        unsupported_method = SupportedMethod()
+
+        res, _ = activate_method(unsupported_method)
+        assert res.success is True
+
+    @patch("wakepy.core.method.CURRENT_PLATFORM", IdentifiedPlatformType.UNKNOWN)
+    def test_with_unknown_platform_support_just_linux(self):
+        # This is otherwise supported method, so it works also on the UNKNOWN
+        # system. Only the platform support check should return None ("I don't
+        # know"), but the rest of the activation process should proceed and the
+        # activation should succeed.
+        SupportedMethod = get_test_method_class(
+            supported_platforms=(PlatformType.LINUX,), caniuse=True, enter_mode=None
+        )
+        unsupported_method = SupportedMethod()
+
+        res, _ = activate_method(unsupported_method)
+        assert res.success is True
+
+    def test_method_caniuse_fails(self):
         # Case 1: Fail by returning False from caniuse
         method = get_test_method_class(caniuse=False)()
         res, heartbeat = activate_method(method)
@@ -83,7 +104,7 @@ class TestActivateMethod:
         assert res.failure_reason == "SomeSW version <2.1.5 not supported"
         assert heartbeat is None
 
-    def test_activate_method_method_enter_mode_fails(self):
+    def test_method_enter_mode_fails(self):
         # Case: Fail by returning False from enter_mode
         method = get_test_method_class(
             caniuse=True, enter_mode=RuntimeError("failed")
@@ -94,7 +115,7 @@ class TestActivateMethod:
         assert "RuntimeError('failed')" in res.failure_reason
         assert heartbeat is None
 
-    def test_activate_method_enter_mode_success(self):
+    def test_enter_mode_success(self):
         method = get_test_method_class(caniuse=True, enter_mode=None)()
         res, heartbeat = activate_method(method)
         assert res.success is True
@@ -103,7 +124,7 @@ class TestActivateMethod:
         # No heartbeat on success, as the used Method does not have heartbeat()
         assert heartbeat is None
 
-    def test_activate_method_heartbeat_success(self):
+    def test_heartbeat_success(self):
         method = get_test_method_class(heartbeat=None)()
         res, heartbeat = activate_method(method)
         assert res.success is True
@@ -321,29 +342,6 @@ class TestTryEnterAndHeartbeat:
         assert success is False
         assert "The only accepted return value is None" in err_message
         assert heartbeat_call_time is None
-
-
-class TestPlatformSupported:
-    """tests for get_platform_supported"""
-
-    @pytest.mark.usefixtures("provide_methods_different_platforms")
-    def test_get_platform_supported(self):
-        WindowsA, LinuxA, MultiPlatformA = get_methods(["WinA", "LinuxA", "multiA"])
-
-        # The windows method is only supported on windows
-        assert get_platform_supported(WindowsA(), PlatformName.WINDOWS)
-        assert not get_platform_supported(WindowsA(), PlatformName.LINUX)
-        assert not get_platform_supported(WindowsA(), PlatformName.MACOS)
-
-        # The linux method is only supported on linux
-        assert get_platform_supported(LinuxA(), PlatformName.LINUX)
-        assert not get_platform_supported(LinuxA(), PlatformName.WINDOWS)
-        assert not get_platform_supported(LinuxA(), PlatformName.MACOS)
-
-        # Case: Method that supports linux, windows and macOS
-        assert get_platform_supported(MultiPlatformA(), PlatformName.LINUX)
-        assert get_platform_supported(MultiPlatformA(), PlatformName.WINDOWS)
-        assert get_platform_supported(MultiPlatformA(), PlatformName.MACOS)
 
 
 class TestCanIUseFails:

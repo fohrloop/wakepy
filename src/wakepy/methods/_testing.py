@@ -2,7 +2,7 @@
 activation success. It is controlled with the WAKEPY_FAKE_SUCCESS environment
 variable and meant to be used in CI pipelines / tests."""
 
-from wakepy.core import CURRENT_PLATFORM, Method
+from wakepy.core import Method, PlatformType
 from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
 
 
@@ -16,7 +16,7 @@ class WakepyFakeSuccess(Method):
 
     name = WAKEPY_FAKE_SUCCESS
     mode_name = "_fake"
-    supported_platforms = (CURRENT_PLATFORM,)
+    supported_platforms = (PlatformType.ANY,)
 
     def enter_mode(self) -> None:
         """Does nothing ("succeeds" automatically; Will never raise an

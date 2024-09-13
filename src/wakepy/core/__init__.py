@@ -7,8 +7,9 @@ See the public Python API at: https://wakepy.readthedocs.io/
 from .activationresult import ActivationResult as ActivationResult
 from .activationresult import MethodActivationResult as MethodActivationResult
 from .constants import BusType as BusType
+from .constants import IdentifiedPlatformType as IdentifiedPlatformType
 from .constants import ModeName as ModeName
-from .constants import PlatformName as PlatformName
+from .constants import PlatformType as PlatformType
 from .dbus import DBusAdapter as DBusAdapter
 from .dbus import DBusAddress as DBusAddress
 from .dbus import DBusMethod as DBusMethod

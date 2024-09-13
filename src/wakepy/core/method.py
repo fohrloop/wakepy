@@ -14,9 +14,9 @@ from abc import ABC
 from typing import Type, cast
 
 from .activationresult import MethodActivationResult
-from .constants import PlatformName, StageName
+from .constants import PlatformType, StageName
 from .heartbeat import Heartbeat
-from .platform import CURRENT_PLATFORM
+from .platform import CURRENT_PLATFORM, get_platform_supported
 from .registry import register_method
 from .strenum import StrEnum, auto
 
@@ -31,7 +31,7 @@ if typing.TYPE_CHECKING:
 
     from wakepy.core import DBusAdapter, DBusMethodCall
 
-    from .constants import ModeName, PlatformName
+    from .constants import ModeName, PlatformType
 
 MethodCls = Type["Method"]
 
@@ -69,20 +69,26 @@ class Method(ABC):
     defines the Mode `foo` (:class:`Mode` classes are themselves not defined or
     registered anywhere)"""
 
-    supported_platforms: Tuple[PlatformName, ...] = (
-        PlatformName.LINUX,
-        PlatformName.WINDOWS,
-        PlatformName.MACOS,
-        PlatformName.OTHER,
-    )
-    """Lists the platforms the Method supports. If a platform is not listed in
-    ``method.supported_platforms``, the ``method`` is not going to be used on
-    the platform (when used as part of  a :class:`Mode`), and the Method
-    activation result will show a fail in the "PLATFORM" stage.
+    supported_platforms: Tuple[PlatformType, ...] = (PlatformType.ANY,)
+    """Lists the platforms the Method supports. If the current platform is not
+    part of any of the platform types listed in ``method.supported_platforms``,
+    the ``method`` is not* going to be used (when used as part of a
+    :class:`Mode`), and the Method activation result will show a fail in the
+    "PLATFORM" stage.
 
-    When subclassing, defining ``supported_platforms`` reduces some work
-    required when writing the logic for :meth:`caniuse`.  Additionally, it aids
-    in distinguishing the "PLATFORM" stage fail as a separate type of failure.
+    When subclassing the ``Method``, defining ``supported_platforms`` reduces
+    some work required when writing the logic for :meth:`caniuse`.
+    Additionally, it aids in distinguishing the "PLATFORM" stage fail as a
+    separate type of failure.
+
+    As an example, if the Method would support all Unix-like FOSS desktop
+    operating systems, the supported_platforms would be
+    ``(PlatformType.UNIX_LIKE_FOSS, )``. See the
+    :class:`~wakepy.core.constants.PlatformType` for all options.
+
+    \*unless the current platform is unidentified (``UNKNOWN``). In this case,
+    platform check does not fail (nor succeed), and the activation process
+    continues normally.
 
     Default: Support all platforms.
     """
@@ -114,6 +120,7 @@ class Method(ABC):
 
         # waits for https://github.com/fohrloop/wakepy/issues/256
         # self.method_kwargs = kwargs
+        _check_supported_platforms(self.supported_platforms, self.__class__.__name__)
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         register_method(cls)
@@ -285,6 +292,22 @@ class Method(ABC):
         return cls.name == unnamed
 
 
+def _check_supported_platforms(
+    supported_platforms: Tuple[PlatformType, ...], classname: str
+) -> None:
+    err_supported_platforms = (
+        f"The supported_platforms of {classname} must be a tuple of PlatformType!"
+    )
+
+    if not isinstance(supported_platforms, tuple):
+        raise ValueError(err_supported_platforms)
+    for p in supported_platforms:
+        if not isinstance(p, PlatformType):
+            raise ValueError(
+                err_supported_platforms + f' One item ({p}) is of type "{type(p)}"'
+            )
+
+
 def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat | None]:
     """Activates a mode defined by a single Method.
 
@@ -303,7 +326,7 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
         success=False, method_name=method.name, mode_name=method.mode_name
     )
 
-    if not get_platform_supported(method, platform=CURRENT_PLATFORM):
+    if get_platform_supported(CURRENT_PLATFORM, method.supported_platforms) is False:
         result.failure_stage = StageName.PLATFORM_SUPPORT
         return result, None
 
@@ -370,24 +393,6 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
 
     if method.dbus_adapter:
         method.dbus_adapter.close_connections()
-
-
-def get_platform_supported(method: Method, platform: PlatformName) -> bool:
-    """Checks if method is supported by the platform
-
-    Parameters
-    ----------
-    method: Method
-        The method which platform support to check.
-    platform:
-        The platform to check against.
-
-    Returns
-    -------
-    is_supported: bool
-        If True, the platform is supported. Otherwise, False.
-    """
-    return platform in method.supported_platforms
 
 
 def caniuse_fails(method: Method) -> tuple[bool, str]:

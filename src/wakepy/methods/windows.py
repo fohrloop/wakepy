@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from queue import Queue
 from threading import Event, Thread
 
-from wakepy.core import Method, ModeName, PlatformName
+from wakepy.core import Method, ModeName, PlatformType
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
     # The SetThreadExecutionState docs say that it supports Windows XP and
     # above (client) or Windows Server 2003 and above (server)
-    supported_platforms = (PlatformName.WINDOWS,)
+    supported_platforms = (PlatformType.WINDOWS,)
     _wait_timeout = 5  # seconds
     """timeout for calls like queue.get() and thread.join() which could
     otherwise block execution indefinitely."""

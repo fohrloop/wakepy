@@ -11,7 +11,7 @@ from wakepy.core import (
     DBusMethodCall,
     Method,
     ModeName,
-    PlatformName,
+    PlatformType,
 )
 
 if typing.TYPE_CHECKING:
@@ -56,7 +56,7 @@ class _GnomeSessionManager(Method, ABC):
         params=("inhibit_cookie",),
     ).of(session_manager)
 
-    supported_platforms = (PlatformName.LINUX,)
+    supported_platforms = (PlatformType.LINUX,)
 
     @property
     @abstractmethod
