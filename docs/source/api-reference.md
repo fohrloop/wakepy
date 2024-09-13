@@ -51,10 +51,18 @@ Wakepy Core
 .. autoclass:: wakepy.ModeExit
     :exclude-members: args, with_traceback
 
-.. autoclass:: wakepy.core.constants.PlatformName
+.. autoclass:: wakepy.core.constants.PlatformType
   :members:
   :undoc-members:
   :member-order: bysource
+
+.. autoclass:: wakepy.core.constants.IdentifiedPlatformType
+  :members:
+  :undoc-members:
+  :member-order: bysource
+
+.. autodata:: wakepy.core.platform.CURRENT_PLATFORM
+  :no-value:
 
 DBus Adapter
 -------------

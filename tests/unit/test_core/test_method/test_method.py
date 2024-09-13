@@ -6,12 +6,12 @@ import sys
 import pytest
 
 from tests.unit.test_core.testmethods import TestMethod
-from wakepy.core import DBusMethodCall
-from wakepy.core.constants import PlatformName
+from wakepy.core import DBusMethodCall, PlatformType
 from wakepy.core.method import (
     Method,
     MethodOutcome,
     MethodOutcomeValue,
+    _check_supported_platforms,
     has_enter,
     has_exit,
     has_heartbeat,
@@ -122,7 +122,7 @@ def test_method_defaults():
     assert m.exit_mode() is None  # type: ignore
 
     # By default, all platforms are supported
-    assert set(m.supported_platforms) == set(PlatformName)
+    assert set(m.supported_platforms) == set((PlatformType.ANY,))
 
 
 @pytest.mark.usefixtures("provide_methods_a_f")
@@ -147,3 +147,23 @@ def test_process_dbus_call(dbus_method: DBusMethod):
 
 def test_methodoutcome(assert_strenum_values):
     assert_strenum_values(MethodOutcome, MethodOutcomeValue)
+
+
+class TestCheckSupportedPlatforms:
+    def test_wrong_type_of_supported_platforms(self):
+
+        with pytest.raises(
+            ValueError,
+            match="The supported_platforms of someclass must be a tuple of PlatformType!",  # noqa: E501
+        ):
+            _check_supported_platforms("x", "someclass")  # type: ignore
+
+    def test_wrong_type_of_a_single_platform(self):
+        supported_platforms = (PlatformType.UNIX_LIKE_FOSS, "foo", PlatformType.WINDOWS)
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "The supported_platforms of someclass must be a tuple of PlatformType! One item (foo) is of type \"<class 'str'>\""  # noqa: E501
+            ),
+        ):
+            _check_supported_platforms(supported_platforms, "someclass")  # type: ignore

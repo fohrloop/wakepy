@@ -38,7 +38,7 @@ import itertools
 from collections import Counter
 from typing import Iterable, Type
 
-from wakepy.core import CURRENT_PLATFORM
+from wakepy.core import PlatformType
 from wakepy.core.method import Method
 
 
@@ -82,7 +82,7 @@ def get_test_method_class(
     enter_mode=METHOD_MISSING,
     heartbeat=METHOD_MISSING,
     exit_mode=METHOD_MISSING,
-    supported_platforms=(CURRENT_PLATFORM,),
+    supported_platforms=(PlatformType.ANY,),
 ) -> Type[Method]:
     """Get a test Method class with the .caniuse(), .enter_mode(), .heartbeat()
     and .exit_mode() methods defined as wanted. All methods can either be:

@@ -14,7 +14,7 @@ from wakepy.core import (
     DBusMethodCall,
     Method,
     ModeName,
-    PlatformName,
+    PlatformType,
 )
 
 if typing.TYPE_CHECKING:
@@ -41,7 +41,7 @@ class FreedesktopInhibitorWithCookieMethod(Method):
     """Base class for freedesktop.org D-Bus based methods."""
 
     service_dbus_address: DBusAddress
-    supported_platforms = (PlatformName.LINUX,)
+    supported_platforms = (PlatformType.LINUX,)
 
     def __init__(self, **kwargs: object) -> None:
         super().__init__(**kwargs)

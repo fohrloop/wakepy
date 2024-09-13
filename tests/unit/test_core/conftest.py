@@ -1,7 +1,7 @@
 import pytest
 
 from tests.unit.test_core.testmethods import TestMethod
-from wakepy.core import DBusAddress, DBusMethod, Method, PlatformName
+from wakepy.core import DBusAddress, DBusMethod, Method, PlatformType
 from wakepy.core.heartbeat import Heartbeat
 
 
@@ -28,34 +28,34 @@ def provide_methods_different_platforms(monkeypatch, testutils):
 
     class WindowsA(TestMethod):
         name = "WinA"
-        supported_platforms = (PlatformName.WINDOWS,)
+        supported_platforms = (PlatformType.WINDOWS,)
 
     class WindowsB(TestMethod):
         name = "WinB"
-        supported_platforms = (PlatformName.WINDOWS,)
+        supported_platforms = (PlatformType.WINDOWS,)
 
     class WindowsC(TestMethod):
         name = "WinC"
-        supported_platforms = (PlatformName.WINDOWS,)
+        supported_platforms = (PlatformType.WINDOWS,)
 
     class LinuxA(TestMethod):
         name = "LinuxA"
-        supported_platforms = (PlatformName.LINUX,)
+        supported_platforms = (PlatformType.LINUX,)
 
     class LinuxB(TestMethod):
         name = "LinuxB"
-        supported_platforms = (PlatformName.LINUX,)
+        supported_platforms = (PlatformType.LINUX,)
 
     class LinuxC(TestMethod):
         name = "LinuxC"
-        supported_platforms = (PlatformName.LINUX,)
+        supported_platforms = (PlatformType.LINUX,)
 
     class MultiPlatformA(TestMethod):
         name = "multiA"
         supported_platforms = (
-            PlatformName.LINUX,
-            PlatformName.WINDOWS,
-            PlatformName.MACOS,
+            PlatformType.LINUX,
+            PlatformType.WINDOWS,
+            PlatformType.MACOS,
         )
 
 

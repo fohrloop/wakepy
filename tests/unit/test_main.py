@@ -14,7 +14,7 @@ from wakepy.__main__ import (
     parse_arguments,
     wait_until_keyboardinterrupt,
 )
-from wakepy.core import CURRENT_PLATFORM
+from wakepy.core import PlatformType
 from wakepy.core.constants import ModeName
 
 
@@ -36,7 +36,7 @@ def method1(mode_name_working):
 
         name = "method1"
         mode_name = mode_name_working
-        supported_platforms = (CURRENT_PLATFORM,)
+        supported_platforms = (PlatformType.ANY,)
 
         def enter_mode(self) -> None:
             return
@@ -52,7 +52,7 @@ def method2_broken(mode_name_broken):
 
         name = "method2_broken"
         mode_name = mode_name_broken
-        supported_platforms = (CURRENT_PLATFORM,)
+        supported_platforms = (PlatformType.ANY,)
 
         def enter_mode(self) -> None:
             raise RuntimeError("foo")

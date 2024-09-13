@@ -5,7 +5,7 @@ import typing
 from abc import ABC, abstractmethod
 from subprocess import PIPE, Popen
 
-from wakepy.core import Method, ModeName, PlatformName
+from wakepy.core import Method, ModeName, PlatformType
 
 if typing.TYPE_CHECKING:
     from typing import Optional
@@ -18,7 +18,7 @@ class _MacCaffeinate(Method, ABC):
     Also: https://web.archive.org/web/20140604153141/https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html
     """
 
-    supported_platforms = (PlatformName.MACOS,)
+    supported_platforms = (PlatformType.MACOS,)
 
     def __init__(self, **kwargs: object) -> None:
         super().__init__(**kwargs)

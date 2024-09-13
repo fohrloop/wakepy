@@ -69,6 +69,7 @@ def handle_activation_error(result: ActivationResult) -> None:
 def _get_activation_error_text(result: ActivationResult) -> str:
     from wakepy import __version__
 
+    # LATER: This should be improved in https://github.com/fohrloop/wakepy/issues/378
     error_text = f"""
     Wakepy could not activate the "{result.mode_name}" mode. This might occur because of a bug or because your current platform is not yet supported or your system is missing required software.
 

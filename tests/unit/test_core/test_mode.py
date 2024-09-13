@@ -10,6 +10,7 @@ import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
 from wakepy import ActivationError, ActivationResult, Method, Mode
+from wakepy.core import PlatformType
 from wakepy.core.activationresult import MethodActivationResult
 from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName
 from wakepy.core.dbus import DBusAdapter
@@ -21,7 +22,6 @@ from wakepy.core.mode import (
     select_methods,
     should_fake_success,
 )
-from wakepy.core.platform import CURRENT_PLATFORM
 from wakepy.core.registry import get_method, get_methods
 
 if typing.TYPE_CHECKING:
@@ -48,7 +48,7 @@ def methods_abc(monkeypatch, testutils) -> List[Type[Method]]:
     testutils.empty_method_registry(monkeypatch)
 
     class TestMethod(Method):
-        supported_platforms = (CURRENT_PLATFORM,)
+        supported_platforms = (PlatformType.ANY,)
 
     class MethodA(TestMethod):
         name = "MethodA"
