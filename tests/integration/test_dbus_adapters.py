@@ -18,16 +18,24 @@ from wakepy import JeepneyDBusAdapter
 from wakepy.core import DBusAddress, DBusMethod, DBusMethodCall
 from wakepy.dbus_adapters.jeepney import DBusNotFoundError
 
-# For some unknown reason, when using jeepney, one will get a warning like
-# this:
+# For some unknown reason the D-Bus integration tests emit warnings like
+#
 # ResourceWarning: unclosed <socket.socket fd=14, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, raddr=b'\x00/tmp/dbus-cTfPKAeBWk'> # noqa: E501, W505
-# This is just ignored. It only triggers at *random* line, on random test when
-# python does garbage collection.
+# or
+# ResourceWarning: unclosed <socket.socket fd=14, family=1, type=1, proto=0, raddr=/tmp/dbus-WkEJOPjiAu> # noqa: E501, W505
+#
+# on garbage collection (either automatic; on any line or manual; during
+# gc_collect_after_dbus_integration_tests). These warnings are expected and
+# harmless. They occur either because a bug or some feature present in the DBus
+# Service or the interactions with the DBus service in the integration tests.
+# These do not happen during normal usage of wakepy and do not affect wakepy
+# users and are therefore simply ignored.
 #
 # Ref1: https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-mark-filterwarnings
 # Ref2: https://docs.pytest.org/en/7.1.x/reference/reference.html#globalvar-pytestmark
+# Ref3: https://github.com/fohrloop/wakepy/issues/380
 pytestmark = pytest.mark.filterwarnings(
-    r"ignore:unclosed.*raddr=b'\\x00/tmp/dbus-.*:ResourceWarning"
+    r"ignore:unclosed <socket.*raddr=[^=]*/tmp/dbus-.*:ResourceWarning"
 )
 
 
