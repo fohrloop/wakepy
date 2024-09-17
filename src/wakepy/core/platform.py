@@ -60,37 +60,48 @@ def get_platform_debug_info_dict() -> Dict[str, str]:
 
 
 def get_etc_os_release() -> dict[str, str]:
-    ignored_keys = [
-        "ANSI_COLOR",
-        "LOGO",
-        "CPE_NAME",
-        "DEFAULT_HOSTNAME",
-        "HOME_URL",
-        "DOCUMENTATION_URL",
-        "SUPPORT_URL",
-        "SUPPORT_END",
-        "BUG_REPORT_URL",
-        "REDHAT_BUGZILLA_PRODUCT",
-        "REDHAT_BUGZILLA_PRODUCT_VERSION",
-        "REDHAT_SUPPORT_PRODUCT",
-        "REDHAT_SUPPORT_PRODUCT_VERSION",
-    ]
-    os_release_file = Path("/etc/os-release")
-    if not os_release_file.exists():
-        os_release_file = Path("/etc/lsb-release")
-    if not os_release_file.exists():
+    """Get metadata about OS release from /etc/os-release file or, if that is
+    missing, from /etc/lsb-release. If neither of the files exist, returns an
+    empty dictionary. Otherwise, returns key-value pairs from the release
+    file."""
+
+    if Path(ETC_OS_RELEASE_PATH).exists():
+        release_file = ETC_OS_RELEASE_PATH
+    elif Path(ETC_LSB_RELEASE_PATH).exists():
+        release_file = ETC_LSB_RELEASE_PATH
+    else:
         return dict()
 
     out = dict()
-    with open(os_release_file) as f:
+    with open(release_file) as f:
         for line in f:
             key, value = line.split("=", maxsplit=1)
-            if key in ignored_keys:
+            if key in ignored_release_keys:
                 continue
-            key_out = f"({os_release_file}) {key}"
+            key_out = f"({release_file}) {key}"
             out[key_out] = value.strip()
     return out
 
+
+ETC_OS_RELEASE_PATH = "/etc/os-release"
+ETC_LSB_RELEASE_PATH = "/etc/lsb-release"
+
+# keys ignored in /etc/os-release and /etc/lsb-release files
+ignored_release_keys = [
+    "ANSI_COLOR",
+    "LOGO",
+    "CPE_NAME",
+    "DEFAULT_HOSTNAME",
+    "HOME_URL",
+    "DOCUMENTATION_URL",
+    "SUPPORT_URL",
+    "SUPPORT_END",
+    "BUG_REPORT_URL",
+    "REDHAT_BUGZILLA_PRODUCT",
+    "REDHAT_BUGZILLA_PRODUCT_VERSION",
+    "REDHAT_SUPPORT_PRODUCT",
+    "REDHAT_SUPPORT_PRODUCT_VERSION",
+]
 
 CURRENT_PLATFORM: IdentifiedPlatformType = get_current_platform()
 """The current platform as detected. If the platform cannot be detected,
