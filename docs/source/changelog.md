@@ -12,6 +12,7 @@
 
 ### 👷 Maintenance
 - Fixed GitHub Release pipeline: Creates releases only from tags. Added automatic titles. Cannot accidentally publish with "main" tag. ([#328](https://github.com/fohrloop/wakepy/pull/328), [#346](https://github.com/fohrloop/wakepy/pull/346))
+- Fixed: Tests failing on Fedora 40 [#381](https://github.com/fohrloop/wakepy/pull/381)
 
 ## wakepy 0.9.1
 🗓️ 2024-06-04
