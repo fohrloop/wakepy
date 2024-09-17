@@ -125,12 +125,12 @@ def test_get_platform_debug_info():
     - platform.release\(\): .*
     - platform.machine\(\): .*
     - sysconfig.get_platform\(\): .*
-    .*
     """.strip(
             "\n"
         )
     )
-    assert re.match(expected_out, debug_info)
+    # re.DOTALL makes . to match also the newlines.
+    assert re.match(expected_out, debug_info, re.DOTALL)
 
 
 mock_etc_os_release = """
