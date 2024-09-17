@@ -34,6 +34,11 @@ support DBus, but it's nice to be able to import this directly from wakepy
 top level package."""
 
 
+# This is a test for Issue 380
+foo = 1
+"""some text \* fooo"""
+
+
 def __getattr__(name: str) -> object:
     """Some lazy implementation of lazy loading.
 
