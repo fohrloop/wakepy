@@ -136,6 +136,7 @@ def test_get_platform_debug_info():
 mock_etc_os_release = """
 NAME="Ubuntu"
 FOO=123
+BUG_REPORT_URL="http://this-is-skipped"
 """.strip()
 
 mock_etc_lsb_release = """
