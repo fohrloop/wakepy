@@ -70,7 +70,7 @@ class Method(ABC):
     registered anywhere)"""
 
     supported_platforms: Tuple[PlatformType, ...] = (PlatformType.ANY,)
-    """Lists the platforms the Method supports. If the current platform is not
+    r"""Lists the platforms the Method supports. If the current platform is not
     part of any of the platform types listed in ``method.supported_platforms``,
     the ``method`` is not* going to be used (when used as part of a
     :class:`Mode`), and the Method activation result will show a fail in the

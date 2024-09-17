@@ -32,6 +32,7 @@ def gc_collect_after_dbus_integration_tests():
     # this as garbage colletion is triggered also automatically. The garbage
     # collection must be triggered here manually as the warnings are
     # ResourceWarning is only filtered away in the dbus integration tests.
+    # See also: comments for pytestmark in tests/integration/test_dbus_adapters.py # noqa: W505, E501
     gc.collect()
 
     logger.debug("called gc.collect")
