@@ -76,7 +76,7 @@ def get_etc_os_release() -> dict[str, str]:
     with open(release_file) as f:
         for line in f:
             key, value = line.split("=", maxsplit=1)
-            if key in ignored_release_keys:
+            if key in IGNORED_RELEASE_FILE_KEYS:
                 continue
             key_out = f"({release_file}) {key}"
             out[key_out] = value.strip()
@@ -87,7 +87,7 @@ ETC_OS_RELEASE_PATH = "/etc/os-release"
 ETC_LSB_RELEASE_PATH = "/etc/lsb-release"
 
 # keys ignored in /etc/os-release and /etc/lsb-release files
-ignored_release_keys = [
+IGNORED_RELEASE_FILE_KEYS = [
     "ANSI_COLOR",
     "LOGO",
     "CPE_NAME",
