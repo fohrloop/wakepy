@@ -1,10 +1,17 @@
+import re
+import textwrap
 from unittest.mock import patch
 
 import pytest
 
 from wakepy.core import PlatformType
 from wakepy.core.constants import IdentifiedPlatformType
-from wakepy.core.platform import get_current_platform, get_platform_supported
+from wakepy.core.platform import (
+    get_current_platform,
+    get_platform_debug_info,
+    get_platform_debug_info_dict,
+    get_platform_supported,
+)
 
 P = IdentifiedPlatformType
 
@@ -84,3 +91,30 @@ class TestPlatformSupported:
         assert get_platform_supported(P.LINUX, (PlatformType.LINUX,)) is True
         # Linux is unix like
         assert get_platform_supported(P.LINUX, (PlatformType.UNIX_LIKE_FOSS,)) is True
+
+
+def test_get_platform_debug_info_dict():
+    info_dct = get_platform_debug_info_dict()
+    assert isinstance(info_dct, dict)
+
+    for key, val in info_dct.items():
+        assert isinstance(key, str)
+        assert isinstance(val, str)
+
+
+def test_get_platform_debug_info():
+    debug_info = get_platform_debug_info()
+    expected_out = textwrap.dedent(
+        r"""
+    - os.name: .*
+    - sys.platform: .*
+    - platform.system\(\): .*
+    - platform.release\(\): .*
+    - platform.machine\(\): .*
+    - sysconfig.get_platform\(\): .*
+    .*
+    """.strip(
+            "\n"
+        )
+    )
+    assert re.match(expected_out, debug_info)

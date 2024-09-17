@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import os
 import platform
+import sys
+import sysconfig
 import typing
 import warnings
+from pathlib import Path
 
 from .constants import IdentifiedPlatformType, PlatformType
 
 if typing.TYPE_CHECKING:
-    from typing import Callable, Tuple
+    from typing import Callable, Dict, Tuple
 
     PlatformFunc = Callable[[IdentifiedPlatformType], bool]
 
@@ -29,6 +33,63 @@ def get_current_platform() -> IdentifiedPlatformType:
         f"Could not detect current platform! platform.system() returned {system}"
     )
     return IdentifiedPlatformType.UNKNOWN
+
+
+def get_platform_debug_info() -> str:
+    info_dict = get_platform_debug_info_dict()
+    return "\n".join(f"- {key}: {val}" for key, val in info_dict.items())
+
+
+def get_platform_debug_info_dict() -> Dict[str, str]:
+    info = dict()
+    try:
+        info["os.name"] = os.name
+        info["sys.platform"] = sys.platform
+        info["platform.system()"] = platform.system()
+        info["platform.release()"] = platform.release()
+        info["platform.machine()"] = platform.machine()
+        info["sysconfig.get_platform()"] = sysconfig.get_platform()
+        info["DESKTOP_SESSION"] = os.environ.get("DESKTOP_SESSION", "[not set]")
+        os_release_info = get_etc_os_release()
+        info.update(os_release_info)
+    except Exception:
+        # This should never happen, but better to be safe.
+        warnings.warn("Error in creating platform debug info")
+
+    return info
+
+
+def get_etc_os_release() -> dict[str, str]:
+    ignored_keys = [
+        "ANSI_COLOR",
+        "LOGO",
+        "CPE_NAME",
+        "DEFAULT_HOSTNAME",
+        "HOME_URL",
+        "DOCUMENTATION_URL",
+        "SUPPORT_URL",
+        "SUPPORT_END",
+        "BUG_REPORT_URL",
+        "REDHAT_BUGZILLA_PRODUCT",
+        "REDHAT_BUGZILLA_PRODUCT_VERSION",
+        "REDHAT_SUPPORT_PRODUCT",
+        "REDHAT_SUPPORT_PRODUCT_VERSION",
+    ]
+    os_release_file = Path("/etc/os-release")
+    if not os_release_file.exists():
+        os_release_file = Path("/etc/lsb-release")
+    if not os_release_file.exists():
+        return dict()
+
+    out = dict()
+    with open(os_release_file) as f:
+        for line in f:
+            key, value = line.split("=", maxsplit=1)
+            if key in ignored_keys:
+                continue
+            key_out = f"({os_release_file}) {key}"
+            out[key_out] = value.strip()
+    return out
 
 
 CURRENT_PLATFORM: IdentifiedPlatformType = get_current_platform()
