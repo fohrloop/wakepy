@@ -34,9 +34,23 @@ from wakepy.dbus_adapters.jeepney import DBusNotFoundError
 # Ref1: https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-mark-filterwarnings
 # Ref2: https://docs.pytest.org/en/7.1.x/reference/reference.html#globalvar-pytestmark
 # Ref3: https://github.com/fohrloop/wakepy/issues/380
+ignore_resource_warning_regex = r"unclosed <socket.*raddr=[^=]*/tmp/dbus-.*"
 pytestmark = pytest.mark.filterwarnings(
-    r"ignore:unclosed <socket.*raddr=[^=]*/tmp/dbus-.*:ResourceWarning"
+    f"ignore:{ignore_resource_warning_regex}:ResourceWarning"
 )
+
+
+def test_pytestmark_regex_okay():
+    # Tests that the regex used in the pytestmark ignores the warning strings
+    # that have been occurred.
+    examples = [
+        # On Ubuntu:
+        r"""unclosed <socket.socket fd=14, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, raddr=b'\x00/tmp/dbus-cTfPKAeBWk'>""",  # noqa: E501
+        # On Fedora 40
+        r"""unclosed <socket.socket fd=14, family=1, type=1, proto=0, raddr=/tmp/dbus-WkEJOPjiAu>""",  # noqa: E501
+    ]
+    for warning_example in examples:
+        assert re.match(ignore_resource_warning_regex, warning_example)
 
 
 @pytest.mark.usefixtures("dbus_calculator_service")
