@@ -22,6 +22,7 @@ from textwrap import dedent, fill
 from wakepy import ModeExit
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import Mode
+from wakepy.core.platform import get_platform_debug_info
 
 if typing.TYPE_CHECKING:
     from typing import List, Tuple
@@ -67,9 +68,10 @@ def handle_activation_error(result: ActivationResult) -> None:
 
 
 def _get_activation_error_text(result: ActivationResult) -> str:
+    import textwrap
+
     from wakepy import __version__
 
-    # LATER: This should be improved in https://github.com/fohrloop/wakepy/issues/378
     error_text = f"""
     Wakepy could not activate the "{result.mode_name}" mode. This might occur because of a bug or because your current platform is not yet supported or your system is missing required software.
 
@@ -79,8 +81,7 @@ def _get_activation_error_text(result: ActivationResult) -> str:
     - wakepy version: {__version__}
     - Mode: {result.mode_name}
     - Python version: {sys.version}
-    - Operating system & version: [PLEASE FILL THIS]
-    - Desktop Environment & version (if not default): [FILL OR REMOVE THIS LINE]
+    {textwrap.indent(get_platform_debug_info().strip(), ' '*4).strip()}
     - Additional details: [FILL OR REMOVE THIS LINE]
 
     Thank you!

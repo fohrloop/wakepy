@@ -28,9 +28,8 @@ def get_current_platform() -> IdentifiedPlatformType:
     elif system == "FreeBSD":
         return IdentifiedPlatformType.FREEBSD
 
-    # LATER: This should be improved in https://github.com/fohrloop/wakepy/issues/378
     warnings.warn(
-        f"Could not detect current platform! platform.system() returned {system}"
+        f"Could not detect current platform! Debug info:\n{get_platform_debug_info()}"
     )
     return IdentifiedPlatformType.UNKNOWN
 
