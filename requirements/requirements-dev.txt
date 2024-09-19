@@ -5,7 +5,7 @@
 -r requirements-docs.txt
 -r requirements-check.txt
 
-sphinx-autobuild==2024.2.4
+sphinx-autobuild==2024.9.19
 IPython
 invoke==2.2.0
 # Colorama is used with the tasks.py (invoke commands)
