@@ -16,7 +16,6 @@ import itertools
 import sys
 import time
 import typing
-import warnings
 from textwrap import dedent, fill
 
 from wakepy import ModeExit
