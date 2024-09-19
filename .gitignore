@@ -15,6 +15,7 @@ htmlcov/
 .tox/
 .coverage
 .ruff_cache
+.mypy_cache
 
 # pyenv
 .python-version
