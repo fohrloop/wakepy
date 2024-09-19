@@ -69,21 +69,26 @@ used_method: org.gnome.SessionManager
 ## Controlling the on-fail action
 ```{versionadded} 0.8.0
 ```
+```{versionchanged} 0.10.0
+`on_fail` defaults to "warn" instead of "error". See: [wakepy/#376](https://github.com/fohrloop/wakepy/issues/376).
+```
 
-Wakepy follows the [Zen on Python](https://peps.python.org/pep-0020/):
+The wakepy Modes (e.g. [`keep.running`](#keep-running-mode) and  [`keep.presenting`](#keep-presenting-mode)) also take an `on_fail` input argument which may be used to alter the behavior. Example:
 
-> Errors should never pass silently.  
-> Unless explicitly silenced.
+```{code-block} python
+from wakepy import keep
 
-and therefore by default if a mode cannot be activated, an {class}`~wakepy.ActivationError` is raised. The wakepy Modes also take an `on_fail` input argument which may be used to alter the behavior.
+with keep.running(on_fail="warn"):
+    # do something
+```
 
 
 ### on-fail actions
 
 | `on_fail`                | What happens? |
 | ------------------------ | ------------ |
-| "error"  (default)    | Raises an {class}`~wakepy.ActivationError`        |
-| "warn"  | Issues an {class}`~wakepy.ActivationWarning` |
+| "warn" (default) | Issues an {class}`~wakepy.ActivationWarning` |
+| "error" | Raises an {class}`~wakepy.ActivationError`        |
 | "pass"  | Does nothing |
 | Callable | The callable is called with one argument: the result of the activation which is <br> a instance of {class}`~wakepy.ActivationResult`. The call occurs before the with block is entered. |
 

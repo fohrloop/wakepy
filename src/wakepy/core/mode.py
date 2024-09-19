@@ -173,7 +173,7 @@ class Mode:
         method_classes: list[Type[Method]],
         methods_priority: Optional[MethodsPriorityOrder] = None,
         name: Optional[ModeName | str] = None,
-        on_fail: OnFail = "error",
+        on_fail: OnFail = "warn",
         dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
     ):
         r"""Initialize a `Mode` using `Method`\ s.
@@ -209,7 +209,7 @@ class Mode:
         methods: Optional[StrCollection] = None,
         omit: Optional[StrCollection] = None,
         methods_priority: Optional[MethodsPriorityOrder] = None,
-        on_fail: OnFail = "error",
+        on_fail: OnFail = "warn",
         dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
     ) -> Mode:
         """

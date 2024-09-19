@@ -11,6 +11,7 @@
 
 ### ✨ Enhancements
 - Improve warnings and errors if platform is not supported ([#383](https://github.com/fohrloop/wakepy/pull/383))
+- Change default `on_fail` action to be "warn" instead of "error" (in keep.running and keep.presenting modes). ([#388](https://github.com/fohrloop/wakepy/pull/388))
 
 ### 👷 Maintenance
 - Fixed GitHub Release pipeline: Creates releases only from tags. Added automatic titles. Cannot accidentally publish with "main" tag. ([#328](https://github.com/fohrloop/wakepy/pull/328), [#346](https://github.com/fohrloop/wakepy/pull/346))
