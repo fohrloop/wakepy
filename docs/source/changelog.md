@@ -3,7 +3,6 @@
 ## wakepy 0.10.0
 🗓️ unreleased
 
-
 ### ✨ Features
 - Add support for BSD and other non-Linux Unix-like FOSS desktop systems. All systems running a supported Desktop Environment (currently: KDE, Gnome + other freedesktop compliant DEs) should be supported. ([#379](https://github.com/fohrloop/wakepy/pull/379), [#385](https://github.com/fohrloop/wakepy/pull/385))
 - When running on an *unknown* platform, do not fail any Methods in the platform check phase anymore, but try to use each Method. This means for example that any system running GNOME that is not Linux (or BSD) could still use wakepy with the [org.gnome.SessionManager](https://wakepy.readthedocs.io/stable/methods-reference.html#org-gnome-sessionmanager) ([#379](https://github.com/fohrloop/wakepy/pull/379))
