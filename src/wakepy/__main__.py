@@ -16,7 +16,6 @@ import itertools
 import sys
 import time
 import typing
-import warnings
 from textwrap import dedent, fill
 
 from wakepy import ModeExit
@@ -51,7 +50,7 @@ def main() -> None:
 
     # print the deprecations _after_ the startup text to make them more visible
     for deprecation_msg in deprecations:
-        warnings.warn(deprecation_msg, category=DeprecationWarning)  # pragma: no cover
+        print(deprecation_msg)  # pragma: no cover
 
     with mode:
         if not mode.active:

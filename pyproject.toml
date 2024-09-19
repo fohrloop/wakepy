@@ -85,9 +85,6 @@ disallow_untyped_defs = false
 module = ['toxfile']
 disallow_any_unimported = false
 
-[tool.pytest.ini_options]
-filterwarnings = "ignore:.*is deprecated in wakepy 0.7.0 and will be removed in a future version of wakepy.*:DeprecationWarning"
-
 [tool.coverage.run]
 plugins = ["coverage_conditional_plugin"]
 omit = [
