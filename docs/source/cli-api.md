@@ -15,7 +15,7 @@ python -m wakepy
 This starts wakepy in the *default mode* (`-k`), which corresponds to a call to `keep.running` with default arguments. The available options are:
 
 ```{code-block} output
-wakepy [-h] [-k] [-p]
+wakepy [-h | -r | -p]
 
 options:
   -h, --help               show this help message and exit
@@ -31,3 +31,7 @@ options:
 
 If you just installed `wakepy`, you might need to restart shell / terminal application to make added to the PATH.
 ````
+
+```{versionchanged} 0.10.0
+Renamed `-k` to `-r` and `--presentation` to `--keep-presenting` ([wakepy/#355](https://github.com/fohrloop/wakepy/issues/355)).
+```
