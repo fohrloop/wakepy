@@ -41,7 +41,7 @@ class FreedesktopInhibitorWithCookieMethod(Method):
     """Base class for freedesktop.org D-Bus based methods."""
 
     service_dbus_address: DBusAddress
-    supported_platforms = (PlatformType.LINUX,)
+    supported_platforms = (PlatformType.UNIX_LIKE_FOSS,)
 
     def __init__(self, **kwargs: object) -> None:
         super().__init__(**kwargs)
