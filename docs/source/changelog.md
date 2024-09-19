@@ -3,6 +3,7 @@
 ## wakepy 0.10.0
 🗓️ unreleased
 
+
 ### ✨ Features
 - Add support for BSD and other non-Linux Unix-like FOSS desktop systems. All systems running a supported Desktop Environment (currently: KDE, Gnome + other freedesktop compliant DEs) should be supported. ([#379](https://github.com/fohrloop/wakepy/pull/379), [#385](https://github.com/fohrloop/wakepy/pull/385))
 - When running on an *unknown* platform, do not fail any Methods in the platform check phase anymore, but try to use each Method. This means for example that any system running GNOME that is not Linux (or BSD) could still use wakepy with the [org.gnome.SessionManager](https://wakepy.readthedocs.io/stable/methods-reference.html#org-gnome-sessionmanager) ([#379](https://github.com/fohrloop/wakepy/pull/379))
@@ -17,6 +18,9 @@
 - Fixed GitHub Release pipeline: Creates releases only from tags. Added automatic titles. Cannot accidentally publish with "main" tag. ([#328](https://github.com/fohrloop/wakepy/pull/328), [#346](https://github.com/fohrloop/wakepy/pull/346))
 - Fixed: Tests failing on Fedora 40 [#381](https://github.com/fohrloop/wakepy/pull/381)
 - Update various development time dependencies [#389](https://github.com/fohrloop/wakepy/pull/389)
+
+### 📖 Documentation
+- Update Installing instructions. Wakepy is available in conda-forge starting from version 0.9.1. ([#390](https://github.com/fohrloop/wakepy/pull/390) + Thanks to [@thewchan](https://github.com/thewchan) for [wakepy-feedstock](https://github.com/conda-forge/wakepy-feedstock))
 
 ## wakepy 0.9.1
 🗓️ 2024-06-04
