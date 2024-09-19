@@ -3,9 +3,21 @@
 # Overview
 
 ```{include} ../../README.md
-:start-after: <!-- start wakepy readme main -->
-:end-before: <!-- end wakepy readme main -->
+:start-after: <!-- wakepy readme beginning -->
+:end-before: <!-- wakepy readme at install before note -->
 ```
+
+```{admonition} Restart your shell after installing wakepy
+:class: note
+To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">CLI command</a> working, you might need to restart the shell / terminal application.
+```
+
+```{include} ../../README.md
+:start-after: <!-- wakepy readme at install after note -->
+:end-before: <!-- wakepy readme basic usage before tip -->
+```
+
+
 
 ```{admonition} Next Steps
 :class: seealso
@@ -22,8 +34,8 @@ a major release (e.g. 1.x.x -> 2.0.0).
 
 
 ```{include} ../../README.md
-:start-after: <!-- start wakepy readme part2 -->
-:end-before: <!-- end wakepy readme part2 -->
+:start-after: <!-- wakepy readme where used -->
+:end-before: <!-- wakepy readme after footnotes -->
 ```
 
 ```{toctree}
@@ -32,6 +44,7 @@ a major release (e.g. 1.x.x -> 2.0.0).
 :numbered: -1
 :titlesonly:
 
+installing
 user-guide
 tests-and-ci
 ```

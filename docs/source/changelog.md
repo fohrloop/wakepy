@@ -18,6 +18,9 @@
 - Fixed: Tests failing on Fedora 40 [#381](https://github.com/fohrloop/wakepy/pull/381)
 - Update various development time dependencies [#389](https://github.com/fohrloop/wakepy/pull/389)
 
+### 📖 Documentation
+- Update Installing instructions. Wakepy is available in conda-forge starting from version 0.9.1. ([#390](https://github.com/fohrloop/wakepy/pull/390) + Thanks to [@thewchan](https://github.com/thewchan) for [wakepy-feedstock](https://github.com/conda-forge/wakepy-feedstock))
+
 ## wakepy 0.9.1
 🗓️ 2024-06-04
 

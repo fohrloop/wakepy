@@ -5,7 +5,7 @@
 
 Cross-platform wakelock / keep-awake / stay-awake written in Python.
 
-<!-- start wakepy readme main -->
+<!-- wakepy readme beginning -->
 ## What is wakepy?
 
 Wakepy is a package with an Python API and a CLI tool for *keeping a system awake*. It has two main modes:
@@ -70,13 +70,22 @@ Unix above refers to Linux in wakepy 0.9.x, but upcoming releases of wakepy will
 
 ## Installing
 
-Wakepy supports CPython 3.7 to 3.13 (PyPy support: [wakepy/#274](https://github.com/fohrloop/wakepy/issues/274)), and may be installed with
+Wakepy supports CPython 3.7 to 3.13 (PyPy support: [wakepy/#274](https://github.com/fohrloop/wakepy/issues/274)), and may be installed from [PyPI](https://pypi.org/project/wakepy/) with
 
 ```
 pip install wakepy
 ```
 
-To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">CLI command</a> working, you might need to restart the shell / terminal application.
+Wakepy can also be installed from conda-forge with
+```
+conda install wakepy
+```
+For more details and install options, see: [Installing documentation](https://wakepy.readthedocs.io/stable/cli-api.html).
+
+<!-- wakepy readme at install before note -->
+> [!NOTE]
+> To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">CLI command</a> working, you might need to restart the shell / terminal application.
+<!-- wakepy readme at install after note -->
 
 ## Why wakepy?
 Here's some reasons why you might want to consider using wakepy:
@@ -131,7 +140,7 @@ from wakepy import keep
 with keep.presenting():
     # Do something that takes a long time and requires the screen to be awake
 ```
-<!-- end wakepy readme main -->
+<!-- wakepy readme basic usage before tip -->
 
 > [!TIP]
 > See the [User Guide](https://wakepy.readthedocs.io/stable/user-guide.html) and the available wakepy [Modes](https://wakepy.readthedocs.io/stable/modes.html) and [Methods](https://wakepy.readthedocs.io/stable/methods-reference.html)
@@ -143,7 +152,7 @@ with keep.presenting():
 > one release to another. After that, breaking changes should occur only part of
 > a major release (e.g. 1.x.x -> 2.0.0).
 
-<!-- start wakepy readme part2 -->
+<!-- wakepy readme where used -->
 ## Where wakepy is used?
 
 - [aTrain](https://github.com/JuergenFleiss/aTrain) — transcription of speech recordings utilizing machine learning models.
@@ -250,5 +259,5 @@ The contents of this repository are licensed with [MIT License](https://github.c
 | <sup>[4]</sup> KDE Plasma 5.12.90 (May 2018) onwards.                                                                                       |
 | <sup>[5]</sup> Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces. |
 
-<!-- end wakepy readme part2 -->
+<!-- wakepy readme after footnotes -->
 
