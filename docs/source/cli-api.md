@@ -19,9 +19,9 @@ wakepy [-h] [-k] [-p]
 
 options:
   -h, --help               show this help message and exit
-  -k, --keep-running       Keep programs running; inhibit automatic sleep/suspend. This
+  -r, --keep-running       Keep programs running; inhibit automatic sleep/suspend. This
                            is used as a default if no modes are selected.
-  -p, --presentation       Presentation mode; inhibit automatic sleep, screensaver and
+  -p, --keep-presenting    Presentation mode; inhibit automatic sleep, screensaver and
                            screenlock
 ```
 
