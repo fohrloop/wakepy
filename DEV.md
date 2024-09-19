@@ -21,6 +21,11 @@ python -m pip install -r requirements/requirements-dev.txt -e .
 
 where `.` means the current directory (assuming cwd is at root of the repository).
 
+### FreeBSD notes (installing for development)
+
+- To install ruff, You need a recent version of Rust. Recommended to use rustup. You'll also need gmake.
+- You'll also need the Standard Python binding to the SQLite3 library (py3**-sqlite3)
+
 ## Documentation
 
 - The documentation is done with Sphinx and the source code lives at

@@ -56,7 +56,7 @@ class _GnomeSessionManager(Method, ABC):
         params=("inhibit_cookie",),
     ).of(session_manager)
 
-    supported_platforms = (PlatformType.LINUX,)
+    supported_platforms = (PlatformType.UNIX_LIKE_FOSS,)
 
     @property
     @abstractmethod

@@ -6,8 +6,10 @@ authors = [
     {name = "Niko Föhr", email = "fohrloop@gmail.com"},
 ]
 dependencies = [
-    # For using the D-Bus based methods
-    "jeepney >= 0.7.1;sys_platform=='linux'",
+    # For using the D-Bus based methods. All Unix-öike FOSS desktop operating
+    # systems should be listed here (as they might use Gnome, XFCE, etc.)
+    # Full list of the environment markers at https://peps.python.org/pep-0508/
+    "jeepney >= 0.7.1;platform_system=='Linux' or platform_system=='FreeBSD' or platform_system=='OpenBSD' or platform_system=='NetBSD' or platform_system=='DragonFly' or platform_system=='SunOS' or platform_system=='AIX' or platform_system=='Minix'",
     # The typing.Literal was introduced in Python 3.8. Need to install
     # typing-extensions for Python 3.7 support.
     'typing-extensions; python_version < "3.8.0"',
