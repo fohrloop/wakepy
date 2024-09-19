@@ -18,7 +18,7 @@ def running(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
-    on_fail: OnFail = "error",
+    on_fail: OnFail = "warn",
     dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping programs running.
@@ -91,7 +91,7 @@ def presenting(
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
     methods_priority: Optional[MethodsPriorityOrder] = None,
-    on_fail: OnFail = "error",
+    on_fail: OnFail = "warn",
     dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
 ) -> Mode:
     """Create a wakepy mode (a context manager) for keeping a system running
