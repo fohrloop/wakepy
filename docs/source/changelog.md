@@ -1,7 +1,14 @@
 # Changelog
 
+
+## wakepy 0.10.1
+🗓️ 2024-09-20
+
+### 🐞 Bug fixes
+- Fix the wakepy logo/text printed to CLI ([#400](https://github.com/fohrloop/wakepy/pull/400))
+
 ## wakepy 0.10.0
-🗓️ 2024-09-24
+🗓️ 2024-09-20
 
 ### 🏆 Highlights
 - Wakepy has been available in conda-forge since 0.9.1. Now it's also documented.
