@@ -13,16 +13,16 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import platform
 import sys
 import time
 import typing
-import platform
 from textwrap import dedent, fill
 
 from wakepy import ModeExit
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import Mode
-from wakepy.core.platform import get_platform_debug_info, CURRENT_PLATFORM, is_windows
+from wakepy.core.platform import CURRENT_PLATFORM, get_platform_debug_info, is_windows
 
 if typing.TYPE_CHECKING:
     from typing import List, Tuple
@@ -42,6 +42,7 @@ WAKEPY_TICKBOXES_TEMPLATE = """
  [{no_auto_suspend}] System will continue running programs
  [{presentation_mode}] Display is kept on and automatic screenlock disabled.
 """
+
 
 def main() -> None:
     mode_name, deprecations = parse_arguments(sys.argv[1:])
@@ -208,16 +209,20 @@ def wait_until_keyboardinterrupt() -> None:
     except KeyboardInterrupt:
         pass
 
+
 def get_spinner_symbols() -> list[str]:
 
-    if is_windows(CURRENT_PLATFORM) \
-        and platform.python_implementation().lower() == 'pypy':
+    if (
+        is_windows(CURRENT_PLATFORM)
+        and platform.python_implementation().lower() == "pypy"
+    ):
         # Windows + PyPy combination does not support unicode well, at least
         # yet at version 7.3.17. See:
         # https://github.com/pypy/pypy/issues/3890
-        # https://github.com/fohrloop/wakepy/issues/274#issuecomment-2363293422 
-        return  ["|", "/", "-", "\\"]
+        # https://github.com/fohrloop/wakepy/issues/274#issuecomment-2363293422
+        return ["|", "/", "-", "\\"]
     return ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
+
 
 if __name__ == "__main__":
     main()  # pragma: no cover
