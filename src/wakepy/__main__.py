@@ -191,7 +191,7 @@ def get_startup_text(mode: ModeName) -> str:
     from wakepy import __version__
 
     wakepy_text = WAKEPY_TEXT_TEMPLATE.format(
-        VERSION_STRING=f"{'  v.'+__version__[:24]: <24}"
+        VERSION_STRING=f"{'  v.'+__version__[:24]: <28}"
     )
     options_txt = WAKEPY_TICKBOXES_TEMPLATE.strip("\n").format(
         no_auto_suspend="x",
