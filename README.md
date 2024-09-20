@@ -70,7 +70,7 @@ Unix above refers to Linux in wakepy 0.9.x, but upcoming releases of wakepy will
 
 ## Installing
 
-Wakepy supports CPython 3.7 to 3.13 (PyPy support: [wakepy/#274](https://github.com/fohrloop/wakepy/issues/274)), and may be installed from [PyPI](https://pypi.org/project/wakepy/) with
+Wakepy supports CPython 3.7 to 3.13 and PyPy 3.8 to 3.10, and may be installed from [PyPI](https://pypi.org/project/wakepy/) with
 
 ```
 pip install wakepy
@@ -241,7 +241,7 @@ Wakepy vision is to support *any*<sup>†</sup> environment which runs Python. T
   </tbody>
 </table>
 
-In addition, [supporting PyPy](https://github.com/fohrloop/wakepy/issues/274) is on the roadmap. If you have ideas or comments, please post yours on [wakepy/#317](https://github.com/fohrloop/wakepy/discussions/317).
+If you have ideas or comments, please post yours on [wakepy/#317](https://github.com/fohrloop/wakepy/discussions/317).
 
 ## Licenses
 
