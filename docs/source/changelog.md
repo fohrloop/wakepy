@@ -1,26 +1,31 @@
 # Changelog
 
 ## wakepy 0.10.0
-🗓️ unreleased
+🗓️ 2024-09-24
+
+### 🏆 Highlights
+- Wakepy has been available in conda-forge since 0.9.1. Now it's also documented.
+- Warn instead of raise Exception by default if activating a Mode fails.
+
 
 ### ✨ Features
+- Change default `on_fail` action to be "warn" instead of "error" (in {func}`keep.running <wakepy.keep.running>` and {func}`keep.presenting <wakepy.keep.presenting>` modes). ([#388](https://github.com/fohrloop/wakepy/pull/388))
 - Add support for BSD and other non-Linux Unix-like FOSS desktop systems. All systems running a supported Desktop Environment (currently: KDE, Gnome + other freedesktop compliant DEs) should be supported. ([#379](https://github.com/fohrloop/wakepy/pull/379), [#385](https://github.com/fohrloop/wakepy/pull/385))
-- Add support for PyPy ([#393](https://github.com/fohrloop/wakepy/pull/393) and [#396](https://github.com/fohrloop/wakepy/pull/396))
+- Add support for PyPy ([#393](https://github.com/fohrloop/wakepy/pull/393),  [#396](https://github.com/fohrloop/wakepy/pull/396))
 - When running on an *unknown* platform, do not fail any Methods in the platform check phase anymore, but try to use each Method. This means for example that any system running GNOME that is not Linux (or BSD) could still use wakepy with the [org.gnome.SessionManager](https://wakepy.readthedocs.io/stable/methods-reference.html#org-gnome-sessionmanager) ([#379](https://github.com/fohrloop/wakepy/pull/379))
 - 🚨 CLI arguments: Change `-k, --keep-running` to be `-r, --keep-running` and `-p, --presentation` to be `-p, --keep-presenting`; Be more consistent with the naming of the [Modes](#wakepy-modes). The old alternatives are deprecated and will be removed in a future release. ([#356](https://github.com/fohrloop/wakepy/pull/356))
 - 🚨 Renamed [`PlatformName`](https://wakepy.readthedocs.io/v0.9.0.post1/api-reference.html#wakepy.core.constants.PlatformName) to [`PlatformType`](https://wakepy.readthedocs.io/v0.10.0/api-reference.html#wakepy.core.constants.PlatformType) and added new types: `ANY`, which means "any platform", `BSD`, meaning "any BSD system" in the future, but currently just FreeBSD / GhostBSD, and  `UNIX_LIKE_FOSS`, which means "Unix-like desktop environment, but FOSS". Includes: Linux and BSD. Excludes: Android (mobile), MacOS (non-FOSS), ChromeOS (non-FOSS). Only affects you if you have created custom [Method](https://wakepy.readthedocs.io/v0.9.0.post1/api-reference.html#wakepy.Method) subclasses.  ([#379](https://github.com/fohrloop/wakepy/pull/379))
-
-### ✨ Enhancements
 - Improve warnings and errors if platform is not supported ([#383](https://github.com/fohrloop/wakepy/pull/383))
-- Change default `on_fail` action to be "warn" instead of "error" (in keep.running and keep.presenting modes). ([#388](https://github.com/fohrloop/wakepy/pull/388))
 
 ### 👷 Maintenance
 - Fixed GitHub Release pipeline: Creates releases only from tags. Added automatic titles. Cannot accidentally publish with "main" tag. ([#328](https://github.com/fohrloop/wakepy/pull/328), [#346](https://github.com/fohrloop/wakepy/pull/346))
-- Fixed: Tests failing on Fedora 40 [#381](https://github.com/fohrloop/wakepy/pull/381)
-- Update various development time dependencies [#389](https://github.com/fohrloop/wakepy/pull/389)
+- Fixed: Tests failing on Fedora 40 ([#381](https://github.com/fohrloop/wakepy/pull/381))
+- Update various development time dependencies ([#389](https://github.com/fohrloop/wakepy/pull/389))
 
 ### 📖 Documentation
 - Update Installing instructions. Wakepy is available in conda-forge starting from version 0.9.1. ([#390](https://github.com/fohrloop/wakepy/pull/390) + Thanks to [@thewchan](https://github.com/thewchan) for [wakepy-feedstock](https://github.com/conda-forge/wakepy-feedstock))
+- Add Roadmap and improve the Supported Platforms docs ([#365](https://github.com/fohrloop/wakepy/pull/365))
+- Add logos and banners ([#370](https://github.com/fohrloop/wakepy/pull/370), [#371](https://github.com/fohrloop/wakepy/pull/371))
 
 ## wakepy 0.9.1
 🗓️ 2024-06-04

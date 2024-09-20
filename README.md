@@ -66,7 +66,7 @@ Wakepy may keep the following systems awake. ⌛: <a href="https://wakepy.readth
   </tbody>
 </table>
 
-Unix above refers to Linux in wakepy 0.9.x, but upcoming releases of wakepy will support any Unix-like systems, e.g. FreeBSD ([wakepy/#359](https://github.com/fohrloop/wakepy/issues/)). See also: [Wakepy roadmap](#wakepy-roadmap).
+Unix above refers to any Unix-like systems which might use such DEs, e.g. Linux or FreeBSD. See also: [Wakepy roadmap](#wakepy-roadmap).
 
 ## Installing
 
@@ -80,7 +80,7 @@ Wakepy can also be installed from conda-forge with
 ```
 conda install wakepy
 ```
-For more details and install options, see: [Installing documentation](https://wakepy.readthedocs.io/stable/cli-api.html).
+For more details and install options, see: [Installing documentation](https://wakepy.readthedocs.io/stable/installing.html).
 
 <!-- wakepy readme at install before note -->
 > [!NOTE]
@@ -157,11 +157,14 @@ with keep.presenting():
 
 - [aTrain](https://github.com/JuergenFleiss/aTrain) — transcription of speech recordings utilizing machine learning models.
 - [mpc-autofill](https://github.com/chilli-axe/mpc-autofill) — Automating MakePlayingCards' online ordering system
+- [LiveboxMonitor](https://github.com/p-dor/LiveboxMonitor) — Graphical user interface for routers (French project)
+- [FOLON-FO4Downgrader](https://github.com/Fallout-London/FOLON-FO4Downgrader) — Tool for reverting to a previous version of a game (Fallout 4)
+- [BD_to_AVP](https://github.com/cbusillo/BD_to_AVP) — 3D Blu-ray to Apple Vision Pro converter
+- [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI
 - [minarca](https://github.com/ikus060/minarca) — Cross-platform data backup software
 - [OceanOptics/Inlinino](https://github.com/OceanOptics/Inlinino) — Data logger for oceanography
 - [cogent3/EnsemblLite](https://github.com/cogent3/EnsemblLite) —  Obtaining dumps of Ensembl MySQL databases
 - [lakeshore](https://github.com/lakeshorecryotronics/python-driver) — Lake Shore instruments python Driver
-- [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI
 - [UCSD-E4E/baboon-tracking](https://github.com/UCSD-E4E/baboon-tracking) — In pipelines of a Computer Vision project tracking baboons
 - [pysimai](https://github.com/ansys/pysimai) — A Python wrapper for Ansys SimAI
 - [viskillz-blender](https://www.sciencedirect.com/science/article/pii/S2352711023000249) — Generating assets of Mental Cutting Test exercises
