@@ -80,7 +80,7 @@ Wakepy can also be installed from conda-forge with
 ```
 conda install wakepy
 ```
-For more details and install options, see: [Installing documentation](https://wakepy.readthedocs.io/stable/cli-api.html).
+For more details and install options, see: [Installing documentation](https://wakepy.readthedocs.io/stable/installing.html).
 
 <!-- wakepy readme at install before note -->
 > [!NOTE]
