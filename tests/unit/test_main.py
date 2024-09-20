@@ -8,6 +8,7 @@ import pytest
 from wakepy import ActivationResult, Method
 from wakepy.__main__ import (
     _get_activation_error_text,
+    get_spinner_symbols,
     get_startup_text,
     handle_activation_error,
     main,
@@ -15,7 +16,7 @@ from wakepy.__main__ import (
     wait_until_keyboardinterrupt,
 )
 from wakepy.core import PlatformType
-from wakepy.core.constants import ModeName
+from wakepy.core.constants import IdentifiedPlatformType, ModeName
 
 
 @pytest.fixture
@@ -214,3 +215,14 @@ class TestMain:
         # The patched value for sys.argv. Does not matter here otherwise, but
         # should be a list of at least two items.
         return ["", ""]
+
+
+class TestGetSpinnerSymbols:
+    @patch("wakepy.__main__.CURRENT_PLATFORM", IdentifiedPlatformType.LINUX)
+    def test_on_linux(self):
+        assert get_spinner_symbols() == ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
+
+    @patch("wakepy.__main__.CURRENT_PLATFORM", IdentifiedPlatformType.WINDOWS)
+    @patch("wakepy.__main__.platform.python_implementation", lambda: "PyPy")
+    def test_on_windows_pypy(self):
+        assert get_spinner_symbols() == ["|", "/", "-", "\\"]
