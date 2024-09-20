@@ -8,7 +8,6 @@ import re
 from unittest.mock import patch
 
 import pytest
-import time_machine
 
 from tests.unit.test_core.testmethods import (
     FAILURE_REASON,
@@ -227,15 +226,10 @@ class TestTryEnterAndHeartbeat:
             assert "The only accepted return value is None" in err_message
             assert heartbeat_call_time is None
 
-    @time_machine.travel(
-        dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
-    )
+    @pytest.mark.usefixtures("mock_datetime")
     def test_enter_mode_missing_heartbeat_success(self):
         """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
 
-        expected_time = dt.datetime.strptime(
-            "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=dt.timezone.utc)
         for method in combinations_of_test_methods(
             enter_mode=[METHOD_MISSING],
             heartbeat=[None],
@@ -243,7 +237,7 @@ class TestTryEnterAndHeartbeat:
         ):
             res = try_enter_and_heartbeat(method)
             # Expecting: Return Success + '' +  heartbeat time
-            assert res == (True, "", expected_time)
+            assert res == (True, "", self.fake_datetime_now)
 
     def test_enter_mode_success_heartbeat_missing(self):
         """Tests 5) SM from TABLE 1; enter_mode success, heartbeat missing"""
@@ -307,15 +301,9 @@ class TestTryEnterAndHeartbeat:
             ):
                 try_enter_and_heartbeat(method)
 
-    @time_machine.travel(
-        dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
-    )
+    @pytest.mark.usefixtures("mock_datetime")
     def test_enter_mode_success_heartbeat_success(self):
         """Tests 7) SS from TABLE 1; enter_mode success & heartbeat success"""
-        expected_time = dt.datetime.strptime(
-            "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=dt.timezone.utc)
-
         for method in combinations_of_test_methods(
             enter_mode=[None],
             heartbeat=[None],
@@ -323,7 +311,7 @@ class TestTryEnterAndHeartbeat:
         ):
             res = try_enter_and_heartbeat(method)
             # Expecting Return Success + '' + heartbeat time
-            assert res == (True, "", expected_time)
+            assert res == (True, "", self.fake_datetime_now)
 
     def test_enter_mode_returns_bad_balue(self):
         # Case: returning bad value (None return value accepted)
@@ -342,6 +330,14 @@ class TestTryEnterAndHeartbeat:
         assert success is False
         assert "The only accepted return value is None" in err_message
         assert heartbeat_call_time is None
+
+    fake_datetime_now = dt.datetime.strptime("2000-01-01 12:34:56", "%Y-%m-%d %H:%M:%S")
+
+    @pytest.fixture
+    def mock_datetime(self):
+        with patch("wakepy.core.method.dt.datetime") as datetime:
+            datetime.now.return_value = self.fake_datetime_now
+            yield
 
 
 class TestCanIUseFails:
