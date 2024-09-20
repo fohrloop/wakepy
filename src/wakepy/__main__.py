@@ -43,7 +43,6 @@ WAKEPY_TICKBOXES_TEMPLATE = """
  [{presentation_mode}] Display is kept on and automatic screenlock disabled.
 """
 
-
 def main() -> None:
     mode_name, deprecations = parse_arguments(sys.argv[1:])
     mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
@@ -191,7 +190,7 @@ def get_startup_text(mode: ModeName) -> str:
     from wakepy import __version__
 
     wakepy_text = WAKEPY_TEXT_TEMPLATE.format(
-        VERSION_STRING=f"{'  v.'+__version__: <28}"
+        VERSION_STRING=f"{'  v.'+__version__[:24]: <24}"
     )
     options_txt = WAKEPY_TICKBOXES_TEMPLATE.strip("\n").format(
         no_auto_suspend="x",
