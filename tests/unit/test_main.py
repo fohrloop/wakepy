@@ -16,8 +16,7 @@ from wakepy.__main__ import (
     wait_until_keyboardinterrupt,
 )
 from wakepy.core import PlatformType
-from wakepy.core.constants import ModeName
-from wakepy.core.platform import IdentifiedPlatformType
+from wakepy.core.constants import IdentifiedPlatformType, ModeName
 
 
 @pytest.fixture
