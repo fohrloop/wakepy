@@ -71,8 +71,12 @@ run code formatting checks.
 
 ## Running tests with multiple environments
 
-- Requirement:  One or more of the python versions mentioned in the envlist in tox.ini have to be installed and available for tox. Missing python versions are going to be simply skipped. If running on UNIX/macOS,
-  you may use [pyenv](https://github.com/pyenv/pyenv) to install multiple versions of python.
+- Requirement:  One or more of the python versions mentioned in the envlist in tox.ini have to be installed and available for tox. Missing python versions are going to be simply skipped. If running on UNIX/macOS, you may use [pyenv](https://github.com/pyenv/pyenv) to install multiple versions of python. In this case, you probably want to use the [pyenv global](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-global-advanced) to mark multiple versions, as in the example below. Also note that pypy3.7 would be used in place of CPython3.7 with py37 tox marker, if CPython3.7 is not installed.
+
+```
+pyenv global 3.12.6 3.10.15 3.7.17 pypy3.10 pypy3.7
+```
+
 - To run the tests with multiple python versions, use tox:
 
 ```
