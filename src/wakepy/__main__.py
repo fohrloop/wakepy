@@ -16,12 +16,13 @@ import itertools
 import sys
 import time
 import typing
+import platform
 from textwrap import dedent, fill
 
 from wakepy import ModeExit
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import Mode
-from wakepy.core.platform import get_platform_debug_info
+from wakepy.core.platform import get_platform_debug_info, CURRENT_PLATFORM, is_windows
 
 if typing.TYPE_CHECKING:
     from typing import List, Tuple
@@ -200,7 +201,7 @@ def get_startup_text(mode: ModeName) -> str:
 
 
 def wait_until_keyboardinterrupt() -> None:
-    spinner_symbols = ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
+    spinner_symbols = get_spinner_symbols()
     try:
         for spinner_symbol in itertools.cycle(spinner_symbols):  # pragma: no branch
             print("\r " + spinner_symbol + r" [Press Ctrl+C to exit] ", end="")
@@ -208,6 +209,16 @@ def wait_until_keyboardinterrupt() -> None:
     except KeyboardInterrupt:
         pass
 
+def get_spinner_symbols() -> list[str]:
+
+    if is_windows(CURRENT_PLATFORM) \
+        and platform.python_implementation().lower() == 'pypy':
+        # Windows + PyPy combination does not support unicode well, at least
+        # yet at version 7.3.17. See:
+        # https://github.com/pypy/pypy/issues/3890
+        # https://github.com/fohrloop/wakepy/issues/274#issuecomment-2363293422 
+        return  ["|", "/", "-", "\\"]
+    return ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
 
 if __name__ == "__main__":
     main()  # pragma: no cover
