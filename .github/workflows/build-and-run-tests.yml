@@ -51,7 +51,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         # All supported python versions on linux
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.7", "pypy3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.8", "pypy3.10"]
         include:
           # Oldest supported python on MacOS
           - python-version: "3.7"
