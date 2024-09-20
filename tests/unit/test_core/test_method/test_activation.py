@@ -8,7 +8,6 @@ import re
 from unittest.mock import patch
 
 import pytest
-import time_machine
 
 from tests.unit.test_core.testmethods import (
     FAILURE_REASON,
@@ -227,15 +226,15 @@ class TestTryEnterAndHeartbeat:
             assert "The only accepted return value is None" in err_message
             assert heartbeat_call_time is None
 
-    @time_machine.travel(
-        dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
-    )
-    def test_enter_mode_missing_heartbeat_success(self):
+    @patch("wakepy.core.method.dt.datetime")
+    def test_enter_mode_missing_heartbeat_success(self, mock_datetime):
         """Tests 4) MS from TABLE 1; enter_mode missing, heartbeat success"""
 
         expected_time = dt.datetime.strptime(
             "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
         ).replace(tzinfo=dt.timezone.utc)
+        mock_datetime.now.return_value = expected_time
+
         for method in combinations_of_test_methods(
             enter_mode=[METHOD_MISSING],
             heartbeat=[None],
@@ -307,14 +306,13 @@ class TestTryEnterAndHeartbeat:
             ):
                 try_enter_and_heartbeat(method)
 
-    @time_machine.travel(
-        dt.datetime(2023, 12, 21, 16, 17, tzinfo=dt.timezone.utc), tick=False
-    )
-    def test_enter_mode_success_heartbeat_success(self):
+    @patch("wakepy.core.method.dt.datetime")
+    def test_enter_mode_success_heartbeat_success(self, mock_datetime):
         """Tests 7) SS from TABLE 1; enter_mode success & heartbeat success"""
         expected_time = dt.datetime.strptime(
             "2023-12-21 16:17:00", "%Y-%m-%d %H:%M:%S"
         ).replace(tzinfo=dt.timezone.utc)
+        mock_datetime.now.return_value = expected_time
 
         for method in combinations_of_test_methods(
             enter_mode=[None],
