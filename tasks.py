@@ -51,11 +51,13 @@ if typing.TYPE_CHECKING:
 def get_run_with_print(c):
     def run_with_print(cmd: str, ignore_errors: bool = False) -> Result:
         print("Running:", Fore.YELLOW, cmd, Fore.RESET)
+
+        unix_like = is_unix_like_foss(CURRENT_PLATFORM)
         res: Result = c.run(
             cmd,
-            pty=is_unix_like_foss(CURRENT_PLATFORM),
+            pty=unix_like,
             warn=ignore_errors,
-            shell=get_shell(),
+            shell=get_shell() if unix_like else None,
         )
         return res
 
