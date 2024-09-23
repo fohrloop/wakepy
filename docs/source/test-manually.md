@@ -75,9 +75,9 @@ or in python
 ```{code-block} python
 import time
 from wakepy import keep
+
 with keep.running():
-    while True:
-      time.sleep(1)
+    time.sleep(9999)
 ```
 
 (enter-keep-presenting-script)=
@@ -95,9 +95,9 @@ or in python
 ```{code-block} python
 import time
 from wakepy import keep
+
 with keep.presenting():
-    while True:
-      time.sleep(1)
+    time.sleep(9999)
 ```
 
 
@@ -126,7 +126,7 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 15
 ```
 
-Test that your system sleeps automatically and blanks the screen after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script)  or in the in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
+Test that your system sleeps automatically and blanks the screen after 15 seconds. Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script) in another. After you're done, reset the timeout values to what they were (in this example, 1800 seconds):
 
 ```{code-block} text
 gsettings set org.gnome.desktop.session idle-delay 1800
@@ -138,6 +138,55 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-tim
 
 Follow the [same steps as in with keep.running](#gnome-keep-running-manual-test), but enter the [keep.presenting](#enter-keep-presenting-script) mode
 
+
+## Xfce
+
+- Homepage: [xfce.org](https://www.xfce.org/)
+
+(xfce-keep-running-manual-test)=
+### keep.running (Xfce)
+
+There are two types of settings _On battery_ vs _Plugged in_. Let's say that we want to change the _On battery_ settings. You may list the current settings with
+
+```
+xfconf-query -c xfce4-power-manager -lv
+```
+NOTE: If you do not see the relevant settings, you probably have defaults set. Open the `xfce4-power-manager-settings` to see them. Here are the explanations for relevant settings:
+
+```{code-block} text
+/xfce4-power-manager/inactivity-sleep-mode-on-battery   1    # 1=suspend, 2=hibernate
+/xfce4-power-manager/inactivity-on-battery              10   # minutes to suspend/hibernate
+/xfce4-power-manager/blank-on-battery                   1    # minutes to screen blank
+/xfce4-power-manager/dpms-on-battery-sleep              2    # minutes to screen sleep
+/xfce4-power-manager/dpms-on-battery-off                3    # minutes to screen off
+
+```
+
+To set all of the above to one minute, you would run:
+
+```{code-block} text
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/inactivity-on-battery -n -s 1 &&
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/blank-on-battery -n -s 1 &&
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-on-battery-sleep -n -s 1 &&
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-on-battery-off -n -s 1
+```
+
+Then, run the [wakepy test script](#code-wakepy-test-script) on one terminal window, and enter in the [keep.running](#enter-keep-running-script) using another terminal window. After you're done, reset the timeout values to what they were. For example:
+
+```{code-block} text
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/inactivity-on-battery -n -s 10 &&
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/blank-on-battery -n -s 1 &&
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-on-battery-sleep -n -s 2 &&
+xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-on-battery-off -n -s 3
+```
+
+Tip: You may also open a GUI for the settings with
+
+```
+xfce4-power-manager-settings
+```
+
+Then, in the System tab and Display tab you can change or remove the timers.
 
 ## Windows
 
