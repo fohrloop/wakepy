@@ -1,5 +1,10 @@
 # Changelog
 
+## wakepy x.x.x
+🗓️ unreleased
+
+### 👷 Maintenance
+- Disallow TODO comments ([#410](https://github.com/fohrloop/wakepy/pull/410))
 
 ## wakepy 0.10.1
 🗓️ 2024-09-20
