@@ -151,10 +151,22 @@ exclude = [
 [tool.ruff.lint]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-# W505: doc-line-too-long. Ref: https://docs.astral.sh/ruff/rules/doc-line-too-long/
-# W291: trailing-whitespace. Ref: https://docs.astral.sh/ruff/rules/trailing-whitespace/
-select = ["E", "F", "W505", "W291"]
+select = [
+    # E: pycodestyle
+    "E",
+    # F: Pyflakes
+    "F",
+    # W505: doc-line-too-long. Ref: https://docs.astral.sh/ruff/rules/doc-line-too-long/
+    "W505",
+    # W291: trailing-whitespace. Ref: https://docs.astral.sh/ruff/rules/trailing-whitespace/
+    "W291",
+    # Disallow TODO (these should be either fixed before merging, or
+    # alternatively, use a LATER tag. In addition, disallow XXX, FIXME and HACK
+    "FIX001",
+    "FIX002",
+    "FIX003",
+    "FIX004",
+]
 ignore = []
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
