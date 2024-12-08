@@ -260,7 +260,7 @@ The contents of this repository are licensed with [MIT License](https://github.c
 | <sup>[2]</sup> Mac OS X 10.8 Mountain Lion (July 2012) or newer.                                                                            |
 | <sup>[3]</sup> GNOME 2.24 (Sept 2008) onwards.                                                                                              |
 | <sup>[4]</sup> KDE Plasma 5.12.90 (May 2018) onwards.                                                                                       |
-| <sup>[5]</sup> Freedesktop.org compliant Desktop Environments on Unix-line (Linux/BSD) system which implements the listed D-Bus interfaces. |
+| <sup>[5]</sup> Freedesktop.org compliant Desktop Environments on Unix-like (Linux/BSD) system which implements the listed D-Bus interfaces. |
 
 <!-- wakepy readme after footnotes -->
 
