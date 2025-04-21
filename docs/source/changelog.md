@@ -1,13 +1,19 @@
 # Changelog
 
-## wakepy x.x.x
-🗓️ unreleased
+## wakepy 0.10.2
+🗓️ 2025-04-21
 
 ### 🐞 Bug fixes
-- Fix keep.running mode on KDE Plasma 6.x.x, when `plasmashell --version` output contained extra lines, such as "QThreadStorage: entry 3 destroyed before end of thread 0x61b4ee73d540" ([#417](https://github.com/fohrloop/wakepy/pull/417))
+- Fix keep.running mode on KDE Plasma 6.x.x, when `plasmashell --version` output contained extra lines, such as "QThreadStorage: entry 3 destroyed before end of thread 0x61b4ee73d540" ([#417](https://github.com/fohrloop/wakepy/pull/417)). Thanks to [@materemias](https://github.com/materemias) for [#415](https://github.com/fohrloop/wakepy/issues/415).
 
 ### 👷 Maintenance
+- Fix CI pipelines for Python 3.7 on linux ([#419](https://github.com/fohrloop/wakepy/pull/419))
 - Disallow TODO comments ([#410](https://github.com/fohrloop/wakepy/pull/410))
+- Fix: Cannot install -r requirements/requirements-test.txt ([#403](https://github.com/fohrloop/wakepy/pull/403))
+
+### 📖 Documentation
+- Add manual testing instructions for Xfce ([#405](https://github.com/fohrloop/wakepy/pull/405))
+- Readme updates ([#412](https://github.com/fohrloop/wakepy/pull/412) & [#413](https://github.com/fohrloop/wakepy/pull/413))
 
 ## wakepy 0.10.1
 🗓️ 2024-09-20
