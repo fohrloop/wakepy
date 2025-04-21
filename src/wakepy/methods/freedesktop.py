@@ -233,12 +233,16 @@ def _get_kde_plasma_version() -> Optional[Tuple[int, ...]]:
         If no KDE Plasma is found, returns None.
 
     """
-    # returns for example 'plasmashell 5.27.9'
-    out = subprocess.getoutput("plasmashell --version")
-    mtch = re.match("plasmashell ([0-9][0-9.]*)$", out)
-    if mtch is None:
+    # returns for example 'plasmashell 5.27.9' but may also return some
+    # additional text. See: https://github.com/fohrloop/wakepy/issues/415
+    output = subprocess.getoutput("plasmashell --version")
+    for line in output.splitlines():
+        match = re.match(".*plasmashell ([0-9.]*).*", line)
+        if match:
+            break
+    else:
         return None
 
-    versionstring = mtch.group(1)
+    versionstring = match.group(1)
     versiontuple = tuple(int(x) for x in versionstring.split("."))
     return versiontuple

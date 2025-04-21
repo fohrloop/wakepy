@@ -3,6 +3,9 @@
 ## wakepy x.x.x
 🗓️ unreleased
 
+### 🐞 Bug fixes
+- Fix keep.running mode on KDE Plasma 6.x.x, when `plasmashell --version` output contained extra lines, such as "QThreadStorage: entry 3 destroyed before end of thread 0x61b4ee73d540" ([#417](https://github.com/fohrloop/wakepy/pull/417))
+
 ### 👷 Maintenance
 - Disallow TODO comments ([#410](https://github.com/fohrloop/wakepy/pull/410))
 
