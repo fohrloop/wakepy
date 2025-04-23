@@ -161,6 +161,7 @@ with keep.presenting():
 - [FOLON-FO4Downgrader](https://github.com/Fallout-London/FOLON-FO4Downgrader) — Tool for reverting to a previous version of a game (Fallout 4)
 - [BD_to_AVP](https://github.com/cbusillo/BD_to_AVP) — 3D Blu-ray to Apple Vision Pro converter
 - [davlee1972/upscale_video](https://github.com/davlee1972/upscale_video) — Upscaling video using AI
+- [AYAB - All Yarns Are Beautiful](https://github.com/AllYarnsAreBeautiful/ayab-desktop/) — Automated knitting software
 - [minarca](https://github.com/ikus060/minarca) — Cross-platform data backup software
 - [OceanOptics/Inlinino](https://github.com/OceanOptics/Inlinino) — Data logger for oceanography
 - [cogent3/ensembl_tui](https://github.com/cogent3/ensembl_tui) —  Obtaining dumps of Ensembl MySQL databases
