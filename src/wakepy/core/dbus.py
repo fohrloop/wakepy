@@ -1,6 +1,6 @@
 """This module is contains classes and functions related to D-Bus, which is
 a message bus for communication between processes operating systems like
-Linux and DSD.
+Linux and BSD.
 
 When creating a subclass of wakepy.Method, which uses D-Bus methods, one needs
 to create DBusMethodCall, and use the Method.process_dbus_call to get the
