@@ -4,15 +4,17 @@
 🗓️ Unreleased
 
 ### ✨ Features
+- New method: "gtk_application_inhibit", which calls the [gtk_application_inhibit()](https://docs.gtk.org/gtk4/method.Application.inhibit.html) through the GObject Instrospection python package (import name `gi`). This supports both GTK3 and GTK4 based Desktop Environments (examples: GNOME, Xfce, Cinnamon, LXDE, MATE, Unity, Budgie and Pantheon). This can use _system python_, so installing PyGObject is not needed. ([#407](https://github.com/fohrloop/wakepy/pull/407))
 - Update the wakepy CLI printout: Adds the used Method and activated Mode to the printout ([#434](https://github.com/fohrloop/wakepy/pull/434))
 - Added `-v` (INFO) and `-vv` (DEBUG) verbosity flags for the [wakepy CLI command](https://wakepy.readthedocs.io/stable/cli-api.html). ([#439](https://github.com/fohrloop/wakepy/pull/439))
 - Add [Mode.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode.method), [ActivationResult.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.ActivationResult.method) and [MethodActivationResult.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodActivationResult.method) attributes, which are instances of [MethodInfo](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodInfo) ([#459](https://github.com/fohrloop/wakepy/pull/459), [#460](https://github.com/fohrloop/wakepy/pull/460), [#464](https://github.com/fohrloop/wakepy/pull/464))
 - Make [Mode.active_method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode.active_method) a [MethodInfo](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodInfo) instance (was a string) ([#459](https://github.com/fohrloop/wakepy/pull/459))
 
-### ✨ Minor Enhancements
+### ✨ Enhancements
 - Better error messages: When selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427)) and when a D-Bus -based method fails ([#438](https://github.com/fohrloop/wakepy/pull/438))
 - Enhance Mode Activation Observability. Add logging (DEBUG and INFO level) for different parts in the Mode activation process. Show which methods are to be tried, and log any success and failure of activating a Mode. Improved the `ActivationResult.get_failure_text()` output. Added `NoMethodsWarning` which is issued if trying to activate a Mode with an empty list of methods. ([#411](https://github.com/fohrloop/wakepy/pull/411))
 - Make ActivationWarning use proper stacklevel, so that issued warnings point to user code, and not into wakepy source code. ([#432](https://github.com/fohrloop/wakepy/pull/432))
+- Better error message when selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427))
 
 ### 🐞 Bug fixes
 - Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)).
