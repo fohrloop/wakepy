@@ -83,7 +83,7 @@ class PlatformType(StrEnum):
 class ModeName(StrEnum):
     """The names of the modes wakepy supports
 
-    See: wakepy/modes/keep.py for full definitions of the modes.
+    See: :ref:`wakepy-modes` for full definitions of the modes.
     """
 
     KEEP_RUNNING = "keep.running"

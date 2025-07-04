@@ -26,6 +26,7 @@ from .core import Method as Method
 from .core import MethodActivationResult as MethodActivationResult
 from .core import Mode as Mode
 from .core import ModeExit as ModeExit
+from .core import ModeName as ModeName
 from .modes import keep as keep
 
 JeepneyDBusAdapter: Type[DBusAdapter]
