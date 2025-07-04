@@ -11,7 +11,7 @@ This document serves as documentation for the package developers.
 ## Installing for development
 
 Requirements:
-- At least of of the supported Python versions installed (see README.md and/or tox.ini).
+- At least one of the supported Python versions installed (see README.md and/or tox.ini).
 - pip >= 21.3 (for pyproject.toml support)
 
 Install in editable state with the `dev` requirements:
@@ -54,7 +54,7 @@ Wakepy uses pytest for testing the source tree with one python version and tox f
 - `tox` - pytest on multiple python versions & black + isort + ruff + mypy on single python version. Tests are run agains a build (.whl) version instead of the source tree.
 - GitHub Actions (PR checks): pytest + mypy on multiple python versions and multiple operating systems. Code check (isort + black + ruff + mypy) on single python version. Test that documentation build does not crash.
 
-Below a few more words about the `inv test` and `tox` options.
+Below there are a few more words about the `inv test` and `tox` options.
 
 ## Running tests with single environment
 
