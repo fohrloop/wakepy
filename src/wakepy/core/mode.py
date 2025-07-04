@@ -205,7 +205,7 @@ class Mode:
     @classmethod
     def from_name(
         cls,
-        mode_name: ModeName,
+        mode_name: ModeName | str,
         methods: Optional[StrCollection] = None,
         omit: Optional[StrCollection] = None,
         methods_priority: Optional[MethodsPriorityOrder] = None,
@@ -217,11 +217,12 @@ class Mode:
 
         Parameters
         ----------
-        mode_name: str
-            The name of the mode to create. Must be an existing Mode name;
-            something that has used as Method.name attribute in a
-            :class:`~wakepy.core.method.Method` subclass. Examples:
-            "keep.running", "keep.presenting".
+        mode_name: str | ModeName
+            The name of the mode to create. Must be an existing, registered
+            Mode name, which means that there must be at least one subclass of
+            :class:`~wakepy.core.method.Method` which has the
+            :attr:`~wakepy.Method.mode_name` class attribute set to
+            `mode_name`. Examples: "keep.running", "keep.presenting".
         methods: list, tuple or set of str
             The names of Methods to select from the mode defined with
             `mode_name`; a "whitelist" filter. Means "use these and only these
