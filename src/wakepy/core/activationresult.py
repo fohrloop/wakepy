@@ -176,7 +176,7 @@ class ActivationResult:
 
         return out
 
-    def get_failure_text(self) -> str:
+    def get_failure_text(self, newlines: bool = True) -> str:
         """Gets information about a failure as text. In case the mode
         activation was successful, returns an empty string.
 
@@ -185,20 +185,68 @@ class ActivationResult:
         without a notice. For programmatic use cases, it is advisable to use
         :meth:`query`, instead.
 
+        Parameters
+        ----------
+        newlines: bool
+            If True, adds newlines in the text (useful for printing for user),
+            if False, returns a single line string (useful for logging).
+
+
+        Examples
+        --------
+        >>> # Assuming the activation will fail for some reason
+        >>> with keep.presenting() as m:
+        >>>     # do stuff
+        >>>
+        >>> print(m.activation_result.get_failure_text())
+        Could not activate wakepy Mode "keep.presenting"!
+        <BLANKLINE>
+        Tried Methods (in the order of attempt):
+        (#1, org.gnome.SessionManager, ACTIVATION, RuntimeError('Intentional failure here')),
+        (#2, caffeinate, PLATFORM_SUPPORT, -),
+        (#3, SetThreadExecutionState, PLATFORM_SUPPORT, -).
+        The format of each item in the list is (index, method_name, failure_stage, failure_reason).
+
         See Also
         --------
         list_methods, query
-        """
+        """  # noqa: E501, W505
 
         if self.success:
             return ""
-        debug_info = str(self.query())
         mode_name = self.mode_name or "[unnamed mode]"
 
-        return (
-            f'Could not activate Mode "{mode_name}"!\n\nMethod usage results, in '
-            f"order (highest priority first):\n{debug_info}"
+        if newlines:
+            first_sep = "\n\n"
+            sep = "\n"
+        else:
+            first_sep = sep = " "
+
+        debug_info_lst = []
+        for i, res in enumerate(self.query(), start=1):
+            debug_info_lst.append(
+                (
+                    f"(#{i}, {res.method_name}, {res.failure_stage or 'N/A'}, "
+                    f"{res.failure_reason or '-'})"
+                )
+            )
+
+        if debug_info_lst:
+            debug_info = f",{sep}".join(debug_info_lst)
+            tried_methods_text = (
+                f"Tried Methods (in the order of attempt):{sep}{debug_info}."
+                f"{sep}The format of each item in the list is (index, method_name, "
+                "failure_stage, failure_reason)."
+            )
+        else:
+            tried_methods_text = "Did not try any methods!"
+
+        err_text = (
+            f'Could not activate wakepy Mode "{mode_name}"!{first_sep}'
+            + tried_methods_text
         )
+
+        return err_text
 
     def _get_success(self) -> bool:
         for res in self._method_results:

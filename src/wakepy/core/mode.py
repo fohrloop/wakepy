@@ -64,6 +64,12 @@ class ActivationWarning(UserWarning):
     """
 
 
+class NoMethodsWarning(UserWarning):
+    """Issued if no methods are selected for a Mode; e.g. when user tries to
+    activate a Mode using empty list as the methods. This is a subclass of
+    `UserWarning <https://docs.python.org/3/library/exceptions.html#UserWarning>`_."""
+
+
 class ModeExit(Exception):
     """This can be used to exit from any wakepy mode with block. Just raise it
     within any with block which is a wakepy mode, and no code below it will
@@ -259,7 +265,18 @@ class Mode:
             The context manager for the selected mode.
 
         """
+
+        logger.debug(
+            'Creating wakepy mode "%s" with methods=%s, omit=%s, methods_priority=%s, on_fail=%s, dbus_adapter=%s',  # noqa E501
+            mode_name,
+            methods,
+            omit,
+            methods_priority,
+            on_fail,
+            dbus_adapter,
+        )
         methods_for_mode = get_methods_for_mode(mode_name)
+
         try:
             selected_methods = select_methods(
                 methods_for_mode, use_only=methods, omit=omit
@@ -275,6 +292,28 @@ class Mode:
                 err_msg,
                 missing_method_names=e.missing_method_names,
             ) from e
+
+        logger.debug(
+            'Found %d method(s) for mode "%s": %s',
+            len(methods_for_mode),
+            mode_name,
+            methods_for_mode,
+        )
+        selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
+
+        logger.debug(
+            'Selected %d method(s) for mode "%s": %s',
+            len(selected_methods),
+            mode_name,
+            selected_methods,
+        )
+        if methods_for_mode and (not selected_methods):
+            warn_text = (
+                f'No methods selected for mode "{mode_name}"! This will lead to automatic failure of mode activation. '  # noqa E501
+                f"To suppress this warning, select at least one of the available methods, which are: {methods_for_mode}"  # noqa E501
+            )
+            warnings.warn(warn_text, NoMethodsWarning, stacklevel=3)
+
         return cls(
             name=mode_name,
             method_classes=selected_methods,
@@ -289,6 +328,16 @@ class Mode:
         Mode using :attr:`~wakepy.Mode.method_classes`.
         """
         self._activate()
+        if self.active:
+            logger.info(
+                'Activated wakepy mode "%s" with method: %s',
+                self.name,
+                self.active_method,
+            )
+        else:
+            logger.info(
+                self.activation_result.get_failure_text(newlines=False),
+            )
         return self
 
     def __exit__(
@@ -343,6 +392,11 @@ class Mode:
             method_classes, self.methods_priority
         )
 
+        logger.info(
+            'Activating wakepy mode "%s". Will try the following methods in this order: %s',  # noqa E501
+            self.name,
+            [m.name for m in method_classes_ordered],
+        )
         methodresults, self._active_method, self.heartbeat = (
             self._activate_one_of_methods(
                 method_classes=method_classes_ordered,
