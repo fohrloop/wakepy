@@ -1,5 +1,11 @@
 # Changelog
 
+## wakepy x.x.x
+🗓️ Unreleased
+
+### ✨ Minor Enhancements
+- Better error message when selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427))
+
 ## wakepy 0.10.2
 🗓️ 2025-04-21
 
@@ -136,7 +142,7 @@
 ### 🐞 Bug fixes
 - The CLI API on python 3.7 and python 3.8. Thanks to [Aymane11](https://github.com/Aymane11) for [PR #50](https://github.com/fohrloop/wakepy/pull/50)
 
-## wakepy 0.7.1 
+## wakepy 0.7.1
 🗓️ 2023-06-11
 
 ### 🐞 Bug fixes

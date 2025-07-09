@@ -260,7 +260,21 @@ class Mode:
 
         """
         methods_for_mode = get_methods_for_mode(mode_name)
-        selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
+        try:
+            selected_methods = select_methods(
+                methods_for_mode, use_only=methods, omit=omit
+            )
+        except UnrecognizedMethodNames as e:
+            err_msg = (
+                f'The following Methods are not part of the "{str(mode_name)}" Mode: '
+                f"{e.missing_method_names}. Please check that the Methods are correctly"
+                f' spelled and that the Methods are part of the "{str(mode_name)}" '
+                "Mode. You may refer to full Methods listing at https://wakepy.readthedocs.io/stable/methods-reference.html."
+            )
+            raise UnrecognizedMethodNames(
+                err_msg,
+                missing_method_names=e.missing_method_names,
+            ) from e
         return cls(
             name=mode_name,
             method_classes=selected_methods,
@@ -450,6 +464,20 @@ class Mode:
         return self._used_method.name
 
 
+class UnrecognizedMethodNames(ValueError):
+    """Raised if a method name is not recognized. This can happen if the
+    method name is not part of the Methods used for a Mode. Typically this
+    is caused by a typo, or mixing methods of different Modes (e.g.
+    keep.presenting and keep.running).
+    """
+
+    def __init__(self, message: str, missing_method_names: StrCollection) -> None:
+        """Initialize the UnrecognizedMethodName exception with a message."""
+        super().__init__(message)
+        self.message = message
+        self.missing_method_names = missing_method_names
+
+
 def select_methods(
     methods: MethodClsCollection,
     omit: Optional[StrCollection] = None,
@@ -495,8 +523,9 @@ def select_methods(
         selected_methods = [m for m in methods if m.name in use_only]
         if not set(use_only).issubset(m.name for m in selected_methods):
             missing = sorted(set(use_only) - set(m.name for m in selected_methods))
-            raise ValueError(
-                f"Methods {missing} in `use_only` are not part of `methods`!"
+            raise UnrecognizedMethodNames(
+                f"Methods {missing} in `use_only` are not part of `methods`!",
+                missing_method_names=missing,
             )
     else:  # pragma: no cover
         raise ValueError("Invalid `omit` and/or `use_only`!")
