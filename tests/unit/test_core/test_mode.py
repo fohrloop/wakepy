@@ -17,6 +17,7 @@ from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import (
     ModeExit,
+    UnrecognizedMethodNames,
     add_fake_success_if_required,
     handle_activation_fail,
     select_methods,
@@ -320,7 +321,7 @@ class TestSelectMethods:
 
         # If a whitelist contains extra methods, raise exception
         with pytest.raises(
-            ValueError,
+            UnrecognizedMethodNames,
             match=re.escape(
                 "Methods ['bar', 'foo'] in `use_only` are not part of `methods`!"
             ),

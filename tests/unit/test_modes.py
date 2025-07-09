@@ -4,6 +4,7 @@ import pytest
 
 from wakepy import ActivationError, ActivationWarning
 from wakepy.core import ActivationResult, DBusAdapter, Method, Mode, ModeName
+from wakepy.core.mode import UnrecognizedMethodNames
 from wakepy.modes import keep
 
 
@@ -166,3 +167,19 @@ class TestOnFail:
         assert isinstance(m, Mode)
         assert m.name == expected_name
         assert m.activation_result.mode_name == expected_name
+
+
+class TestWithBadMethodName:
+
+    def test_with_bad_method_name(self):
+        with pytest.raises(
+            UnrecognizedMethodNames,
+            match=re.escape(
+                'The following Methods are not part of the "keep.running" Mode: '
+                "['bad_method']. Please check that the Methods are correctly "
+                'spelled and that the Methods are part of the "keep.running" Mode. '
+                "You may refer to full Methods listing at "
+                "https://wakepy.readthedocs.io/stable/methods-reference.html."
+            ),
+        ):
+            keep.running(methods=["bad_method"])
