@@ -29,7 +29,8 @@ def get_current_platform() -> IdentifiedPlatformType:
         return IdentifiedPlatformType.FREEBSD
 
     warnings.warn(
-        f"Could not detect current platform! Debug info:\n{get_platform_debug_info()}"
+        f"Could not detect current platform! Debug info:\n{get_platform_debug_info()}",
+        stacklevel=8,
     )
     return IdentifiedPlatformType.UNKNOWN
 
