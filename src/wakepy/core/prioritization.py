@@ -14,7 +14,7 @@ import typing
 from typing import List, Sequence, Set, Union
 
 from .constants import WAKEPY_FAKE_SUCCESS
-from .platform import CURRENT_PLATFORM
+from .platform import CURRENT_PLATFORM, get_platform_supported
 
 if typing.TYPE_CHECKING:
     from typing import List, Optional, Tuple, Union
@@ -254,7 +254,7 @@ def _order_set_of_methods_by_priority(methods: Set[MethodCls]) -> List[MethodCls
             0 if m.name == WAKEPY_FAKE_SUCCESS else 1,
             # Then, prioritize methods supporting CURRENT_PLATFORM over any
             # others
-            0 if CURRENT_PLATFORM in m.supported_platforms else 1,
+            0 if get_platform_supported(CURRENT_PLATFORM, m.supported_platforms) else 1,
             m.name.lower() if m.name else "",
         ),
     )

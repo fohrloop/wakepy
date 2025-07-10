@@ -44,11 +44,11 @@ def provide_methods_different_platforms(monkeypatch, testutils):
 
     class LinuxB(TestMethod):
         name = "LinuxB"
-        supported_platforms = (PlatformType.LINUX,)
+        supported_platforms = (PlatformType.UNIX_LIKE_FOSS,)
 
     class LinuxC(TestMethod):
         name = "LinuxC"
-        supported_platforms = (PlatformType.LINUX,)
+        supported_platforms = (PlatformType.UNIX_LIKE_FOSS,)
 
     class MultiPlatformA(TestMethod):
         name = "multiA"

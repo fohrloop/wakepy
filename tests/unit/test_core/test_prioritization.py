@@ -5,7 +5,7 @@ import typing
 
 import pytest
 
-from wakepy.core import PlatformType
+from wakepy.core import IdentifiedPlatformType
 from wakepy.core.constants import WAKEPY_FAKE_SUCCESS
 from wakepy.core.prioritization import (
     _check_methods_priority,
@@ -14,6 +14,7 @@ from wakepy.core.prioritization import (
     order_methods_by_priority,
 )
 from wakepy.core.registry import get_methods
+from wakepy.methods import gnome, macos, windows
 
 if typing.TYPE_CHECKING:
     from typing import List, Type
@@ -25,7 +26,7 @@ if typing.TYPE_CHECKING:
 def set_current_platform_to_linux(monkeypatch):
 
     monkeypatch.setattr(
-        "wakepy.core.prioritization.CURRENT_PLATFORM", PlatformType.LINUX
+        "wakepy.core.prioritization.CURRENT_PLATFORM", IdentifiedPlatformType.LINUX
     )
 
 
@@ -34,7 +35,7 @@ def set_current_platform_to_windows(monkeypatch):
 
     monkeypatch.setattr(
         "wakepy.core.prioritization.CURRENT_PLATFORM",
-        PlatformType.WINDOWS,
+        IdentifiedPlatformType.WINDOWS,
     )
 
 
@@ -396,3 +397,18 @@ class TestOrderSetOfMethodsByPriority:
         assert _order_set_of_methods_by_priority(
             {WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC, MultiPlatformA}
         ) == [MultiPlatformA, WindowsA, WindowsB, WindowsC, LinuxA, LinuxB, LinuxC]
+
+    @pytest.mark.usefixtures("set_current_platform_to_linux")
+    def test_on_linux_2(self):
+        # This has failed previously.
+        # See: https://github.com/fohrloop/wakepy/issues/428
+
+        ordered = _order_set_of_methods_by_priority(
+            {
+                gnome.GnomeSessionManagerNoIdle,
+                macos.CaffeinateKeepPresenting,
+                windows.WindowsKeepPresenting,
+            }
+        )
+
+        assert ordered[0] == gnome.GnomeSessionManagerNoIdle
