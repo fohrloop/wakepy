@@ -6,6 +6,9 @@
 ### ✨ Minor Enhancements
 - Better error message when selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427))
 
+### 🐞 Bug fixes
+- Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)). 
+
 ## wakepy 0.10.2
 🗓️ 2025-04-21
 
