@@ -1,15 +1,16 @@
 """Unit tests for the __main__ module"""
 
 import sys
-from unittest.mock import Mock, call, patch
+from unittest.mock import patch
 
 import pytest
 
-from wakepy import ActivationResult, Method
+from wakepy import ActivationResult, Method, Mode
 from wakepy.__main__ import (
-    _get_activation_error_text,
+    _get_success_or_fail_symbol,
+    get_should_use_ascii_only,
     get_spinner_symbols,
-    get_startup_text,
+    get_wakepy_cli_info,
     handle_activation_error,
     main,
     parse_arguments,
@@ -17,6 +18,7 @@ from wakepy.__main__ import (
 )
 from wakepy.core import PlatformType
 from wakepy.core.constants import IdentifiedPlatformType, ModeName
+from wakepy.methods._testing import WakepyFakeSuccess
 
 
 @pytest.fixture
@@ -71,7 +73,7 @@ def method2_broken(mode_name_broken):
     ],
 )
 def test_get_argparser_keep_running(args):
-    assert parse_arguments(args) == (ModeName.KEEP_RUNNING, [])
+    assert parse_arguments(args) == (ModeName.KEEP_RUNNING, "")
 
 
 @pytest.mark.parametrize(
@@ -82,7 +84,7 @@ def test_get_argparser_keep_running(args):
     ],
 )
 def test_get_argparser_keep_presenting(args):
-    assert parse_arguments(args) == (ModeName.KEEP_PRESENTING, [])
+    assert parse_arguments(args) == (ModeName.KEEP_PRESENTING, "")
 
 
 @pytest.mark.parametrize(
@@ -109,12 +111,7 @@ def test_get_argparser_too_many_modes(args):
 def test_deprecations(args, expected_mode):
     mode, deprecations = parse_arguments(args)
     assert mode == expected_mode
-    assert len(deprecations) == 1
-    assert f"Using {args[0]} is deprecated in wakepy 0.10.0" in deprecations[0]
-
-
-def test_get_startup_text_smoke_test():
-    assert isinstance(get_startup_text(ModeName.KEEP_PRESENTING), str)
+    assert f"Using {args[0]} is deprecated in wakepy 0.10.0" in deprecations
 
 
 def test_wait_until_keyboardinterrupt():
@@ -124,7 +121,7 @@ def test_wait_until_keyboardinterrupt():
     with patch("wakepy.__main__.time") as timemock:
         timemock.sleep.side_effect = raise_keyboardinterrupt
 
-        wait_until_keyboardinterrupt()
+        wait_until_keyboardinterrupt(True)
 
 
 @patch("builtins.print")
@@ -140,7 +137,6 @@ def test_handle_activation_error(print_mock):
     assert "Wakepy could not activate" in printed_text
 
 
-@patch("wakepy.__main__.wait_until_keyboardinterrupt")
 @patch("wakepy.__main__.parse_arguments")
 class TestMain:
     """Tests the main() function from the __main__.py in a simple way. This
@@ -150,65 +146,39 @@ class TestMain:
     def test_working_mode(
         self,
         parse_arguments,
-        wait_until_keyboardinterrupt,
         method1,
     ):
 
-        with patch("sys.argv", self.sys_argv), patch("builtins.print") as print_mock:
-            manager = self.setup_mock_manager(
-                method1, print_mock, parse_arguments, wait_until_keyboardinterrupt
-            )
+        with patch("wakepy.__main__.wait_until_keyboardinterrupt"), patch(
+            "sys.argv", self.sys_argv
+        ), patch("builtins.print"):
+            self.setup_mocks(method1, parse_arguments)
             main()
-
-        assert manager.mock_calls == [
-            call.print(get_startup_text(method1.mode_name)),
-            call.wait_until_keyboardinterrupt(),
-            call.print("\n\nExited."),
-        ]
 
     @pytest.mark.usefixtures("method2_broken")
     def test_non_working_mode(
         self,
         parse_arguments,
-        wait_until_keyboardinterrupt,
         method2_broken,
         monkeypatch,
     ):
         # need to turn off WAKEPY_FAKE_SUCCESS as we want to get a failure.
         monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
 
-        with patch("sys.argv", self.sys_argv), patch("builtins.print") as print_mock:
-            manager = self.setup_mock_manager(
-                method2_broken,
-                print_mock,
-                parse_arguments,
-                wait_until_keyboardinterrupt,
-            )
+        with patch("wakepy.__main__.wait_until_keyboardinterrupt"), patch(
+            "sys.argv", self.sys_argv
+        ), patch("builtins.print"):
+            self.setup_mocks(method2_broken, parse_arguments)
             main()
 
-        expected_result = ActivationResult(
-            results=[], mode_name=method2_broken.mode_name
-        )
-        assert manager.mock_calls == [
-            call.print(get_startup_text(method2_broken.mode_name)),
-            call.print(_get_activation_error_text(expected_result)),
-        ]
-
     @staticmethod
-    def setup_mock_manager(
+    def setup_mocks(
         method: Method,
-        print_mock,
         parse_arguments,
-        wait_until_keyboardinterrupt,
     ):
         # Assume that user has specified some mode in the commandline which
         # resolves to `method.mode_name`
         parse_arguments.return_value = method.mode_name, []
-
-        mocks = Mock()
-        mocks.attach_mock(print_mock, "print")
-        mocks.attach_mock(wait_until_keyboardinterrupt, "wait_until_keyboardinterrupt")
-        return mocks
 
     @property
     def sys_argv(self):
@@ -217,12 +187,69 @@ class TestMain:
         return ["", ""]
 
 
+# fmt: off
 class TestGetSpinnerSymbols:
+    def test_non_ascii(self):
+        assert get_spinner_symbols(False) == ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"] # noqa: E501
+
+    def test_ascii(self):
+        assert get_spinner_symbols(True) == ["|", "/", "-", "\\"]
+# fmt: on
+
+
+class TestShouldUseAsciiOnly:
     @patch("wakepy.__main__.CURRENT_PLATFORM", IdentifiedPlatformType.LINUX)
     def test_on_linux(self):
-        assert get_spinner_symbols() == ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
+        assert get_should_use_ascii_only() is False
 
     @patch("wakepy.__main__.CURRENT_PLATFORM", IdentifiedPlatformType.WINDOWS)
     @patch("wakepy.__main__.platform.python_implementation", lambda: "PyPy")
     def test_on_windows_pypy(self):
-        assert get_spinner_symbols() == ["|", "/", "-", "\\"]
+        assert get_should_use_ascii_only() is True
+
+
+@pytest.fixture
+def somemode():
+    return Mode([WakepyFakeSuccess], name="testmode")
+
+
+class TestGetWakepyCliInfo:
+
+    @patch("wakepy.__version__", "0.10.0")
+    def test_get_wakepy_cli_info(self, somemode: Mode):
+
+        deprecations = "This thing is deprecated"
+
+        with somemode as m:
+            info = get_wakepy_cli_info(
+                m,
+                ascii_only=False,
+                deprecations="",
+            )
+        assert "v.0.10.0" in info
+        assert "[✔] Programs keep running" in info
+        assert "[ ] Display kept on, screenlock disabled" in info
+        assert "Method: WAKEPY_FAKE_SUCCESS" in info
+        assert deprecations not in info
+
+        with somemode as m:
+            info = get_wakepy_cli_info(
+                m,
+                ascii_only=False,
+                deprecations=deprecations,
+            )
+        assert deprecations in info
+
+
+class TestGetSuccessOrFailSymbol:
+    @pytest.mark.parametrize(
+        "success, ascii_only, expected",
+        [
+            (True, True, "x"),
+            (False, True, " "),
+            (True, False, "✔"),
+            (False, False, " "),
+        ],
+    )
+    def test_get_success_or_fail_symbol(self, success, ascii_only, expected):
+        assert _get_success_or_fail_symbol(success, ascii_only) == expected
