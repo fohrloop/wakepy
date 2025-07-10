@@ -317,10 +317,11 @@ class TestActivationResult:
             [mr_platform_support_fail, mr_requirements_fail], mode_name="SomeMode"
         )
         assert ar.get_failure_text() == (
-            'Could not activate Mode "SomeMode"!\n\nMethod usage results, in order '
-            "(highest priority first):\n[(FAIL @PLATFORM_SUPPORT, fail-platform, "
-            '"Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, '
-            '"Missing requirement: Some SW v.1.2.3")]'
+            'Could not activate wakepy Mode "SomeMode"!\n\nTried Methods (in the order '
+            "of attempt):\n(#1, fail-platform, PLATFORM_SUPPORT, Platform XYZ not "
+            "supported!),\n(#2, fail-requirements, REQUIREMENTS, Missing requirement: "
+            "Some SW v.1.2.3).\nThe format of each item in the list is (index, "
+            "method_name, failure_stage, failure_reason)."
         )
 
     def test_active_method(

@@ -133,22 +133,26 @@ class TestOnFail:
     """Test failure handling for keep.presenting and keep.running. (the on_fail
     parameter)"""
 
+    @pytest.mark.filterwarnings("ignore:.*:wakepy.core.mode.NoMethodsWarning")
     def test_on_fail_pass(self, mode_under_test, expected_name):
         with mode_under_test(methods=[], on_fail="pass") as m:
             self._assertions_for_activation_failure(m, expected_name)
 
+    @pytest.mark.filterwarnings("ignore:.*:wakepy.core.mode.NoMethodsWarning")
     def test_on_fail_warn(self, mode_under_test, expected_name):
-        err_txt = f'Could not activate Mode "{expected_name}"!'
+        err_txt = f'Could not activate wakepy Mode "{expected_name}"!'
         with pytest.warns(ActivationWarning, match=re.escape(err_txt)):
             with mode_under_test(methods=[], on_fail="warn") as m:
                 self._assertions_for_activation_failure(m, expected_name)
 
+    @pytest.mark.filterwarnings("ignore:.*:wakepy.core.mode.NoMethodsWarning")
     def test_on_fail_error(self, mode_under_test, expected_name):
-        err_txt = f'Could not activate Mode "{expected_name}"!'
+        err_txt = f'Could not activate wakepy Mode "{expected_name}"!'
         with pytest.raises(ActivationError, match=re.escape(err_txt)):
             with mode_under_test(methods=[], on_fail="error") as m:
                 self._assertions_for_activation_failure(m, expected_name)
 
+    @pytest.mark.filterwarnings("ignore:.*:wakepy.core.mode.NoMethodsWarning")
     def test_on_fail_callable(self, mode_under_test, expected_name):
         called = False
 
