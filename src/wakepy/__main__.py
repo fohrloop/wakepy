@@ -239,8 +239,16 @@ def get_wakepy_cli_info(mode: Mode, ascii_only: bool, deprecations: str) -> str:
 
     # print the deprecations _after_ the startup text to make them more visible
     if deprecations:
+        cli_text += "\n\n" + wrap_text("DEPRECATION NOTICE: " + deprecations) + "\n"
+
+    if not mode.activation_result.real_success:
         cli_text += (
-            "\n\n" + "\n".join(wrap("DEPRECATION NOTICE: " + deprecations, 66)) + "\n"
+            "\n"
+            + wrap_text(
+                "WARNING: You are using the WAKEPY_FAKE_SUCCESS. Wakepy is not active. "
+                "See: https://wakepy.readthedocs.io/stable/tests-and-ci.html#wakepy-fake-success",
+            )
+            + "\n"
         )
     return cli_text
 
@@ -284,6 +292,22 @@ def get_spinner_symbols(ascii_only: bool = False) -> list[str]:
     if ascii_only:
         return ["|", "/", "-", "\\"]
     return ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
+
+
+CLI_TEXT_MAX_WIDTH = 66
+
+
+def wrap_text(
+    text: str, break_long_words: bool = True, break_on_hyphens: bool = True
+) -> str:
+    return "\n".join(
+        wrap(
+            text,
+            CLI_TEXT_MAX_WIDTH,
+            break_long_words=break_long_words,
+            break_on_hyphens=break_on_hyphens,
+        )
+    )
 
 
 if __name__ == "__main__":
