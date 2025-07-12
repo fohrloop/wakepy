@@ -104,16 +104,21 @@ def run_wakepy(sysargs: list[str]) -> Mode:
 
 
 def _setup_logging(verbosity: int) -> None:
-    if verbosity >= 2:  # Corresponds to -vv or higher
-        log_level = logging.DEBUG
-    elif verbosity == 1:  # Corresponds to -v
-        log_level = logging.INFO
-    else:
-        assert verbosity == 0
-        log_level = logging.WARNING
+    log_level = _get_logging_level(verbosity)
     logging.basicConfig(
         level=log_level, format="%(asctime)s - %(levelname)s - %(message)s"
     )
+
+
+def _get_logging_level(verbosity: int) -> int:
+    """Get the logging level based on the verbosity argument."""
+    if verbosity >= 2:  # Corresponds to -vv or higher
+        return logging.DEBUG
+    elif verbosity == 1:  # Corresponds to -v
+        return logging.INFO
+    else:
+        assert verbosity == 0
+        return logging.WARNING
 
 
 def handle_activation_error(result: ActivationResult) -> None:
