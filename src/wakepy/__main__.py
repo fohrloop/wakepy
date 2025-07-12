@@ -69,8 +69,6 @@ def main() -> None:
 
     ascii_only = get_should_use_ascii_only()
 
-    # print the deprecations _after_ the startup text to make them more visible
-
     with mode:
         if not mode.active:
             raise ModeExit
@@ -238,6 +236,8 @@ def get_wakepy_cli_info(mode: Mode, ascii_only: bool, deprecations: str) -> str:
         wakepy_method=method_name,
         method_spacing=method_spacing,
     )
+
+    # print the deprecations _after_ the startup text to make them more visible
     if deprecations:
         cli_text += (
             "\n\n" + "\n".join(wrap("DEPRECATION NOTICE: " + deprecations, 66)) + "\n"
