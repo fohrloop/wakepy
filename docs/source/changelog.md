@@ -5,7 +5,7 @@
 
 ### ✨ Features
 - Update the wakepy CLI printout: Adds the used Method and activated Mode to the printout ([#434](https://github.com/fohrloop/wakepy/pull/434))
-- Added `-v` (INFO) and `-vv` (DEBUG) verbosity flags for the [wakepy CLI command](https://wakepy.readthedocs.io/stable/cli-api.html).
+- Added `-v` (INFO) and `-vv` (DEBUG) verbosity flags for the [wakepy CLI command](https://wakepy.readthedocs.io/stable/cli-api.html). ([#439](https://github.com/fohrloop/wakepy/pull/439))
 
 ### ✨ Minor Enhancements
 - Better error messages: When selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427)) and when a D-Bus -based method fails ([#438](https://github.com/fohrloop/wakepy/pull/438))
