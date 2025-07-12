@@ -8,6 +8,7 @@ import pytest
 from tests.unit.test_core.testmethods import TestMethod
 from wakepy.core import DBusMethodCall, PlatformType
 from wakepy.core.method import (
+    DBusCallError,
     Method,
     MethodOutcome,
     MethodOutcomeValue,
@@ -133,16 +134,36 @@ def test_method_string_representations():
     assert method.__repr__() == f"<wakepy Method: MethodB at {hex(id(method))}>"
 
 
-def test_process_dbus_call(dbus_method: DBusMethod):
-    method = Method()
-    # when there is no dbus adapter..
-    assert method.dbus_adapter is None
-    # we get RuntimeError
-    with pytest.raises(
-        RuntimeError,
-        match=".*cannot process dbus method call.*as it does not have a DBusAdapter",
-    ):
-        assert method.process_dbus_call(DBusMethodCall(dbus_method))
+class TestProcessDBusCall:
+    def test_missing_dbus_adapter(self, dbus_method: DBusMethod):
+        method = Method()
+        # when there is no dbus adapter..
+        assert method.dbus_adapter is None
+        # we get RuntimeError
+        with pytest.raises(
+            RuntimeError,
+            match=".*cannot process dbus method call.*as it does not have a DBusAdapter",  # noqa: E501
+        ):
+            assert method.process_dbus_call(DBusMethodCall(dbus_method))
+
+    def test_error_when_calling_dbus_methods(self, dbus_method: DBusMethod):
+        method = Method()
+
+        class MockedDBusAdapter:
+            def process(self, _: DBusMethodCall) -> object:
+                raise RuntimeError("Error from mocked DBusAdapter")
+
+        method.dbus_adapter = MockedDBusAdapter()  # type: ignore[assignment]
+
+        # When there's an error while calling a D-Bus method,
+        # we get DBusCallError with message telling what went wrong
+        with pytest.raises(
+            DBusCallError,
+            match=re.escape(
+                "DBus call of method 'test-method' on interface '/foo' with args () failed with message: Error from mocked DBusAdapter"  # noqa: E501
+            ),
+        ):
+            assert method.process_dbus_call(DBusMethodCall(dbus_method))
 
 
 def test_methodoutcome(assert_strenum_values):
