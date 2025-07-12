@@ -49,6 +49,10 @@ unnamed = "__unnamed__"
 """Constant for defining unnamed Method(s)"""
 
 
+class DBusCallError(RuntimeError):
+    """Raised when a Method's D-Bus call fails."""
+
+
 class Method(ABC):
     """Methods are objects that are used to switch modes. The phases for
     changing and being in a Mode is:
@@ -273,7 +277,14 @@ class Method(ABC):
                 f'{self.__class__.__name__ } cannot process dbus method call "{call}" '
                 "as it does not have a DBusAdapter."
             )
-        return self.dbus_adapter.process(call)
+        try:
+            return self.dbus_adapter.process(call)
+        except Exception as exc:
+            raise DBusCallError(
+                f"DBus call of method '{call.method.name}' on interface "
+                f"'{call.method.interface}' with args {call.args} failed with message: "
+                f"{exc}"
+            ) from exc
 
     def __str__(self) -> str:
         return f"<wakepy Method: {self.__class__.__name__}>"
