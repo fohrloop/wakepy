@@ -15,14 +15,20 @@ python -m wakepy
 This starts wakepy in the *default mode* (`-k`), which corresponds to a call to `keep.running` with default arguments. The available options are:
 
 ```{code-block} output
-wakepy [-h | -r | -p]
+usage: wakepy [-h] [-r] [-p] [-v]
 
 options:
-  -h, --help               show this help message and exit
-  -r, --keep-running       Keep programs running; inhibit automatic sleep/suspend. This
-                           is used as a default if no modes are selected.
-  -p, --keep-presenting    Presentation mode; inhibit automatic sleep, screensaver and
-                           screenlock
+  -h, --help             show this help message and exit
+  -r, --keep-running     Keep programs running (DEFAULT); inhibit automatic idle timer based
+                         sleep / suspend. If a screen lock (or a screen saver) with a
+                         password is enabled, your system *may* still lock the session
+                         automatically. You may, and probably should, lock the session
+                         manually. Locking the workstation does not stop programs from
+                         executing.
+  -p, --keep-presenting  Presentation mode; inhibit automatic idle timer based sleep,
+                         screensaver, screenlock and display power management.
+  -v, --verbose          Increase verbosity level (-v for INFO, -vv for DEBUG). Default is
+                         WARNING, which shows only really important messages.
 ```
 
 

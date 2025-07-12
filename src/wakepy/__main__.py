@@ -250,7 +250,7 @@ def _get_argparser() -> argparse.ArgumentParser:
         default=0,
         help=(
             "Increase verbosity level (-v for INFO, -vv for DEBUG). Default is "
-            "WARNING, which shows only really important messages.",
+            "WARNING, which shows only really important messages."
         ),
     )
     return parser
