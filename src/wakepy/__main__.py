@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import logging
 import platform
 import sys
 import time
@@ -63,8 +64,26 @@ WAKEPY_INFO_ASCII_TEMPLATE = (
 )
 
 
-def main() -> Mode:
-    args = parse_args(sys.argv[1:])
+def main() -> None:
+    """Entry point for the wakepy CLI. Separated from run_wakepy() basically to
+    make testing easier."""
+    run_wakepy(sys.argv[1:])  # pragma: no cover
+
+
+def run_wakepy(sysargs: list[str]) -> Mode:
+    """Run the wakepy CLI with the given command line arguments.
+
+    Parameters
+    ----------
+    sysargs : list[str]
+        The command line arguments to parse and use. You should pass
+        sys.argv[1:] as the sysargs.
+
+    """
+    args = parse_args(sysargs)
+
+    _setup_logging(args.verbose)
+
     mode_name = _get_mode_name(args)
     deprecations = _get_deprecations(args)
     mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
@@ -82,6 +101,24 @@ def main() -> Mode:
         # If activation did not succeed, there is also no deactivation / exit.
         print("\n\nExited.")
     return mode
+
+
+def _setup_logging(verbosity: int) -> None:
+    log_level = _get_logging_level(verbosity)
+    logging.basicConfig(
+        level=log_level, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
+
+def _get_logging_level(verbosity: int) -> int:
+    """Get the logging level based on the verbosity argument."""
+    if verbosity >= 2:  # Corresponds to -vv or higher
+        return logging.DEBUG
+    elif verbosity == 1:  # Corresponds to -v
+        return logging.INFO
+    else:
+        assert verbosity == 0
+        return logging.WARNING
 
 
 def handle_activation_error(result: ActivationResult) -> None:
@@ -211,6 +248,16 @@ def _get_argparser() -> argparse.ArgumentParser:
         default=False,
     )
 
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        default=0,
+        help=(
+            "Increase verbosity level (-v for INFO, -vv for DEBUG). Default is "
+            "WARNING, which shows only really important messages."
+        ),
+    )
     return parser
 
 
