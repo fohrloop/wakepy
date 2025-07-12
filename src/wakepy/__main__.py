@@ -17,7 +17,7 @@ import platform
 import sys
 import time
 import typing
-from textwrap import dedent, fill
+from textwrap import dedent, fill, wrap
 
 from wakepy import ModeExit
 from wakepy.core.constants import ModeName
@@ -29,34 +29,52 @@ if typing.TYPE_CHECKING:
 
     from wakepy import ActivationResult
 
-WAKEPY_TEXT_TEMPLATE = r"""                  _
-                 | |
- __      __ __ _ | | __ ___  _ __   _   _
- \ \ /\ / // _` || |/ // _ \| '_ \ | | | |
-  \ V  V /| (_| ||   <|  __/| |_) || |_| |
-   \_/\_/  \__,_||_|\_\\___|| .__/  \__, |
-{VERSION_STRING}| |      __/ |
-                            |_|     |___/ """
+WAKEPY_LOGO_TEMPLATE = r"""                         _
+                        | |
+        __      __ __ _ | | __ ___  _ __   _   _
+        \ \ /\ / // _` || |/ // _ \| '_ \ | | | |
+         \ V  V /| (_| ||   <|  __/| |_) || |_| |
+          \_/\_/  \__,_||_|\_\\___|| .__/  \__, |
+       {version_string}| |      __/ |
+                                   |_|     |___/ """
 
-WAKEPY_TICKBOXES_TEMPLATE = """
- [{no_auto_suspend}] System will continue running programs
- [{presentation_mode}] Display is kept on and automatic screenlock disabled.
-"""
+WAKEPY_INFO_UNICODE_TEMPLATE = (
+    WAKEPY_LOGO_TEMPLATE
+    + """
+ ┏━━ Mode: {wakepy_mode} {header_bars}━┓
+ ┃                                                      ┃
+ ┃  [{no_auto_suspend}] Programs keep running                           ┃
+ ┃  [{presentation_mode}] Display kept on, screenlock disabled            ┃
+ ┃                                                      ┃
+ ┃   Method: {wakepy_method} {method_spacing}┃
+ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"""
+)
+
+WAKEPY_INFO_ASCII_TEMPLATE = (
+    WAKEPY_LOGO_TEMPLATE
+    + """
+ ┏━━ Mode: {wakepy_mode} {header_bars}━┓
+ ┃                                                      ┃
+ ┃  [{no_auto_suspend}] Programs keep running                           ┃
+ ┃  [{presentation_mode}] Display kept on, screenlock disabled            ┃
+ ┃                                                      ┃
+ ┃   Method: {wakepy_method} {method_spacing}┃
+ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"""
+)
 
 
 def main() -> None:
     mode_name, deprecations = parse_arguments(sys.argv[1:])
     mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
-    print(get_startup_text(mode=mode_name))
 
-    # print the deprecations _after_ the startup text to make them more visible
-    for deprecation_msg in deprecations:
-        print(deprecation_msg)  # pragma: no cover
+    ascii_only = get_should_use_ascii_only()
 
     with mode:
         if not mode.active:
             raise ModeExit
-        wait_until_keyboardinterrupt()
+
+        print(get_wakepy_cli_info(mode, ascii_only, deprecations))
+        wait_until_keyboardinterrupt(ascii_only)
 
     if mode.activation_result and mode.activation_result.success:
         # If activation did not succeed, there is also no deactivation / exit.
@@ -96,8 +114,9 @@ def _get_activation_error_text(result: ActivationResult) -> str:
 
 def parse_arguments(
     sysargs: List[str],
-) -> Tuple[ModeName, list[str]]:
-    """Parses arguments from sys.argv and returns kwargs for"""
+) -> Tuple[ModeName, str]:
+    """Parses arguments from sys.argv and returns the name of the mode and
+    deprecation message, if any."""
 
     args = _get_argparser().parse_args(sysargs)
     deprecations: list[str] = []
@@ -130,7 +149,7 @@ def parse_arguments(
         assert keep_presenting
         mode = ModeName.KEEP_PRESENTING
 
-    return mode, deprecations
+    return mode, "\n".join(deprecations) if deprecations else ""
 
 
 def _get_argparser() -> argparse.ArgumentParser:
@@ -187,31 +206,76 @@ def _get_argparser() -> argparse.ArgumentParser:
     return parser
 
 
-def get_startup_text(mode: ModeName) -> str:
+def get_wakepy_cli_info(mode: Mode, ascii_only: bool, deprecations: str) -> str:
     from wakepy import __version__
 
-    wakepy_text = WAKEPY_TEXT_TEMPLATE.format(
-        VERSION_STRING=f"{'  v.'+__version__[:24]: <28}"
+    template = (
+        WAKEPY_INFO_ASCII_TEMPLATE if ascii_only else WAKEPY_INFO_UNICODE_TEMPLATE
     )
-    options_txt = WAKEPY_TICKBOXES_TEMPLATE.strip("\n").format(
-        no_auto_suspend="x",
-        presentation_mode="x" if mode == ModeName.KEEP_PRESENTING else " ",
+
+    mode_name_max_length = 43
+    method_name_max_length = 42
+    mode_name = mode.name or "(unknown mode)"
+    mode_name = mode_name[:mode_name_max_length]
+    header_bars = "━" * (mode_name_max_length - len(mode_name))
+
+    method_name = mode.active_method or "(no method)"
+    method_name = method_name[:method_name_max_length]
+    method_spacing = " " * (method_name_max_length - len(method_name))
+
+    presentation_mode_symbol = _get_success_or_fail_symbol(
+        mode_name == ModeName.KEEP_PRESENTING, ascii_only
     )
-    return "\n".join((wakepy_text, options_txt)) + "\n"
+
+    cli_text = template.strip("\n").format(
+        version_string=f"{'  v.'+__version__[:24]: <28}",
+        wakepy_mode=mode_name,
+        header_bars=header_bars,
+        no_auto_suspend=_get_success_or_fail_symbol(True, ascii_only),
+        presentation_mode=presentation_mode_symbol,
+        wakepy_method=method_name,
+        method_spacing=method_spacing,
+    )
+
+    # print the deprecations _after_ the startup text to make them more visible
+    if deprecations:
+        cli_text += "\n\n" + wrap_text("DEPRECATION NOTICE: " + deprecations) + "\n"
+
+    if not mode.activation_result.real_success:
+        cli_text += (
+            "\n"
+            + wrap_text(
+                "WARNING: You are using the WAKEPY_FAKE_SUCCESS. Wakepy is not active. "
+                "See: https://wakepy.readthedocs.io/stable/tests-and-ci.html#wakepy-fake-success",
+            )
+            + "\n"
+        )
+    return cli_text
 
 
-def wait_until_keyboardinterrupt() -> None:
-    spinner_symbols = get_spinner_symbols()
+def _get_success_or_fail_symbol(success: bool, ascii_only: bool) -> str:
+    if success:
+        symbol = "x" if ascii_only else "✔"
+    else:
+        symbol = " "
+    return symbol
+
+
+def wait_until_keyboardinterrupt(ascii_only: bool) -> None:
+    spinner_symbols = get_spinner_symbols(ascii_only)
+    width = 32 if ascii_only else 31
     try:
         for spinner_symbol in itertools.cycle(spinner_symbols):  # pragma: no branch
-            print("\r " + spinner_symbol + r" [Press Ctrl+C to exit] ", end="")
+            print(
+                "\r " + " " + spinner_symbol + " " * width + r"[Press Ctrl+C to exit] ",
+                end="",
+            )
             time.sleep(0.8)
     except KeyboardInterrupt:
         pass
 
 
-def get_spinner_symbols() -> list[str]:
-
+def get_should_use_ascii_only() -> bool:
     if (
         is_windows(CURRENT_PLATFORM)
         and platform.python_implementation().lower() == "pypy"
@@ -220,8 +284,30 @@ def get_spinner_symbols() -> list[str]:
         # yet at version 7.3.17. See:
         # https://github.com/pypy/pypy/issues/3890
         # https://github.com/fohrloop/wakepy/issues/274#issuecomment-2363293422
+        return True
+    return False
+
+
+def get_spinner_symbols(ascii_only: bool = False) -> list[str]:
+    if ascii_only:
         return ["|", "/", "-", "\\"]
     return ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"]
+
+
+CLI_TEXT_MAX_WIDTH = 66
+
+
+def wrap_text(
+    text: str, break_long_words: bool = True, break_on_hyphens: bool = True
+) -> str:
+    return "\n".join(
+        wrap(
+            text,
+            CLI_TEXT_MAX_WIDTH,
+            break_long_words=break_long_words,
+            break_on_hyphens=break_on_hyphens,
+        )
+    )
 
 
 if __name__ == "__main__":

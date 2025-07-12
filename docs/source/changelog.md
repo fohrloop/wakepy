@@ -3,6 +3,9 @@
 ## wakepy x.x.x
 🗓️ Unreleased
 
+### ✨ Features
+- Update the wakepy CLI printout: Adds the used Method and activated Mode to the printout ([#434](https://github.com/fohrloop/wakepy/pull/434))
+
 ### ✨ Minor Enhancements
 - Better error message when selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427))
 - Enhance Mode Activation Observability. Add logging (DEBUG and INFO level) for different parts in the Mode activation process. Show which methods are to be tried, and log any success and failure of activating a Mode. Improved the `ActivationResult.get_failure_text()` output. Added `NoMethodsWarning` which is issued if trying to activate a Mode with an empty list of methods. ([#411](https://github.com/fohrloop/wakepy/pull/411))
