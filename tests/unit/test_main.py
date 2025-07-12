@@ -7,13 +7,15 @@ import pytest
 
 from wakepy import ActivationResult, Method, Mode
 from wakepy.__main__ import (
+    _get_deprecations,
+    _get_mode_name,
     _get_success_or_fail_symbol,
     get_should_use_ascii_only,
     get_spinner_symbols,
     get_wakepy_cli_info,
     handle_activation_error,
     main,
-    parse_arguments,
+    parse_args,
     wait_until_keyboardinterrupt,
 )
 from wakepy.core import PlatformType
@@ -64,7 +66,7 @@ def method2_broken(mode_name_broken):
 
 
 @pytest.mark.parametrize(
-    "args",
+    "sysargs",
     [
         ["-r"],
         ["--keep-running"],
@@ -72,23 +74,23 @@ def method2_broken(mode_name_broken):
         [],
     ],
 )
-def test_get_argparser_keep_running(args):
-    assert parse_arguments(args) == (ModeName.KEEP_RUNNING, "")
+def test_get_argparser_keep_running(sysargs):
+    assert _get_mode_name(parse_args(sysargs)) == ModeName.KEEP_RUNNING
 
 
 @pytest.mark.parametrize(
-    "args",
+    "sysargs",
     [
         ["-p"],
         ["--keep-presenting"],
     ],
 )
-def test_get_argparser_keep_presenting(args):
-    assert parse_arguments(args) == (ModeName.KEEP_PRESENTING, "")
+def test_get_argparser_keep_presenting(sysargs):
+    assert _get_mode_name(parse_args(sysargs)) == ModeName.KEEP_PRESENTING
 
 
 @pytest.mark.parametrize(
-    "args",
+    "sysargs",
     [
         ["-r", "-p"],
         ["--keep-presenting", "-r"],
@@ -96,22 +98,21 @@ def test_get_argparser_keep_presenting(args):
         ["--keep-presenting", "--keep-running"],
     ],
 )
-def test_get_argparser_too_many_modes(args):
+def test_get_argparser_too_many_modes(sysargs):
     with pytest.raises(ValueError, match="You may only select one of the modes!"):
-        assert parse_arguments(args)
+        assert _get_mode_name(parse_args(sysargs))
 
 
 @pytest.mark.parametrize(
-    "args, expected_mode",
+    "sysargs",
     [
-        (["--presentation"], ModeName.KEEP_PRESENTING),
-        (["-k"], ModeName.KEEP_RUNNING),
+        ["--presentation"],
+        ["-k"],
     ],
 )
-def test_deprecations(args, expected_mode):
-    mode, deprecations = parse_arguments(args)
-    assert mode == expected_mode
-    assert f"Using {args[0]} is deprecated in wakepy 0.10.0" in deprecations
+def test_deprecations(sysargs):
+    deprecations = _get_deprecations(parse_args(sysargs))
+    assert f"Using {sysargs[0]} is deprecated in wakepy 0.10.0" in deprecations
 
 
 def test_wait_until_keyboardinterrupt():
@@ -137,64 +138,55 @@ def test_handle_activation_error(print_mock):
     assert "Wakepy could not activate" in printed_text
 
 
-@patch("wakepy.__main__.parse_arguments")
 class TestMain:
     """Tests the main() function from the __main__.py in a simple way. This
     is more of a smoke test. The functionality of the different parts is
     already tested in other unit tests."""
 
+    @pytest.fixture(autouse=True)
+    def patch_function(self):
+        with patch("wakepy.__main__.wait_until_keyboardinterrupt"), patch(
+            "sys.argv", self.sys_argv
+        ), patch("builtins.print"):
+            yield
+
     def test_working_mode(
         self,
-        parse_arguments,
         method1,
     ):
+        with patch("wakepy.__main__._get_mode_name", return_value=method1.mode_name):
+            mode = main()
+            assert mode.activation_result.success is True
 
-        with patch("wakepy.__main__.wait_until_keyboardinterrupt"), patch(
-            "sys.argv", self.sys_argv
-        ), patch("builtins.print"):
-            self.setup_mocks(method1, parse_arguments)
-            main()
-
-    @pytest.mark.usefixtures("method2_broken")
-    def test_non_working_mode(
-        self,
-        parse_arguments,
-        method2_broken,
-        monkeypatch,
-    ):
+    def test_non_working_mode(self, method2_broken, monkeypatch):
         # need to turn off WAKEPY_FAKE_SUCCESS as we want to get a failure.
         monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "0")
+        with patch(
+            "wakepy.__main__._get_mode_name", return_value=method2_broken.mode_name
+        ):
+            mode = main()
+            assert mode.activation_result.success is False
 
-        with patch("wakepy.__main__.wait_until_keyboardinterrupt"), patch(
-            "sys.argv", self.sys_argv
-        ), patch("builtins.print"):
-            self.setup_mocks(method2_broken, parse_arguments)
-            main()
-
-    @staticmethod
-    def setup_mocks(
-        method: Method,
-        parse_arguments,
-    ):
-        # Assume that user has specified some mode in the commandline which
-        # resolves to `method.mode_name`
-        parse_arguments.return_value = method.mode_name, []
+            # the method2_broken enter_mode raises this:
+            assert (
+                mode.activation_result.query()[0].failure_reason
+                == "RuntimeError('foo')"
+            )
 
     @property
     def sys_argv(self):
-        # The patched value for sys.argv. Does not matter here otherwise, but
-        # should be a list of at least two items.
-        return ["", ""]
+        # The patched value for sys.argv.
+        return ["wakepy"]
 
 
-# fmt: off
 class TestGetSpinnerSymbols:
     def test_non_ascii(self):
+        # fmt: off
         assert get_spinner_symbols(False) == ["⢎⡰", "⢎⡡", "⢎⡑", "⢎⠱", "⠎⡱", "⢊⡱", "⢌⡱", "⢆⡱"] # noqa: E501
+        # fmt: on
 
     def test_ascii(self):
         assert get_spinner_symbols(True) == ["|", "/", "-", "\\"]
-# fmt: on
 
 
 class TestShouldUseAsciiOnly:
