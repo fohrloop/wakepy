@@ -25,7 +25,7 @@ from wakepy.core.mode import Mode
 from wakepy.core.platform import CURRENT_PLATFORM, get_platform_debug_info, is_windows
 
 if typing.TYPE_CHECKING:
-    from typing import List, Tuple
+    from argparse import Namespace
 
     from wakepy import ActivationResult
 
@@ -63,8 +63,10 @@ WAKEPY_INFO_ASCII_TEMPLATE = (
 )
 
 
-def main() -> None:
-    mode_name, deprecations = parse_arguments(sys.argv[1:])
+def main() -> Mode:
+    args = parse_args(sys.argv[1:])
+    mode_name = _get_mode_name(args)
+    deprecations = _get_deprecations(args)
     mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
 
     ascii_only = get_should_use_ascii_only()
@@ -79,6 +81,7 @@ def main() -> None:
     if mode.activation_result and mode.activation_result.success:
         # If activation did not succeed, there is also no deactivation / exit.
         print("\n\nExited.")
+    return mode
 
 
 def handle_activation_error(result: ActivationResult) -> None:
@@ -112,26 +115,7 @@ def _get_activation_error_text(result: ActivationResult) -> str:
     return "\n".join(out)
 
 
-def parse_arguments(
-    sysargs: List[str],
-) -> Tuple[ModeName, str]:
-    """Parses arguments from sys.argv and returns the name of the mode and
-    deprecation message, if any."""
-
-    args = _get_argparser().parse_args(sysargs)
-    deprecations: list[str] = []
-
-    if args.k:
-        deprecations.append(
-            "Using -k is deprecated in wakepy 0.10.0, and will be removed in a future "
-            "release. Use -r/--keep-running, instead. "
-            "Note that this is the default value so -r is optional.",
-        )
-    if args.presentation:
-        deprecations.append(
-            "Using --presentation is deprecated in wakepy 0.10.0, and will be removed "
-            "in a future release. Use -p/--keep-presenting, instead. ",
-        )
+def _get_mode_name(args: Namespace) -> ModeName:
 
     # For the duration of deprecation, allow also the old flags
     keep_running = args.keep_running or args.k
@@ -149,7 +133,31 @@ def parse_arguments(
         assert keep_presenting
         mode = ModeName.KEEP_PRESENTING
 
-    return mode, "\n".join(deprecations) if deprecations else ""
+    return mode
+
+
+def _get_deprecations(args: Namespace) -> str:
+
+    deprecations: list[str] = []
+
+    if args.k:
+        deprecations.append(
+            "Using -k is deprecated in wakepy 0.10.0, and will be removed in a future "
+            "release. Use -r/--keep-running, instead. "
+            "Note that this is the default value so -r is optional.",
+        )
+    if args.presentation:
+        deprecations.append(
+            "Using --presentation is deprecated in wakepy 0.10.0, and will be removed "
+            "in a future release. Use -p/--keep-presenting, instead. ",
+        )
+    return "\n".join(deprecations) if deprecations else ""
+
+
+def parse_args(args: list[str] | None = None) -> Namespace:
+    """Parse the command line arguments and return the parsed Namespace."""
+    parser = _get_argparser()
+    return parser.parse_args(args)
 
 
 def _get_argparser() -> argparse.ArgumentParser:
