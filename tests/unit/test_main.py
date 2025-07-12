@@ -1,5 +1,6 @@
 """Unit tests for the __main__ module"""
 
+import logging
 import sys
 from unittest.mock import patch
 
@@ -8,6 +9,7 @@ import pytest
 from wakepy import ActivationResult, Method, Mode
 from wakepy.__main__ import (
     _get_deprecations,
+    _get_logging_level,
     _get_mode_name,
     _get_success_or_fail_symbol,
     get_should_use_ascii_only,
@@ -240,3 +242,21 @@ class TestGetSuccessOrFailSymbol:
     )
     def test_get_success_or_fail_symbol(self, success, ascii_only, expected):
         assert _get_success_or_fail_symbol(success, ascii_only) == expected
+
+
+class TestGetLoggingLevel:
+    @pytest.mark.parametrize(
+        "verbosity, expected_level",
+        [
+            (0, logging.WARNING),
+            (1, logging.INFO),
+            (2, logging.DEBUG),
+            (3, logging.DEBUG),
+        ],
+    )
+    def test_get_logging_level(self, verbosity, expected_level):
+        assert _get_logging_level(verbosity) == expected_level
+
+    def test_with_bad_verbosity(self):
+        with pytest.raises(AssertionError):
+            _get_logging_level(-2)
