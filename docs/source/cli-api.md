@@ -12,7 +12,7 @@ or
 python -m wakepy
 ```
 
-This starts wakepy in the *default mode* (`-k`), which corresponds to a call to `keep.running` with default arguments. The available options are:
+This starts wakepy in the *default mode* (`-r`), which corresponds to a [`keep.running`](#keep-running-mode) mode with default arguments. The available options are:
 
 ```{code-block} output
 usage: wakepy [-h] [-r] [-p] [-v]

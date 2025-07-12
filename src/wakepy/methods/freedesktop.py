@@ -200,7 +200,7 @@ class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
 
         elif current_de == XFCE:
             raise RuntimeError(
-                "org.freedesktop.PowerManagemen does not support XFCE as it has a bug "
+                "org.freedesktop.PowerManagement does not support XFCE as it has a bug "
                 "which prevents automatic screenlock / screensaver. See: "
                 "https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/65"
             )
