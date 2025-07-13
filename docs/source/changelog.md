@@ -15,6 +15,9 @@
 ### 🐞 Bug fixes
 - Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)). 
 
+### 👷 Maintenance
+- Fix development environment setup instructions and requirements on Windows ([#445](https://github.com/fohrloop/wakepy/pull/445))
+
 ## wakepy 0.10.2
 🗓️ 2025-04-21
 

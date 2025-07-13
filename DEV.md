@@ -14,6 +14,12 @@ Requirements:
 - At least one of the supported Python versions installed (see README.md and/or tox.ini).
 - pip >= 21.3 (for pyproject.toml support)
 
+Update pip and install wheel:
+
+```
+python -m pip install -U pip wheel
+```
+
 Install in editable state with the `dev` requirements:
 ```
 python -m pip install -r requirements/requirements-dev.txt -e .
