@@ -5,7 +5,10 @@
 -r requirements-docs.txt
 -r requirements-check.txt
 
-sphinx-autobuild==2024.9.19
+# On Windows, cannot use later version of sphinx-autobuild until
+# https://github.com/sphinx-doc/sphinx-autobuild/issues/197 is resolved.
+# See also: https://github.com/fohrloop/wakepy/issues/444
+sphinx-autobuild==2024.4.16
 IPython
 invoke==2.2.0
 # Colorama is used with the tasks.py (invoke commands)
