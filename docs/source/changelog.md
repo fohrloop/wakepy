@@ -18,7 +18,8 @@
 ### 👷 Maintenance
 - Fix development environment setup instructions and requirements on Windows ([#445](https://github.com/fohrloop/wakepy/pull/445))
 - Fix flaky tests on pypy+windows ([#447](https://github.com/fohrloop/wakepy/pull/447))
-
+- Remove the AttributeError traceback when building docs on Windows/MacOS ([#449](https://github.com/fohrloop/wakepy/pull/449))
+  
 ## wakepy 0.10.2
 🗓️ 2025-04-21
 
