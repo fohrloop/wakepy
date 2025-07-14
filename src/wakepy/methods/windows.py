@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import ctypes
 import enum
-import warnings
 import logging
 import threading
 import typing
+import warnings
 from abc import ABC, abstractmethod
 from queue import Queue
 from threading import Event, Thread
@@ -82,13 +82,14 @@ class WindowsSetThreadExecutionState(Method, ABC):
         )
         self._inhibiting_thread.start()
         self._check_thread_response()
-        if not self._queue_from_thread.empty(): # pragma: no cover
+        if not self._queue_from_thread.empty():  # pragma: no cover
             warnings.warn(
-                'The queue from the inhibitor thread contained more than one respose! '
-                'This most likely means that the thread exited before being released '
-                'due to a small timeout value. This should never happen outside tests, '
-                'and if this occurs in tests, it means that the _release_event_timeout '
-                'is set too low!')
+                "The queue from the inhibitor thread contained more than one respose! "
+                "This most likely means that the thread exited before being released "
+                "due to a small timeout value. This should never happen outside tests, "
+                "and if this occurs in tests, it means that the _release_event_timeout "
+                "is set too low!"
+            )
 
     def exit_mode(self) -> None:
         self._release.set()
