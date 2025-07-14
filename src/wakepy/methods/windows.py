@@ -92,6 +92,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
             )
 
     def exit_mode(self) -> None:
+        1 / 0  # remove this
         self._release.set()
         self._check_thread_response()
         if self._inhibiting_thread:
