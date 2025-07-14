@@ -1,3 +1,10 @@
+"""Defines the SetThreadExecutionState based methods for Windows:
+WindowsKeepRunning and WindowsKeepPresenting.
+
+The Methods call the SetThreadExecutionState in a separate thread, making each
+inhibition call isolated from each other.
+"""
+
 from __future__ import annotations
 
 import ctypes
@@ -35,9 +42,18 @@ class WindowsSetThreadExecutionState(Method, ABC):
     # The SetThreadExecutionState docs say that it supports Windows XP and
     # above (client) or Windows Server 2003 and above (server)
     supported_platforms = (PlatformType.WINDOWS,)
-    _wait_timeout = 5  # seconds
-    """timeout for calls like queue.get() and thread.join() which could
-    otherwise block execution indefinitely."""
+
+    _wait_for_worker_timeout: float = 5  # seconds
+    """timeout for waiting for the worker (inhibitor) thread on the main
+    thread. For example for calls like queue.get() and thread.join() which
+    could otherwise block execution indefinitely."""
+
+    _release_event_timeout: int | float | None = None
+    """Timeout in seconds used in the inhibitor thread (seconds). If the
+    inhibitor is not shut down with a release event within the timeout, the
+    thread is shut down automatically. None means "wait indefinitely". This
+    variable exists mainly for tests (edit this to make tests not to wait
+    forever in case of errors). """
 
     @property
     @abstractmethod
@@ -56,7 +72,12 @@ class WindowsSetThreadExecutionState(Method, ABC):
         # threads. See: https://github.com/fohrloop/wakepy/issues/167
         self._inhibiting_thread = threading.Thread(
             target=_inhibit_until_released,
-            args=(self.flags, self._release, self._queue_from_thread),
+            kwargs=dict(
+                inhibit_flags=self.flags,
+                release_event=self._release,
+                queue=self._queue_from_thread,
+                release_event_timeout=self._release_event_timeout,
+            ),
         )
         self._inhibiting_thread.start()
         self._check_thread_response()
@@ -65,7 +86,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
         self._release.set()
         self._check_thread_response()
         if self._inhibiting_thread:
-            self._inhibiting_thread.join(timeout=self._wait_timeout)
+            self._inhibiting_thread.join(timeout=self._wait_for_worker_timeout)
         self._inhibiting_thread = None
 
     def _check_thread_response(self) -> None:
@@ -74,7 +95,7 @@ class WindowsSetThreadExecutionState(Method, ABC):
         it's not, raises an Exception. Re-raises any Exceptions put into the
         queue.
         """
-        res = self._queue_from_thread.get(timeout=self._wait_timeout)
+        res = self._queue_from_thread.get(timeout=self._wait_for_worker_timeout)
 
         if isinstance(res, int):
             logger.debug("The previous flags were %s (%s)", res, Flags(res))
@@ -86,23 +107,45 @@ class WindowsSetThreadExecutionState(Method, ABC):
 
 
 def _inhibit_until_released(
-    flags: Flags, exit_event: Event, queue: Queue[int | Exception]
+    inhibit_flags: Flags,
+    release_event: Event,
+    queue: Queue[int | Exception],
+    release_event_timeout: int | float | None = None,
 ) -> None:
-    _call_and_put_result_in_queue(flags.value, queue)
-    exit_event.wait(_release_event_timeout)
-    _call_and_put_result_in_queue(Flags.RELEASE.value, queue)
+    """Inhibit system using SetThreadExecutionState.
 
+    First, uses SetThreadExecutionState and the given `inhibit_flags` to
+    inhibit system. Then waits for a release event until release event timeout.
+    The release event can be given from another thread. After released, calls
+    SetThreadExecutionState once more to remove the inhibitor flag.
 
-_release_event_timeout: int | float | None = None
-"""Timeout for the release events (to stop a inhibit thread). None means
-wait indefinitely. This variable exists for tests (edit this to make tests not
-to wait forever in case of errors).
-"""
+    Parameters
+    ----------
+    inhibit_flags:
+        The flags to use for inhibition.
+    release_event:
+        The event to listen to. Inhibition will be active until the release
+        event occurs, or until the `release_event_timeout` is reached. The
+        event can be set from a different thread.
+    queue:
+        The Queue used to communicate from the inhibitor back to the user.
+        The most important use case is to communicate any errors related to
+        the inhibiti/uninhibit process.
+    release_event_timeout:
+        Timeout for the release event. If None, waits indefinitely. See also:
+        `release_event`.
 
-
-def _call_and_put_result_in_queue(flags: int, queue: Queue[int | Exception]) -> None:
+    """
     try:
-        prev_flags = _call_set_thread_execution_state(flags)
+        prev_flags = _call_set_thread_execution_state(inhibit_flags.value)
+        queue.put(prev_flags)
+    except Exception as exc:
+        queue.put(exc)
+
+    release_event.wait(release_event_timeout)
+
+    try:
+        prev_flags = _call_set_thread_execution_state(Flags.RELEASE.value)
         queue.put(prev_flags)
     except Exception as exc:
         queue.put(exc)
