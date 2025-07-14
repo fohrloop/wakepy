@@ -84,6 +84,11 @@ def check(c) -> None:
 @task
 def docs(c) -> None:
     """Starts sphinx build with live-reload on browser."""
+    if not is_unix_like_foss(CURRENT_PLATFORM):
+        print(
+            "WARNING: Note that full docs are built only on Linux / BSD (most of the "
+            "docs are fine)"
+        )
 
     run = get_run_with_print(c)
     # The `-a` flag ensures that *all* files (not only edited files) will get

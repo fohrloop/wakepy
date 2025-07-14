@@ -107,6 +107,13 @@ numpydoc_class_members_toctree = False
 # listings (duplicate info).
 numpydoc_show_class_members = False
 
+# This is a fix for https://github.com/fohrloop/wakepy/issues/448
+autodoc_mock_imports = []
+try:
+    from wakepy import JeepneyDBusAdapter  # noqa: F401
+except ImportError:
+    autodoc_mock_imports.append("wakepy.dbus_adapters.jeepney")
+
 
 def setup(app: Sphinx) -> None:
     app.add_js_file("wakepy-docs.js", loading_method="defer")
