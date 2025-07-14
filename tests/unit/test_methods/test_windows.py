@@ -12,7 +12,6 @@ if sys.platform != "win32":
 import wakepy.methods.windows as windows  # type: ignore[unreachable, unused-ignore]
 from wakepy.methods.windows import Flags, WindowsKeepPresenting, WindowsKeepRunning
 
-
 windows.WindowsSetThreadExecutionState._release_event_timeout = 0.001
 """Make tests *not* to wait forever"""
 
@@ -23,14 +22,15 @@ patch_SetThreadExecutionState_working = patch(
 """A patched version of ctypes.windll.kernel32.SetThreadExecutionState
 which returns some sensible value and "works"."""
 
+
 def raise_attribute_error(_):
     # Used for patching ctypes.windll.kernel32.SetThreadExecutionState
     # for some test cases. (It is possible that sometimes you'll get
     # an AttributeError when trying to use it.)
     raise AttributeError("foo")
 
-class TestWindowsSetThreadExecutionState:
 
+class TestWindowsSetThreadExecutionState:
 
     @pytest.mark.parametrize(
         "method_cls_under_test",
@@ -53,8 +53,6 @@ class TestWindowsSetThreadExecutionState:
         assert len(set_thread_execution_state.mock_calls) == 2
         # This time, the call was with the RELEASE flag.
         set_thread_execution_state.assert_called_with(Flags.RELEASE.value)
-
-
 
     @pytest.mark.parametrize(
         "method_cls_under_test",
@@ -149,6 +147,3 @@ class TestWindowsSetThreadExecutionState:
             match=re.escape("Unknown result type: <class 'str'> (foo)"),
         ):
             method.enter_mode()
-
-
-
