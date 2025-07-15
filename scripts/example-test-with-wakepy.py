@@ -1,4 +1,9 @@
-"""This is a simple script for testing wakepy (manually)
+"""This is a simple script for testing wakepy (manually). It is similar to
+scripts\example-test.py but there's a wakepy mode activated & deactivated
+before the timer starts.
+
+Can be used to determine the status of the system sleep timer right after
+exiting the wakepy mode.
 """
 
 import datetime as dt
