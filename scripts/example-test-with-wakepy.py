@@ -8,17 +8,18 @@ exiting the wakepy mode.
 
 import datetime as dt
 import time
+
 from wakepy import keep
 
 start = dt.datetime.now()
 now = None
 
 print(dt.datetime.now().strftime("%b %d %H:%M:%S"))
-print('Wakepy inhibit start')
+print("Wakepy inhibit start")
 with keep.presenting():
-    time.sleep(6*60)
-    print('Wakepy inhibit end')
-    
+    time.sleep(6 * 60)
+    print("Wakepy inhibit end")
+
 while True:
     prev = now or dt.datetime.now()
     now = dt.datetime.now()
