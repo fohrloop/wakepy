@@ -175,7 +175,7 @@ class TestModeActiveAndUsedMethod:
 
         # theoretically, if activating again, it should work. Let's change
         # the available methods so we see that the names change, too.
-        mode.method_classes = [MethodB]
+        mode._method_classes = [MethodB]
         with mode:
             # This time the active method is the other one used.
             assert mode.active_method == "MethodB"

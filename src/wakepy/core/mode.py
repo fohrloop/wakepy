@@ -94,62 +94,26 @@ class ModeExit(Exception):
 
 
 class Mode:
-    """A mode is something that is activated (entered in) and deactivated
-    (exited from). Each Mode instance is created with a set of Method classes,
-    and each one of the Methods may be used to activate the Mode. There are
-    multiple Methods for each Mode as there are multiple different operating
-    systems, platforms and desktop environments which might need different
-    activation strategy, but for a single system only one Method would be
-    enough for Mode activation. The rest are typically just for supporting
-    other platforms/DEs/etc.
+    """Mode instances are the most important objects, and they provide the main
+    API of wakepy for the user. Typically, Mode instances are created with the
+    factory functions like :func:`keep.presenting <wakepy.keep.presenting>` and
+    :func:`keep.running <wakepy.keep.running>`
 
-    Modes are implemented as context managers, and user code runs when the mode
-    is active. When the mode is active, there is a possibility to run a
-    heartbeat (implemented in a future version).
+    The Mode instances are `context managers \\
+    <https://peps.python.org/pep-0343/>`_, which means that they can be used
+    with the `with` statement, like this::
 
-    **Purpose of Mode**:
+        with keep.running() as m:
+            type(m) # <class 'wakepy.Mode'>
 
-    * Provide the main API of wakepy for the user
-    * Provide `__enter__` and `__exit__`  for fulfilling the `context manager
-      protocol <https://peps.python.org/pep-0343/>`_
-    * Provide easy way to define list of Methods to be used for entering a mode
-
-    Modes are usually created with a factory function like
-    :func:`keep.presenting <wakepy.keep.presenting>` or  :func:`keep.running
-    <wakepy.keep.running>`, but using the :class:`~wakepy.Mode` separately
-    can be used for more fine-grained control.
-
-    Parameters
-    ----------
-    methods:
-        The list of Methods to be used for activating this Mode.
-    methods_priority: list[str | set[str]]
-        The priority order, which is a list of method names or asterisk
-        ('*'). The asterisk means "all rest methods" and may occur only
-        once in the priority order, and cannot be part of a set. All method
-        names must be unique and must be part of the `methods`.
-    name:
-        Name of the Mode. Used for communication to user, logging and in
-        error messages (can be "any string" which makes sense to you).
-        Optional.
-    on_fail: "error" | "warn" | "pass" | Callable
-        Determines what to do in case mode activation fails. Valid options
-        are: "error", "warn", "pass" and a callable. If the option is
-        "error", raises :class:`~wakepy.ActivationError`. Is selected "warn",
-        issues a warning. If "pass", does nothing. If ``on_fail`` is a
-        callable, it must take one positional argument: result, which is an
-        instance of :class:`ActivationResult`. The ActivationResult contains
-        more detailed information about the activation process.
-    dbus_adapter:
-        For using a custom dbus-adapter. Optional. If not given, the
-        default dbus adapter is used, which is :class:`~wakepy.dbus_adapters.\\
-        jeepney.JeepneyDBusAdapter`
+    For more information about how to use the Mode instances, see the
+    :ref:`user-guide-page`.
     """
 
-    method_classes: list[Type[Method]]
-    """The list of methods associated for this mode as given when creating the
-    ``Mode``. For details, see the documentation of  ``methods`` in the
-    :class:`Mode` constructor parameters.
+    name: str | None
+    """The name of the mode. Examples: "keep.running" for the
+    :func:`keep.presenting <wakepy.keep.presenting>` mode and "keep.presenting"
+    for the :func:`keep.running <wakepy.keep.running>` mode.
     """
 
     active: bool
@@ -162,16 +126,25 @@ class Mode:
     outcome. See :class:`ActivationResult`.
     """
 
-    name: str | None
-    """The ``name`` given when creating the :class:`Mode`.
-    """
-
     methods_priority: Optional[MethodsPriorityOrder]
-    """The ``methods_priority`` given when creating the :class:`Mode`.
+    """The priority order for the methods to be used when entering the Mode.
+    For more detailed explanation, see the ``methods_priority`` argument of the
+    :func:`keep.presenting <wakepy.keep.presenting>` or :func:`keep.running \\
+    <wakepy.keep.running>` factory functions.
     """
 
     on_fail: OnFail
-    """The ``on_fail`` given when creating the :class:`Mode`.
+    """Tells what the mode does in case the activation fails. This can be
+    "error", "warn", "pass" or a callable. If "error", raises
+    :class:`ActivationError`. If "warn", issues a :class:`ActivationWarning`.
+    If "pass", does nothing. If ``on_fail`` is a callable, it is called with
+    an instance of :class:`ActivationResult`. For mode information, refer to
+    the :ref:`on-fail-actions-section` in the user guide."""
+
+    _method_classes: list[Type[Method]]
+    """The list of methods associated for this mode as given when creating the
+    ``Mode``. For details, see the documentation of  ``methods`` in the
+    ``Mode.__init__()`` method.
     """
 
     def __init__(
@@ -186,13 +159,39 @@ class Mode:
 
         This is also where the activation process related settings, such as the
         dbus adapter to be used, are defined.
+
+        Parameters
+        ----------
+        methods:
+            The list of Methods to be used for activating this Mode.
+        methods_priority: list[str | set[str]]
+            The priority order, which is a list of method names or asterisk
+            ('*'). The asterisk means "all rest methods" and may occur only
+            once in the priority order, and cannot be part of a set. All method
+            names must be unique and must be part of the `methods`.
+        name:
+            Name of the Mode. Used for communication to user, logging and in
+            error messages (can be "any string" which makes sense to you).
+            Optional.
+        on_fail: "error" | "warn" | "pass" | Callable
+            Determines what to do in case mode activation fails. Valid options
+            are: "error", "warn", "pass" and a callable. If the option is
+            "error", raises :class:`~wakepy.ActivationError`. Is selected
+            "warn", issues a warning. If "pass", does nothing. If ``on_fail``
+            is a callable, it must take one positional argument: result, which
+            is an instance of :class:`ActivationResult`. The ActivationResult
+            contains more detailed information about the activation process.
+        dbus_adapter:
+            For using a custom dbus-adapter. Optional. If not given, the
+            default dbus adapter is used, which is
+            :class:`~wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter`
         """
-        self.method_classes = method_classes
         self.active: bool = False
         self.activation_result = ActivationResult()
         self.name = name
         self.methods_priority = methods_priority
         self.on_fail = on_fail
+        self._method_classes = method_classes
         self._active_method: Method | None = None
         """This holds the active method instance"""
         self._used_method: Method | None = None
@@ -209,7 +208,7 @@ class Mode:
         self._logger = logging.getLogger(__name__)
 
     @classmethod
-    def from_name(
+    def _from_name(
         cls,
         mode_name: ModeName | str,
         methods: Optional[StrCollection] = None,
@@ -386,7 +385,7 @@ class Mode:
         """
 
         method_classes = add_fake_success_if_required(
-            self.method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
+            self._method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
         )
         method_classes_ordered = order_methods_by_priority(
             method_classes, self.methods_priority

@@ -60,7 +60,7 @@ class TestKeepRunninAndPresenting:
 
         mode = function_under_test()
         # All the methods for the mode are selected automatically
-        assert set(mode.method_classes) == {
+        assert set(mode._method_classes) == {
             methods["MethodA"],
             methods["MethodB"],
             methods["MethodC"],
@@ -69,12 +69,12 @@ class TestKeepRunninAndPresenting:
     def test_omit_parameter(self, name_prefix, function_under_test, methods):
         # Case: Test "omit" parameter
         mode = function_under_test(omit=[f"{name_prefix}A"])
-        assert set(mode.method_classes) == {methods["MethodB"], methods["MethodC"]}
+        assert set(mode._method_classes) == {methods["MethodB"], methods["MethodC"]}
 
     def test_methods_parameter(self, name_prefix, function_under_test, methods):
         # Case: Test "methods" parameter
         mode = function_under_test(methods=[f"{name_prefix}A", f"{name_prefix}B"])
-        assert set(mode.method_classes) == {methods["MethodA"], methods["MethodB"]}
+        assert set(mode._method_classes) == {methods["MethodA"], methods["MethodB"]}
 
     def test_methods_priority_parameter(
         self, name_prefix, function_under_test, methods
@@ -83,7 +83,7 @@ class TestKeepRunninAndPresenting:
         methods_priority = [f"{name_prefix}A", f"{name_prefix}B"]
         mode = function_under_test(methods_priority=methods_priority)
         assert mode.methods_priority == methods_priority
-        assert set(mode.method_classes) == {
+        assert set(mode._method_classes) == {
             methods["MethodA"],
             methods["MethodB"],
             methods["MethodC"],

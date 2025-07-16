@@ -77,7 +77,7 @@ def running(
     >>> with keep.running() as k:
     >>>     # do something that takes a long time.
     """
-    return Mode.from_name(
+    return Mode._from_name(
         ModeName.KEEP_RUNNING,
         omit=omit,
         methods=methods,
@@ -151,7 +151,7 @@ def presenting(
     >>>     # do something that takes a long time.
 
     """
-    return Mode.from_name(
+    return Mode._from_name(
         ModeName.KEEP_PRESENTING,
         methods=methods,
         omit=omit,
