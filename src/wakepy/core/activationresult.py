@@ -75,8 +75,9 @@ class ActivationResult:
     """
 
     real_success: bool = field(init=False)
-    """Tells is entering into a mode was successful. This
-    may not faked with the :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
+    """Tells is entering into a mode was successful. This may not be faked with
+    the :ref:`WAKEPY_FAKE_SUCCESS` environment variable.
+
     See also: :attr:`success`.
     """
 
