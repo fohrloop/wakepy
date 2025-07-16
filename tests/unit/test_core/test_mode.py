@@ -9,7 +9,7 @@ from unittest.mock import Mock
 import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
-from wakepy import ActivationError, ActivationResult, Method, Mode
+from wakepy import ActivationError, ActivationResult, Method, MethodInfo, Mode
 from wakepy.core import PlatformType
 from wakepy.core.activationresult import MethodActivationResult
 from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName
@@ -159,32 +159,35 @@ class TestModeActiveAndUsedMethod:
         [MethodA, MethodB, _] = methods_abc
         mode = Mode(method_classes=[MethodA])
 
+        method_info_a = MethodInfo._from_method(MethodA())
+        method_info_b = MethodInfo._from_method(MethodB())
+
         # before activated, active and userd methods are None
         assert mode.active_method is None
         assert mode.used_method is None
 
         with mode:
             # When mode is active, active and used methods are same.
-            assert mode.active_method == "MethodA"
-            assert mode.used_method == "MethodA"
+            assert mode.active_method == method_info_a
+            assert mode.used_method == method_info_a
 
         # when mode is not active, active method is None, but used method is
         # the one used previously.
         assert mode.active_method is None
-        assert mode.used_method == "MethodA"
+        assert mode.used_method == method_info_a
 
         # theoretically, if activating again, it should work. Let's change
         # the available methods so we see that the names change, too.
         mode._method_classes = [MethodB]
         with mode:
             # This time the active method is the other one used.
-            assert mode.active_method == "MethodB"
-            assert mode.used_method == "MethodB"
+            assert mode.active_method == method_info_b
+            assert mode.used_method == method_info_b
 
         # and when deactivated, the active method is again None, but the used
         # method remembers the last used method.
         assert mode.active_method is None
-        assert mode.used_method == "MethodB"
+        assert mode.used_method == method_info_b
 
 
 @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
@@ -464,4 +467,5 @@ class TestActivateOneOfMethods:
             )
         ]
         assert active_method is None
+        assert heartbeat is None
         assert heartbeat is None

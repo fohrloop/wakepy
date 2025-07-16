@@ -11,6 +11,7 @@ import datetime as dt
 import sys
 import typing
 from abc import ABC
+from dataclasses import dataclass
 from typing import Type, cast
 
 from .activationresult import MethodActivationResult
@@ -27,7 +28,7 @@ else:  # pragma: no-cover-if-py-lt-38
 
 
 if typing.TYPE_CHECKING:
-    from typing import Any, Optional, Tuple
+    from typing import Any, Optional, Tuple, Type
 
     from wakepy.core import DBusAdapter, DBusMethodCall
 
@@ -54,8 +55,16 @@ class DBusCallError(RuntimeError):
 
 
 class Method(ABC):
-    """Methods are objects that are used to switch modes. The phases for
-    changing and being in a Mode is:
+    """Methods are objects that are used to implement modes. The
+    :class:`Method` class is an advanced topic in wakepy and typically users of
+    wakepy do not need to interact with it directly. Instead, users will
+    interact with the read-only :class:`MethodInfo` instances.
+
+    The subclassing of :class:`Method` is the way to implement a new Methods
+    (and Modes) in wakepy.
+
+    The different phases of using a Method for activating / keeping /
+    deactivating a Mode are:
 
     1) enter into a mode by calling :meth:`enter_mode`
     2) keep into a mode by calling :meth:`heartbeat` periodically
@@ -606,3 +615,50 @@ def has_exit(method: Method) -> bool:
 
 def has_heartbeat(method: Method) -> bool:
     return type(method).heartbeat is not Method.heartbeat
+
+
+@dataclass(frozen=True)
+class MethodInfo:
+    """MethodInfo is a read-only object which contains information about the
+    used wakepy :class:`Method`. You'll most likely bump into this through the
+    :attr:`Mode.active_method` or :attr:`Mode.used_method` when using one of
+    the :ref:`wakepy-modes`. For example::
+
+        >>> with keep.running() as m:
+        ...      print('Used method:', m.used_method)
+        ...      print(type(m.used_method))
+        ...
+        Used method: org.gnome.SessionManager
+        <class 'wakepy.core.method.MethodInfo'>
+
+
+    .. seealso::
+
+        See :ref:`wakepy-methods` for a full listing of the available Methods.
+    """
+
+    name: str
+    """Name of the :class:`Method`. See full listing of different methods at
+    :ref:`wakepy-methods`. Examples: "SetThreadExecutionState", "caffeinate".
+    """
+
+    mode_name: ModeName | str
+    """The name of the mode the method implements. Examples: "keep.running" for
+    the :func:`keep.presenting <wakepy.keep.presenting>` mode and
+    "keep.presenting" for the :func:`keep.running <wakepy.keep.running>` mode.
+    """
+
+    supported_platforms: Tuple[PlatformType, ...]
+    """The list the platforms the Method supports."""
+
+    @classmethod
+    def _from_method(cls, method: Method) -> MethodInfo:
+        """Creates a MethodInfo from a Method instance."""
+        return cls(
+            name=method.name,
+            mode_name=method.mode_name,
+            supported_platforms=method.supported_platforms,
+        )
+
+    def __str__(self) -> str:
+        return self.name

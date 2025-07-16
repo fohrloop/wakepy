@@ -6,10 +6,10 @@ import sys
 import pytest
 
 from tests.unit.test_core.testmethods import TestMethod
+from wakepy import Method, MethodInfo
 from wakepy.core import DBusMethodCall, PlatformType
 from wakepy.core.method import (
     DBusCallError,
-    Method,
     MethodOutcome,
     MethodOutcomeValue,
     _check_supported_platforms,
@@ -188,3 +188,25 @@ class TestCheckSupportedPlatforms:
             ),
         ):
             _check_supported_platforms(supported_platforms, "someclass")  # type: ignore
+
+
+class TestMethodInfo:
+
+    class SomeMethod(TestMethod):
+        name = "SomeMethod"
+        mode_name = "SomeMode"
+        supported_platforms = (PlatformType.WINDOWS,)
+
+    def test_method_info(self):
+
+        method_info = MethodInfo._from_method(self.SomeMethod())
+
+        assert method_info.name == "SomeMethod"
+        assert method_info.mode_name == "SomeMode"
+        assert method_info.supported_platforms == (PlatformType.WINDOWS,)
+
+        # Check that the string representation is correct
+        assert str(method_info) == "SomeMethod"
+        assert repr(method_info).startswith(
+            "MethodInfo(name='SomeMethod', mode_name='SomeMode', "
+        )

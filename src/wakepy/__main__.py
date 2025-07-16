@@ -274,7 +274,7 @@ def get_wakepy_cli_info(mode: Mode, ascii_only: bool, deprecations: str) -> str:
     mode_name = mode_name[:mode_name_max_length]
     header_bars = "━" * (mode_name_max_length - len(mode_name))
 
-    method_name = mode.active_method or "(no method)"
+    method_name = mode.active_method.name if mode.active_method else "(no method)"
     method_name = method_name[:method_name_max_length]
     method_spacing = " " * (method_name_max_length - len(method_name))
 
