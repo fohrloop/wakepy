@@ -69,7 +69,7 @@ class Method(ABC):
     mode_name: ModeName | str
     """A name for the mode which the Method implements. The name can be
     basically anything, and is typically used when you create :class:`Mode`
-    instances using the :meth:`Mode.from_name`. For example: "keep.running".
+    instances using the :meth:`Mode._from_name`. For example: "keep.running".
     Each Method subclass implements a single mode, but multiple Methods may
     implement the same mode. Setting ``Method.mode_name`` to "foo" on one or
     more ``Method`` subclasses defines and registers a mode called "foo"."""

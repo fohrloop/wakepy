@@ -15,11 +15,21 @@
 ### 🐞 Bug fixes
 - Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)). 
 
+### 📖 Documentation
+- Simplify and clarify the documentation of the [Mode](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode) ([#458](https://github.com/fohrloop/wakepy/pull/458))
+
+### 🚨 Backwards incompatible changes
+- Make the `Mode._from_name()` private; Not part of the public API anymore ([#458](https://github.com/fohrloop/wakepy/pull/458))
+- Make the `Mode._method_classes` private; Not part of the public API anymore ([#458](https://github.com/fohrloop/wakepy/pull/458))
+
+
 ### 👷 Maintenance
 - Fix development environment setup instructions and requirements on Windows ([#445](https://github.com/fohrloop/wakepy/pull/445))
 - Make Run Tox fail on Windows pipelines if pytest fails ([#442](https://github.com/fohrloop/wakepy/pull/442)). There was a bug in the workflow file which could make the tests pass on Windows even if pytest fails.
 - Fix flaky tests on pypy+windows ([#447](https://github.com/fohrloop/wakepy/pull/447))
 - Remove the AttributeError traceback when building docs on Windows/MacOS ([#449](https://github.com/fohrloop/wakepy/pull/449))
+
+
 
 ## wakepy 0.10.2
 🗓️ 2025-04-21

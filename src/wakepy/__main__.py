@@ -86,7 +86,7 @@ def run_wakepy(sysargs: list[str]) -> Mode:
 
     mode_name = _get_mode_name(args)
     deprecations = _get_deprecations(args)
-    mode = Mode.from_name(mode_name, on_fail=handle_activation_error)
+    mode = Mode._from_name(mode_name, on_fail=handle_activation_error)
 
     ascii_only = get_should_use_ascii_only()
 

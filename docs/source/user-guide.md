@@ -1,3 +1,4 @@
+(user-guide-page)=
 # User Guide
 
 Wakepy main Python API is are the wakepy [Modes](#wakepy-modes), which are states that are activated and deactivated and which keep your system awake. The method for activating the mode depends on your platform (among other things) and is determined by the used [Method](#wakepy-methods).  For example [keep.presenting](#keep-presenting-mode) mode is implemented by [org.gnome.SessionManager](#org-gnome-sessionmanager) for Linux with GNOME DE, [SetThreadExecutionState](#windows-stes) for Windows and [caffeinate](#macos-caffeinate) for MacOS. In most cases, wakepy does nothing but calls an executable (caffeinate), a DLL function call (SetThreadExecutionState) or a D-Bus method (org.gnome.SessionManager). Wakepy helps in this by providing a coherent API which should just work™ on any system. Or, at least that is the vision of wakepy.
@@ -82,7 +83,7 @@ with keep.running(on_fail="warn"):
     # do something
 ```
 
-
+(on-fail-actions-section)=
 ### on-fail actions
 
 | `on_fail`                | What happens? |
@@ -196,9 +197,8 @@ with keep.running(omit=['org.gnome.SessionManager', 'SomeOtherMethod']):
 ```
 
 
-
 ```{seealso}
-`omit` and `methods` parameter of {meth}`Mode.from_name() <wakepy.Mode.from_name>`, {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
+`omit` and `methods` parameter of {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
 ```
 
 (how-to-control-order-of-methods)=
@@ -223,7 +223,7 @@ with keep.running(methods_priority=[{"MethodA", "MethodB"}, "*", "MethodF"]):
 
 
 ```{seealso}
-`methods_priority` parameter of {meth}`Mode.from_name() <wakepy.Mode.from_name>`, {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
+`methods_priority` parameter of {func}`keep.running() <wakepy.keep.running>`  and {func}`keep.presenting() <wakepy.keep.presenting>`
 ```
 
 ```{admonition} experimental feature

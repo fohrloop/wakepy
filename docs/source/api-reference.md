@@ -26,11 +26,15 @@ Wakepy Modes
 Wakepy Core
 ------------
 .. autoclass:: wakepy.Mode
-    :members:
-
-    .. automethod:: __enter__
-
-    .. automethod:: __exit__
+    :members: name,
+              activation_result,
+              active_method,
+              used_method,
+              active,
+              methods_priority,
+              on_fail,
+              method_classes,
+    :member-order: bysource
 
 .. autoclass:: wakepy.Method
     :members:
