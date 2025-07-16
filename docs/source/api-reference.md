@@ -35,7 +35,7 @@ Wakepy Core
               on_fail,
     :member-order: bysource
 
-.. autoclass:: wakepy.Method
+.. autoclass:: wakepy.MethodInfo
     :members:
 
 .. autoclass:: wakepy.ActivationResult
@@ -72,6 +72,8 @@ Wakepy Core
   :undoc-members:
   :member-order: bysource
 
+.. autoclass:: wakepy.Method
+    :members:
 
 DBus Adapter
 -------------

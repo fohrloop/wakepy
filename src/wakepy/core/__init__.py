@@ -15,6 +15,7 @@ from .dbus import DBusAddress as DBusAddress
 from .dbus import DBusMethod as DBusMethod
 from .dbus import DBusMethodCall as DBusMethodCall
 from .method import Method as Method
+from .method import MethodInfo as MethodInfo
 from .mode import ActivationError as ActivationError
 from .mode import ActivationWarning as ActivationWarning
 from .mode import Mode as Mode

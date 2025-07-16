@@ -24,6 +24,7 @@ from .core import ActivationWarning as ActivationWarning
 from .core import DBusAdapter as DBusAdapter
 from .core import Method as Method
 from .core import MethodActivationResult as MethodActivationResult
+from .core import MethodInfo as MethodInfo
 from .core import Mode as Mode
 from .core import ModeExit as ModeExit
 from .core import ModeName as ModeName

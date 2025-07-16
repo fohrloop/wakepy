@@ -21,7 +21,7 @@ from wakepy.core.constants import FALSY_ENV_VAR_VALUES, WAKEPY_FAKE_SUCCESS
 from .activationresult import ActivationResult, MethodActivationResult
 from .dbus import DBusAdapter, get_dbus_adapter
 from .heartbeat import Heartbeat
-from .method import Method, activate_method, deactivate_method
+from .method import Method, MethodInfo, activate_method, deactivate_method
 from .prioritization import order_methods_by_priority
 from .registry import get_method, get_methods_for_mode
 
@@ -32,7 +32,7 @@ if typing.TYPE_CHECKING:
 
     from .constants import Collection, ModeName, StrCollection
     from .dbus import DBusAdapter, DBusAdapterTypeSeq
-    from .method import Method, MethodCls
+    from .method import MethodCls
     from .prioritization import MethodsPriorityOrder
 
     if sys.version_info < (3, 8):  # pragma: no-cover-if-py-gte-38
@@ -95,9 +95,9 @@ class ModeExit(Exception):
 
 class Mode:
     """Mode instances are the most important objects, and they provide the main
-    API of wakepy for the user. Typically, Mode instances are created with the
-    factory functions like :func:`keep.presenting <wakepy.keep.presenting>` and
-    :func:`keep.running <wakepy.keep.running>`
+    API of wakepy for the user. Typically, :class:`Mode` instances are created
+    with the factory functions like :func:`keep.presenting \\
+    <wakepy.keep.presenting>` and :func:`keep.running <wakepy.keep.running>`
 
     The Mode instances are `context managers \\
     <https://peps.python.org/pep-0343/>`_, which means that they can be used
@@ -132,6 +132,15 @@ class Mode:
     :func:`keep.presenting <wakepy.keep.presenting>` or :func:`keep.running \\
     <wakepy.keep.running>` factory functions.
     """
+
+    active_method: MethodInfo | None
+    """The :class:`MethodInfo` representing the currenly used (active) Method.
+    ``None`` if the Mode is not active. See also :attr:`used_method`."""
+
+    used_method: MethodInfo | None
+    """The :class:`MethodInfo` representing the currenly used (active) or
+    previously used (already deactivated) Method. ``None`` if the Mode is not
+    active. See also :attr:`active_method`."""
 
     on_fail: OnFail
     """Tells what the mode does in case the activation fails. This can be
@@ -192,11 +201,15 @@ class Mode:
         self.methods_priority = methods_priority
         self.on_fail = on_fail
         self._method_classes = method_classes
+
         self._active_method: Method | None = None
         """This holds the active method instance"""
+        self.active_method: MethodInfo | None = None
+
         self._used_method: Method | None = None
         """This holds the used method instance. The used method instance will
         not be set to None when deactivating."""
+        self.used_method: MethodInfo | None = None
 
         self.heartbeat: Heartbeat | None = None
 
@@ -402,10 +415,16 @@ class Mode:
                 dbus_adapter=self._dbus_adapter,
             )
         )
+        self.active_method = (
+            MethodInfo._from_method(self._active_method)
+            if self._active_method
+            else None
+        )
 
         self.activation_result = ActivationResult(methodresults, mode_name=self.name)
         self.active = self.activation_result.success
         self._used_method = self._active_method
+        self.used_method = self.active_method
 
         if not self.active:
             handle_activation_fail(self.on_fail, self.activation_result)
@@ -483,6 +502,7 @@ class Mode:
             deactivated = False
 
         self._active_method = None
+        self.active_method = None
         self.heartbeat = None
         self.active = False
 
@@ -498,23 +518,6 @@ class Mode:
             self._dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
             self._dbus_adapter_created = True
         return self._dbus_adapter_instance
-
-    @property
-    def active_method(self) -> str | None:
-        """The name of the active Method. None if Mode is not active. See also
-        :attr:`used_method`."""
-        if self._active_method is None:
-            return None
-        return self._active_method.name
-
-    @property
-    def used_method(self) -> str | None:
-        """The name of the currently used (active) or previously used (already
-        deactivated) Method. None If Mode has never been activated. See also:
-        :attr:`active_method`."""
-        if self._used_method is None:
-            return None
-        return self._used_method.name
 
 
 class UnrecognizedMethodNames(ValueError):
