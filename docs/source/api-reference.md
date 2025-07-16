@@ -33,7 +33,6 @@ Wakepy Core
               active,
               methods_priority,
               on_fail,
-              method_classes,
     :member-order: bysource
 
 .. autoclass:: wakepy.Method
