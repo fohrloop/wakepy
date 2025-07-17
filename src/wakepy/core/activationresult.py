@@ -287,7 +287,7 @@ class ActivationResult:
             )
 
     @property
-    def active_method(self) -> str | None:
+    def active_method(self) -> str | None:  # pragma: no cover
         """
         .. deprecated:: 1.0.0
             Use :attr:`method` instead. This property will be removed in a

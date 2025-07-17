@@ -532,7 +532,7 @@ class Mode:
         return self._dbus_adapter_instance
 
     @property
-    def activation_result(self) -> ActivationResult:
+    def activation_result(self) -> ActivationResult:  # pragma: no cover
         """
         .. deprecated:: 1.0.0
             Use :attr:`result` instead. This property will be removed in a
@@ -546,7 +546,7 @@ class Mode:
         return self.result
 
     @property
-    def used_method(self) -> str | None:
+    def used_method(self) -> str | None:  # pragma: no cover
         """
         .. deprecated:: 1.0.0
             Use :attr:`method` instead. This property will be removed in a
