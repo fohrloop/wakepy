@@ -117,21 +117,26 @@ class Mode:
     """
 
     active: bool
-    """True if the mode is active. Otherwise, False. See also:
-    :attr:`active_method`.
-    """
+    """``True`` if the mode is active. Otherwise, ``False``. See also:
+    :attr:`active_method`."""
 
-    activation_result: ActivationResult
+    result: ActivationResult
     """The activation result which tells more about the activation process
     outcome. See :class:`ActivationResult`.
+
+    .. versionchanged:: 1.0.0
+        Renamed from ``activation_result`` to ``result``.
     """
 
-    methods_priority: Optional[MethodsPriorityOrder]
-    """The priority order for the methods to be used when entering the Mode.
-    For more detailed explanation, see the ``methods_priority`` argument of the
-    :func:`keep.presenting <wakepy.keep.presenting>` or :func:`keep.running \\
-    <wakepy.keep.running>` factory functions.
-    """
+    method: MethodInfo | None
+    """The :class:`MethodInfo` representing the currenly used (active) or
+    previously used (already deactivated) Method. ``None`` if the Mode has not
+    ever been succesfully activated. See also :attr:`active_method`.
+
+    .. versionadded:: 1.0.0
+
+        The ``method`` attribute was added in wakepy 1.0.0 to replace the
+        deprecated :attr:`used_method` attribute. """
 
     active_method: MethodInfo | None
     """The :class:`MethodInfo` representing the currenly used (active) Method.
@@ -142,16 +147,6 @@ class Mode:
         The ``active_method`` is now a ``MethodInfo`` instance instead of
         a ``str`` representing the method name. """
 
-    used_method: MethodInfo | None
-    """The :class:`MethodInfo` representing the currenly used (active) or
-    previously used (already deactivated) Method. ``None`` if the Mode is not
-    active. See also :attr:`active_method`.
-
-    .. versionchanged:: 1.0.0
-
-        The ``used_method`` is now a ``MethodInfo`` instance instead of
-        a ``str`` representing the method name. """
-
     on_fail: OnFail
     """Tells what the mode does in case the activation fails. This can be
     "error", "warn", "pass" or a callable. If "error", raises
@@ -159,6 +154,13 @@ class Mode:
     If "pass", does nothing. If ``on_fail`` is a callable, it is called with
     an instance of :class:`ActivationResult`. For mode information, refer to
     the :ref:`on-fail-actions-section` in the user guide."""
+
+    methods_priority: Optional[MethodsPriorityOrder]
+    """The priority order for the methods to be used when entering the Mode.
+    For more detailed explanation, see the ``methods_priority`` argument of the
+    :func:`keep.presenting <wakepy.keep.presenting>` or :func:`keep.running \\
+    <wakepy.keep.running>` factory functions.
+    """
 
     _method_classes: list[Type[Method]]
     """The list of methods associated for this mode as given when creating the
@@ -206,20 +208,18 @@ class Mode:
             :class:`~wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter`
         """
         self.active: bool = False
-        self.activation_result = ActivationResult()
+        self.result = ActivationResult()
         self.name = name
-        self.methods_priority = methods_priority
-        self.on_fail = on_fail
         self._method_classes = method_classes
+
+        self._method: Method | None = None
+        """This holds the used method instance. The used method instance will
+        not be set to None when deactivating."""
+        self.method: MethodInfo | None = None
 
         self._active_method: Method | None = None
         """This holds the active method instance"""
         self.active_method: MethodInfo | None = None
-
-        self._used_method: Method | None = None
-        """This holds the used method instance. The used method instance will
-        not be set to None when deactivating."""
-        self.used_method: MethodInfo | None = None
 
         self.heartbeat: Heartbeat | None = None
 
@@ -228,6 +228,8 @@ class Mode:
         self._dbus_adapter_instance: DBusAdapter | None = None
         self._dbus_adapter_created: bool = False
 
+        self.on_fail = on_fail
+        self.methods_priority = methods_priority
         self._logger = logging.getLogger(__name__)
 
     @classmethod
@@ -358,7 +360,7 @@ class Mode:
             )
         else:
             logger.info(
-                self.activation_result.get_failure_text(newlines=False),
+                self.result.get_failure_text(newlines=False),
             )
         return self
 
@@ -431,15 +433,15 @@ class Mode:
             else None
         )
 
-        self.activation_result = ActivationResult(methodresults, mode_name=self.name)
-        self.active = self.activation_result.success
-        self._used_method = self._active_method
-        self.used_method = self.active_method
+        self.result = ActivationResult(methodresults, mode_name=self.name)
+        self.active = self.result.success
+        self._method = self._active_method
+        self.method = self.active_method
 
         if not self.active:
-            handle_activation_fail(self.on_fail, self.activation_result)
+            handle_activation_fail(self.on_fail, self.result)
 
-        return self.activation_result
+        return self.result
 
     @staticmethod
     def _activate_one_of_methods(
@@ -528,6 +530,34 @@ class Mode:
             self._dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
             self._dbus_adapter_created = True
         return self._dbus_adapter_instance
+
+    @property
+    def activation_result(self) -> ActivationResult:
+        """
+        .. deprecated:: 1.0.0
+            Use :attr:`result` instead. This property will be removed in a
+            future version of wakepy."""
+        warnings.warn(
+            "'Mode.activation_result' is deprecated in wakepy 1.0.0 and will be "
+            "removed in a future version. Use 'Mode.result', instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.result
+
+    @property
+    def used_method(self) -> str | None:
+        """
+        .. deprecated:: 1.0.0
+            Use :attr:`method` instead. This property will be removed in a
+            future version of wakepy."""
+        warnings.warn(
+            "'Mode.used_method' is deprecated in wakepy 1.0.0 and will be "
+            "removed in a future version. Use 'Mode.method', instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.method.name if self.method else None
 
 
 class UnrecognizedMethodNames(ValueError):

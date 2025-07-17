@@ -315,8 +315,8 @@ class TestActivationResult:
         self, method_activation_results1: List[MethodActivationResult]
     ):
         ar = ActivationResult(method_activation_results1)
-        assert ar.active_method is not None
-        assert ar.active_method.name == "a-successful-method"
+        assert ar.method is not None
+        assert ar.method.name == "a-successful-method"
 
     def test_active_method_with_fails(
         self,
@@ -324,7 +324,7 @@ class TestActivationResult:
         mr_requirements_fail: MethodActivationResult,
     ):
         ar = ActivationResult([mr_platform_support_fail, mr_requirements_fail])
-        assert ar.active_method is None
+        assert ar.method is None
 
     def test_active_method_with_multiple_success(
         self, method_activation_results2_manysuccess: List[MethodActivationResult]
@@ -361,7 +361,7 @@ class TestActivationResult:
     def test__repr__(self, method_activation_results1: List[MethodActivationResult]):
         ar1 = ActivationResult(method_activation_results1, mode_name="foo")
         assert ar1.__repr__().startswith(
-            """ActivationResult(success=True, real_success=True, failure=False, mode_name=\'foo\', active_method=MethodInfo(name=\'a-successful-method\', mode_name=\'test-mode\'"""  # noqa: E501
+            """ActivationResult(success=True, real_success=True, failure=False, mode_name=\'foo\', method=MethodInfo(name=\'a-successful-method\', mode_name=\'test-mode\'"""  # noqa: E501
         )
 
 

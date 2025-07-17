@@ -7,7 +7,7 @@ in wakepy-docs.js! -->
 Wakepy Modes
 -------------
 
-There are two different modes in wakepy: The ``keep.running`` and ``keep.presenting``. The the :ref:`wakepy-modes` for more detailed explanations what they do and the :ref:`user-guide-page` for examples.
+There are two different modes in wakepy: The ``keep.running`` and ``keep.presenting``. See the :ref:`wakepy-modes` for more detailed explanations what they do and the :ref:`user-guide-page` for examples.
 
 .. autosummary::
 
@@ -22,12 +22,14 @@ Wakepy Core
 ------------
 .. autoclass:: wakepy.Mode
     :members: name,
-              activation_result,
-              active_method,
+              result,
+              method,
               used_method,
               active,
               methods_priority,
               on_fail,
+              activation_result,
+              active_method,
     :member-order: bysource
 
 .. autoclass:: wakepy.MethodInfo

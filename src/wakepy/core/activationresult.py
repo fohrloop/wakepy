@@ -14,6 +14,7 @@ MethodActivationResult
 from __future__ import annotations
 
 import typing
+import warnings
 from dataclasses import InitVar, dataclass, field
 from typing import List, Sequence
 
@@ -57,7 +58,7 @@ class ActivationResult:
     # lowest priority)
 
     success: bool = field(init=False)
-    """Tells is entering into a mode was successful. Note that this may be
+    """Tells if entering into a mode was successful. Note that this may be
     faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable e.g. for testing
     purposes.
 
@@ -86,13 +87,15 @@ class ActivationResult:
         The ``mode_name`` is now always a string (or None) instead of
         ``ModeName``."""
 
-    active_method: MethodInfo | None = field(init=False)
+    method: MethodInfo | None = field(init=False)
     """The :class:`MethodInfo` about the used (successful) :class:`Method`. If
     the activation was not successful, this is ``None``.
 
-    .. versionchanged:: 1.0.0.
-        The ``active_method`` is now a ``MethodInfo`` instance instead of
-        a ``str`` representing the method name."""
+    .. versionadded:: 1.0.0.
+
+        The ``method`` attribute was added in wakepy 1.0.0 to replace the
+        deprecated :attr:`active_method` attribute.
+    """
 
     _method_results: List[MethodActivationResult] = field(init=False)
 
@@ -104,7 +107,7 @@ class ActivationResult:
         self.success = self._get_success()
         self.failure = not self.success
         self.real_success = self._get_real_success()
-        self.active_method = self._get_active_method()
+        self.method = self._get_success_method()
 
     def list_methods(
         self,
@@ -270,7 +273,7 @@ class ActivationResult:
                 return True
         return False
 
-    def _get_active_method(self) -> MethodInfo | None:
+    def _get_success_method(self) -> MethodInfo | None:
         methods = [res.method for res in self._method_results if res.success]
         if not methods:
             return None
@@ -282,6 +285,20 @@ class ActivationResult:
                 "The ActivationResult cannot have more than one active methods! "
                 f"Active methods: {methodnames}"
             )
+
+    @property
+    def active_method(self) -> str | None:
+        """
+        .. deprecated:: 1.0.0
+            Use :attr:`method` instead. This property will be removed in a
+            future version of wakepy."""
+        warnings.warn(
+            "'ActivationResult.active_method' is deprecated in wakepy 1.0.0 and will"
+            " be removed in a future version. Use 'ActivationResult.method', instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.method.name if self.method else None
 
 
 @dataclass

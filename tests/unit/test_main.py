@@ -158,7 +158,7 @@ class TestRunWakepy:
     ):
         with patch("wakepy.__main__._get_mode_name", return_value=method1.mode_name):
             mode = run_wakepy([])
-            assert mode.activation_result.success is True
+            assert mode.result.success is True
 
     def test_non_working_mode(self, method2_broken, monkeypatch):
         # need to turn off WAKEPY_FAKE_SUCCESS as we want to get a failure.
@@ -167,13 +167,10 @@ class TestRunWakepy:
             "wakepy.__main__._get_mode_name", return_value=method2_broken.mode_name
         ):
             mode = run_wakepy([])
-            assert mode.activation_result.success is False
+            assert mode.result.success is False
 
             # the method2_broken enter_mode raises this:
-            assert (
-                mode.activation_result.query()[0].failure_reason
-                == "RuntimeError('foo')"
-            )
+            assert mode.result.query()[0].failure_reason == "RuntimeError('foo')"
 
 
 class TestGetSpinnerSymbols:

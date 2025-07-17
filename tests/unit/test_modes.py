@@ -108,10 +108,10 @@ def test_keep_running_with_fake_success(monkeypatch, fake_dbus_adapter):
     with mode as m:
         assert mode is m
         assert m.active is True
-        assert m.activation_result.success is True
+        assert m.result.success is True
 
     assert m.active is False
-    assert isinstance(m.activation_result, ActivationResult)
+    assert isinstance(m.result, ActivationResult)
 
 
 def test_keep_presenting(monkeypatch, fake_dbus_adapter):
@@ -119,7 +119,7 @@ def test_keep_presenting(monkeypatch, fake_dbus_adapter):
     monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "1")
     with keep.presenting(dbus_adapter=fake_dbus_adapter) as m:
         assert isinstance(m, Mode)
-        assert m.activation_result.success is True
+        assert m.result.success is True
 
 
 @pytest.mark.parametrize(
@@ -170,7 +170,7 @@ class TestOnFail:
         assert m.active is False
         assert isinstance(m, Mode)
         assert m.name == expected_name
-        assert m.activation_result.mode_name == expected_name
+        assert m.result.mode_name == expected_name
 
 
 class TestWithBadMethodName:
