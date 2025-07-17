@@ -97,7 +97,7 @@ def run_wakepy(sysargs: list[str]) -> Mode:
         print(get_wakepy_cli_info(mode, ascii_only, deprecations))
         wait_until_keyboardinterrupt(ascii_only)
 
-    if mode.activation_result and mode.activation_result.success:
+    if mode.result and mode.result.success:
         # If activation did not succeed, there is also no deactivation / exit.
         print("\n\nExited.")
     return mode
@@ -296,7 +296,7 @@ def get_wakepy_cli_info(mode: Mode, ascii_only: bool, deprecations: str) -> str:
     if deprecations:
         cli_text += "\n\n" + wrap_text("DEPRECATION NOTICE: " + deprecations) + "\n"
 
-    if not mode.activation_result.real_success:
+    if not mode.result.real_success:
         cli_text += (
             "\n"
             + wrap_text(

@@ -17,10 +17,7 @@ now = None
 print(dt.datetime.now().strftime("%b %d %H:%M:%S"))
 print("Wakepy inhibit start")
 with keep.presenting() as m:
-    print(
-        f"Method: {m.activation_result.active_method}, "
-        f"Mode: {m.activation_result.mode_name}"
-    )
+    print(f"Method: {m.result.method}, " f"Mode: {m.result.mode_name}")
     time.sleep(6 * 60)
     print("Wakepy inhibit end")
 

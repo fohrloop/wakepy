@@ -124,11 +124,11 @@ class TestModeContextManager:
             # We have activated the Mode
             assert mode0.active
             # There is an ActivationResult available in .activation_result
-            assert isinstance(m.activation_result, ActivationResult)
+            assert isinstance(m.result, ActivationResult)
             # The active method is also available
             assert isinstance(mode0._active_method, Method)
 
-            activation_result = copy.deepcopy(m.activation_result)
+            activation_result = copy.deepcopy(m.result)
             flag_end_of_with_block = True
 
         # reached the end of the with block
@@ -140,7 +140,7 @@ class TestModeContextManager:
         assert m.active_method is None
         # The activation result is still there (not removed during
         # deactivation)
-        assert activation_result == m.activation_result
+        assert activation_result == m.result
 
     @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
     def test_no_methods_succeeds_when_using_fake_success(
@@ -164,17 +164,17 @@ class TestModeActiveAndUsedMethod:
 
         # before activated, active and userd methods are None
         assert mode.active_method is None
-        assert mode.used_method is None
+        assert mode.method is None
 
         with mode:
             # When mode is active, active and used methods are same.
             assert mode.active_method == method_info_a
-            assert mode.used_method == method_info_a
+            assert mode.method == method_info_a
 
         # when mode is not active, active method is None, but used method is
         # the one used previously.
         assert mode.active_method is None
-        assert mode.used_method == method_info_a
+        assert mode.method == method_info_a
 
         # theoretically, if activating again, it should work. Let's change
         # the available methods so we see that the names change, too.
@@ -182,12 +182,12 @@ class TestModeActiveAndUsedMethod:
         with mode:
             # This time the active method is the other one used.
             assert mode.active_method == method_info_b
-            assert mode.used_method == method_info_b
+            assert mode.method == method_info_b
 
         # and when deactivated, the active method is again None, but the used
         # method remembers the last used method.
         assert mode.active_method is None
-        assert mode.used_method == method_info_b
+        assert mode.method == method_info_b
 
 
 @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
@@ -259,7 +259,7 @@ class TestHandleActivationFail:
     @staticmethod
     @pytest.fixture
     def result1():
-        return ActivationResult(mode_name="testmode")
+        return ActivationResult([], mode_name="testmode")
 
     @staticmethod
     @pytest.fixture
