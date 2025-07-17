@@ -22,7 +22,6 @@ from .constants import WAKEPY_FAKE_SUCCESS, StageName, StageNameValue
 if typing.TYPE_CHECKING:
     from typing import Optional
 
-    from .constants import ModeName
     from .method import MethodInfo
 
 
@@ -328,7 +327,7 @@ class MethodActivationResult:
         return f"({success_str}{error_at}, {self.method_name}{failure_reason})"
 
     @property
-    def mode_name(self) -> ModeName | str:
+    def mode_name(self) -> str:
         """The name of the mode of the :class:`Method` this result is for."""
         return self.method.mode_name
 

@@ -643,7 +643,7 @@ class MethodInfo:
     :ref:`wakepy-methods`. Examples: "SetThreadExecutionState", "caffeinate".
     """
 
-    mode_name: ModeName | str
+    mode_name: str
     """The name of the mode the method implements. Examples: "keep.running" for
     the :func:`keep.presenting <wakepy.keep.presenting>` mode and
     "keep.presenting" for the :func:`keep.running <wakepy.keep.running>` mode.
@@ -657,7 +657,7 @@ class MethodInfo:
         """Creates a MethodInfo from a Method instance."""
         return cls(
             name=method.name,
-            mode_name=method.mode_name,
+            mode_name=str(method.mode_name),
             supported_platforms=method.supported_platforms,
         )
 
