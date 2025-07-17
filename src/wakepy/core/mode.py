@@ -208,7 +208,7 @@ class Mode:
             :class:`~wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter`
         """
         self.active: bool = False
-        self.result = ActivationResult()
+        self.result = ActivationResult([])
         self.name = name
         self._method_classes = method_classes
 

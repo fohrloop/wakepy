@@ -259,7 +259,7 @@ class TestHandleActivationFail:
     @staticmethod
     @pytest.fixture
     def result1():
-        return ActivationResult(mode_name="testmode")
+        return ActivationResult([], mode_name="testmode")
 
     @staticmethod
     @pytest.fixture

@@ -52,7 +52,7 @@ class ActivationResult:
 
     """
 
-    results: InitVar[Optional[List[MethodActivationResult]]] = None
+    results: InitVar[List[MethodActivationResult]]
     # These are the results for each of the used wakepy.Methods, in the
     # order the methods were tried (first = highest priority, last =
     # lowest priority)
@@ -101,9 +101,9 @@ class ActivationResult:
 
     def __post_init__(
         self,
-        results: Optional[List[MethodActivationResult]] = None,
+        results: List[MethodActivationResult],
     ) -> None:
-        self._method_results = results or []
+        self._method_results = results
         self.success = self._get_success()
         self.failure = not self.success
         self.real_success = self._get_real_success()

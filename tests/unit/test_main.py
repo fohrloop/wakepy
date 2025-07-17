@@ -129,7 +129,7 @@ def test_wait_until_keyboardinterrupt():
 
 @patch("builtins.print")
 def test_handle_activation_error(print_mock):
-    result = ActivationResult()
+    result = ActivationResult([])
     handle_activation_error(result)
     if sys.version_info[:2] == (3, 7):
         # on python 3.7, need to do other way.
