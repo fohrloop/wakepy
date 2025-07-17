@@ -1,11 +1,13 @@
 # Changelog
 
-## wakepy x.x.x
+## wakepy 1.0.0
 🗓️ Unreleased
 
 ### ✨ Features
 - Update the wakepy CLI printout: Adds the used Method and activated Mode to the printout ([#434](https://github.com/fohrloop/wakepy/pull/434))
 - Added `-v` (INFO) and `-vv` (DEBUG) verbosity flags for the [wakepy CLI command](https://wakepy.readthedocs.io/stable/cli-api.html). ([#439](https://github.com/fohrloop/wakepy/pull/439))
+- Added [MethodInfo](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodInfo) objects, which are now used in [Mode.active_method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode.active_method), [Mode.used_method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode.used_method),  [ActivationResult.active_method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.ActivationResult.active_method) instead of them being strings.  ([#459](https://github.com/fohrloop/wakepy/pull/459), [#460](https://github.com/fohrloop/wakepy/pull/460))
+- The [MethodActivationResult](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodActivationResult) has now a [method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodActivationResult.method) attribute which is also a [MethodInfo](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodInfo) instance. ([#460](https://github.com/fohrloop/wakepy/pull/460))
 
 ### ✨ Minor Enhancements
 - Better error messages: When selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427)) and when a D-Bus -based method fails ([#438](https://github.com/fohrloop/wakepy/pull/438))
@@ -13,15 +15,14 @@
 - Make ActivationWarning use proper stacklevel, so that issued warnings point to user code, and not into wakepy source code. ([#432](https://github.com/fohrloop/wakepy/pull/432))
 
 ### 🐞 Bug fixes
-- Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)). 
+- Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)).
 
 ### 📖 Documentation
 - Simplify and clarify the documentation of the [Mode](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode) ([#458](https://github.com/fohrloop/wakepy/pull/458))
 
 ### 🚨 Backwards incompatible changes
-- Make the `Mode._from_name()` private; Not part of the public API anymore ([#458](https://github.com/fohrloop/wakepy/pull/458))
-- Make the `Mode._method_classes` private; Not part of the public API anymore ([#458](https://github.com/fohrloop/wakepy/pull/458))
-
+- Make the `Mode._from_name()` and `Mode._method_classes` private; Not part of the public API anymore ([#458](https://github.com/fohrloop/wakepy/pull/458))
+- The `Mode.active_method`, `Mode.used_method`, are now instances of the new ModeInfo (previously strings) ([#460](https://github.com/fohrloop/wakepy/pull/460))
 
 ### 👷 Maintenance
 - Fix development environment setup instructions and requirements on Windows ([#445](https://github.com/fohrloop/wakepy/pull/445))

@@ -343,9 +343,8 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     if method.is_unnamed():
         raise ValueError("Methods without a name may not be used to activate modes!")
 
-    result = MethodActivationResult(
-        success=False, method_name=method.name, mode_name=method.mode_name
-    )
+    method_info = MethodInfo._from_method(method)
+    result = MethodActivationResult(method=method_info, success=False)
 
     if get_platform_supported(CURRENT_PLATFORM, method.supported_platforms) is False:
         result.failure_stage = StageName.PLATFORM_SUPPORT
@@ -635,6 +634,8 @@ class MethodInfo:
     .. seealso::
 
         See :ref:`wakepy-methods` for a full listing of the available Methods.
+
+    .. versionadded:: 1.0.0
     """
 
     name: str

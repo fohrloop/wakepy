@@ -23,6 +23,7 @@ if typing.TYPE_CHECKING:
     from typing import Optional
 
     from .constants import ModeName
+    from .method import MethodInfo
 
 
 @dataclass
@@ -56,14 +57,6 @@ class ActivationResult:
     # order the methods were tried (first = highest priority, last =
     # lowest priority)
 
-    mode_name: Optional[str] = None
-    """Name of the :class:`Mode`. If the associated ``Mode`` does not have a
-    name, the ``mode_name`` will be ``None``."""
-
-    active_method: str | None = field(init=False)
-    """The name of the active (successful) :class:`Method`. If no methods are
-    active, this is ``None``."""
-
     success: bool = field(init=False)
     """Tells is entering into a mode was successful. Note that this may be
     faked with :ref:`WAKEPY_FAKE_SUCCESS` environment variable e.g. for testing
@@ -85,6 +78,18 @@ class ActivationResult:
     """Always opposite of :attr:`success`. Included for convenience. See also:
     :meth:`get_failure_text`.
     """
+
+    mode_name: Optional[str] = None
+    """Name of the :class:`Mode`. If the associated ``Mode`` does not have a
+    name, the ``mode_name`` will be ``None``."""
+
+    active_method: MethodInfo | None = field(init=False)
+    """The :class:`MethodInfo` about the used (successful) :class:`Method`. If
+    the activation was not successful, this is ``None``.
+
+    .. versionchanged:: 1.0.0.
+        The ``active_method`` is now a ``MethodInfo`` instance instead of
+        a ``str`` representing the method name."""
 
     _method_results: List[MethodActivationResult] = field(init=False)
 
@@ -262,28 +267,40 @@ class ActivationResult:
                 return True
         return False
 
-    def _get_active_method(self) -> str | None:
-        methods = [res.method_name for res in self._method_results if res.success]
+    def _get_active_method(self) -> MethodInfo | None:
+        methods = [res.method for res in self._method_results if res.success]
         if not methods:
             return None
         elif len(methods) == 1:
             return methods[0]
         else:
+            methodnames = [m.name for m in methods]
             raise ValueError(
                 "The ActivationResult cannot have more than one active methods! "
-                f"Active methods: {methods}"
+                f"Active methods: {methodnames}"
             )
 
 
 @dataclass
 class MethodActivationResult:
-    """This class is a result from using a single Method to activate a mode."""
+    r"""This class is a result from using a single Method to activate a mode.
 
-    method_name: str
-    """The name of the :class:`Method` this result is for."""
+    When activating a wakepy :class:`Mode`, the activation process:
 
-    mode_name: ModeName | str
-    """The name of the mode of the :class:`Method` this result is for."""
+    * Creates a list of :class:`Method`\ s to try, and prioritizes them
+    * Tries to activate the mode by using the Methods in the list, one by one.
+
+    For each Method activation attempt, a :class:`MethodActivationResult`
+    is created. The :class:`ActivationResult` then collects all the
+    :class:`MethodActivationResult` instances and provides a higher-level
+    interface to access the results of the activation process.
+    """
+
+    method: MethodInfo
+    """Information about the wakepy :class:`Method` this result is for.
+
+    .. versionadded:: 1.0.0
+   """
 
     success: bool | None
     """Tells about the result of the activation:
@@ -309,3 +326,13 @@ class MethodActivationResult:
             "SUCCESS" if self.success else "FAIL" if self.success is False else "UNUSED"
         )
         return f"({success_str}{error_at}, {self.method_name}{failure_reason})"
+
+    @property
+    def mode_name(self) -> ModeName | str:
+        """The name of the mode of the :class:`Method` this result is for."""
+        return self.method.mode_name
+
+    @property
+    def method_name(self) -> str:
+        """The name of the :class:`Method` this result is for."""
+        return self.method.name

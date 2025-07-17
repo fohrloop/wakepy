@@ -5,6 +5,7 @@ import typing
 
 import pytest
 
+from tests.helpers import get_method_info
 from wakepy.core import ActivationResult, MethodActivationResult
 from wakepy.core.constants import StageName
 from wakepy.core.registry import get_method
@@ -14,16 +15,13 @@ if typing.TYPE_CHECKING:
 
 fake_success_cls = get_method("WAKEPY_FAKE_SUCCESS")
 
-TEST_MODE = "test-mode"
-
 
 @pytest.fixture
 def mr_platform_support_fail() -> MethodActivationResult:
     return MethodActivationResult(
+        method=get_method_info("fail-platform"),
         success=False,
         failure_stage=StageName.PLATFORM_SUPPORT,
-        method_name="fail-platform",
-        mode_name=TEST_MODE,
         failure_reason="Platform XYZ not supported!",
     )
 
@@ -31,10 +29,9 @@ def mr_platform_support_fail() -> MethodActivationResult:
 @pytest.fixture
 def mr_requirements_fail() -> MethodActivationResult:
     return MethodActivationResult(
+        method=get_method_info("fail-requirements"),
         success=False,
         failure_stage=StageName.REQUIREMENTS,
-        method_name="fail-requirements",
-        mode_name=TEST_MODE,
         failure_reason="Missing requirement: Some SW v.1.2.3",
     )
 
@@ -42,38 +39,34 @@ def mr_requirements_fail() -> MethodActivationResult:
 @pytest.fixture
 def mr_success_result() -> MethodActivationResult:
     return MethodActivationResult(
+        method=get_method_info("a-successful-method"),
         success=True,
-        method_name="a-successful-method",
-        mode_name=TEST_MODE,
     )
 
 
 @pytest.fixture
 def mr_unused_result() -> MethodActivationResult:
     return MethodActivationResult(
+        method=get_method_info("some-unused-method"),
         success=None,
-        method_name="some-unused-method",
-        mode_name=TEST_MODE,
     )
 
 
 @pytest.fixture
 def mr_wakepy_fake_notinuse() -> MethodActivationResult:
     return MethodActivationResult(
+        method=get_method_info(fake_success_cls.name),
         success=False,
         failure_stage=StageName.ACTIVATION,
-        method_name=fake_success_cls.name,
-        mode_name=TEST_MODE,
     )
 
 
 @pytest.fixture
 def mr_wakepy_fake_success() -> MethodActivationResult:
     return MethodActivationResult(
+        method=get_method_info(fake_success_cls.name),
         success=True,
         failure_stage=StageName.ACTIVATION,
-        method_name=fake_success_cls.name,
-        mode_name=TEST_MODE,
     )
 
 
@@ -98,21 +91,18 @@ def method_activation_results2_manysuccess(
 ) -> List[MethodActivationResult]:
     return [
         MethodActivationResult(
+            get_method_info("1st.successful.method"),
             success=True,
-            method_name="1st.successful.method",
-            mode_name=TEST_MODE,
         ),
         # Fails in Requirement stage
         mr_requirements_fail,
         MethodActivationResult(
+            get_method_info("2nd-successful-method"),
             success=True,
-            method_name="2nd-successful-method",
-            mode_name=TEST_MODE,
         ),
         MethodActivationResult(
+            get_method_info("last-successful-method"),
             success=True,
-            method_name="last-successful-method",
-            mode_name=TEST_MODE,
         ),
     ]
 
@@ -121,17 +111,15 @@ def method_activation_results2_manysuccess(
 def method_activation_results3_fail() -> List[MethodActivationResult]:
     return [
         MethodActivationResult(
+            method=get_method_info("fail-platform"),
             success=False,
             failure_stage=StageName.PLATFORM_SUPPORT,
-            method_name="fail-platform",
-            mode_name=TEST_MODE,
             failure_reason="Platform XYZ not supported!",
         ),
         MethodActivationResult(
+            method=get_method_info("fail-requirements"),
             success=False,
             failure_stage=StageName.REQUIREMENTS,
-            method_name="fail-requirements",
-            mode_name=TEST_MODE,
             failure_reason="Missing requirement: Some SW v.1.2.3",
         ),
     ]
@@ -232,7 +220,6 @@ class TestActivationResult:
         mr_success_result: MethodActivationResult,
         mr_unused_result: MethodActivationResult,
     ):
-
         # When no arguments given, return everything
         assert ar.query() == [
             mr_platform_support_fail,
@@ -328,7 +315,8 @@ class TestActivationResult:
         self, method_activation_results1: List[MethodActivationResult]
     ):
         ar = ActivationResult(method_activation_results1)
-        assert ar.active_method == "a-successful-method"
+        assert ar.active_method is not None
+        assert ar.active_method.name == "a-successful-method"
 
     def test_active_method_with_fails(
         self,
@@ -372,20 +360,84 @@ class TestActivationResult:
 
     def test__repr__(self, method_activation_results1: List[MethodActivationResult]):
         ar1 = ActivationResult(method_activation_results1, mode_name="foo")
-        assert (
-            ar1.__repr__()
-            == """ActivationResult(mode_name='foo', active_method='a-successful-method', success=True, real_success=True, failure=False, _method_results=[(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!"), (FAIL @REQUIREMENTS, fail-requirements, "Missing requirement: Some SW v.1.2.3"), (SUCCESS, a-successful-method), (UNUSED, some-unused-method)])"""  # noqa: E501
+        assert ar1.__repr__().startswith(
+            """ActivationResult(success=True, real_success=True, failure=False, mode_name=\'foo\', active_method=MethodInfo(name=\'a-successful-method\', mode_name=\'test-mode\'"""  # noqa: E501
         )
 
 
 class TestMethodActivationResult:
     """Tests for MethodActivationResult"""
 
+    @pytest.mark.parametrize(
+        "success, failure_stage, method_name, mode_name, message, expected_string_representation",  # noqa: E501
+        [
+            (
+                False,
+                StageName.PLATFORM_SUPPORT,
+                "fail-platform",
+                "some-mode",
+                "Platform XYZ not supported!",
+                '(FAIL @PLATFORM_SUPPORT, fail-platform, "Platform XYZ not supported!")',  # noqa: E501
+            ),
+            (
+                False,
+                StageName.REQUIREMENTS,
+                "other-fail-method",
+                "some-mode",
+                "Need SW X version >= 8.9!",
+                '(FAIL @REQUIREMENTS, other-fail-method, "Need SW X version >= 8.9!")',
+            ),
+            (
+                True,
+                None,
+                "successfulMethod",
+                "some-mode",
+                "",
+                # Succesful methods do not print empty message
+                "(SUCCESS, successfulMethod)",
+            ),
+            (
+                None,
+                None,
+                "SomeMethod",
+                "some-mode",
+                "",
+                # Unused methods do not print empty message
+                "(UNUSED, SomeMethod)",
+            ),
+        ],
+    )
+    def test_method_activation_result(
+        self,
+        success,
+        failure_stage,
+        method_name,
+        mode_name,
+        message,
+        expected_string_representation,
+    ):
+        mar = MethodActivationResult(
+            method=get_method_info(method_name, mode_name=mode_name),
+            success=success,
+            failure_stage=failure_stage,
+            failure_reason=message,
+        )
+        # These attributes are available
+        # From the MethodInfo
+        assert mar.method_name == method_name
+        assert mar.mode_name == mode_name
+
+        # Direct arguments
+        assert mar.success == success
+        assert mar.failure_stage == failure_stage
+        assert mar.failure_reason == message
+
+        assert str(mar) == expected_string_representation
+
     @pytest.fixture
     def a(self) -> MethodActivationResult:
         return MethodActivationResult(
-            method_name="foo",
-            mode_name=TEST_MODE,
+            method=get_method_info("foo"),
             success=False,
             failure_stage=StageName.REQUIREMENTS,
             failure_reason="some-text",
@@ -394,8 +446,7 @@ class TestMethodActivationResult:
     @pytest.fixture
     def b(self) -> MethodActivationResult:
         return MethodActivationResult(
-            method_name="foo",
-            mode_name=TEST_MODE,
+            method=get_method_info("foo"),
             success=False,
             failure_stage=StageName.REQUIREMENTS,
             failure_reason="some-text",
@@ -411,8 +462,7 @@ class TestMethodActivationResult:
     @pytest.fixture
     def c_different_method_name(self) -> MethodActivationResult:
         return MethodActivationResult(
-            method_name="bar",
-            mode_name=TEST_MODE,
+            method=get_method_info("bar"),
             success=False,
             failure_stage=StageName.REQUIREMENTS,
             failure_reason="some-text",
@@ -421,8 +471,7 @@ class TestMethodActivationResult:
     @pytest.fixture
     def c_different_success(self) -> MethodActivationResult:
         return MethodActivationResult(
-            method_name="foo",
-            mode_name=TEST_MODE,
+            method=get_method_info("foo"),
             success=True,
             failure_stage=StageName.REQUIREMENTS,
             failure_reason="some-text",
@@ -431,8 +480,7 @@ class TestMethodActivationResult:
     @pytest.fixture
     def c_different_failure_stage(self) -> MethodActivationResult:
         return MethodActivationResult(
-            method_name="foo",
-            mode_name=TEST_MODE,
+            method=get_method_info("foo"),
             success=False,
             failure_stage=StageName.PLATFORM_SUPPORT,
             failure_reason="some-text",
@@ -441,8 +489,7 @@ class TestMethodActivationResult:
     @pytest.fixture
     def c_different_failure_reason(self) -> MethodActivationResult:
         return MethodActivationResult(
-            method_name="foo",
-            mode_name=TEST_MODE,
+            method=get_method_info("foo"),
             success=False,
             failure_stage=StageName.REQUIREMENTS,
             failure_reason="some-other-text",

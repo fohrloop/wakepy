@@ -135,12 +135,22 @@ class Mode:
 
     active_method: MethodInfo | None
     """The :class:`MethodInfo` representing the currenly used (active) Method.
-    ``None`` if the Mode is not active. See also :attr:`used_method`."""
+    ``None`` if the Mode is not active. See also :attr:`used_method`.
+
+    .. versionchanged:: 1.0.0
+
+        The ``active_method`` is now a ``MethodInfo`` instance instead of
+        a ``str`` representing the method name. """
 
     used_method: MethodInfo | None
     """The :class:`MethodInfo` representing the currenly used (active) or
     previously used (already deactivated) Method. ``None`` if the Mode is not
-    active. See also :attr:`active_method`."""
+    active. See also :attr:`active_method`.
+
+    .. versionchanged:: 1.0.0
+
+        The ``used_method`` is now a ``MethodInfo`` instance instead of
+        a ``str`` representing the method name. """
 
     on_fail: OnFail
     """Tells what the mode does in case the activation fails. This can be
@@ -457,24 +467,24 @@ class Mode:
         methodresults = []
         while method_classes:
             methodcls = method_classes.pop(0)
-            method = methodcls(**method_kwargs)
-            methodresult, heartbeat = activate_method(method)
+            active_method = methodcls(**method_kwargs)
+            methodresult, heartbeat = activate_method(active_method)
             methodresults.append(methodresult)
             if methodresult.success:
                 break
         else:
             # Tried activate with all methods, but none of them succeed
-            method, heartbeat = None, None
+            active_method, heartbeat = None, None
 
         # Add unused methods to the results
-        for method_cls in method_classes:
+        for methodcls in method_classes:
+            unused_method = methodcls(**method_kwargs)
+            method_info = MethodInfo._from_method(unused_method)
             methodresults.append(
-                MethodActivationResult(
-                    method_cls.name, mode_name=method_cls.mode_name, success=None
-                )
+                MethodActivationResult(method=method_info, success=None)
             )
 
-        return methodresults, method, heartbeat
+        return methodresults, active_method, heartbeat
 
     def _deactivate(self) -> bool:
         """Deactivates the active mode, defined by the active Method, if any.

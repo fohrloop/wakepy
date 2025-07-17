@@ -397,31 +397,35 @@ class TestActivateOneOfMethods:
     """tests for Mode._activate_one_of_methods"""
 
     def test_activate_without_methods(self):
+        # Act
         res, active_method, heartbeat = Mode._activate_one_of_methods(
             [], dbus_adapter=None
         )
+
+        # Assert
         assert res == []
         assert active_method is None
         assert heartbeat is None
 
     def test_activate_function_success(self):
 
+        # Setup
         methodcls_fail = get_test_method_class(enter_mode=Exception("error"))
         methodcls_success = get_test_method_class(enter_mode=None)
 
+        # Act
         res, active_method, heartbeat = Mode._activate_one_of_methods(
             [methodcls_success, methodcls_fail],
         )
+        # Assert
         assert len(res) == 2
         assert res == [
             MethodActivationResult(
-                method_name=methodcls_success.name,
-                mode_name=methodcls_success.mode_name,
+                method=MethodInfo._from_method(methodcls_success()),
                 success=True,
             ),
             MethodActivationResult(
-                method_name=methodcls_fail.name,
-                mode_name=methodcls_success.mode_name,
+                method=MethodInfo._from_method(methodcls_fail()),
                 success=None,
             ),
         ]
@@ -430,20 +434,22 @@ class TestActivateOneOfMethods:
 
     def test_activate_function_success_with_heartbeat(self):
 
+        # Setup
         methodcls_success_with_hb = get_test_method_class(
             enter_mode=None, heartbeat=None
         )
 
+        # Act
         res, active_method, heartbeat = Mode._activate_one_of_methods(
             [methodcls_success_with_hb],
         )
 
+        # Assert
         # The activation succeeded, and the method has heartbeat, so the
         # heartbeat must be instance of Heartbeate
         assert res == [
             MethodActivationResult(
-                methodcls_success_with_hb.name,
-                methodcls_success_with_hb.mode_name,
+                method=MethodInfo._from_method(methodcls_success_with_hb()),
                 success=True,
             )
         ]
@@ -451,16 +457,18 @@ class TestActivateOneOfMethods:
         assert isinstance(heartbeat, Heartbeat)
 
     def test_activate_function_failure(self):
+        # Setup
         exc = Exception("error")
         methodcls_fail = get_test_method_class(enter_mode=exc)
 
+        # Act
         res, active_method, heartbeat = Mode._activate_one_of_methods([methodcls_fail])
 
+        # Assert
         # The activation failed, so active_method and heartbeat is None
         assert res == [
             MethodActivationResult(
-                methodcls_fail.name,
-                methodcls_fail.mode_name,
+                method=MethodInfo._from_method(methodcls_fail()),
                 success=False,
                 failure_stage=StageName.ACTIVATION,
                 failure_reason=repr(exc),

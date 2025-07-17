@@ -41,9 +41,16 @@ Wakepy Core
 .. autoclass:: wakepy.ActivationResult
     :members:
     :exclude-members: results
+    :member-order: bysource
 
 .. autoclass:: wakepy.MethodActivationResult
-    :members:
+    :members: method,
+              success,
+              method_name,
+              mode_name,
+              failure_stage,
+              failure_reason,
+    :member-order: bysource
 
 .. autoclass:: wakepy.ActivationError
     :exclude-members: args, with_traceback
