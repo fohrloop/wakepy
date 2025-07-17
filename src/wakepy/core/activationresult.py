@@ -80,7 +80,11 @@ class ActivationResult:
 
     mode_name: Optional[str] = None
     """Name of the :class:`Mode`. If the associated ``Mode`` does not have a
-    name, the ``mode_name`` will be ``None``."""
+    name, the ``mode_name`` will be ``None``.
+
+    .. versionchanged:: 1.0.0.
+        The ``mode_name`` is now always a string (or None) instead of
+        ``ModeName``."""
 
     active_method: MethodInfo | None = field(init=False)
     """The :class:`MethodInfo` about the used (successful) :class:`Method`. If
