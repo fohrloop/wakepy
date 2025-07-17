@@ -26,7 +26,7 @@ def tox_on_install(tox_env: ToxEnv, arguments: Any, section: str, of_type: str) 
     Explanation
     -----------
     The tox_on_install is one of the available tox hooks[1]. What we are
-    here after is the tox_on_intall hook call of the ".pkg_external"
+    here after is the tox_on_install hook call of the ".pkg_external"
     environment, which is called max once per tox invocation, before any
     commands of other environments are executed. This makes it possible to
     build wheel just once and use it in multiple tox environments. See tox
@@ -36,7 +36,7 @@ def tox_on_install(tox_env: ToxEnv, arguments: Any, section: str, of_type: str) 
     [2]: https://github.com/tox-dev/tox/issues/2729
     """
 
-    print(f"Called tox_on_intall hook ({tox_env.name}, {of_type})")
+    print(f"Called tox_on_install hook ({tox_env.name}, {of_type})")
 
     # (1) The tox_env of .pkg_external is passed here only if the package needs
     # to be built; only if tox is run with at least one environment with
