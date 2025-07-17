@@ -1,4 +1,4 @@
-"""This is a simple script for testing wakepy (manually). It is similar to
+r"""This is a simple script for testing wakepy (manually). It is similar to
 scripts\example-test.py but there's a wakepy mode activated & deactivated
 before the timer starts.
 
