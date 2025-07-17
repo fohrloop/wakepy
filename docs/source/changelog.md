@@ -23,6 +23,7 @@
 ### 🚨 Backwards incompatible changes
 - Make the `Mode._from_name()` and `Mode._method_classes` private; Not part of the public API anymore ([#458](https://github.com/fohrloop/wakepy/pull/458))
 - The `Mode.active_method`, `Mode.used_method`, are now instances of the new ModeInfo (previously strings) ([#460](https://github.com/fohrloop/wakepy/pull/460))
+- The `ActivationResult.mode_name` is now always a string (instead of being a ModeName) ([#462](https://github.com/fohrloop/wakepy/pull/462))
 
 ### 👷 Maintenance
 - Fix development environment setup instructions and requirements on Windows ([#445](https://github.com/fohrloop/wakepy/pull/445))

@@ -22,7 +22,6 @@ from .constants import WAKEPY_FAKE_SUCCESS, StageName, StageNameValue
 if typing.TYPE_CHECKING:
     from typing import Optional
 
-    from .constants import ModeName
     from .method import MethodInfo
 
 
@@ -81,7 +80,11 @@ class ActivationResult:
 
     mode_name: Optional[str] = None
     """Name of the :class:`Mode`. If the associated ``Mode`` does not have a
-    name, the ``mode_name`` will be ``None``."""
+    name, the ``mode_name`` will be ``None``.
+
+    .. versionchanged:: 1.0.0.
+        The ``mode_name`` is now always a string (or None) instead of
+        ``ModeName``."""
 
     active_method: MethodInfo | None = field(init=False)
     """The :class:`MethodInfo` about the used (successful) :class:`Method`. If
@@ -328,7 +331,7 @@ class MethodActivationResult:
         return f"({success_str}{error_at}, {self.method_name}{failure_reason})"
 
     @property
-    def mode_name(self) -> ModeName | str:
+    def mode_name(self) -> str:
         """The name of the mode of the :class:`Method` this result is for."""
         return self.method.mode_name
 
