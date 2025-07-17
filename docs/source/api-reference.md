@@ -2,24 +2,19 @@
 in wakepy-docs.js! -->
 # API Reference
 
-```{admonition} Wakepy API is still experimental 🚧
-:class: note
-
-Since wakepy is still 0.x.x, the API might change without further notice from
-one release to another. After that, breaking changes should occur only part of
-a major release (e.g. 1.x.x -> 2.0.0). 
-```
-
-
 ```{eval-rst}
+
+Wakepy Modes
+-------------
+
+There are two different modes in wakepy: The ``keep.running`` and ``keep.presenting``. The the :ref:`wakepy-modes` for more detailed explanations what they do and the :ref:`user-guide-page` for examples.
 
 .. autosummary::
 
     wakepy.keep.running
     wakepy.keep.presenting
 
-Wakepy Modes
--------------
+
 .. autofunction:: wakepy.keep.running
 .. autofunction:: wakepy.keep.presenting
 

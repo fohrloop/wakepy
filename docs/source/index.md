@@ -24,13 +24,6 @@ To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">
 
 See the [User Guide](#user-guide) and the available wakepy [Modes](#wakepy-modes) and [Methods](#wakepy-methods)
 ```
-```{admonition} Wakepy API is still experimental 🚧
-:class: note
-
-Since wakepy is still 0.x.x, the API might change without further notice from
-one release to another. After that, breaking changes should occur only part of
-a major release (e.g. 1.x.x -> 2.0.0). 
-```
 
 
 ```{include} ../../README.md

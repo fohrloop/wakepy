@@ -145,12 +145,6 @@ with keep.presenting():
 > [!TIP]
 > See the [User Guide](https://wakepy.readthedocs.io/stable/user-guide.html) and the available wakepy [Modes](https://wakepy.readthedocs.io/stable/modes.html) and [Methods](https://wakepy.readthedocs.io/stable/methods-reference.html)
 
-> [!NOTE]
-> Wakepy API is still experimental 🚧
-> 
-> Since wakepy is still 0.x.x, the API might change without further notice from
-> one release to another. After that, breaking changes should occur only part of
-> a major release (e.g. 1.x.x -> 2.0.0).
 
 <!-- wakepy readme where used -->
 ## Where wakepy is used?
