@@ -353,14 +353,18 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
         'Entering "%s" mode implemented with %s', method.mode_name, method.name
     )
     if get_platform_supported(CURRENT_PLATFORM, method.supported_platforms) is False:
-        logger.debug('"%s" failed platform check stage', method.name)
+        logger.debug(
+            'Failed entering "%s" mode with "%s" at platform check stage',
+            method.mode_name,
+            method.name,
+        )
         result.failure_stage = StageName.PLATFORM_SUPPORT
         return result, None
 
     requirements_fail, err_message = caniuse_fails(method)
     if requirements_fail:
         logger.debug(
-            'Entering "%s" mode with "%s" failed requirements check stage. Error message: %s',  # noqa: E501
+            'Failed entering "%s" mode with "%s" at requirements check stage. Error message: %s',  # noqa: E501
             method.mode_name,
             method.name,
             err_message,
@@ -372,7 +376,7 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
     if not success:
         logger.debug(
-            'Entering "%s" mode with "%s" failed during activation. Error message: %s',
+            'Failed entering "%s" mode with "%s" during activation. Error message: %s',
             method.mode_name,
             method.name,
             err_message,
@@ -384,7 +388,7 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     result.success = True
 
     logger.debug(
-        'Entering "%s" mode with "%s" was successful',
+        'Entered "%s" mode with "%s" successfully',
         method.mode_name,
         method.name,
     )
