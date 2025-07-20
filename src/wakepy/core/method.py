@@ -8,6 +8,7 @@ Method
 from __future__ import annotations
 
 import datetime as dt
+import logging
 import sys
 import typing
 from abc import ABC
@@ -48,6 +49,8 @@ MethodOutcomeValue = Literal["NOT_IMPLEMENTED", "SUCCESS", "FAILURE"]
 
 unnamed = "__unnamed__"
 """Constant for defining unnamed Method(s)"""
+
+logger = logging.getLogger(__name__)
 
 
 class DBusCallError(RuntimeError):
@@ -346,24 +349,49 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     method_info = MethodInfo._from_method(method)
     result = MethodActivationResult(method=method_info, success=False)
 
+    logger.debug(
+        'Entering "%s" mode implemented with %s', method.mode_name, method.name
+    )
     if get_platform_supported(CURRENT_PLATFORM, method.supported_platforms) is False:
+        logger.debug(
+            'Failed entering "%s" mode with "%s" at platform check stage',
+            method.mode_name,
+            method.name,
+        )
         result.failure_stage = StageName.PLATFORM_SUPPORT
         return result, None
 
     requirements_fail, err_message = caniuse_fails(method)
     if requirements_fail:
+        logger.debug(
+            'Failed entering "%s" mode with "%s" at requirements check stage. Error message: %s',  # noqa: E501
+            method.mode_name,
+            method.name,
+            err_message,
+        )
         result.failure_stage = StageName.REQUIREMENTS
         result.failure_reason = err_message
         return result, None
 
     success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
     if not success:
+        logger.debug(
+            'Failed entering "%s" mode with "%s" during activation. Error message: %s',
+            method.mode_name,
+            method.name,
+            err_message,
+        )
         result.failure_stage = StageName.ACTIVATION
         result.failure_reason = err_message
         return result, None
 
     result.success = True
 
+    logger.debug(
+        'Entered "%s" mode with "%s" successfully',
+        method.mode_name,
+        method.name,
+    )
     if not heartbeat_call_time:
         # Success, using just enter_mode(); no heartbeat()
         return result, None
@@ -381,8 +409,12 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
     ------
     RuntimeError, if the deactivation was not successful.
     """
-
-    heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
+    logger.debug('Exiting "%s" mode implemented with %s', method.mode_name, method.name)
+    if heartbeat is not None:
+        logger.info("Stopping heartbeat of %s", method.name)
+        heartbeat_stopped = heartbeat.stop()
+    else:
+        heartbeat_stopped = True
 
     if has_exit(method):
         errortxt = (
@@ -401,6 +433,12 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
             retval = method.exit_mode()  # type: ignore[func-returns-value]
             if retval is not None:
                 raise ValueError("exit_mode returned a value other than None!")
+            else:
+                logger.info(
+                    'Exited "%s" mode implemented with %s',
+                    method.mode_name,
+                    method.name,
+                )
         except Exception as e:
             raise RuntimeError(errortxt + "Original error: " + str(e))
 

@@ -96,10 +96,11 @@ def run_wakepy(sysargs: list[str]) -> Mode:
 
         print(get_wakepy_cli_info(mode, ascii_only, deprecations))
         wait_until_keyboardinterrupt(ascii_only)
+        print("\n", end="")  # Add newline before logs
 
     if mode.result and mode.result.success:
         # If activation did not succeed, there is also no deactivation / exit.
-        print("\n\nExited.")
+        print("\nExited.")
     return mode
 
 
