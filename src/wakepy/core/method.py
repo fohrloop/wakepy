@@ -8,6 +8,7 @@ Method
 from __future__ import annotations
 
 import datetime as dt
+import logging
 import sys
 import typing
 from abc import ABC
@@ -48,6 +49,8 @@ MethodOutcomeValue = Literal["NOT_IMPLEMENTED", "SUCCESS", "FAILURE"]
 
 unnamed = "__unnamed__"
 """Constant for defining unnamed Method(s)"""
+
+logger = logging.getLogger(__name__)
 
 
 class DBusCallError(RuntimeError):
@@ -381,8 +384,12 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
     ------
     RuntimeError, if the deactivation was not successful.
     """
-
-    heartbeat_stopped = heartbeat.stop() if heartbeat is not None else True
+    logger.debug('Exiting "%s" mode implemented with %s', method.mode_name, method.name)
+    if heartbeat is not None:
+        logger.info("Stopping heartbeat of %s", method.name)
+        heartbeat_stopped = heartbeat.stop()
+    else:
+        heartbeat_stopped = True
 
     if has_exit(method):
         errortxt = (
@@ -401,6 +408,12 @@ def deactivate_method(method: Method, heartbeat: Optional[Heartbeat] = None) -> 
             retval = method.exit_mode()  # type: ignore[func-returns-value]
             if retval is not None:
                 raise ValueError("exit_mode returned a value other than None!")
+            else:
+                logger.info(
+                    'Exited "%s" mode implemented with %s',
+                    method.mode_name,
+                    method.name,
+                )
         except Exception as e:
             raise RuntimeError(errortxt + "Original error: " + str(e))
 
@@ -662,4 +675,5 @@ class MethodInfo:
         )
 
     def __str__(self) -> str:
+        return self.name
         return self.name
