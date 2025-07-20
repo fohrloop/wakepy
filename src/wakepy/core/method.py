@@ -349,24 +349,45 @@ def activate_method(method: Method) -> Tuple[MethodActivationResult, Heartbeat |
     method_info = MethodInfo._from_method(method)
     result = MethodActivationResult(method=method_info, success=False)
 
+    logger.debug(
+        'Entering "%s" mode implemented with %s', method.mode_name, method.name
+    )
     if get_platform_supported(CURRENT_PLATFORM, method.supported_platforms) is False:
+        logger.debug('"%s" failed platform check stage', method.name)
         result.failure_stage = StageName.PLATFORM_SUPPORT
         return result, None
 
     requirements_fail, err_message = caniuse_fails(method)
     if requirements_fail:
+        logger.debug(
+            'Entering "%s" mode with "%s" failed requirements check stage. Error message: %s',  # noqa: E501
+            method.mode_name,
+            method.name,
+            err_message,
+        )
         result.failure_stage = StageName.REQUIREMENTS
         result.failure_reason = err_message
         return result, None
 
     success, err_message, heartbeat_call_time = try_enter_and_heartbeat(method)
     if not success:
+        logger.debug(
+            'Entering "%s" mode with "%s" failed during activation. Error message: %s',
+            method.mode_name,
+            method.name,
+            err_message,
+        )
         result.failure_stage = StageName.ACTIVATION
         result.failure_reason = err_message
         return result, None
 
     result.success = True
 
+    logger.debug(
+        'Entering "%s" mode with "%s" was successful',
+        method.mode_name,
+        method.name,
+    )
     if not heartbeat_call_time:
         # Success, using just enter_mode(); no heartbeat()
         return result, None
@@ -675,5 +696,4 @@ class MethodInfo:
         )
 
     def __str__(self) -> str:
-        return self.name
         return self.name
