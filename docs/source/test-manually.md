@@ -1,3 +1,4 @@
+(how-to-test-wakepy-modes)=
 # How to test wakepy Modes?
 
 All wakepy Modes rely somehow on external software, library or dbus service. This is why it cannot be 100% guaranteed beforehand that a wakepy Mode can be activated on some specific platform and Desktop Environment, even if a particular Mode would have multiple alternative Methods. This page lists ways to check manually if wakepy mode works on a system.

@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="384.85712mm"
+   height="217.68073mm"
+   viewBox="0 0 384.8572 217.68071"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="idle-timer-non-resetting.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.82394606"
+     inkscape:cx="591.66494"
+     inkscape:cy="481.82765"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="marker35_F-358274_S-818181-3"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:#818181;fill-rule:evenodd;stroke:#818181;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1-64-71" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker35_F-358274_S-818181-3-9"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:#818181;fill-rule:evenodd;stroke:#818181;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1-64-71-1" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker35_F-358274_S-818181-3-9-9"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:#818181;fill-rule:evenodd;stroke:#818181;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1-64-71-1-3" />
+    </marker>
+  </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="bg"
+     transform="translate(-10.444956,-1.1353221)"
+     sodipodi:insensitive="true">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#818181;stroke-width:0.30342;stroke-dasharray:none;stroke-dashoffset:1.57133"
+       id="rect1"
+       width="384.55371"
+       height="217.3773"
+       x="10.596666"
+       y="1.2870321"
+       rx="4.2786589"
+       ry="7.5644455"
+       inkscape:label="background" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(29.385839,-54.345692)">
+    <path
+       style="fill:#ee9041;stroke:#2341a4;stroke-width:0.465001;stroke-dasharray:2.79002, 0.93;stroke-opacity:1"
+       d="M 68.929587,262.58128 V 84.153487"
+       id="path1-7" />
+    <path
+       style="fill:#ee9041;stroke:#2341a4;stroke-width:0.465001;stroke-dasharray:2.79002, 0.929999;stroke-opacity:1"
+       d="M 87.075281,263.51061 V 83.720431"
+       id="path1" />
+    <rect
+       style="fill:#c828a8;fill-opacity:1;stroke:#e06cd5;stroke-width:0.349999;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect1-2-6-2-9-9-6-5-3"
+       width="129.98114"
+       height="16.738001"
+       x="68.821289"
+       y="105.96498"
+       rx="1"
+       ry="1" />
+    <rect
+       style="fill:#c828a8;fill-opacity:1;stroke:#e06cdd;stroke-width:0.349999;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect1-2-6-2-9-9-6-5-2-5"
+       width="39.747181"
+       height="16.738001"
+       x="47.105011"
+       y="86.528358"
+       rx="1"
+       ry="1" />
+    <text
+       xml:space="preserve"
+       style="font-size:6.05218px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       x="25.830654"
+       y="117.38752"
+       id="text2-1-6-2"><tspan
+         sodipodi:role="line"
+         id="tspan2-7-1-6"
+         style="font-weight:bold;fill:#484848;fill-opacity:1;stroke:none;stroke-width:0.282827;stroke-opacity:1"
+         x="25.830654"
+         y="117.38752">Inhibitor</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:6.05218px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       x="31.226164"
+       y="97.586655"
+       id="text2-1-6-2-5"><tspan
+         sodipodi:role="line"
+         id="tspan2-7-1-6-9"
+         style="font-weight:bold;fill:#484848;fill-opacity:1;stroke:none;stroke-width:0.282827;stroke-opacity:1"
+         x="31.226164"
+         y="97.586655">User</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="137.03951"
+       y="116.56434"
+       id="text1-9-2-2-6-1-4-5"><tspan
+         sodipodi:role="line"
+         id="tspan1-2-54-4-2-7-1-7"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="137.03951"
+         y="116.56434">Wakepy Mode active</tspan></text>
+    <rect
+       style="fill:#c828a8;fill-opacity:1;stroke:#c828a8;stroke-width:0.349999;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect1-2-6-2-9-9-6-5-20"
+       width="129.07623"
+       height="16.738001"
+       x="68.94146"
+       y="176.78934"
+       rx="0.99999994"
+       ry="1" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="137.24075"
+       y="186.90016"
+       id="text1-9-2-2-6-1-4-5-6"><tspan
+         sodipodi:role="line"
+         id="tspan1-2-54-4-2-7-1-7-8"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="137.24075"
+         y="186.90016">Inhibit flag preventing idle action</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="66.89344"
+       y="97.127716"
+       id="text1-9-2-2-6-1-4-5-0"><tspan
+         sodipodi:role="line"
+         id="tspan1-2-54-4-2-7-1-7-2"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="66.89344"
+         y="97.127716">User Activity</tspan></text>
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:#358274;fill-opacity:0.579625;stroke:#818181;stroke-width:0.464453;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#marker35_F-358274_S-818181-3);stop-color:#000000"
+       d="m 66.927087,130.46601 1.95272,-7.561"
+       id="path34-8-2"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:4.14016px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6d87e1;fill-opacity:0.752196;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="65.257912"
+       y="135.75781"
+       id="text1-9-7-1-9-1-12-2-52-7-0-4-3"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-weight:bold;fill:#6d87e1;fill-opacity:0.752196;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="65.257912"
+         y="135.75781"
+         id="tspan7-6-8-5">Activate Mode</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.14016px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6d87e1;fill-opacity:0.752196;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="217.34129"
+       y="137.34961"
+       id="text1-9-7-1-9-1-12-2-52-7-0-4-3-2"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-weight:bold;fill:#6d87e1;fill-opacity:0.752196;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="217.34129"
+         y="137.34961"
+         id="tspan7-6-8-5-6">Deactivate Mode</tspan></text>
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:#358274;fill-opacity:0.579625;stroke:#818181;stroke-width:0.464453;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#marker35_F-358274_S-818181-3-9);stop-color:#000000"
+       d="m 206.1311,132.65257 -5.96619,-8.5544"
+       id="path34-8-2-0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#ee9041;stroke:#2341a4;stroke-width:0.464999;stroke-dasharray:2.79001, 0.929999;stroke-opacity:1"
+       d="M 198.56481,264.79229 V 85.589282"
+       id="path1-4" />
+    <text
+       xml:space="preserve"
+       style="font-size:6.05218px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       x="29.640516"
+       y="166.79668"
+       id="text8"><tspan
+         sodipodi:role="line"
+         id="tspan8"
+         style="font-weight:bold;fill:#484848;fill-opacity:1;stroke:none;stroke-width:0.282827;stroke-opacity:1"
+         x="29.640516"
+         y="166.79668">Timer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.35673px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       x="7.458921"
+       y="173.72566"
+       id="text8-4"><tspan
+         sodipodi:role="line"
+         id="tspan8-9"
+         style="font-weight:bold;fill:#484848;fill-opacity:1;stroke:none;stroke-width:0.282827;stroke-opacity:1"
+         x="7.4589219"
+         y="173.72566">length of inhibitor &gt; idle_limit</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.35673px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       x="7.458921"
+       y="234.73589"
+       id="text8-4-7"><tspan
+         sodipodi:role="line"
+         id="tspan8-9-1"
+         style="font-weight:bold;fill:#484848;fill-opacity:1;stroke:none;stroke-width:0.282827;stroke-opacity:1"
+         x="7.4589219"
+         y="234.73589">length of inhibitor &lt; idle_limit</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.14016px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6d87e1;fill-opacity:0.752196;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="217.23686"
+       y="207.76483"
+       id="text9"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-weight:bold;fill:#6d87e1;fill-opacity:0.752196;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="217.23686"
+         y="207.76483"
+         id="tspan9">Trigger idle action</tspan></text>
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:#358274;fill-opacity:0.579625;stroke:#818181;stroke-width:0.464453;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#marker35_F-358274_S-818181-3-9-9);stop-color:#000000"
+       d="m 205.36492,202.93227 -5.48367,-7.95835"
+       id="path9"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#1870d8;fill-opacity:1;stroke:#6c87e0;stroke-width:0.349998;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect9"
+       width="39.392834"
+       height="16.738001"
+       x="47.6049"
+       y="159.37022"
+       rx="1"
+       ry="1" />
+    <rect
+       style="fill:#3b8be9;fill-opacity:1;stroke:#6c87e0;stroke-width:0.349998;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect10"
+       width="72.789032"
+       height="16.738001"
+       x="87.496696"
+       y="159.2148"
+       rx="0.99999994"
+       ry="1" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="67.653725"
+       y="168.74307"
+       id="text10"><tspan
+         sodipodi:role="line"
+         id="tspan10"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="67.653725"
+         y="168.74307">timer = 0</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="124.51197"
+       y="168.76039"
+       id="text11"><tspan
+         sodipodi:role="line"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="124.51197"
+         y="168.76039"
+         id="tspan11">timer &lt; idle_limit</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.15035px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="123.96851"
+       y="173.25337"
+       id="text12"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;fill:#eff002;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="123.96851"
+         y="173.25337"
+         id="tspan12">duration: idle_limit</tspan></text>
+    <rect
+       style="fill:#e9ac3b;fill-opacity:1;stroke:#e0b06c;stroke-width:0.349997;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect12"
+       width="181.96892"
+       height="16.738001"
+       x="161.05084"
+       y="159.2148"
+       rx="0.99999988"
+       ry="1" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="198.45692"
+       y="169.30858"
+       id="text13"><tspan
+         sodipodi:role="line"
+         id="tspan13"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="198.45692"
+         y="169.30858">timer &gt; idle_limit</tspan></text>
+    <rect
+       style="fill:#c828a8;fill-opacity:1;stroke:#c828a8;stroke-width:0.349999;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect13"
+       width="129.18976"
+       height="16.738001"
+       x="68.827927"
+       y="234.99771"
+       rx="0.99999994"
+       ry="1" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="137.24075"
+       y="245.10854"
+       id="text14"><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="137.24075"
+         y="245.10854">Inhibit flag preventing idle action</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:6.05218px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       x="29.640516"
+       y="228.37679"
+       id="text15"><tspan
+         sodipodi:role="line"
+         id="tspan15"
+         style="font-weight:bold;fill:#484848;fill-opacity:1;stroke:none;stroke-width:0.282827;stroke-opacity:1"
+         x="29.640516"
+         y="228.37679">Timer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.14016px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#6d87e1;fill-opacity:0.752196;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="245.84695"
+       y="250.53281"
+       id="text16"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;font-weight:bold;fill:#6d87e1;fill-opacity:0.752196;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="245.84695"
+         y="250.53281"
+         id="tspan16">Trigger idle action</tspan></text>
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:#358274;fill-opacity:0.579625;stroke:#818181;stroke-width:0.464453;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#marker35_F-358274_S-818181-3-9-9);stop-color:#000000"
+       d="m 233.97501,245.70027 -5.48367,-7.95835"
+       id="path16"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#1870d8;fill-opacity:1;stroke:#6c87e0;stroke-width:0.349998;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect16"
+       width="39.392834"
+       height="16.738001"
+       x="47.6049"
+       y="217.57861"
+       rx="1"
+       ry="1" />
+    <rect
+       style="fill:#3b8be9;fill-opacity:1;stroke:#6c87e0;stroke-width:0.349999;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect17"
+       width="137.97585"
+       height="16.738001"
+       x="87.496704"
+       y="217.42319"
+       rx="1"
+       ry="1" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="67.653725"
+       y="226.95145"
+       id="text17"><tspan
+         sodipodi:role="line"
+         id="tspan17"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="67.653725"
+         y="226.95145">timer = 0</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="148.91689"
+       y="226.00543"
+       id="text18"><tspan
+         sodipodi:role="line"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="148.91689"
+         y="226.00543"
+         id="tspan18">timer &lt; idle_limit</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.15035px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="148.37343"
+       y="230.4984"
+       id="text19"><tspan
+         sodipodi:role="line"
+         style="font-style:italic;fill:#eff002;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="148.37343"
+         y="230.4984"
+         id="tspan19">duration: idle_limit</tspan></text>
+    <rect
+       style="fill:#e9ac3b;fill-opacity:1;stroke:#e0b06c;stroke-width:0.349997;stroke-dasharray:none;stroke-dashoffset:0.415748;stroke-opacity:1"
+       id="rect19"
+       width="116.13987"
+       height="16.738001"
+       x="226.87988"
+       y="217.42319"
+       rx="0.99999988"
+       ry="1" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.0321px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#2749b8;fill-opacity:0.996078;stroke-width:0.35;stroke-dashoffset:0.415748"
+       x="277.83194"
+       y="227.51697"
+       id="text20"><tspan
+         sodipodi:role="line"
+         id="tspan20"
+         style="fill:#ffffff;fill-opacity:0.996078;stroke:none;stroke-width:0.35;stroke-opacity:1"
+         x="277.83194"
+         y="227.51697">timer &gt; idle_limit</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:8.8393px;line-height:normal;font-family:FreeSans, Arial;-inkscape-font-specification:'FreeSans,Arial, Normal';text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#184210;fill-opacity:0.579625;stroke:none;stroke-width:0.282827;stroke-dashoffset:0.415748;stroke-opacity:1"
+       x="170.36172"
+       y="70.45047"
+       id="text2-1-2"><tspan
+         sodipodi:role="line"
+         id="tspan2-7-7"
+         style="font-weight:bold;fill:#1e1e1e;fill-opacity:0.579625;stroke-width:0.282827"
+         x="170.36172"
+         y="70.45047">Non-Resetting Method Used</tspan></text>
+  </g>
+</svg>
