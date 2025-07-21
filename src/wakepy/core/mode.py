@@ -230,7 +230,6 @@ class Mode:
 
         self.on_fail = on_fail
         self.methods_priority = methods_priority
-        self._logger = logging.getLogger(__name__)
 
     @classmethod
     def _from_name(
