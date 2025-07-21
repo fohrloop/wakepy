@@ -13,12 +13,13 @@ from wakepy import keep
 
 start = dt.datetime.now()
 now = None
+MODE_ACTIVE_TIME = 6 * 60  # seconds
 
 print(dt.datetime.now().strftime("%b %d %H:%M:%S"))
 print("Wakepy inhibit start")
 with keep.presenting() as m:
     print(f"Method: {m.result.method}, " f"Mode: {m.result.mode_name}")
-    time.sleep(6 * 60)
+    time.sleep(MODE_ACTIVE_TIME)
     print("Wakepy inhibit end")
 
 while True:
