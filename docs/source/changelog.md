@@ -13,6 +13,7 @@
 - Better error messages: When selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427)) and when a D-Bus -based method fails ([#438](https://github.com/fohrloop/wakepy/pull/438))
 - Enhance Mode Activation Observability. Add logging (DEBUG and INFO level) for different parts in the Mode activation process. Show which methods are to be tried, and log any success and failure of activating a Mode. Improved the `ActivationResult.get_failure_text()` output. Added `NoMethodsWarning` which is issued if trying to activate a Mode with an empty list of methods. ([#411](https://github.com/fohrloop/wakepy/pull/411)) 
 - Add logging to every Method activation and deactivation step ([#469](https://github.com/fohrloop/wakepy/pull/469))
+- Improve logging: org.gnome.Sessionmanager and freedesktop methods ([#474](https://github.com/fohrloop/wakepy/pull/474))
 - Make ActivationWarning use proper stacklevel, so that issued warnings point to user code, and not into wakepy source code. ([#432](https://github.com/fohrloop/wakepy/pull/432))
 
 ### 🐞 Bug fixes
