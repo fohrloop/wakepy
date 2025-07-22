@@ -100,7 +100,7 @@ class _GnomeSessionManager(Method, ABC):
             return
 
         logger.debug(
-            "Exiting org.gnome.SessionManager mode using inhibit cookie: %s. Flags: %s (%s)",
+            "Exiting org.gnome.SessionManager mode using inhibit cookie: %s. Flags: %s (%s)",  # noqa: E501
             self.inhibit_cookie,
             self.flags.name,
             self.flags.value,
