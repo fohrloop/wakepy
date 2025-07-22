@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import logging
 import typing
 from abc import ABC, abstractmethod
 
@@ -16,6 +17,8 @@ from wakepy.core import (
 
 if typing.TYPE_CHECKING:
     from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 class GnomeFlag(enum.IntFlag):
@@ -82,6 +85,13 @@ class _GnomeSessionManager(Method, ABC):
             raise RuntimeError(
                 "Could not get inhibit cookie from org.gnome.SessionManager"
             )
+
+        logger.debug(
+            "Got inhibit cookie from org.gnome.SessionManager: %s. Flags: %s (%s)",
+            retval[0],
+            self.flags.name,
+            self.flags.value,
+        )
         self.inhibit_cookie = retval[0]
 
     def exit_mode(self) -> None:
@@ -89,6 +99,12 @@ class _GnomeSessionManager(Method, ABC):
             # Nothing to exit from.
             return
 
+        logger.debug(
+            "Exiting org.gnome.SessionManager mode using inhibit cookie: %s. Flags: %s (%s)",
+            self.inhibit_cookie,
+            self.flags.name,
+            self.flags.value,
+        )
         call = DBusMethodCall(
             method=self.method_uninhibit,
             args=dict(inhibit_cookie=self.inhibit_cookie),
