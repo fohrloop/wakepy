@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 import subprocess
@@ -19,6 +20,8 @@ from wakepy.core import (
 
 if typing.TYPE_CHECKING:
     from typing import Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 XDG_SESSION_DESKTOP = "XDG_SESSION_DESKTOP"
 """The environment variable for the xdg desktop of the current session. Defined
@@ -59,6 +62,12 @@ class FreedesktopInhibitorWithCookieMethod(Method):
         retval = self.process_dbus_call(call)
         if retval is None:
             raise RuntimeError(f"Could not get inhibit cookie from {self.name}")
+
+        logger.debug(
+            "Got inhibit cookie from %s: %s",
+            self.name,
+            retval[0],
+        )
         self.inhibit_cookie = retval[0]
 
     def exit_mode(self) -> None:
@@ -66,6 +75,11 @@ class FreedesktopInhibitorWithCookieMethod(Method):
             # Nothing to exit from.
             return
 
+        logger.debug(
+            "Exiting %s using inhibit cookie: %s",
+            self.name,
+            self.inhibit_cookie,
+        )
         call = DBusMethodCall(
             method=self.method_uninhibit,
             args=dict(cookie=self.inhibit_cookie),
@@ -181,10 +195,10 @@ class FreedesktopPowerManagementInhibit(FreedesktopInhibitorWithCookieMethod):
     def caniuse(self) -> bool | None | str:
 
         current_de = _get_current_desktop_environment()
+        logger.debug("Detected DE: %s", current_de)
 
         if current_de == KDE:
             kde_version = _get_kde_plasma_version()
-
             if kde_version is None:
                 raise RuntimeError(
                     "Running on KDE but could not detect KDE Plasma version."
@@ -215,7 +229,7 @@ def _get_current_desktop_environment() -> str | None:
     if XDG_SESSION_DESKTOP not in os.environ:
         return None
 
-    de_from_env_var = os.environ[XDG_SESSION_DESKTOP]
+    de_from_env_var = os.environ[XDG_SESSION_DESKTOP].upper()
     if de_from_env_var.upper() == KDE:
         return KDE
     elif de_from_env_var.upper() == XFCE:
