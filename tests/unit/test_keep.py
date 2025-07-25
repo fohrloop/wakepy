@@ -229,9 +229,13 @@ class TestGetCurrentMode:
             current_mode()
 
 
-def test_decorator_syntax_without_parenthesis():
+def test_decorator_syntax_without_parenthesis(monkeypatch):
 
-    @keep.running(methods=["MethodForThreadSafety"])
+    # Since we can't control which method is used, let's just make it use the
+    # WAKEPY_FAKE_SUCCESS method, which is always successful.
+    monkeypatch.setenv("WAKEPY_FAKE_SUCCESS", "1")
+
+    @keep.running
     def long_running_function():
         assert modecount() == 1
 
