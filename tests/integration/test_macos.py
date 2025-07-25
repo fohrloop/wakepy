@@ -13,4 +13,4 @@ class TestMacOS:
         # Test that the caffeinate command can be run without errors
         with keep.running() as m:
             assert m.active is True
-            assert str(m.methods) == "caffeinate"
+            assert str(m.method) == "caffeinate"
