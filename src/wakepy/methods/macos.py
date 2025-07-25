@@ -3,7 +3,9 @@ from __future__ import annotations
 import logging
 import typing
 from abc import ABC, abstractmethod
+from io import IOBase
 from subprocess import PIPE, Popen
+from typing import cast
 
 from wakepy.core import Method, ModeName, PlatformType
 
@@ -34,6 +36,19 @@ class _MacCaffeinate(Method, ABC):
             self.logger.debug("No need to terminate process (not started)")
             return
         self.logger.debug('Terminating process ("%s")', self.command)
+
+        # The pipes need to be closed before terminating the process, otherwise
+        # will get ResourceWarning: unclosed file
+        # See: https://stackoverflow.com/a/58696973/3015186 and
+        # https://github.com/fohrloop/wakepy/issues/478
+        #
+        # The cast is required because we know that these are not None, but
+        # mypy doesn't, and using if statements would ruin test coverage.
+        stdin = cast(IOBase, self._process.stdin)
+        stdout = cast(IOBase, self._process.stdout)
+        stdin.close()
+        stdout.close()
+
         self._process.terminate()
         self._process.wait()
 

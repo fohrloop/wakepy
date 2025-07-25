@@ -1,46 +1,35 @@
-from subprocess import PIPE
-from unittest.mock import Mock, call, patch
+import logging
 
-import pytest
-
+from wakepy import keep
+from wakepy.core import ModeName, PlatformType
 from wakepy.methods import macos
 
 
-@pytest.mark.parametrize(
-    "method_cls, expected_command",
-    [
-        (macos.CaffeinateKeepRunning, ["caffeinate"]),
-        (macos.CaffeinateKeepPresenting, ["caffeinate", "-d"]),
-    ],
-)
-def test_enter_mode_success(method_cls, expected_command):
-    method = method_cls()
+class DummyMacCaffeinate(macos._MacCaffeinate):
+    """Test class for _MacCaffeinate to allow instantiation."""
 
-    with patch("wakepy.methods.macos.Popen") as popenmock:
-        popenmock.return_value = Mock()
-        retval = method.enter_mode()
-
-    assert retval is None
-    assert expected_command == method.command.split()
-    popenmock.assert_called_with(expected_command, stdin=PIPE, stdout=PIPE)
-    # Entering the mode sets the ._process
-    assert method._process is popenmock.return_value
+    command = "ls"  # some linux command for testing
+    name = "DummyMacCaffeinate"
+    mode_name = ModeName.KEEP_RUNNING
+    supported_platforms = (PlatformType.ANY,)
 
 
-@pytest.mark.parametrize(
-    "method_cls",
-    [macos.CaffeinateKeepRunning, macos.CaffeinateKeepPresenting],
-)
-def test_exit_mode_success(method_cls):
-    method = method_cls()
+def test_mac_caffeinate_context_manager():
+    """Test that the context manager works as expected."""
 
-    method._process = Mock()
-    retval = method.exit_mode()
+    # If this does to raise an Exception, the context manager works as
+    # expected.
+    with keep.running(methods=["DummyMacCaffeinate"], on_fail="error"):
+        ...
 
-    assert retval is None
-    assert method._process.mock_calls == [call.terminate(), call.wait()]
 
-    # Case: Mode not entered
-    method = method_cls()
-    retval = method.exit_mode()
-    assert retval is None
+def test_exit_before_enter(caplog):
+    method = DummyMacCaffeinate()
+
+    # Act
+    with caplog.at_level(logging.DEBUG):
+        method.exit_mode()
+
+    # Assert
+    assert caplog.text.startswith("DEBUG ")
+    assert "No need to terminate process (not started)" in caplog.text

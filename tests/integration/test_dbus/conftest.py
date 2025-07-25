@@ -10,7 +10,7 @@ import sys
 import pytest
 
 if sys.platform.lower().startswith("linux"):
-    from tests.integration.dbus_service import DBusService, start_dbus_service
+    from tests.integration.test_dbus.dbus_service import DBusService, start_dbus_service
 else:
 
     class DBusService: ...  # type: ignore

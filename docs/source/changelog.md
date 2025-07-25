@@ -18,6 +18,7 @@
 - Make ActivationWarning use proper stacklevel, so that issued warnings point to user code, and not into wakepy source code. ([#432](https://github.com/fohrloop/wakepy/pull/432))
 
 ### 🐞 Bug fixes
+- Fix ResourceWarning with caffeinate Method on macOS ([#479](https://github.com/fohrloop/wakepy/pull/479))
 - Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)).
 - Raise ContextAlreadyEnteredError (subclass of RuntimeError) if trying to use context manager twice without exiting first ([#476](https://github.com/fohrloop/wakepy/pull/476))
 
