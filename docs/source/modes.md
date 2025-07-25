@@ -20,7 +20,18 @@ The table above only considers the *automatic* actions (go to sleep, start scree
 
 While `keep.running` mode is activated, the system may not automatically go to sleep (or suspend) meaning that programs will continue running and can use CPU.
 
-**Python example**
+**Python example: Decorator syntax**
+```{code-block} python
+from wakepy import keep
+
+@keep.running
+def long_running_task():
+    # Do something that takes a long time. The system may start screensaver
+    # / screenlock or blank the screen, but CPU will keep running.
+```
+
+
+**Python example: Context Manager syntax**
 ```{code-block} python
 from wakepy import keep
 
@@ -55,7 +66,16 @@ display. Automatic lock screen is not guaranteed, but it is  not prevented in an
 While `keep.presenting` mode is activated, the system may not automatically go to sleep (or suspend) meaning that programs will continue running and can use CPU. In addition to that, automatic start of screensaver & screenlock are prevented, meaning that you can
 show content in the `keep.presenting` mode.
 
-**Python example**
+**Python example: Decorator syntax**
+```{code-block} python
+from wakepy import keep
+
+@keep.presenting
+def long_running_task():
+    # Do something that takes a long time and requires the screen to be awake
+```
+
+**Python example: Context Manager syntax**
 ```{code-block} python
 from wakepy import keep
 

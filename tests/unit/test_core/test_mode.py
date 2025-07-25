@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import re
+import threading
 import typing
 import warnings
 from unittest.mock import Mock
@@ -24,7 +25,9 @@ from wakepy.core.dbus import DBusAdapter
 from wakepy.core.heartbeat import Heartbeat
 from wakepy.core.mode import (
     ModeExit,
+    ThreadSafetyWarning,
     UnrecognizedMethodNames,
+    _ModeParams,
     add_fake_success_if_required,
     handle_activation_fail,
     select_methods,
@@ -89,13 +92,14 @@ def mode0(
     methods_abc: List[Type[Method]],
     testmode_cls: Type[Mode],
     methods_priority0: List[str],
-):
-    return testmode_cls(
-        methods_abc,
+) -> Mode:
+    params = _ModeParams(
+        name="TestMode",
+        method_classes=methods_abc,
         dbus_adapter=None,
         methods_priority=methods_priority0,
-        name="TestMode",
     )
+    return testmode_cls(params)
 
 
 @pytest.fixture
@@ -105,12 +109,13 @@ def mode1_with_dbus(
     methods_priority0: List[str],
     dbus_adapter_cls: Type[DBusAdapter],
 ):
-    return testmode_cls(
-        methods_abc,
+    params = _ModeParams(
+        name="TestMode1",
+        method_classes=methods_abc,
         methods_priority=methods_priority0,
         dbus_adapter=dbus_adapter_cls,
-        name="TestMode1",
     )
+    return testmode_cls(params)
 
 
 class TestModeContextManager:
@@ -130,7 +135,7 @@ class TestModeContextManager:
             assert m is mode0
             # We have activated the Mode
             assert mode0.active
-            # There is an ActivationResult available in .activation_result
+            # There is an ActivationResult available in .result
             assert isinstance(m.result, ActivationResult)
             # The active method is also available
             assert isinstance(mode0._active_method, Method)
@@ -155,21 +160,22 @@ class TestModeContextManager:
     ):
         # This will not fail as when the Mode is activated, the
         # WakepyFakeSuccess method is added to the list of used methods.
-        with Mode(method_classes=[]):
+        params = _ModeParams(method_classes=[])
+        with Mode(params):
             ...
 
 
 class TestModeActiveAndUsedMethod:
-    """Test the .active_method and .used_method attributes"""
+    """Test the .active_method and .method attributes"""
 
     def test_simple(self, methods_abc):
         [MethodA, MethodB, _] = methods_abc
-        mode = Mode(method_classes=[MethodA])
+        params = _ModeParams(method_classes=[MethodA, MethodB])
+        mode = Mode(params)
 
         method_info_a = MethodInfo._from_method(MethodA())
-        method_info_b = MethodInfo._from_method(MethodB())
 
-        # before activated, active and userd methods are None
+        # before activated, active and used methods are None
         assert mode.active_method is None
         assert mode.method is None
 
@@ -182,19 +188,6 @@ class TestModeActiveAndUsedMethod:
         # the one used previously.
         assert mode.active_method is None
         assert mode.method == method_info_a
-
-        # theoretically, if activating again, it should work. Let's change
-        # the available methods so we see that the names change, too.
-        mode._method_classes = [MethodB]
-        with mode:
-            # This time the active method is the other one used.
-            assert mode.active_method == method_info_b
-            assert mode.method == method_info_b
-
-        # and when deactivated, the active method is again None, but the used
-        # method remembers the last used method.
-        assert mode.active_method is None
-        assert mode.method == method_info_b
 
 
 @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")
@@ -225,6 +218,21 @@ class TestModeActivateDeactivate:
             with mode0:
                 # Setting active method
                 mode0._active_method = None
+
+        # Need to manually cleanup after this test, as otherwise the global
+        # state will not be correct. As said, this should never ever happen
+        # in a real life situation.
+        mode0._unset_current_mode()
+
+    def test_unset_before_activate(
+        self,
+        mode0: Mode,
+    ):
+        with pytest.raises(
+            RuntimeError,
+            match="Cannot unset current mode, because it was never set! ",
+        ):
+            mode0._unset_current_mode()
 
     def test_activate_twice_without_deactivation(
         self,
@@ -498,3 +506,22 @@ class TestActivateOneOfMethods:
         assert active_method is None
         assert heartbeat is None
         assert heartbeat is None
+
+
+def test_use_mode_in_separate_thread(mode0: Mode):
+    """Modes should be only used in the thread they were created in.
+    Test that using a Mode in a different thread issues a Warning."""
+
+    # Setup
+    def func():
+        with pytest.warns(ThreadSafetyWarning):
+            with mode0:
+                ...
+
+    t = threading.Thread(target=func)
+
+    # Act and Assert
+    t.start()
+
+    # Cleanup
+    t.join()

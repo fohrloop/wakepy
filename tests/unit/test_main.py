@@ -22,6 +22,7 @@ from wakepy.__main__ import (
 )
 from wakepy.core import PlatformType
 from wakepy.core.constants import IdentifiedPlatformType, ModeName
+from wakepy.core.mode import _ModeParams
 from wakepy.methods._testing import WakepyFakeSuccess
 
 
@@ -196,7 +197,8 @@ class TestShouldUseAsciiOnly:
 
 @pytest.fixture
 def somemode():
-    return Mode([WakepyFakeSuccess], name="testmode")
+    params = _ModeParams([WakepyFakeSuccess], name="testmode")
+    return Mode(params)
 
 
 class TestGetWakepyCliInfo:

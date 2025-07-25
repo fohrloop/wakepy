@@ -103,7 +103,7 @@ Here's some reasons why you might want to consider using wakepy:
   <dt>💪 You want to have more control ⚙️</dt>
   <dd>It is possible to whitelist or blacklist the used wakepy Methods. It is also possible to prioritize them and define a on-fail action in case activating a wakepy mode fails.</dd>
   <dt>✂️ You want to keep the amount of dependencies low 📦</dt>
-  <dd>If you're running wakepy on Linux,  <a href="https://jeepney.readthedocs.io/">jeepney</A> (a dependecy free package) is required for D-Bus based methods. On Python 3.7,  <a href="https://pypi.org/project/typing-extensions/">typing-extensions</a> is needed for typing. Otherwise: wakepy has no python dependencies.</dd>
+  <dd>If you're running wakepy on Linux,  <a href="https://jeepney.readthedocs.io/">jeepney</A> (a dependecy free package) is required for D-Bus based methods. On Python 3.9 and earlier,  <a href="https://pypi.org/project/typing-extensions/">typing-extensions</a> is needed for typing. Otherwise: wakepy has no python dependencies.</dd>
   <dt>⚖️ Package needs to have a permissive licence ✔️</dt>
   <dd>Wakepy is licenced under permissive <a href="https://github.com/fohrloop/wakepy/blob/main/LICENSE.txt">MIT License</a>.</dd>
 </dl>
@@ -127,9 +127,9 @@ In the simplest case, keeping a system running long running task with wakepy wou
 ```python
 from wakepy import keep
 
-with keep.running():
-    # Do something that takes a long time. The system may start screensaver
-    # / screenlock or blank the screen, but CPU will keep running.
+@keep.running
+def long_running_task():
+    # Do something that takes a long time
 ```
 
 If you want to *also* prevent screen lock and screen blank, use the <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a> mode:
@@ -137,9 +137,27 @@ If you want to *also* prevent screen lock and screen blank, use the <a href="htt
 ```python
 from wakepy import keep
 
-with keep.presenting():
-    # Do something that takes a long time and requires the screen to be awake
+@keep.presenting
+def long_running_task():
+    # Do something that takes a long time AND requires the display to stay on
 ```
+
+<!-- wakepy decorator syntax note start -->
+> [!NOTE]
+> The [decorator syntax](https://wakepy.readthedocs.io/latest/user-guide.html#decorator-syntax) was added in wakepy version 1.0.0
+<!-- wakepy decorator syntax note end -->
+
+
+It's also possible to use the <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running()</a> and <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting()</a> as [context managers](https://wakepy.readthedocs.io/latest/user-guide.html#context-managers), like this:
+
+
+```python
+from wakepy import keep
+
+with keep.running()
+    ...
+```
+
 <!-- wakepy readme basic usage before tip -->
 
 > [!TIP]

@@ -40,6 +40,10 @@ Wakepy Core
     :exclude-members: results
     :member-order: bysource
 
+.. autofunction:: wakepy.current_mode
+.. autofunction:: wakepy.global_modes
+.. autofunction:: wakepy.modecount
+
 .. autoclass:: wakepy.MethodActivationResult
     :members: method,
               success,
@@ -53,6 +57,9 @@ Wakepy Core
     :exclude-members: args, with_traceback
 
 .. autoclass:: wakepy.ActivationWarning
+    :exclude-members: args, with_traceback
+
+.. autoclass:: wakepy.NoCurrentModeError
     :exclude-members: args, with_traceback
 
 .. autoclass:: wakepy.ModeExit

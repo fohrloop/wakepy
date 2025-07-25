@@ -658,12 +658,12 @@ def has_heartbeat(method: Method) -> bool:
 class MethodInfo:
     """MethodInfo is a read-only object which contains information about the
     used wakepy :class:`Method`. You'll most likely bump into this through the
-    :attr:`Mode.active_method` or :attr:`Mode.used_method` when using one of
+    :attr:`Mode.active_method` or :attr:`Mode.method` when using one of
     the :ref:`wakepy-modes`. For example::
 
         >>> with keep.running() as m:
-        ...      print('Used method:', m.used_method)
-        ...      print(type(m.used_method))
+        ...      print('Used method:', m.method)
+        ...      print(type(m.method))
         ...
         Used method: org.gnome.SessionManager
         <class 'wakepy.core.method.MethodInfo'>

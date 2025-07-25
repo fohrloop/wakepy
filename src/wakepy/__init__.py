@@ -29,6 +29,10 @@ from .core import MethodInfo as MethodInfo
 from .core import Mode as Mode
 from .core import ModeExit as ModeExit
 from .core import ModeName as ModeName
+from .core import NoCurrentModeError as NoCurrentModeError
+from .core import current_mode as current_mode
+from .core import global_modes as global_modes
+from .core import modecount as modecount
 from .modes import keep as keep
 
 JeepneyDBusAdapter: Type[DBusAdapter]

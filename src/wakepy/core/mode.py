@@ -13,8 +13,12 @@ from __future__ import annotations
 
 import logging
 import os
+import threading
 import typing
 import warnings
+from contextvars import ContextVar
+from dataclasses import dataclass, field
+from functools import wraps
 
 from wakepy.core.constants import FALSY_ENV_VAR_VALUES, WAKEPY_FAKE_SUCCESS
 
@@ -27,6 +31,7 @@ from .registry import get_method, get_methods_for_mode
 
 if typing.TYPE_CHECKING:
     import sys
+    from contextvars import Token
     from types import TracebackType
     from typing import Callable, List, Optional, Tuple, Type, Union
 
@@ -39,6 +44,14 @@ if typing.TYPE_CHECKING:
         from typing_extensions import Literal
     else:  # pragma: no-cover-if-py-lt-38
         from typing import Literal
+
+    if sys.version_info >= (3, 10):  # pragma: no-cover-if-py-gte-310
+        from typing import ParamSpec, TypeVar
+    else:  # pragma: no-cover-if-py-lt-310
+        from typing_extensions import ParamSpec, TypeVar
+
+    P = ParamSpec("P")
+    R = TypeVar("R")
 
     OnFail = Union[Literal["error", "warn", "pass"], Callable[[ActivationResult], None]]
 
@@ -70,6 +83,13 @@ class NoMethodsWarning(UserWarning):
     `UserWarning <https://docs.python.org/3/library/exceptions.html#UserWarning>`_."""
 
 
+class ThreadSafetyWarning(UserWarning):
+    """Issued if entering or exiting a Mode in a different thread than the one
+    it was created in. This is a subclass of `UserWarning \\
+    <https://docs.python.org/3/library/exceptions.html#UserWarning>`_.
+    """
+
+
 class ModeExit(Exception):
     """This can be used to exit from any wakepy mode with block. Just raise it
     within any with block which is a wakepy mode, and no code below it will
@@ -96,14 +116,235 @@ class ModeExit(Exception):
 class ContextAlreadyEnteredError(RuntimeError):
     """Raised if the context of a :class:`Mode` is already entered. This is a
     subclass of `RuntimeError <https://docs.python.org/3/library/exceptions.html#RuntimeError>`_.
+
+    .. versionadded:: 1.0.0
     """
+
+
+class NoCurrentModeError(RuntimeError):
+    """Raised when trying to get the current mode but none is active.
+    This is a subclass of `RuntimeError <https://docs.python.org/3/library/exceptions.html#RuntimeError>`_.
+
+    .. versionadded:: 1.0.0
+
+    .. seealso:: :func:`current_mode() <wakepy.current_mode>`
+    """
+
+
+@dataclass(frozen=True)
+class _ModeParams:
+    method_classes: list[Type[Method]] = field(default_factory=list)
+    name: ModeName | str = "__unnamed__"
+    methods_priority: Optional[MethodsPriorityOrder] = None
+    use_only: Optional[StrCollection] = None
+    omit: Optional[StrCollection] = None
+    on_fail: OnFail = "warn"
+    dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None
+
+
+def create_mode_params(
+    mode_name: ModeName | str,
+    methods: Optional[StrCollection] = None,
+    omit: Optional[StrCollection] = None,
+    methods_priority: Optional[MethodsPriorityOrder] = None,
+    on_fail: OnFail = "warn",
+    dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
+) -> _ModeParams:
+    """Creates Mode parameters based on a mode name."""
+    methods_for_mode = get_methods_for_mode(mode_name)
+    logger.debug(
+        'Found %d method(s) for mode "%s": %s',
+        len(methods_for_mode),
+        mode_name,
+        methods_for_mode,
+    )
+    return _ModeParams(
+        name=mode_name,
+        method_classes=methods_for_mode,
+        methods_priority=methods_priority,
+        on_fail=on_fail,
+        dbus_adapter=dbus_adapter,
+        use_only=methods,
+        omit=omit,
+    )
+
+
+def get_selected_methods(
+    mode_name: ModeName | str,
+    methods_for_mode: MethodClsCollection,
+    methods: Optional[StrCollection] = None,
+    omit: Optional[StrCollection] = None,
+) -> List[MethodCls]:
+    try:
+        selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
+    except UnrecognizedMethodNames as e:
+        err_msg = (
+            f'The following Methods are not part of the "{str(mode_name)}" Mode: '
+            f"{e.missing_method_names}. Please check that the Methods are correctly"
+            f' spelled and that the Methods are part of the "{str(mode_name)}" '
+            "Mode. You may refer to full Methods listing at https://wakepy.readthedocs.io/stable/methods-reference.html."
+        )
+        raise UnrecognizedMethodNames(
+            err_msg,
+            missing_method_names=e.missing_method_names,
+        ) from e
+
+    selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
+
+    logger.debug(
+        'Selected %d method(s) for mode "%s": %s',
+        len(selected_methods),
+        mode_name,
+        selected_methods,
+    )
+    if methods_for_mode and (not selected_methods):
+        warn_text = (
+            f'No methods selected for mode "{mode_name}"! This will lead to automatic failure of mode activation. '  # noqa E501
+            f"To suppress this warning, select at least one of the available methods, which are: {methods_for_mode}"  # noqa E501
+        )
+        warnings.warn(warn_text, NoMethodsWarning, stacklevel=4)
+
+    return selected_methods
+
+
+# Storage for the currently active (innermost) Mode for the current thread and
+# context.
+_current_mode: ContextVar[Mode] = ContextVar("wakepy._current_mode")
+
+# Lock for accessing the _all_modes
+_mode_lock = threading.Lock()
+
+# Global storage for all modes from all threads and contexts.
+_all_modes: List[Mode] = []
+
+
+def current_mode() -> Mode:
+    """Gets the current :class:`Mode` instance for the current thread and
+    context.
+
+    Raises
+    ------
+    NoCurrentModeError
+        If there are no Modes active in the call stack, raises a
+        :class:`NoCurrentModeError`.
+
+    Notes
+    -----
+
+    - This function cannot return any Modes from other threads. This means that
+      even if you have entered a Mode in an another thread, but not in the
+      current thread, this function will return ``None``
+    - You may access the current :class:`Mode` instance from anywhere
+      throughout the call stack, as long you are in the same thread and
+      context.
+    - You only need the :func:`current_mode` if you're using the decorator
+      syntax, or if you're checking the mode within a function which is lower
+      in the call stack.
+    - Internally, a `ContextVar <https://docs.python.org/3/library/\
+      contextvars.html#contextvars.ContextVar>`_. is used to store the
+      current Mode instance for the current thread and context.
+
+    Returns
+    -------
+    current_mode: Mode | None
+        The current Mode instance for the thread and context. ``None``, if not
+        entered in any Mode.
+
+
+    Examples
+    --------
+    **Decorator syntax**: You may use this function to get the current
+    :class:`Mode` instance, when using the :ref:`decorator syntax \\
+    <decorator-syntax>`, like this::
+
+        from wakepy import keep, current_mode
+
+        @keep.presenting
+        def long_running_function():
+            m = current_mode()
+            print(f"Used method is: {m.method}")
+
+    **Deeper in the call stack**: You can also use this function to get the
+    current :class:`Mode` instance in a function which is lower in the call
+    stack, like this::
+
+        from wakepy import keep, current_mode
+
+        def long_running_function():
+            with keep.presenting():
+                sub_function()
+
+        def sub_function():
+            m = current_mode()
+            print(f"Used method is: {m.method}")
+
+    .. versionadded:: 1.0.0
+
+    .. seealso:: :func:`global_modes() <wakepy.global_modes>`,
+      :func:`modecount()  <wakepy.modecount>`,
+      :ref:`multithreading-multiprocessing`
+    """
+
+    try:
+        return _current_mode.get()
+    except LookupError:
+        raise NoCurrentModeError("No wakepy Modes active!")
+
+
+def global_modes() -> List[Mode]:
+    """Gets all the :class:`Mode` instances from all threads and active
+    contexts for the current python process.
+
+    While the :func:`current_mode` returns the innermost Mode for the
+    current thread and context, this function returns all Modes from all
+    threads and contexts.
+
+    Returns
+    -------
+    all_modes: List[Mode]
+        The list of all active wakepy :class:`Mode` instances from all threads
+        and active contexts.
+
+    .. versionadded:: 1.0.0
+
+    .. seealso:: :func:`current_mode() <wakepy.current_mode>` for getting the
+       current Mode instance and :func:`modecount() <wakepy.modecount>` for
+       getting the number of all Modes from all threads and contexts.
+    """
+    _mode_lock.acquire()
+    try:
+        return _all_modes.copy()
+    finally:
+        _mode_lock.release()
+
+
+def modecount() -> int:
+    """The global mode count accross all threads and contexts, for the current
+    python process
+
+    Returns
+    -------
+    mode_count: int
+        The number of all Mode instances from all threads and active contexts.
+
+    .. versionadded:: 1.0.0
+
+    .. seealso:: :func:`current_mode() <current_mode>` for getting the current
+        Mode instance and :func:`global_modes() <global_modes>` for getting all
+        the Modes from all threads and contexts.
+    """
+    _mode_lock.acquire()
+    try:
+        return len(_all_modes)
+    finally:
+        _mode_lock.release()
 
 
 class Mode:
     """Mode instances are the most important objects, and they provide the main
     API of wakepy for the user. Typically, :class:`Mode` instances are created
-    with the factory functions like :func:`keep.presenting \\
-    <wakepy.keep.presenting>` and :func:`keep.running <wakepy.keep.running>`
+    with the factory functions like :func:`keep.presenting() \\
+    <wakepy.keep.presenting>` and :func:`keep.running() <wakepy.keep.running>`
 
     The Mode instances are `context managers \\
     <https://peps.python.org/pep-0343/>`_, which means that they can be used
@@ -111,6 +352,13 @@ class Mode:
 
         with keep.running() as m:
             type(m) # <class 'wakepy.Mode'>
+
+    The factory functions (and the Mode instances) are also decorators, which
+    means you can also use them like this::
+
+        @keep.running
+        def long_running_function():
+            # do something
 
     For more information about how to use the Mode instances, see the
     :ref:`user-guide-page`.
@@ -168,55 +416,29 @@ class Mode:
     <wakepy.keep.running>` factory functions.
     """
 
-    _method_classes: list[Type[Method]]
-    """The list of methods associated for this mode as given when creating the
-    ``Mode``. For details, see the documentation of  ``methods`` in the
-    ``Mode.__init__()`` method.
-    """
-
-    def __init__(
-        self,
-        method_classes: list[Type[Method]],
-        methods_priority: Optional[MethodsPriorityOrder] = None,
-        name: Optional[ModeName | str] = None,
-        on_fail: OnFail = "warn",
-        dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
-    ):
-        r"""Initialize a `Mode` using `Method`\ s.
-
-        This is also where the activation process related settings, such as the
-        dbus adapter to be used, are defined.
+    def __init__(self, params: _ModeParams):
+        r"""Initialize a Mode instance with the given parameters.
 
         Parameters
         ----------
-        methods:
-            The list of Methods to be used for activating this Mode.
-        methods_priority: list[str | set[str]]
-            The priority order, which is a list of method names or asterisk
-            ('*'). The asterisk means "all rest methods" and may occur only
-            once in the priority order, and cannot be part of a set. All method
-            names must be unique and must be part of the `methods`.
-        name:
-            Name of the Mode. Used for communication to user, logging and in
-            error messages (can be "any string" which makes sense to you).
-            Optional.
-        on_fail: "error" | "warn" | "pass" | Callable
-            Determines what to do in case mode activation fails. Valid options
-            are: "error", "warn", "pass" and a callable. If the option is
-            "error", raises :class:`~wakepy.ActivationError`. Is selected
-            "warn", issues a warning. If "pass", does nothing. If ``on_fail``
-            is a callable, it must take one positional argument: result, which
-            is an instance of :class:`ActivationResult`. The ActivationResult
-            contains more detailed information about the activation process.
-        dbus_adapter:
-            For using a custom dbus-adapter. Optional. If not given, the
-            default dbus adapter is used, which is
-            :class:`~wakepy.dbus_adapters.jeepney.JeepneyDBusAdapter`
+        params: _ModeParams
+            The parameters for the Mode.
         """
+
+        logger.debug(
+            'Creating wakepy Mode "%s" with methods=%s, omit=%s, methods_priority=%s, on_fail=%s, dbus_adapter=%s',  # noqa E501
+            params.name,
+            params.use_only,
+            params.omit,
+            params.methods_priority,
+            params.on_fail,
+            params.dbus_adapter,
+        )
+
+        self._init_params = params
         self.active: bool = False
         self.result = ActivationResult([])
-        self.name = name
-        self._method_classes = method_classes
+        self.name = params.name
 
         self._method: Method | None = None
         """This holds the used method instance. The used method instance will
@@ -229,13 +451,29 @@ class Mode:
 
         self.heartbeat: Heartbeat | None = None
 
-        self._dbus_adapter_cls = dbus_adapter
+        self._dbus_adapter_cls = params.dbus_adapter
         # Retrieved and updated using the _dbus_adapter property
         self._dbus_adapter_instance: DBusAdapter | None = None
         self._dbus_adapter_created: bool = False
 
-        self.on_fail = on_fail
-        self.methods_priority = methods_priority
+        self._all_method_classes = params.method_classes
+        """All Method classes for this Mode, regardless of what user has
+        selected to use"""
+
+        self._selected_method_classes = get_selected_methods(
+            mode_name=params.name,
+            methods_for_mode=params.method_classes,
+            methods=params.use_only,
+            omit=params.omit,
+        )
+        """The Method classes for this Mode that user has selected to use
+        (either by whitelisting with "use_only" (="methods"), or by
+        blacklisting with "omit" parameter)."""
+
+        self.on_fail = params.on_fail
+        self.methods_priority = params.methods_priority
+        self._thread_id = threading.get_ident()
+        self._context_token: Optional[Token[Mode]] = None
 
         self._has_entered_context: bool = False
         """This is used to track if the mode has been entered already. Set to
@@ -243,137 +481,35 @@ class Mode:
         from `active`, because you might be entered into a mode which fails,
         so `active` can be False even if this is True. """
 
-    @classmethod
-    def _from_name(
-        cls,
-        mode_name: ModeName | str,
-        methods: Optional[StrCollection] = None,
-        omit: Optional[StrCollection] = None,
-        methods_priority: Optional[MethodsPriorityOrder] = None,
-        on_fail: OnFail = "warn",
-        dbus_adapter: Type[DBusAdapter] | DBusAdapterTypeSeq | None = None,
-    ) -> Mode:
-        """
-        Creates and returns a Mode based on a mode name.
+    def __call__(self, func: Callable[P, R]) -> Callable[P, R]:
+        """Provides the decorator syntax for the KeepAwake instances."""
 
-        Parameters
-        ----------
-        mode_name: str | ModeName
-            The name of the mode to create. Must be an existing, registered
-            Mode name, which means that there must be at least one subclass of
-            :class:`~wakepy.core.method.Method` which has the
-            :attr:`~wakepy.Method.mode_name` class attribute set to
-            `mode_name`. Examples: "keep.running", "keep.presenting".
-        methods: list, tuple or set of str
-            The names of Methods to select from the mode defined with
-            `mode_name`; a "whitelist" filter. Means "use these and only these
-            Methods". Any Methods in `methods` but not in the selected mode
-            will raise a ValueError. Cannot be used same time with `omit`.
-            Optional.
-        omit: list, tuple or set of str or None
-            The names of Methods to remove from the mode defined with
-            `mode_name`; a "blacklist" filter. Any Method in `omit` but not in
-            the selected mode will be silently ignored. Cannot be used same
-            time with `methods`. Optional.
-        on_fail: "error" | "warn" | "pass" | Callable
-            Determines what to do in case mode activation fails. Valid options
-            are: "error", "warn", "pass" and a callable. If the option is
-            "error", raises :class:`ActivationError`. Is selected "warn",
-            issues a warning. If "pass", does nothing. If ``on_fail`` is a
-            callable, it must take one positional argument: result, which is an
-            instance of :class:`ActivationResult`. The ActivationResult
-            contains more detailed information about the activation process.
-        methods_priority: list[str | set[str]]
-            The priority order, which is a list of method names or asterisk
-            ('*'). The asterisk means "all rest methods" and may occur only
-            once in the priority order, and cannot be part of a set. All method
-            names must be unique and must be part of the `methods`.
-        dbus_adapter:
-            For using a custom dbus-adapter. Optional. If not given, the
-            default dbus adapter is used, which is :class:`~wakepy.\\
-            dbus_adapters.jeepney.JeepneyDBusAdapter`.
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            # Note that using `with self` would not work here as in multi-
+            # threaded environment, the `self` would be shared between threads.
+            # It would create multiple Mode instances on __enter__() but only
+            # the last one would be set to be self._mode. During the
+            # __exit__() the last Mode instance would be used on every thread.
+            with Mode(self._init_params):
+                retval = func(*args, **kwargs)
+            return retval
 
-
-        Returns
-        -------
-        mode: Mode
-            The context manager for the selected mode.
-
-        """
-
-        logger.debug(
-            'Creating wakepy mode "%s" with methods=%s, omit=%s, methods_priority=%s, on_fail=%s, dbus_adapter=%s',  # noqa E501
-            mode_name,
-            methods,
-            omit,
-            methods_priority,
-            on_fail,
-            dbus_adapter,
-        )
-        methods_for_mode = get_methods_for_mode(mode_name)
-
-        try:
-            selected_methods = select_methods(
-                methods_for_mode, use_only=methods, omit=omit
-            )
-        except UnrecognizedMethodNames as e:
-            err_msg = (
-                f'The following Methods are not part of the "{str(mode_name)}" Mode: '
-                f"{e.missing_method_names}. Please check that the Methods are correctly"
-                f' spelled and that the Methods are part of the "{str(mode_name)}" '
-                "Mode. You may refer to full Methods listing at https://wakepy.readthedocs.io/stable/methods-reference.html."
-            )
-            raise UnrecognizedMethodNames(
-                err_msg,
-                missing_method_names=e.missing_method_names,
-            ) from e
-
-        logger.debug(
-            'Found %d method(s) for mode "%s": %s',
-            len(methods_for_mode),
-            mode_name,
-            methods_for_mode,
-        )
-        selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
-
-        logger.debug(
-            'Selected %d method(s) for mode "%s": %s',
-            len(selected_methods),
-            mode_name,
-            selected_methods,
-        )
-        if methods_for_mode and (not selected_methods):
-            warn_text = (
-                f'No methods selected for mode "{mode_name}"! This will lead to automatic failure of mode activation. '  # noqa E501
-                f"To suppress this warning, select at least one of the available methods, which are: {methods_for_mode}"  # noqa E501
-            )
-            warnings.warn(warn_text, NoMethodsWarning, stacklevel=3)
-
-        return cls(
-            name=mode_name,
-            method_classes=selected_methods,
-            methods_priority=methods_priority,
-            on_fail=on_fail,
-            dbus_adapter=dbus_adapter,
-        )
+        return wrapper
 
     def __enter__(self) -> Mode:
         """Called automatically when entering a with block and a instance of
         Mode is used as the context expression. This tries to activate the
         Mode using :attr:`~wakepy.Mode.method_classes`.
         """
-
+        logger.debug(
+            'Calling Mode.__enter__() for "%s" mode on object with id=%s, thread=%s',
+            self.name,
+            id(self),
+            threading.get_ident(),
+        )
         self._activate()
-        if self.active:
-            logger.info(
-                'Activated wakepy mode "%s" with method: %s',
-                self.name,
-                self.active_method,
-            )
-        else:
-            logger.info(
-                self.result.get_failure_text(newlines=False),
-            )
+        self._set_current_mode()
         return self
 
     def __exit__(
@@ -397,7 +533,14 @@ class Mode:
         _ = exc_type
         _ = traceback
 
+        logger.debug(
+            'Calling Mode.__exit__() for "%s" mode on object with id=%s, thread=%s',
+            self.name,
+            id(self),
+            threading.get_ident(),
+        )
         self._deactivate()
+        self._unset_current_mode()
 
         if exception is None or isinstance(exception, ModeExit):
             # Returning True means that the exception within the with block is
@@ -411,6 +554,36 @@ class Mode:
         # unreachable.
 
         return False
+
+    def _set_current_mode(self) -> None:
+        self._context_token = _current_mode.set(self)
+        try:
+            _mode_lock.acquire()
+            _all_modes.append(self)
+        finally:
+            _mode_lock.release()
+
+    def _unset_current_mode(self) -> None:
+        if self._context_token is None:
+            raise RuntimeError(  # should never happen
+                "Cannot unset current mode, because it was never set! "
+            )
+        _current_mode.reset(self._context_token)
+        try:
+            _mode_lock.acquire()
+            try:
+                _all_modes.remove(self)
+            except ValueError:
+                # This should never happen in practice.
+                logger.warning(
+                    'Mode "%s" with id=%s was not found in _all_modes. '
+                    "This can happen if the Mode was not entered in the current "
+                    "thread or context, or if it was already removed.",
+                    self.name,
+                    id(self),
+                )
+        finally:
+            _mode_lock.release()
 
     def _activate(self) -> ActivationResult:
         """Activates the mode with one of the methods which belong to the mode.
@@ -426,9 +599,10 @@ class Mode:
                 "you need to activate two Modes, you need to use two separate Mode "
                 "instances."
             )
+        self._thread_check()
 
         method_classes = add_fake_success_if_required(
-            self._method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
+            self._selected_method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
         )
         method_classes_ordered = order_methods_by_priority(
             method_classes, self.methods_priority
@@ -455,6 +629,17 @@ class Mode:
         self.active = self.result.success
         self._method = self._active_method
         self.method = self.active_method
+
+        if self.active:
+            logger.info(
+                'Activated wakepy mode "%s" with method: %s',
+                self.name,
+                self.active_method,
+            )
+        else:
+            logger.info(
+                self.result.get_failure_text(newlines=False),
+            )
 
         if not self.active:
             handle_activation_fail(self.on_fail, self.result)
@@ -522,6 +707,8 @@ class Mode:
         RuntimeError, if there was active method but an error occurred when
         trying to deactivate it."""
 
+        self._thread_check()
+
         if self.active:
             if self._active_method is None:
                 raise RuntimeError(
@@ -549,6 +736,18 @@ class Mode:
             self._dbus_adapter_instance = get_dbus_adapter(self._dbus_adapter_cls)
             self._dbus_adapter_created = True
         return self._dbus_adapter_instance
+
+    def _thread_check(self) -> None:
+        current_thread_id = threading.get_ident()
+        if self._thread_id != current_thread_id:
+
+            warning_text = (
+                f"Using the Mode {self.name} with id ({id(self)}) in thread "
+                f"{current_thread_id} but it was created in thread {self._thread_id}. "
+                "Wakepy Modes are not thread-safe!"
+            )
+            warnings.warn(warning_text, ThreadSafetyWarning, stacklevel=2)
+            logger.warning(warning_text)
 
     @property
     def activation_result(self) -> ActivationResult:  # pragma: no cover
@@ -714,7 +913,7 @@ def handle_activation_fail(on_fail: OnFail, result: ActivationResult) -> None:
     if on_fail == "pass":
         return
     elif on_fail == "warn":
-        warnings.warn(result.get_failure_text(), ActivationWarning, stacklevel=4)
+        warnings.warn(result.get_failure_text(), ActivationWarning, stacklevel=5)
         return
     elif on_fail == "error":
         raise ActivationError(result.get_failure_text())
