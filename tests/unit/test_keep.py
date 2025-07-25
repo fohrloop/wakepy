@@ -231,7 +231,7 @@ class TestGetCurrentMode:
 
 def test_decorator_syntax_without_parenthesis():
 
-    @keep.running
+    @keep.running(methods=["MethodForThreadSafety"])
     def long_running_function():
         assert modecount() == 1
 
