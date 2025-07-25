@@ -4,6 +4,7 @@
 🗓️ Unreleased
 
 ### ✨ Features
+- Decorator syntax: `@keep.running` and `@keep.presenting` and the helper functions `current_mode()`, `global_modes()` and `modecount()` ([#477](https://github.com/fohrloop/wakepy/pull/477))
 - Update the wakepy CLI printout: Adds the used Method and activated Mode to the printout ([#434](https://github.com/fohrloop/wakepy/pull/434))
 - Added `-v` (INFO) and `-vv` (DEBUG) verbosity flags for the [wakepy CLI command](https://wakepy.readthedocs.io/stable/cli-api.html). ([#439](https://github.com/fohrloop/wakepy/pull/439))
 - Add [Mode.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode.method), [ActivationResult.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.ActivationResult.method) and [MethodActivationResult.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodActivationResult.method) attributes, which are instances of [MethodInfo](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodInfo) ([#459](https://github.com/fohrloop/wakepy/pull/459), [#460](https://github.com/fohrloop/wakepy/pull/460), [#464](https://github.com/fohrloop/wakepy/pull/464))
