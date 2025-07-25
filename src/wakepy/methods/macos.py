@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import logging
-import typing
 from abc import ABC, abstractmethod
+from contextlib import ExitStack
 from subprocess import PIPE, Popen
 
 from wakepy.core import Method, ModeName, PlatformType
-
-if typing.TYPE_CHECKING:
-    from typing import Optional
 
 
 class _MacCaffeinate(Method, ABC):
@@ -23,19 +20,23 @@ class _MacCaffeinate(Method, ABC):
     def __init__(self, **kwargs: object) -> None:
         super().__init__(**kwargs)
         self.logger = logging.getLogger(__name__)
-        self._process: Optional[Popen[bytes]] = None
+        self._exit_stack: ExitStack | None = None
 
     def enter_mode(self) -> None:
         self.logger.debug('Running "%s"', self.command)
-        self._process = Popen(self.command.split(), stdin=PIPE, stdout=PIPE)
+        self._exit_stack = ExitStack()
+        self._exit_stack.enter_context(
+            Popen(self.command.split(), stdin=PIPE, stdout=PIPE)
+        )
 
     def exit_mode(self) -> None:
-        if self._process is None:
+        if self._exit_stack is None:
             self.logger.debug("No need to terminate process (not started)")
             return
         self.logger.debug('Terminating process ("%s")', self.command)
-        self._process.terminate()
-        self._process.wait()
+        self._exit_stack.close()
+        self._exit_stack = None
+        self.logger.debug("Process terminated")
 
     @property
     @abstractmethod
