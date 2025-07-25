@@ -127,9 +127,9 @@ In the simplest case, keeping a system running long running task with wakepy wou
 ```python
 from wakepy import keep
 
-with keep.running():
-    # Do something that takes a long time. The system may start screensaver
-    # / screenlock or blank the screen, but CPU will keep running.
+@keep.running
+def long_running_task():
+    # Do something that takes a long time
 ```
 
 If you want to *also* prevent screen lock and screen blank, use the <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a> mode:
@@ -137,17 +137,24 @@ If you want to *also* prevent screen lock and screen blank, use the <a href="htt
 ```python
 from wakepy import keep
 
-with keep.presenting():
-    # Do something that takes a long time and requires the screen to be awake
+@keep.presenting
+def long_running_task():
+    # Do something that takes a long time AND requires the display to stay on
 ```
 
-Starting from wakepy 1.0.0 it's also possible to use the factory functions <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running</a> and <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a> as decorators, like this:
+<!-- wakepy decorator syntax note start -->
+> [!NOTE]
+> The [decorator syntax](https://wakepy.readthedocs.io/latest/user-guide.html#decorator-syntax) was added in wakepy version 1.0.0
+<!-- wakepy decorator syntax note end -->
+
+
+It's also possible to use the <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running()</a> and <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting()</a> as [context managers](https://wakepy.readthedocs.io/latest/user-guide.html#context-managers), like this:
+
 
 ```python
 from wakepy import keep
 
-@keep.running()
-def long_running_task():
+with keep.running()
     ...
 ```
 

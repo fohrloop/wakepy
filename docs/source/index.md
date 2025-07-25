@@ -14,6 +14,19 @@ To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">
 
 ```{include} ../../README.md
 :start-after: <!-- wakepy readme at install after note -->
+:end-before: <!-- wakepy decorator syntax note start -->
+```
+
+```{admonition} New in wakepy 1.0.0
+:class: note
+
+[Decorator syntax](#decorator-syntax) was added in wakepy 1.0.0.
+```
+
+
+
+```{include} ../../README.md
+:start-after: <!-- wakepy decorator syntax note end -->
 :end-before: <!-- wakepy readme basic usage before tip -->
 ```
 
