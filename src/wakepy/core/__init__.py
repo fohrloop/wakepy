@@ -18,6 +18,7 @@ from .method import Method as Method
 from .method import MethodInfo as MethodInfo
 from .mode import ActivationError as ActivationError
 from .mode import ActivationWarning as ActivationWarning
+from .mode import ContextAlreadyEnteredError as ContextAlreadyEnteredError
 from .mode import Mode as Mode
 from .mode import ModeExit as ModeExit
 from .platform import CURRENT_PLATFORM as CURRENT_PLATFORM

@@ -9,7 +9,14 @@ from unittest.mock import Mock
 import pytest
 
 from tests.unit.test_core.testmethods import get_test_method_class
-from wakepy import ActivationError, ActivationResult, Method, MethodInfo, Mode
+from wakepy import (
+    ActivationError,
+    ActivationResult,
+    ContextAlreadyEnteredError,
+    Method,
+    MethodInfo,
+    Mode,
+)
 from wakepy.core import PlatformType
 from wakepy.core.activationresult import MethodActivationResult
 from wakepy.core.constants import WAKEPY_FAKE_SUCCESS, StageName
@@ -218,6 +225,20 @@ class TestModeActivateDeactivate:
             with mode0:
                 # Setting active method
                 mode0._active_method = None
+
+    def test_activate_twice_without_deactivation(
+        self,
+        mode0: Mode,
+    ):
+        # It should not be possible to activate a mode twice without
+        # deactivating it first.
+        with mode0 as m:
+            with pytest.raises(
+                ContextAlreadyEnteredError,
+                match="A Mode can only be activated once!.*",
+            ):
+                with m:
+                    ...
 
 
 @pytest.mark.usefixtures("WAKEPY_FAKE_SUCCESS_eq_1")

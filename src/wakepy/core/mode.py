@@ -93,6 +93,12 @@ class ModeExit(Exception):
     """
 
 
+class ContextAlreadyEnteredError(RuntimeError):
+    """Raised if the context of a :class:`Mode` is already entered. This is a
+    subclass of `RuntimeError <https://docs.python.org/3/library/exceptions.html#RuntimeError>`_.
+    """
+
+
 class Mode:
     """Mode instances are the most important objects, and they provide the main
     API of wakepy for the user. Typically, :class:`Mode` instances are created
@@ -231,6 +237,12 @@ class Mode:
         self.on_fail = on_fail
         self.methods_priority = methods_priority
 
+        self._has_entered_context: bool = False
+        """This is used to track if the mode has been entered already. Set to
+        True when activated, and to False when deactivated. A bit different
+        from `active`, because you might be entered into a mode which fails,
+        so `active` can be False even if this is True. """
+
     @classmethod
     def _from_name(
         cls,
@@ -350,6 +362,7 @@ class Mode:
         Mode is used as the context expression. This tries to activate the
         Mode using :attr:`~wakepy.Mode.method_classes`.
         """
+
         self._activate()
         if self.active:
             logger.info(
@@ -407,6 +420,12 @@ class Mode:
         The activation may be faked as to be successful by using the
         WAKEPY_FAKE_SUCCESS environment variable.
         """
+        if self._has_entered_context:
+            raise ContextAlreadyEnteredError(
+                "A Mode can only be activated once! If "
+                "you need to activate two Modes, you need to use two separate Mode "
+                "instances."
+            )
 
         method_classes = add_fake_success_if_required(
             self._method_classes, os.environ.get(WAKEPY_FAKE_SUCCESS)
@@ -440,6 +459,7 @@ class Mode:
         if not self.active:
             handle_activation_fail(self.on_fail, self.result)
 
+        self._has_entered_context = True
         return self.result
 
     @staticmethod
@@ -516,7 +536,7 @@ class Mode:
         self.active_method = None
         self.heartbeat = None
         self.active = False
-
+        self._has_entered_context = False
         return deactivated
 
     @property
