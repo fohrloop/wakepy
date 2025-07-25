@@ -18,6 +18,7 @@
 
 ### 🐞 Bug fixes
 - Fix prioritized order of Methods ([#429](https://github.com/fohrloop/wakepy/pull/429)).
+- Raise ContextAlreadyEnteredError (subclass of RuntimeError) if trying to use context manager twice without exiting first ([#476](https://github.com/fohrloop/wakepy/pull/476))
 
 ### 📖 Documentation
 - Documentation page for [Post Keepawake behavior](https://wakepy.readthedocs.io/stable/post-keepawake-behavior.html). Documented the behavior on Windows, KDE and GNOME ([#472](https://github.com/fohrloop/wakepy/pull/472))
