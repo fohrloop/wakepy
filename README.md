@@ -140,6 +140,17 @@ from wakepy import keep
 with keep.presenting():
     # Do something that takes a long time and requires the screen to be awake
 ```
+
+Starting from wakepy 1.0.0 it's also possible to use the factory functions <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-running-mode">keep.running</a> and <a href="https://wakepy.readthedocs.io/stable/modes.html#keep-presenting-mode">keep.presenting</a> as decorators, like this:
+
+```python
+from wakepy import keep
+
+@keep.running()
+def long_running_task():
+    ...
+```
+
 <!-- wakepy readme basic usage before tip -->
 
 > [!TIP]

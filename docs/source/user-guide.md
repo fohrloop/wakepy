@@ -1,70 +1,93 @@
 (user-guide-page)=
 # User Guide
 
-Wakepy main Python API is are the wakepy [Modes](#wakepy-modes), which are states that are activated and deactivated and which keep your system awake. The method for activating the mode depends on your platform (among other things) and is determined by the used [Method](#wakepy-methods).  For example [keep.presenting](#keep-presenting-mode) mode is implemented by [org.gnome.SessionManager](#org-gnome-sessionmanager) for Linux with GNOME DE, [SetThreadExecutionState](#windows-stes) for Windows and [caffeinate](#macos-caffeinate) for MacOS. In most cases, wakepy does nothing but calls an executable (caffeinate), a DLL function call (SetThreadExecutionState) or a D-Bus method (org.gnome.SessionManager). Wakepy helps in this by providing a coherent API which should just work™ on any system. Or, at least that is the vision of wakepy.
+## What are Modes and Methods?
+The core concept of wakepy are different keepawake [Modes](#wakepy-modes). The Modes are *states* that are activated and deactivated and which keep your system awake. Each Mode is implemented by multiple [Methods](#wakepy-methods), and the particular Method that will be used depends on the operating system, Desktop Environment and their versions (among other things).  For example the [keep.presenting](#keep-presenting-mode) mode is implemented by [org.gnome.SessionManager](#org-gnome-sessionmanager) on Linux with GNOME DE, [SetThreadExecutionState](#windows-stes) on Windows and [caffeinate](#macos-caffeinate) on MacOS. In most cases, wakepy does nothing but calls an executable (caffeinate), a DLL function call (SetThreadExecutionState) or a D-Bus method (org.gnome.SessionManager). Wakepy helps in this by providing a coherent API which should just work™ on any system. Or, at least that is the vision of wakepy.
+
+# Basic Usage
+
+The [Wakepy Modes](#wakepy-modes) are available as factory functions {func}`keep.running() <wakepy.keep.running>` and {func}`keep.presenting() <wakepy.keep.presenting>`, which may be used as both [decorators](#decorator-syntax) and as [context manager factories](#context-manager-syntax). These are the main functions that you interact with when you use wakepy.
 
 
-## Entering a wakepy.Mode
+(decorator-syntax)=
+## Decorator syntax
+```{versionadded} 1.0.0
+```
 
-The wakepy modes are implemented as context managers of type {class}`wakepy.Mode`. The available convenience wrappers for creating a Mode are {func}`keep.running() <wakepy.keep.running>` and {func}`keep.presenting() <wakepy.keep.presenting>`. These are used with the `with` statement:
+The simplest way for using wakepy modes like  [`keep.running`](#keep-running-mode) and [`keep.presenting`](#keep-presenting-mode) is the decorator syntax, like this:
+
+```{code-block} python
+from wakepy import keep
+
+@keep.running
+def long_running_function():
+    # Do something that takes a long time
+```
+
+**Notes**:
+- It does not matter if you use the parenthesis or not if you're not using any input [arguments](#possible-arguments); `@keep.running()` is identical to `@keep.running`.
+- If you want to get access to the current [Mode instance](#mode-instances) when using the decorator
+syntax, you should use {func}`current_mode() <wakepy.current_mode>`, as that is
+the [multi-threading safe](#multithreading-multiprocessing) way for doing it.
+- Using the [decorator syntax](#decorator-syntax)  is functionally equivalent of using the [context managers](#context-manager-syntax); the decorated function will create a new {class}`Mode <wakepy.Mode>` instance under the hood every time you call the decorated function, and will use it as a context manager automatically.
+(context-manager-syntax)=
+## Context Managers
+
+Because [`keep.running()`](#keep-running-mode) or [`keep.presenting()`](#keep-presenting-mode)  return Mode instances which are context managers, they can be used with the `with` statement:
 
 ```{code-block} python
 from wakepy import keep
 
 with keep.running():
-    # Do something that takes a long time. The system may start screensaver
-    # / screenlock or blank the screen, but CPU will keep running.
+    # Do something that takes a long time
 ```
 
- When entering the context, a {class}`~wakepy.Mode` instance (`m`) is returned: 
+ When entering the context, a [Mode instance](#mode-instances) (`m`) is returned:
 
 ```{code-block} python
 with keep.running() as m:
     ...
 ```
 
-The Mode has following important attributes:
-
-- {attr}`m.active <wakepy.Mode.active>`: `True`, if entering mode was successful. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
-- {attr}`m.active_method <wakepy.Mode.active_method>`: The name of the *active* method. Will be `None` after mode is deactivated.
-- {attr}`m.used_method <wakepy.Mode.used_method>`: The name of the used method. Will not be reset to `None` after deactivation.
-- {attr}`m.activation_result <wakepy.Mode.activation_result>`: An {class}`~wakepy.ActivationResult` instance which gives more detailed information about the activation process.
-
-(which-method-was-used))=
-## Which wakepy Method was used?
-```{versionadded} 0.8.0
+```{seealso}
+[Mode instances](#mode-instances) and the API reference for {class}`~wakepy.Mode`
 ```
 
-When you would like to check *how* exactly did wakepy do what you asked it to,
-you can check the used method from the {class}`Mode <wakepy.Mode>` instance.
 
-**Example**
+
+(mode-instances)=
+## Mode instances
+
+ When entering the context, a {class}`~wakepy.Mode` instance (`m`) is returned:
 
 ```{code-block} python
-from wakepy import keep
-
 with keep.running() as m:
-    print('active_method:', m.active_method)
-    print('used_method:', m.used_method)
-
-print('--------')
-print('active_method:', m.active_method)
-print('used_method:', m.used_method)
+    ...
 ```
 
-Example output:
+You can also get access to the Mode instance at any part of the call stack using the {func}`current_mode() <wakepy.current_mode>` function:
+
+
+```{code-block} python
+
+@keep.running
+def long_running_function():
+    otherfunc()
+
+def otherfunc():
+    # Get's access to the Mode instance (of the @keep.running mode)
+    m = current_mode()
 
 ```
-active_method: org.gnome.SessionManager
-used_method: org.gnome.SessionManager
---------
-active_method: None
-used_method: org.gnome.SessionManager
-```
 
-```{seealso}
-{attr}`Mode.active_method <wakepy.Mode.active_method>`,  {attr}`Mode.used_method <wakepy.Mode.used_method>`
-```
+The Mode has following important attributes:
+
+- {attr}`m.active <wakepy.Mode.active>`: `True`, if activating mode was successful, and mode is not yet deactivated. Will be set to `False` when deactivating the mode. Can be [faked in CI](./tests-and-ci.md#wakepy_fake_success).
+- {attr}`m.method <wakepy.Mode.method>`: Information about the used method. Unlike the `active_method`, will be available *also* after the deactivating the mode. (Type: {class}`~wakepy.MethodInfo`)
+- {attr}`m.active_method <wakepy.Mode.active_method>`: Information about the *active* method. Will be `None` after deactivating the mode. (Type: {class}`~wakepy.MethodInfo`)
+- {attr}`m.result <wakepy.Mode.result>`: An {class}`~wakepy.ActivationResult` instance which gives more detailed information about the activation process.
+
+# Possible Arguments
 
 (on-fail-action)=
 ## Controlling the on-fail action
@@ -232,3 +255,39 @@ with keep.running(methods_priority=[{"MethodA", "MethodB"}, "*", "MethodF"]):
 The `methods_priority` is still an experimental feature and may change or be removed without further notice.
 
 ```
+
+# Recipes
+
+## Using similar keepawake in multiple places
+
+In most of the cases, it is advisable to just have a single keepawake like [`keep.running()`](#keep-running-mode) or [`keep.presenting()`](#keep-presenting-mode) near the top level of your application. However, sometimes you might need to make multiple {class}`Mode <wakepy.Mode>` instances with similar keyword arguments. In that case, you can use a factory function like this:
+
+
+```{code-block} python
+from wakepy import keep, Mode
+
+def keepawake() -> Mode:
+    return keep.presenting(methods=["org.gnome.SessionManager"])
+
+```
+
+and use it like this:
+
+```python
+def somefunc():
+    with keepawake() as m:
+        ...
+
+def otherfunc():
+    with keepawake() as m:
+        ...
+
+@keepawake()
+def do_something_useful():
+    ...
+
+@keepawake()
+def do_something_else():
+    ...
+```
+

@@ -22,7 +22,7 @@ from textwrap import dedent, fill, wrap
 
 from wakepy import ModeExit
 from wakepy.core.constants import ModeName
-from wakepy.core.mode import Mode
+from wakepy.core.mode import Mode, create_mode_params
 from wakepy.core.platform import CURRENT_PLATFORM, get_platform_debug_info, is_windows
 
 if typing.TYPE_CHECKING:
@@ -86,11 +86,16 @@ def run_wakepy(sysargs: list[str]) -> Mode:
 
     mode_name = _get_mode_name(args)
     deprecations = _get_deprecations(args)
-    mode = Mode._from_name(mode_name, on_fail=handle_activation_error)
+
+    params = create_mode_params(
+        mode_name=mode_name,
+        on_fail=handle_activation_error,
+    )
+    keepawake = Mode(params)
 
     ascii_only = get_should_use_ascii_only()
 
-    with mode:
+    with keepawake as mode:
         if not mode.active:
             raise ModeExit
 

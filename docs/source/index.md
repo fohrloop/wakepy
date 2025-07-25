@@ -64,6 +64,7 @@ cli-api
 :titlesonly:
 
 wakepy-mode-lifecycle
+multithreading
 post-keepawake-behavior
 test-manually
 ```

@@ -210,7 +210,7 @@ class ActivationResult:
         >>> with keep.presenting() as m:
         >>>     # do stuff
         >>>
-        >>> print(m.activation_result.get_failure_text())
+        >>> print(m.result.get_failure_text())
         Could not activate wakepy Mode "keep.presenting"!
         <BLANKLINE>
         Tried Methods (in the order of attempt):

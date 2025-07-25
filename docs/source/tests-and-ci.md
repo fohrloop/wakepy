@@ -15,7 +15,7 @@ Only `0`, `no`, `N`, `false`, `F` and the empty string are considered as falsy v
 ```{admonition} Distinguishing real activation success from a faked one
 :class: tip
 
-If you need to check if the activation was real or a faked one, you can use the {attr}`Mode.activation_result <wakepy.Mode.activation_result>` which is an {class}`ActivationResult <wakepy.ActivationResult>` instance, and check the {attr}`ActivationResult.real_success <wakepy.ActivationResult.real_success>` attribute.
+If you need to check if the activation was real or a faked one, you can use the {attr}`Mode.result <wakepy.Mode.result>` which is an {class}`ActivationResult <wakepy.ActivationResult>` instance, and check the {attr}`ActivationResult.real_success <wakepy.ActivationResult.real_success>` attribute.
 ```
 
 ### pytest

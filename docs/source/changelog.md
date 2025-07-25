@@ -9,7 +9,7 @@
 - Add [Mode.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode.method), [ActivationResult.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.ActivationResult.method) and [MethodActivationResult.method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodActivationResult.method) attributes, which are instances of [MethodInfo](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodInfo) ([#459](https://github.com/fohrloop/wakepy/pull/459), [#460](https://github.com/fohrloop/wakepy/pull/460), [#464](https://github.com/fohrloop/wakepy/pull/464))
 - Make [Mode.active_method](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.Mode.active_method) a [MethodInfo](https://wakepy.readthedocs.io/stable/api-reference.html#wakepy.MethodInfo) instance (was a string) ([#459](https://github.com/fohrloop/wakepy/pull/459))
 
-### ✨ Minor Enhancements
+### 🌱 Minor Enhancements
 - Better error messages: When selected Method is not part of the selected Mode ([#427](https://github.com/fohrloop/wakepy/pull/427)) and when a D-Bus -based method fails ([#438](https://github.com/fohrloop/wakepy/pull/438))
 - Enhance Mode Activation Observability. Add logging (DEBUG and INFO level) for different parts in the Mode activation process. Show which methods are to be tried, and log any success and failure of activating a Mode. Improved the `ActivationResult.get_failure_text()` output. Added `NoMethodsWarning` which is issued if trying to activate a Mode with an empty list of methods. ([#411](https://github.com/fohrloop/wakepy/pull/411)) 
 - Add logging to every Method activation and deactivation step ([#469](https://github.com/fohrloop/wakepy/pull/469))
@@ -199,7 +199,7 @@
 - Created Readthedocs pages
 
 ### 👷 Maintenance
-* Added manual CI tests
+- Added manual CI tests
 - Start using tox
 - Enforce pass in isort, black, ruff and mypy in tests
 
