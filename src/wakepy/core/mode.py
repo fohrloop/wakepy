@@ -162,7 +162,7 @@ def get_selected_methods(
     methods_for_mode: MethodClsCollection,
     methods: Optional[StrCollection] = None,
     omit: Optional[StrCollection] = None,
-):
+) -> List[MethodCls]:
     try:
         selected_methods = select_methods(methods_for_mode, use_only=methods, omit=omit)
     except UnrecognizedMethodNames as e:
@@ -458,7 +458,7 @@ class Mode:
         self.on_fail = params.on_fail
         self.methods_priority = params.methods_priority
         self._thread_id = threading.get_ident()
-        self._context_token: Optional[Token] = None
+        self._context_token: Optional[Token[Mode]] = None
 
         self._has_entered_context: bool = False
         """This is used to track if the mode has been entered already. Set to
@@ -549,6 +549,10 @@ class Mode:
             _mode_lock.release()
 
     def _unset_current_mode(self) -> None:
+        if self._context_token is None:
+            raise RuntimeError(  # should never happen
+                "Cannot unset current mode, because it was never set! "
+            )
         _current_mode.reset(self._context_token)
         try:
             _mode_lock.acquire()

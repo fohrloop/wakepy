@@ -224,6 +224,16 @@ class TestModeActivateDeactivate:
         # in a real life situation.
         mode0._unset_current_mode()
 
+    def test_unset_before_activate(
+        self,
+        mode0: Mode,
+    ):
+        with pytest.raises(
+            RuntimeError,
+            match="Cannot unset current mode, because it was never set! ",
+        ):
+            mode0._unset_current_mode()
+
     def test_activate_twice_without_deactivation(
         self,
         mode0: Mode,
