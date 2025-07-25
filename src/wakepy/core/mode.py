@@ -116,12 +116,18 @@ class ModeExit(Exception):
 class ContextAlreadyEnteredError(RuntimeError):
     """Raised if the context of a :class:`Mode` is already entered. This is a
     subclass of `RuntimeError <https://docs.python.org/3/library/exceptions.html#RuntimeError>`_.
+
+    .. versionadded:: 1.0.0
     """
 
 
 class NoCurrentModeError(RuntimeError):
     """Raised when trying to get the current mode but none is active.
     This is a subclass of `RuntimeError <https://docs.python.org/3/library/exceptions.html#RuntimeError>`_.
+
+    .. versionadded:: 1.0.0
+
+    .. seealso:: :func:`current_mode() <wakepy.current_mode>`
     """
 
 
@@ -214,8 +220,13 @@ _all_modes: List[Mode] = []
 
 def current_mode() -> Mode:
     """Gets the current :class:`Mode` instance for the current thread and
-    context. If there are multiple Modes active in the call stack, raises
-    :class:`NoCurrentModeError`.
+    context.
+
+    Raises
+    ------
+    NoCurrentModeError
+        If there are no Modes active in the call stack, raises a
+        :class:`NoCurrentModeError`.
 
     Notes
     -----
@@ -271,7 +282,7 @@ def current_mode() -> Mode:
 
     .. seealso:: :func:`global_modes() <wakepy.global_modes>`,
       :func:`modecount()  <wakepy.modecount>`,
-      :ref:`multithreading-multiprocessing`§
+      :ref:`multithreading-multiprocessing`
     """
 
     try:
