@@ -59,6 +59,9 @@ Wakepy Core
 .. autoclass:: wakepy.ActivationWarning
     :exclude-members: args, with_traceback
 
+.. autoclass:: wakepy.NoCurrentModeError
+    :exclude-members: args, with_traceback
+
 .. autoclass:: wakepy.ModeExit
     :exclude-members: args, with_traceback
 

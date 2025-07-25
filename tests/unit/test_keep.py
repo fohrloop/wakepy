@@ -1,13 +1,29 @@
 """Separate tests for thread safety"""
 
+from __future__ import annotations
+
 import logging
 import threading
+import typing
 from itertools import count
 from threading import Lock
 
-from wakepy import Method, Mode, current_mode, global_modes, keep, modecount
+import pytest
+
+from wakepy import (
+    Method,
+    Mode,
+    NoCurrentModeError,
+    current_mode,
+    global_modes,
+    keep,
+    modecount,
+)
 from wakepy.core.constants import ModeName
 from wakepy.core.mode import _all_modes
+
+if typing.TYPE_CHECKING:
+    from typing import List
 
 lock = Lock()
 
@@ -17,8 +33,10 @@ WAIT_TIMEOUT = 2
 
 class MethodForTests(Method):
     counter = count()
-    used_cookies = []
+    used_cookies: List[int] = []
     """keeps track of any cookies used by the any instance of the Method"""
+
+    cookie: int | None
 
     def enter_mode(self):
         lock.acquire()
@@ -134,7 +152,7 @@ class TestGetCurrentMode:
         function."""
 
         # Setup
-        m_list = []
+        m_list: list[Mode] = []
 
         @keep.running(methods=["MethodA"])
         def long_running_function():
@@ -160,10 +178,12 @@ class TestGetCurrentMode:
         # Assert
         assert isinstance(m_list[0], Mode), "Expected a Mode instance."
         assert m_list[0].name == ModeName.KEEP_RUNNING
+        assert m_list[0].method
         assert m_list[0].method.name == "MethodA"
 
         assert len(m_list) == 3, "Expected three modes to be accessed."
         assert m_list[1].name == ModeName.KEEP_PRESENTING
+        assert m_list[1].method
         assert m_list[1].method.name == "MethodB"
 
         # The first and last modes are the same
@@ -175,7 +195,10 @@ class TestGetCurrentMode:
         m_list = []
 
         def sub_function():
-            m = current_mode()
+            try:
+                m = current_mode()
+            except NoCurrentModeError:
+                m = None
             m_list.append(m)
 
         def long_running_function():
@@ -193,11 +216,17 @@ class TestGetCurrentMode:
         # No Mode activated
         assert m_list[0] is None
 
+        assert m_list[1]
         assert m_list[1].name == ModeName.KEEP_PRESENTING
+        assert m_list[1].method
         assert m_list[1].method.name == "MethodB"
 
         # No Mode activated
         assert m_list[2] is None
+
+    def test_mode_access_when_no_modes_active(self):
+        with pytest.raises(NoCurrentModeError):
+            current_mode()
 
 
 def test_decorator_syntax_without_parenthesis():

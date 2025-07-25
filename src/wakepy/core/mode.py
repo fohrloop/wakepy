@@ -119,6 +119,12 @@ class ContextAlreadyEnteredError(RuntimeError):
     """
 
 
+class NoCurrentModeError(RuntimeError):
+    """Raised when trying to get the current mode but none is active.
+    This is a subclass of `RuntimeError <https://docs.python.org/3/library/exceptions.html#RuntimeError>`_.
+    """
+
+
 @dataclass(frozen=True)
 class _ModeParams:
     method_classes: list[Type[Method]] = field(default_factory=list)
@@ -206,10 +212,10 @@ _mode_lock = threading.Lock()
 _all_modes: List[Mode] = []
 
 
-def current_mode() -> Mode | None:
+def current_mode() -> Mode:
     """Gets the current :class:`Mode` instance for the current thread and
-    context. If there are multiple Modes active in the call stack, returns
-    the innermost Mode.
+    context. If there are multiple Modes active in the call stack, raises
+    :class:`NoCurrentModeError`.
 
     Notes
     -----
@@ -245,8 +251,7 @@ def current_mode() -> Mode | None:
         @keep.presenting
         def long_running_function():
             m = current_mode()
-            if m is not None:
-                print(f"Used method is: {m.method}")
+            print(f"Used method is: {m.method}")
 
     **Deeper in the call stack**: You can also use this function to get the
     current :class:`Mode` instance in a function which is lower in the call
@@ -260,20 +265,19 @@ def current_mode() -> Mode | None:
 
         def sub_function():
             m = current_mode()
-            if m is not None:
-                print(f"Used method is: {m.method}")
+            print(f"Used method is: {m.method}")
 
     .. versionadded:: 1.0.0
 
     .. seealso:: :func:`global_modes() <wakepy.global_modes>`,
       :func:`modecount()  <wakepy.modecount>`,
-      :ref:`multithreading-multiprocessing`
+      :ref:`multithreading-multiprocessing`§
     """
 
     try:
         return _current_mode.get()
     except LookupError:
-        return None
+        raise NoCurrentModeError("No wakepy Modes active!")
 
 
 def global_modes() -> List[Mode]:
