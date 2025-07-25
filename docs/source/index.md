@@ -24,12 +24,10 @@ To get the `wakepy` <a href="https://wakepy.readthedocs.io/stable/cli-api.html">
 ```
 
 
-
 ```{include} ../../README.md
 :start-after: <!-- wakepy decorator syntax note end -->
 :end-before: <!-- wakepy readme basic usage before tip -->
 ```
-
 
 
 ```{admonition} Next Steps

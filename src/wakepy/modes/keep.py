@@ -266,7 +266,8 @@ def _get_keepawake(
 ) -> Mode | Callable[P, R]:
 
     if func is not None and callable(func):
-        # Used as @keep.xxx
+        # Used as @keep.xxx; decorator without parameters
         return Mode(params)(func)
-    # Used as @keep.xxx(...)
+    # Used as @keep.xxx(...) or keep.xxx(); decorator with parameters
+    # or a context manager
     return Mode(params)
