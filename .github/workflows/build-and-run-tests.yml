@@ -51,7 +51,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         # All supported python versions on linux
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.8", "pypy3.10"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.8", "pypy3.11"]
         include:
           # Oldest supported python on Linux
           # The ubuntu-latest does not include python 3.7 anymore.
@@ -70,7 +70,7 @@ jobs:
           - python-version: "3.13"
             os: windows-latest
           # PyPy on Windows
-          - python-version: "pypy3.10"
+          - python-version: "pypy3.11"
             os: windows-latest
       fail-fast: false
 
