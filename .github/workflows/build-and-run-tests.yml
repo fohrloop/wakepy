@@ -13,7 +13,7 @@ name: Build and test wakepy
 env:
   TOX_REQUIREMENT: 'tox -c requirements/requirements-test.txt'
     # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
-  PYTHON_VERSION: '3.10'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   build-python-distributions:
