@@ -51,16 +51,12 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         # All supported python versions on linux
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3.8", "pypy3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.14t", "pypy3.8", "pypy3.11"]
         include:
           # Oldest supported python on Linux
           # The ubuntu-latest does not include python 3.7 anymore.
           - python-version: "3.7"
             os: ubuntu-22.04
-          # free-threaded python on Linux
-          - python-version: "3.14"
-            os: ubuntu-latest
-            architecture: x64-freethreaded
           # Oldest supported python on MacOS
           - python-version: "3.7"
             os: macos-13
@@ -68,9 +64,8 @@ jobs:
           - python-version: "3.14"
             os: macos-latest
           # Newest supported python on MacOS, free-threaded
-          - python-version: "3.14"
+          - python-version: "3.14t"
             os: macos-latest
-            architecture: arm64-freethreaded
           # Oldest supported python on Windows
           - python-version: "3.7"
             os: windows-latest
@@ -78,9 +73,8 @@ jobs:
           - python-version: "3.14"
             os: windows-latest
           # Newest supported python on Windows, free-threaded
-          - python-version: "3.14"
+          - python-version: "3.14t"
             os: windows-latest
-            architecture: x64-freethreaded
           # PyPy on Windows
           - python-version: "pypy3.11"
             os: windows-latest
@@ -98,7 +92,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
-          architecture: ${{ matrix.architecture }}
 
       - name: Run tox
         shell: bash
