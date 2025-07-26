@@ -13,7 +13,7 @@ name: Build and test wakepy
 env:
   TOX_REQUIREMENT: 'tox -c requirements/requirements-test.txt'
     # List of available versions: https://github.com/actions/python-versions/blob/main/versions-manifest.json
-  PYTHON_VERSION: '3.10'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   build-python-distributions:
@@ -27,7 +27,7 @@ jobs:
           git describe --tags
           git describe --tags $(git rev-list --tags --max-count=1)
       - name: Install python
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 #v5.6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: install tox
@@ -51,7 +51,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         # All supported python versions on linux
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.8", "pypy3.10"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.14t", "pypy3.8", "pypy3.11"]
         include:
           # Oldest supported python on Linux
           # The ubuntu-latest does not include python 3.7 anymore.
@@ -61,16 +61,22 @@ jobs:
           - python-version: "3.7"
             os: macos-13
           # Newest supported python on MacOS
-          - python-version: "3.13"
+          - python-version: "3.14"
+            os: macos-latest
+          # Newest supported python on MacOS, free-threaded
+          - python-version: "3.14t"
             os: macos-latest
           # Oldest supported python on Windows
           - python-version: "3.7"
             os: windows-latest
           # Newest supported python on Windows
-          - python-version: "3.13"
+          - python-version: "3.14"
+            os: windows-latest
+          # Newest supported python on Windows, free-threaded
+          - python-version: "3.14t"
             os: windows-latest
           # PyPy on Windows
-          - python-version: "pypy3.10"
+          - python-version: "pypy3.11"
             os: windows-latest
       fail-fast: false
 
@@ -82,11 +88,14 @@ jobs:
           path: ./dist/
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 #v5.6
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
-
+      - run: |
+          python --version --version
+          python -c "import sys; is_enabled = sys._is_gil_enabled() if hasattr(sys, '_is_gil_enabled') else '?'; print('sys._is_gil_enabled:', is_enabled)"
+          python -c "import sysconfig; print('Py_GIL_DISABLED:', sysconfig.get_config_var('Py_GIL_DISABLED'))"
       - name: Run tox
         shell: bash
         run: |
@@ -115,7 +124,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install python
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 #v5.6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: install tox
@@ -132,7 +141,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install python
-        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d #v5.1
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 #v5.6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: install tox

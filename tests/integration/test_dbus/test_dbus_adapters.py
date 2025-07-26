@@ -172,7 +172,7 @@ class TestFailuresOnConnectionCreation:
         self,
     ):
         # The open_dbus_connection may sometimes raise KeyError when
-        # DBUS_SESSION_BUS_ADDRESS env var is not set. This test that case.
+        # DBUS_SESSION_BUS_ADDRESS env var is not set. This tests that case.
 
         with patch(
             "wakepy.dbus_adapters.jeepney.open_dbus_connection",

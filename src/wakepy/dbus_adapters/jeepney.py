@@ -18,7 +18,8 @@ if typing.TYPE_CHECKING:
     TypeOfBus = Optional[Union[BusType, str]]
 
 
-class DBusNotFoundError(RuntimeError): ...
+class DBusNotFoundError(RuntimeError):
+    """Exception raised when the DBus session bus is not found."""
 
 
 class JeepneyDBusAdapter(DBusAdapter):
