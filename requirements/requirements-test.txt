@@ -1,8 +1,10 @@
 # requirements for running unit tests
 
+tox==4.28.3; python_version>='3.9'
+# Python 3.8 support dropped in tox 4.26.0
+tox==4.25.0; python_version=='3.8'
 # Python 3.7 support dropped in tox 4.9.0
-tox==4.28.3; python_version>='3.8'
-tox==4.8.0; python_version<'3.8'
+tox==4.8.0; python_version=='3.7'
 
 # Python 3.7 support dropped in pytest 8.0.0
 pytest==8.3.3; python_version>='3.8'
