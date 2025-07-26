@@ -94,7 +94,7 @@ jobs:
           allow-prereleases: true
       - run: |
           python --version --version
-          python -c "import sys; print('sys._is_gil_enabled:', sys._is_gil_enabled())"
+          python -c "import sys; is_enabled = sys._is_gil_enabled() if hasattr(sys, '_is_gil_enabled') else '?'; print('sys._is_gil_enabled:', is_enabled)"
           python -c "import sysconfig; print('Py_GIL_DISABLED:', sysconfig.get_config_var('Py_GIL_DISABLED'))"
       - name: Run tox
         shell: bash
